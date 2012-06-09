@@ -1,0 +1,135 @@
+<?php
+echo $OUTPUT->heading(get_string('reports', 'tracker'), 1);
+echo $OUTPUT->heading(get_string('status', 'tracker'), 2);
+$STATUSKEYS = array(POSTED => get_string('posted', 'tracker'), 
+                    OPEN => get_string('open', 'tracker'), 
+                    RESOLVING => get_string('resolving', 'tracker'), 
+                    WAITING => get_string('waiting', 'tracker'), 
+                    TESTING => get_string('testing', 'tracker'), 
+                    PUBLISHED => get_string('published', 'tracker'), 
+                    RESOLVED => get_string('resolved', 'tracker'), 
+                    ABANDONNED => get_string('abandonned', 'tracker'),
+                    TRANSFERED => get_string('transfered', 'tracker'));
+$STATUSCODES = array(POSTED => 'posted', 
+                    OPEN => 'open', 
+                    RESOLVING => 'resolving', 
+                    WAITING => 'waiting', 
+                    TESTING => 'testing', 
+                    PUBLISHED => 'published', 
+                    RESOLVED => 'resolved', 
+                    ABANDONNED => 'abandonned',
+                    TRANSFERED => 'transfered');
+$tickets = tracker_get_stats($tracker);
+$statsbyassignee = tracker_get_stats_by_user($tracker, 'assignedto');
+$statsbyreporter = tracker_get_stats_by_user($tracker, 'reportedby');
+$alltickets = $DB->count_records('tracker_issue', array('trackerid' => $tracker->id));
+?>
+<table width="100%" cellpadding="20">
+	<tr valign="top">
+		<td width="33%">
+			<?php echo $OUTPUT->heading(get_string('countbystate', 'tracker', $alltickets), 3) ?>
+		<table width="80%">
+		<tr>
+			<td width="40%" align="left"><?php print_string('status', 'tracker') ?></td>
+			<td width="30%" align="right"><?php print_string('count', 'tracker') ?></td>
+			<td width="30%" align="right"></td>
+		</tr>
+		<tr>
+			<td width="40%" align="left" class="status_posted"><?php echo $STATUSKEYS[POSTED] ?></td>
+			<td width="30%" align="right"><?php echo 0 + @$tickets[POSTED] ?></td>
+			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[POSTED])/$alltickets) * 100) .' %' : '0 %' ; ?></td>
+		</tr>
+		<tr>
+			<td width="40%" align="left" class="status_open"><?php echo $STATUSKEYS[OPEN] ?></td>
+			<td width="30%" align="right"><?php echo 0 + @$tickets[OPEN] ?></td>
+			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[OPEN])/$alltickets) * 100).' %' : '0 %' ; ?></td>
+		</tr>
+		<tr>
+			<td width="40%" align="left" class="status_resolving"><?php echo $STATUSKEYS[RESOLVING] ?></td>
+			<td width="30%" align="right"><?php echo 0 + @$tickets[RESOLVING] ?></td>
+			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[RESOLVING])/$alltickets) * 100).' %': '0 %'; ?></td>
+		</tr>
+		<tr>
+			<td width="40%" align="left" class="status_waiting"><?php echo $STATUSKEYS[WAITING] ?></td>
+			<td width="30%" align="right"><?php echo 0 + @$tickets[WAITING] ?></td>
+			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[WAITING])/$alltickets) * 100).' %': '0 %'; ?></td>
+		</tr>
+		<tr>
+			<td width="40%" align="left" class="status_testing"><?php echo $STATUSKEYS[TESTING] ?></td>
+			<td width="30%" align="right"><?php echo 0 + @$tickets[TESTING] ?></td>
+			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[TESTING])/$alltickets) * 100).' %' : '0 %'; ?></td>
+		</tr>
+		</table>
+		<table width="80%">
+		<tr>
+			<td width="40%" align="left" class="status_resolved"><?php echo $STATUSKEYS[RESOLVED] ?></td>
+			<td width="30%" align="right"><?php echo 0 + @$tickets[RESOLVED] ?></td>
+			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[RESOLVED])/$alltickets) * 100).' %': '0 % '; ?></td>
+		</tr>
+		<tr>
+			<td width="40%" align="left" class="status_abandonned"><?php echo $STATUSKEYS[ABANDONNED] ?></td>
+			<td width="30%" align="right"><?php echo 0 + @$tickets[ABANDONNED] ?></td>
+			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[ABANDONNED])/$alltickets) * 100).' %': '0 % '; ?></td>
+		</tr>
+		<tr>
+			<td width="40%" align="left" class="status_transfered"><?php echo $STATUSKEYS[TRANSFERED] ?></td>
+			<td width="30%" align="right"><?php echo 0 + @$tickets[TRANSFERED] ?></td>
+			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[TRANSFERED])/$alltickets) * 100).' %' : '0 % '; ?></td>
+		</tr>
+		</table>
+		</td>
+		<td width="33%">
+			<?php echo $OUTPUT->heading(get_string('countbyassignee', 'tracker', $alltickets), 3) ?>
+			<?php 
+				if (empty($statsbyassignee)){
+					print_string('noticketsorassignation', 'tracker');
+				} else {
+					echo '<table width="95%" class="generaltable">';
+					$line = 0;
+					foreach($statsbyassignee as $r){
+						if (empty($r->name)){
+							$r->name = get_string('unassigned', 'tracker');
+						}
+						echo "<tr class=\"r{$line}\">";
+						echo "<td width=\"50%\" align=\"left\">{$r->name}</td>";
+						echo "<td width=\"10%\" align=\"right\" style=\"font-weight:bolder;font-size:1.3em\">{$r->sum}</td>";
+						echo '<td width="40%">';
+						foreach($r->status as $statkey => $subresult){
+							$statcode = $STATUSCODES[$statkey];
+							echo "<span class=\"status_$statcode\">$subresult</span> "; 
+						}
+						echo '</td>';
+						echo "</tr>";
+						$line = ($line + 1) % 2;
+					}
+					echo '</table>';
+				}
+			?>
+		</td>
+		<td width="33%">
+			<?php echo $OUTPUT->heading(get_string('countbyreporter', 'tracker', $alltickets), 3) ?>
+			<?php 
+				if (empty($statsbyreporter)){
+					print_string('notickets', 'tracker');
+				} else {
+					echo '<table width="95%" class="generaltable">';
+					$line = 0;
+					foreach($statsbyreporter as $r){
+						echo "<tr class=\"r{$line}\">";
+						echo "<td width=\"50%\" align=\"left\">{$r->name}</td>";
+						echo "<td width=\"10%\" align=\"right\" style=\"font-weight:bolder;font-size:1.3em\">{$r->sum}</td>";
+						echo '<td width="40%">';
+						foreach($r->status as $statkey => $subresult){
+							$statcode = $STATUSCODES[$statkey];
+							echo "<span class=\"status_$statcode\">$subresult</span> "; 
+						}
+						echo '</td>';
+						echo "</tr>";
+						$line = ($line + 1) % 2;
+					}
+					echo '</table>';
+				}
+			?>
+		</td>
+	</tr>
+</table>

@@ -1,0 +1,32 @@
+<?php
+
+if ($issues = $DB->get_records_select('tracker_issue', " trackerid = ? AND status != ".RESOLVED." AND status != ".ABANDONNED." ", array($tracker->id), 'status,datereported')){
+
+	$prevstate = '';
+	foreach($issues as $issue){
+		if ($prevstate != $issue->status){
+			echo "<table width=\"100%\" class=\"tracker-printtable\">";
+			echo '<tr>';
+				echo "<td class=\"status_".$STATUSCODES[$issue->status]."\" colspan=\"2\">".$STATUSKEYS[$issue->status]."</td>";
+			echo '</tr>';
+			echo '</table>';
+		}
+		$assigneduser = $DB->get_record('user', array('id' => $issue->assignedto));
+		$assigned = ($assigneduser) ? fullname($assigneduser) : get_string('unassigned', 'tracker');
+		echo "<table width=\"100%\" class=\"tracker-printtable\">";
+		echo '<tr>';
+		echo "<td class=\"tracker-printtable ticketid\" width=\"20%\" align=\"left\">{$tracker->ticketprefix}{$issue->id}</td><td class=\"tracker-printtable title\" align=\"left\">{$issue->summary}</td>";
+		echo '</tr>';
+		echo '<tr>';
+		echo "<td class=\"tracker-printtable summary\" colspan=\"2\">$issue->description</td>";
+		echo '</tr>';
+		echo '<tr>';
+		echo "<td class=\"tracker-printtable assignee\">".$assigned."</td><td class=\"tracker-printtable created\">".userdate($issue->datereported)."</td>";
+		echo '</tr>';
+		echo '</table>';
+		$prevstate = $issue->status;
+	}
+
+}
+
+?>

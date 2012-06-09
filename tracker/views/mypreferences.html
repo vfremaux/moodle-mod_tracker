@@ -1,0 +1,85 @@
+<?php
+
+/**
+* @package mod-tracker
+* @category mod
+* @author Clifford Tham, Valery Fremaux > 1.8
+* @date 02/12/2007
+*
+* Prints a form for user preferences
+*/
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
+}
+
+echo "<br/>";
+echo $OUTPUT->heading(get_string('mypreferences', 'tracker'));
+$OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'bugreport');
+
+tracker_loadpreferences($tracker->id, $USER->id);
+?>
+<center>
+<?php print_string('prefsnote', 'tracker') ?>
+<form name="preferencesform" method="post" action="view.php">
+<input type="hidden" name="id" value="<?php p($cm->id) ?>" />
+<input type="hidden" name="what" value="saveprefs" />
+<table border="1">
+	<tr>
+	    <td valign="top" align="right"><b><?php print_string('unsetwhenopens', 'tracker') ?></b></td>
+		<td colspan="3" align="left">
+		    <?php echo html_writer::select_yes_no('open', @$USER->trackerprefs->eventmask & EVENT_OPEN); ?>
+		</td>
+	</tr>
+	<tr>
+	    <td valign="top" align="right"><b><?php print_string('unsetwhenworks', 'tracker') ?></b></td>
+		<td colspan="3" align="left">
+		    <?php echo html_writer::select_yes_no('resolving', @$USER->trackerprefs->eventmask & EVENT_RESOLVING); ?>
+		</td>
+	</tr>
+	<tr>
+	    <td valign="top" align="right"><b><?php print_string('unsetwhenwaits', 'tracker') ?></b></td>
+		<td colspan="3" align="left">
+		    <?php echo html_writer::select_yes_no('waiting', @$USER->trackerprefs->eventmask & EVENT_WAITING); ?>
+		</td>
+	</tr>
+	<tr>
+	    <td valign="top" align="right"><b><?php print_string('unsetwhentesting', 'tracker') ?></b></td>
+		<td colspan="3" align="left">
+		    <?php echo html_writer::select_yes_no('testing', @$USER->trackerprefs->eventmask & EVENT_TESTING); ?>
+		</td>
+	</tr>
+	<tr>
+	    <td valign="top" align="right"><b><?php print_string('unsetwhenpublished', 'tracker') ?></b></td>
+		<td colspan="3" align="left">
+		    <?php echo html_writer::select_yes_no('published', @$USER->trackerprefs->eventmask & EVENT_PUBLISHED); ?>
+		</td>
+	</tr>
+	<tr>
+	    <td valign="top" align="right"><b><?php print_string('unsetwhenresolves', 'tracker') ?></b></td>
+		<td colspan="3" align="left">
+		    <?php echo html_writer::select_yes_no('resolved', @$USER->trackerprefs->eventmask & EVENT_RESOLVED); ?>
+		</td>
+	</tr>
+	<tr>
+	    <td valign="top" align="right"><b><?php print_string('unsetwhenthrown', 'tracker') ?></b></td>
+		<td colspan="3" align="left">
+		    <?php echo html_writer::select_yes_no('abandonned', @$USER->trackerprefs->eventmask & EVENT_ABANDONNED); ?>
+		</td>
+	</tr>
+	<tr>
+	    <td valign="top" align="right"><b><?php print_string('unsetoncomment', 'tracker') ?></b></td>
+		<td colspan="3" align="left">
+		    <?php echo html_writer::select_yes_no('oncomment', @$USER->trackerprefs->eventmask & ON_COMMENT); ?>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="4" align="center">
+		    <input type="submit" name="go_btn" value="<?php print_string('savechanges') ?>" />
+		</td>
+	</tr>
+</table>
+</form>
+</center>
+<?php
+$OUTPUT->box_end();
+?>

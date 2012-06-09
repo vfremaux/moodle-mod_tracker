@@ -1,0 +1,66 @@
+<?php
+
+/**
+* @package tracker
+* @author Clifford Tham
+* @review Valery Fremaux / 1.8
+* @date 02/12/2007
+*
+* Form for editing an elements
+*/
+
+echo $OUTPUT->heading(get_string("{$form->action}{$form->type}", 'tracker'));
+?>
+<center>
+<form name="editelementform" method="post" action="view.php">
+<input type="hidden" name="id" value="<?php p($cm->id) ?>" />
+<input type="hidden" name="what" value="<?php p($form->action) ?>" />
+<input type="hidden" name="type" value="<?php p($form->type) ?>" />
+<?php
+if ($action == 'editelement'){
+	echo "<input type=\"hidden\" name=\"elementid\" value=\"{$form->elementid}\" />";
+}
+if (!has_capability('mod/tracker:shareelements', $context)){
+	echo "<input type=\"hidden\" name=\"shared\" value=\"0\" />";
+}
+?>
+<table border="1" width="90%">
+	<tr>
+		<td valign="top" align="right"><b><?php print_string('name') ?>:</b></td>		
+		<td align="left">
+            <input type="text" name="name" value="<?php echo @$form->name ?>" size="32" maxlength="32" />
+            <?php $OUTPUT->help_icon('elements', 'tracker'); ?>			
+		</td>
+	</tr>
+	<tr>
+		<td valign="top" align="right"><b><?php print_string('description') ?>:</b></td>
+		<td colspan="3" align="left">
+            <input type="text" name="description" value="<?php echo htmlspecialchars(stripslashes(@$form->description)) ?>" size="80" maxlength="255" />			
+            <?php $OUTPUT->help_icon('elements', 'tracker'); ?>			
+		</td>
+	</tr>
+<?php
+if (has_capability('mod/tracker:shareelements', $context)){
+?>
+	<tr>
+		<td valign="top" align="right">
+			<b><?php print_string('sharing', 'tracker') ?>:</b>
+		</td>
+		<td align="left">
+		    <input type="checkbox" name="shared" value="1" <?php echo (@$form->shared) ? 'checked="checked"' : '' ; ?> /> <?php print_string('sharethiselement', 'tracker') ?>
+		</td>
+
+	</tr>
+<?php
+}
+?>
+	<tr>
+		<td colspan="2" align="center">
+    		<input type="submit" name="go_btn" value="<?php print_string('submit') ?>" />&nbsp;
+			<input type="button" name="cancel_btn" value="<?php print_string('cancel') ?>" onclick="document.forms['editelementform'].what.value = '';document.forms['editelementform'].submit();" /><br/>
+			<br/>
+		</td>
+	</tr>
+</table>
+</form>
+</center>
