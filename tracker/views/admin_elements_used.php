@@ -13,54 +13,53 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
 }
 
-$OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'description');
-$OUTPUT->box_end(); 
-$OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'description');
+print_simple_box_start('center', '100%', '', '', 'generalbox', 'description');
+print_simple_box_end(); 
+print_simple_box_start('center', '100%', '', '', 'generalbox', 'description');
 tracker_loadelementsused($tracker, $used);
 
-echo $OUTPUT->heading(get_string('elementsused', 'tracker'));
+print_heading(get_string('elementsused', 'tracker'));
 
 $orderstr = get_string('order', 'tracker');
 $namestr = get_string('name');
 $typestr = get_string('type', 'tracker');
 $cmdstr = get_string('action', 'tracker');
 
-$table = new html_table();
 $table->head = array("<b>$orderstr</b>", "<b>$namestr</b>", "<b>$typestr</b>", "<b>$cmdstr</b>");
-$table->width = '100%';
+$table->width = 400;
 $table->size = array(20, 250, 50, 100);
 $table->align = array('left', 'center', 'center', 'center'); 
 
 if (!empty($used)){
 	foreach ($used as $element){
-	    $icontype = "<img src=\"".$OUTPUT->pix_url("/types/{$element->type}", 'mod_tracker')."\" />";
+	    $icontype = "<img src=\"{$CFG->wwwroot}/mod/tracker/pix/types/{$element->type}.gif\" />";
 	    if ($element->sortorder > 1){
-    	    $actions = "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=raiseelement&amp;elementid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/up', 'core')."\" /></a>";
+    	    $actions = "<a href=\"view.php?id={$cm->id}&amp;what=raiseelement&amp;elementid={$element->id}\"><img src=\"{$CFG->pixpath}/t/up.gif\" /></a>";
     	} else {
-    	    $actions = "<img src=\"".$OUTPUT->pix_url('up_shadow', 'mod_tracker')."\" />";
+    	    $actions = "<img src=\"{$CFG->wwwroot}/mod/tracker/pix/up_shadow.gif\" />";
     	}
     	if ($element->sortorder < count($used)){
-    	    $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=lowerelement&amp;elementid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/down', 'core')."\" /></a>";
+    	    $actions .= "<a href=\"view.php?id={$cm->id}&amp;what=lowerelement&amp;elementid={$element->id}\"><img src=\"{$CFG->pixpath}/t/down.gif\" /></a>";
     	} else {
-    	    $actions .= "<img src=\"".$OUTPUT->pix_url('down_shadow', 'mod_tracker')."\" />";
+    	    $actions .= "<img src=\"{$CFG->wwwroot}/mod/tracker/pix/down_shadow.gif\" />";
     	}
-	    $actions .= "<a href=\"view.php?id={$cm->id}&amp;what=editelement&amp;elementid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/edit', 'core')."\" /></a>";
-	    $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=viewelementoptions&amp;elementid={$element->id}\" title=\"".get_string('editoptions', 'mod_tracker')."\"><img src=\"".$OUTPUT->pix_url('editoptions', 'mod_tracker')."\" /></a>";
-	    $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=removeelement&amp;usedid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/moveright', 'core')."\" /></a>";
+	    $actions .= "<a href=\"view.php?id={$cm->id}&amp;what=editelement&amp;elementid={$element->id}\"><img src=\"{$CFG->pixpath}/t/edit.gif\" /></a>";
+	    $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=viewelementoptions&amp;elementid={$element->id}\" title=\"".get_string('editoptions', 'tracker')."\"><img src=\"{$CFG->wwwroot}/mod/tracker/pix/editoptions.gif\" /></a>";
+	    $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=removeelement&amp;usedid={$element->id}\"><img src=\"{$CFG->pixpath}/t/removeright.gif\" /></a>";
 	    if ($element->active){
-		    $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=setinactive&amp;usedid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/hide', 'core')."\" /></a>";
+		    $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=setinactive&amp;usedid={$element->id}\"><img src=\"{$CFG->pixpath}/t/hide.gif\" /></a>";
 	    } else {
-		    $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=setactive&amp;usedid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/show', 'core')."\" /></a>";
+		    $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=setactive&amp;usedid={$element->id}\"><img src=\"{$CFG->pixpath}/t/show.gif\" /></a>";
 	    }
         $table->data[] = array($element->sortorder, format_string($element->description), $icontype, $actions);
     }
-    echo html_writer::table($table);
+    print_table($table);
 } else {
     echo '<center>';
     print_string('noelements', 'tracker');
     echo '<br/></center>';
 }
 
-$OUTPUT->box_end(); 
+print_simple_box_end(); 
 
 ?>

@@ -14,10 +14,10 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 echo "<br/>";
-echo $OUTPUT->heading(get_string('me', 'tracker')); 
+print_heading(get_string('me', 'tracker')); 
 ?>
 <center>
-<?php $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'bugreport'); ?>
+<?php print_simple_box_start('center', '80%', '', '', 'generalbox', 'bugreport'); ?>
 <table border="1" cellpadding="3" width="800">
 	<tr>
 		<td align="right" valign="top"><b><?php print_string('name') ?>:</b></td>
@@ -43,7 +43,7 @@ echo $OUTPUT->heading(get_string('me', 'tracker'));
 if ($manager){
 ?>
     <tr>
-        <td colspan="2"><?php echo $OUTPUT->heading(get_string('manager', 'tracker')); ?></td>
+        <td colspan="2"><?php print_heading(get_string('manager', 'tracker')); ?></td>
     </tr>
     <tr>
         <td align="right" valign="top"><b><?php print_string('myassignees', 'tracker') ?>:</b></td>
@@ -67,7 +67,7 @@ if ($manager){
 if ($resolver){
 ?>
     <tr>
-        <td colspan="2"><?php echo $OUTPUT->heading(get_string('resolver', 'tracker')); ?></td>
+        <td colspan="2"><?php print_heading(get_string('resolver', 'tracker')); ?></td>
     </tr>
     <tr>
         <td align="right" valign="top"><b><?php print_string('myissues', 'tracker') ?>:</b></td>
@@ -92,7 +92,7 @@ if ($resolver){
 ?>
 </table>
 <?php 
-$OUTPUT->box_end(); 
+print_simple_box_end(); 
 $nohtmleditorneeded = true;
 ?>
 

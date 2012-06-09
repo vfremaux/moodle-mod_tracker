@@ -19,11 +19,12 @@ class fileelement extends trackerelement{
 
 	function view($editable, $issueid=0){
 	    global $CFG, $COURSE;
+	    
         $this->getvalue($issueid);
 	    if ($editable){
 	        upload_print_form_fragment(1, array('element'.$this->name));
 	        if (!empty($this->value)){
-        	    $issue = $DB->get_record('tracker_issue', array('id' => "$issueid"));
+        	    $issue = get_record('tracker_issue', 'id', "$issueid");
         	    $unstampedvalue = preg_replace("/[^_]+_/", '', $this->value); // strip off the md5 stamp
 
                 if ($CFG->slasharguments){
@@ -31,6 +32,7 @@ class fileelement extends trackerelement{
         		} else {
         		    $filepath = "{$CFG->wwwroot}/file.php?file=/{$COURSE->id}/moddata/tracker/{$issue->trackerid}/{$issue->id}/{$this->value}";
         		}
+        	    
         	    if (preg_match("/\.(jpg|gif|png|jpeg)$/i", $unstampedvalue)){
         		    echo "<img src=\"{$filepath}\" class=\"tracker_image_attachment\" />";
         	    } else {
@@ -40,7 +42,7 @@ class fileelement extends trackerelement{
     	        print_string('deleteattachedfile', 'tracker');
     	    }
 		} else {
-    	    $issue = $DB->get_record('tracker_issue', array('id' => "$issueid"));
+    	    $issue = get_record('tracker_issue', 'id', "$issueid");
     	    if ($issue){
     		    if (!empty($this->value)){
         	        $unstampedvalue = preg_replace("/[^_]+_/", '', $this->value); // strip off the md5 stamp

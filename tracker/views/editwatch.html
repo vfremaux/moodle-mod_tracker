@@ -13,16 +13,20 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
 }
 
-echo $OUTPUT->heading(get_string('editwatch', 'tracker'));
-$OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'bugreport');
+print_heading(get_string('editwatch', 'tracker'));
+print_simple_box_start('center', '100%', '', '', 'generalbox', 'bugreport');
 $open = ($form->events & EVENT_OPEN) ? 'checked="checked"' : '' ;
 $resolving = ($form->events & EVENT_RESOLVING) ? 'checked="checked"' : '' ;
 $waiting = ($form->events & EVENT_WAITING) ? 'checked="checked"' : '' ;
+$published = ($form->events & EVENT_PUBLISHED) ? 'checked="checked"' : '' ;
+$validated = ($form->events & EVENT_VALIDATED) ? 'checked="checked"' : '' ;
 $resolved = ($form->events & EVENT_RESOLVED) ? 'checked="checked"' : '' ;
 $abandonned = ($form->events & EVENT_ABANDONNED) ? 'checked="checked"' : '' ;
 $notopen = ($form->events & EVENT_OPEN) ? '' : 'checked="checked"' ;
 $notresolving = ($form->events & EVENT_RESOLVING) ? '' : 'checked="checked"';
 $notwaiting = ($form->events & EVENT_WAITING) ? '' : 'checked="checked"';
+$notpublished = ($form->events & EVENT_PUBLISHED) ? '' : 'checked="checked"';
+$notvalidated = ($form->events & EVENT_VALIDATED) ? '' : 'checked="checked"';
 $notresolved = ($form->events & EVENT_RESOLVED) ? '' : 'checked="checked"';
 $notabandonned = ($form->events & EVENT_ABANDONNED) ? '' : 'checked="checked"';
 ?>
@@ -65,6 +69,20 @@ $notabandonned = ($form->events & EVENT_ABANDONNED) ? '' : 'checked="checked"';
 		</td>
 	</tr>
 	<tr>
+	    <td valign="top" align="right"><b><?php print_string('setwhenpublished', 'tracker') ?>:</b></td>
+		<td colspan="3" align="left">
+		    <input type="radio" name="published" value="1" <?php echo $published ?> /> <?php print_string('yes') ?> -
+		    <input type="radio" name="published" value="0" <?php echo $notpublished ?> /> <?php print_string('no') ?>
+		</td>
+	</tr>
+	<tr>
+	    <td valign="top" align="right"><b><?php print_string('setwhenvalidated', 'tracker') ?>:</b></td>
+		<td colspan="3" align="left">
+		    <input type="radio" name="validated" value="1" <?php echo $validated ?> /> <?php print_string('yes') ?> -
+		    <input type="radio" name="validated" value="0" <?php echo $notvalidated ?> /> <?php print_string('no') ?>
+		</td>
+	</tr>
+	<tr>
 	    <td valign="top" align="right"><b><?php print_string('setwhenresolves', 'tracker') ?>:</b></td>
 		<td colspan="3" align="left">
 		    <input type="radio" name="resolved" value="1" <?php echo $resolved ?> /> <?php print_string('yes') ?> -
@@ -87,7 +105,7 @@ $notabandonned = ($form->events & EVENT_ABANDONNED) ? '' : 'checked="checked"';
 </table>
 </form>
 <?php
-$OUTPUT->box_end();
+print_simple_box_end();
 $nohtmleditorneeded = true;
 ?>
 </center>

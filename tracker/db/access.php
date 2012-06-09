@@ -31,7 +31,7 @@
 // For the core capabilities, the variable is $moodle_capabilities.
 
 
-$capabilities = array(
+$mod_tracker_capabilities = array(
 
     'mod/tracker:seeissues' => array(
         'captype' => 'read',
@@ -40,7 +40,7 @@ $capabilities = array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'admin' => CAP_ALLOW
         )
     ),
 
@@ -48,7 +48,7 @@ $capabilities = array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
         'legacy' => array(
-            'manager' => CAP_ALLOW
+            'admin' => CAP_ALLOW
         )
     ),
 
@@ -57,7 +57,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_MODULE,
         'legacy' => array(
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'admin' => CAP_ALLOW
         )
     ),
 
@@ -66,7 +66,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_MODULE,
         'legacy' => array(
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'admin' => CAP_ALLOW
         )
     ),
 
@@ -77,7 +77,7 @@ $capabilities = array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'admin' => CAP_ALLOW
         )
     ),
 
@@ -86,7 +86,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_MODULE,
         'legacy' => array(
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'admin' => CAP_ALLOW
         )
     ),
     
@@ -96,7 +96,7 @@ $capabilities = array(
         'legacy' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'admin' => CAP_ALLOW
         )
     ),
 
@@ -106,7 +106,7 @@ $capabilities = array(
         'legacy' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'admin' => CAP_ALLOW
         )
     ),
 
@@ -117,7 +117,7 @@ $capabilities = array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'admin' => CAP_ALLOW
         )
     ),
 
@@ -128,7 +128,7 @@ $capabilities = array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'admin' => CAP_ALLOW
         )
     ),
 
@@ -139,7 +139,7 @@ $capabilities = array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'admin' => CAP_ALLOW
         )
     ),
     
@@ -147,7 +147,7 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'legacy' => array(
-            'manager' => CAP_ALLOW,
+            'admin' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
         )
     ),
@@ -156,7 +156,7 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'legacy' => array(
-            'manager' => CAP_ALLOW,
+            'admin' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
         )
     ),
@@ -165,7 +165,7 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'legacy' => array(
-            'manager' => CAP_ALLOW,
+            'admin' => CAP_ALLOW,
         )
     ),
 
@@ -173,7 +173,7 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'legacy' => array(
-            'manager' => CAP_ALLOW,
+            'admin' => CAP_ALLOW,
         )
     ),
 

@@ -5,7 +5,6 @@
 * @category mod
 * @author Valery Fremaux > 1.8
 * @date 02/12/2007
-* @version 2.x
 *
 * Allows adding a parent tracker in any xmlrpc accessible or local Moodle
 * where an issue may be forwarded.
@@ -18,16 +17,16 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
 }
 
-include_once $CFG->dirroot.'/mnet/xmlrpc/client.php';
-include_once $CFG->dirroot.'/mod/tracker/rpclib.php';
-include_once $CFG->dirroot.'/mod/tracker/utils/AJAX/JSON.php';
+include_once $CFG->dirroot."/mnet/xmlrpc/client.php";
+include_once $CFG->dirroot."/mod/tracker/rpclib.php";
+include_once $CFG->libdir."/pear/HTML/AJAX/JSON.php";
 
 echo "<br/>";
-$OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'bugreport'); 
+print_simple_box_start('center', '100%', '', '', 'generalbox', 'bugreport'); 
 
 /// gets current parent information
 
-echo $OUTPUT->heading(get_string('currentbinding', 'tracker'));
+print_heading(get_string('currentbinding', 'tracker'));
 
 $localid = 0;
 $remoteid = 0;
@@ -38,7 +37,7 @@ if (!empty($tracker->parent)){
         $parent = tracker_rpc_get_infos($tracker->parent, true);
 
         $localid = $tracker->parent;
-        $parent_mnet = $DB->get_record('mnet_host', array('wwwroot' => $CFG->wwwroot));
+        $parent_mnet = get_record('mnet_host', 'wwwroot', $CFG->wwwroot);
 
     } else { // tracker is remote
 
@@ -48,13 +47,18 @@ if (!empty($tracker->parent)){
         $rpcclient = new mnet_xmlrpc_client();
         $rpcclient->set_method('mod/tracker/rpclib.php/tracker_rpc_get_infos');
         $rpcclient->add_param($remoteid, 'int');
+        
         $parent_mnet = new mnet_peer();
         $parent_mnet->set_wwwroot($mnet_host);
+        
         if (!empty($parent_mnet->wwwroot)){
+                
             if (!$rpcclient->send($parent_mnet)){
                 error(implode("<br/>", $rpcclient->error));
             }
+    
             $parent = json_decode($rpcclient->response);
+            
             // fix a bug in XML-RPC transfer of arrays
             $parent->elements = get_object_vars($parent->elements);
         } else {
@@ -93,10 +97,10 @@ if (!empty($tracker->parent)){
 			if (!empty($parent->elements)){
 			    $child = tracker_rpc_get_infos($tracker->id, true);
 			    if (!tracker_display_elementmatch($child, $parent)){
-			       echo $OUTPUT->notification(get_string('unmatchingelements', 'tracker'));
+			       notify(get_string('unmatchingelements', 'tracker'));
         	    }
     		} else {
-    		    echo $OUTPUT->notification(get_string('emptydefinition', 'tracker'));
+    		    notify(get_string('emptydefinition', 'tracker'));
     		}
 			?>
 		</td>
@@ -118,15 +122,16 @@ if (!empty($tracker->parent)){
 
 /// a form to bind this tracker to a parent tracker
 
-echo $OUTPUT->heading(get_string('selectparent', 'tracker'));
+print_heading(get_string('selectparent', 'tracker'));
 
-$localtrackersmenu = $DB->get_records_menu('tracker', null, '', 'id,name');
+$localtrackersmenu = get_records_menu('tracker', '', '', '', 'id,name');
 unset($localtrackersmenu[$tracker->id]); // we should not bind to ourselves
 
 $step = optional_param('step', 0, PARAM_INT) + 1;
 switch ($step) {
     case 1 : {
-        $remote_hosts = $DB->get_records_select('mnet_host', "applicationid = 1 AND deleted = 0");
+        $remote_hosts = get_records_select('mnet_host', "applicationid = 1 AND deleted = 0");
+        
         $options = array();
         if (!empty($remote_hosts)){
             foreach($remote_hosts as $host){
@@ -138,19 +143,24 @@ switch ($step) {
     break;
     case 2 : {
         $remotehostid = required_param('remotehost', PARAM_INT);
+        
         // get available trackers there using RPC
 
-        $userroot = $DB->get_field('mnet_host', 'wwwroot', array('id' => $USER->mnethostid));
+        $userroot = get_field('mnet_host', 'wwwroot', 'id', $USER->mnethostid);
 
         $rpcclient = new mnet_xmlrpc_client();
         $rpcclient->set_method('mod/tracker/rpclib.php/tracker_rpc_get_instances');
         $rpcclient->add_param($USER->username, 'string');
         $rpcclient->add_param($userroot, 'string');
+        
         $parent_mnet = new mnet_peer();
-        $remotehost = $DB->get_field('mnet_host', 'wwwroot', array('id' => $remotehostid));
+        $remotehost = get_field('mnet_host', 'wwwroot', 'id', $remotehostid);
         $parent_mnet->set_wwwroot($remotehost);
+        
         $response = $rpcclient->send($parent_mnet);
+        
         $remotetrackers = json_decode($rpcclient->response);
+        
         if (!empty($remotetrackers)){
             if ($remotetrackers->status == 200){
                 foreach($remotetrackers->trackers as $tracker){
@@ -160,12 +170,13 @@ switch ($step) {
                     print_object($remotetrackers->report);
                 }
             } else {
-                echo $OUTPUT->notification($remotetrackers->error);
+                notify($remotetrackers->error);
             }
         } else {
            echo "RPC failure :";
            print_object($rpcclient->error);
         }
+        
     }
     break;
     default: {
@@ -190,7 +201,7 @@ function submitform(formname){
 			if (empty($localtrackersmenu)){
 			    print_string('nolocalcandidate', 'tracker');
 			} else {
-			    html_writer::select($localtrackersmenu, 'localtracker', '', array('' => 'choose'), array('onchange' => "submitform('bindlocalparent')"));
+			    choose_from_menu($localtrackersmenu, 'localtracker', '', 'choose', "submitform('bindlocalparent')");
 			}
 			?>
 		</td>
@@ -211,7 +222,7 @@ function submitform(formname){
                 if (empty($options)){
     			    print_string('noremotehosts', 'tracker');
     			} else {
-                    echo html_writer::select($options, 'remotehost', '', array('' => 'choose'), array('onchange' => "submitform('bindremoteparent')"));
+                    choose_from_menu($options, 'remotehost', '', 'choose', "submitform('bindremoteparent')");
                 }
             } else {
                echo $remotehost;
@@ -229,7 +240,7 @@ if ($step == 2){
             if (empty($trackersmenu)){
 			    print_string('noremotetrackers', 'tracker');
 			} else {
-                echo html_writer::select($trackersmenu, 'remotetracker', $remoteid, array('' => 'choose'), array('onchange' => "submitform('bindremoteparent')"));
+                choose_from_menu($trackersmenu, 'remotetracker', $remoteid, 'choose', "submitform('bindremoteparent')");
             }
             ?>
 		</td>
@@ -248,6 +259,6 @@ if ($step == 2){
 </form></p>
 <?php
 
-$OUTPUT->box_end() 
+print_simple_box_end() 
 ?>
 </center>

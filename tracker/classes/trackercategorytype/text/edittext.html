@@ -9,7 +9,7 @@
 * A form for editing a textfield element
 */
 
-echo $OUTPUT->heading('createatextelement') ;
+print_heading('createatextelement', 'tracker') ;
 ?>
 <form name="editelementform" method="post" action="view.php">
 <input type="hidden" name="id" value="<?php p($cm->id) ?>" />
@@ -45,14 +45,15 @@ if ($action == 'editelement')
 		<td align="left">
         <?php
             print_textarea($usehtmleditor, 20, 60, 680, 400, 'description', $form->description);
+         
             if ($usehtmleditor) {
                 echo '<input type="hidden" name="format" value="'.FORMAT_HTML.'" />';
             } else {
                 echo '<p align="right">';
-                $OUTPUT->help_icon('textformat', 'moodle');
+                helpbutton('textformat', get_string('formattexttype'));
                 print_string("formattexttype");
                 echo ':&nbsp;';
-                html_writer::select(format_text_menu(), 'format', $form->format); 
+                choose_from_menu(format_text_menu(), 'format', $form->format, ''); 
                 echo '';
             }
         ?>

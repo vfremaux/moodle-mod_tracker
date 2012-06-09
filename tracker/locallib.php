@@ -25,6 +25,7 @@ define('ABANDONNED', 5);
 define('TRANSFERED', 6);
 define('TESTING', 7);
 define('PUBLISHED', 8);
+define('VALIDATED', 9);
 
 // states && eventmasks
 define('EVENT_POSTED', 0);
@@ -37,8 +38,9 @@ define('EVENT_TRANSFERED', 32);
 define('ON_COMMENT', 64);
 define('EVENT_TESTING', 128);
 define('EVENT_PUBLISHED', 256);
+define('EVENT_VALIDATED', 512);
 
-define('ALL_EVENTS', 255);
+define('ALL_EVENTS', 1023);
 
 global $STATUSCODES;
 global $STATUSKEYS;
@@ -50,7 +52,9 @@ $STATUSCODES = array(POSTED => 'posted',
                     ABANDONNED => 'abandonned',
                     TRANSFERED => 'transfered',
                     TESTING => 'testing',
-                    PUBLISHED => 'published');
+                    PUBLISHED => 'published',
+                    VALIDATED => 'validated',
+                    );
 
 $STATUSKEYS = array(POSTED => get_string('posted', 'tracker'), 
                     OPEN => get_string('open', 'tracker'), 
@@ -60,7 +64,9 @@ $STATUSKEYS = array(POSTED => get_string('posted', 'tracker'),
                     ABANDONNED => get_string('abandonned', 'tracker'),
                     TRANSFERED => get_string('transfered', 'tracker'),
                     TESTING => get_string('testing', 'tracker'),
-                    PUBLISHED => get_string('published', 'tracker'));
+                    PUBLISHED => get_string('published', 'tracker'),
+                    VALIDATED => get_string('validated', 'tracker'),
+                    );
 
 /**
 * loads all elements in memory
@@ -70,14 +76,14 @@ $STATUSKEYS = array(POSTED => get_string('posted', 'tracker'),
 * @param reference $elementsobj
 */
 function tracker_loadelements(&$tracker, &$elementsobj){
-    global $COURSE, $CFG, $DB;
+    global $COURSE, $CFG;
 
     /// first get shared elements
-    $elements = $DB->get_records('tracker_element', array('course' => 0));
+    $elements = get_records('tracker_element', 'course' , 0);
     if (!$elements) $elements = array();
 
     /// get course scope elements
-    $courseelements = $DB->get_records('tracker_element', array('course' => $COURSE->id));
+    $courseelements = get_records('tracker_element', 'course' , $COURSE->id);
     if ($courseelements){
         $elements = array_merge($elements, $courseelements);
     }
@@ -112,9 +118,10 @@ function tracker_loadelements(&$tracker, &$elementsobj){
 * @return object
 */
 function tracker_getelement(&$tracker, $elementid=null, $type=null){
-    global $CFG, $DB;
+    global $CFG;
+    
     if ($elementid){
-        $element = $DB->get_record('tracker_element', array('id' => $elementid));
+        $element = get_record('tracker_element', 'id' , $elementid);
         $elementtype = ($element) ? $element->type : $type ;
 
         if (!empty($element)){
@@ -153,6 +160,7 @@ function tracker_getelement(&$tracker, $elementid=null, $type=null){
 */
 function tracker_getelementtypes(){
     global $CFG;
+    
     $typedir = "{$CFG->dirroot}/mod/tracker/classes/trackercategorytype";
     $DIR = opendir($typedir);
     while($entry = readdir($DIR)){
@@ -169,20 +177,21 @@ function tracker_getelementtypes(){
 * @param int $trackerid the current tracker
 */
 function tracker_requiresfile($trackerid){
-    global $CFG, $DB;
+    global $CFG;
 
     $sql = "
         SELECT 
             COUNT(*)
         FROM 
-            {tracker_element} e,
-            {tracker_elementused} eu
+            {$CFG->prefix}tracker_element e,
+            {$CFG->prefix}tracker_elementused eu
         WHERE 
             eu.elementid = e.id AND 
             eu.trackerid = {$trackerid} AND
             e.type = 'file'
     ";
-    $count = $DB->count_records_sql($sql);
+    $count = count_records_sql($sql);
+    
     return $count;
 }
 
@@ -192,7 +201,7 @@ function tracker_requiresfile($trackerid){
 * @param reference a reference to an array of used elements
 */
 function tracker_loadelementsused(&$tracker, &$used){
-    global $CFG, $DB;
+    global $CFG;
 
     $sql = "
         SELECT 
@@ -203,15 +212,16 @@ function tracker_loadelementsused(&$tracker, &$used){
             eu.canbemodifiedby, 
             eu.active
         FROM 
-            {tracker_element} e,
-            {tracker_elementused} eu
+            {$CFG->prefix}tracker_element e,
+            {$CFG->prefix}tracker_elementused eu
         WHERE 
             eu.elementid = e.id AND 
             eu.trackerid = {$tracker->id} 
         ORDER BY 
             eu.sortorder ASC
     ";
-    $elements = $DB->get_records_sql($sql);
+    $elements = get_records_sql($sql);
+    
     $used = array();
     if (!empty($elements)){
         foreach ($elements as $element){
@@ -241,7 +251,7 @@ function tracker_loadelementsused(&$tracker, &$used){
 *
 */
 function tracker_getelementsused_by_name(&$tracker){
-    global $CFG, $DB;
+    global $CFG;
 
     $sql = "
         SELECT 
@@ -254,15 +264,15 @@ function tracker_getelementsused_by_name(&$tracker){
             eu.canbemodifiedby, 
             eu.active
         FROM 
-            {tracker_element} e,
-            {tracker_elementused} eu
+            {$CFG->prefix}tracker_element e,
+            {$CFG->prefix}tracker_elementused eu
         WHERE 
             eu.elementid = e.id AND 
             eu.trackerid = {$tracker->id}
         ORDER BY 
             eu.sortorder ASC
     ";
-    if (!$usedelements = $DB->get_records_sql($sql)){
+    if (!$usedelements = get_records_sql($sql)){
         return array();
     }
     return $usedelements;
@@ -275,9 +285,7 @@ function tracker_getelementsused_by_name(&$tracker){
 * @return boolean
 */
 function tracker_iselementused($trackerid, $elementid){
-	global $DB;
-	
-    $inusedelements = $DB->count_records_select('tracker_elementused', 'elementid = ' . $elementid . ' AND trackerid = ' . $trackerid);  
+    $inusedelements = count_records_select('tracker_elementused', 'elementid = ' . $elementid . ' AND trackerid = ' . $trackerid);  
     return $inusedelements;
 }
 
@@ -288,6 +296,7 @@ function tracker_iselementused($trackerid, $elementid){
 */
 function tracker_printelements(&$tracker, $fields=null, $dest=false){
     tracker_loadelementsused($tracker, $used);
+    
     if (!empty($used)){
         if (!empty($fields)){
             foreach ($used as $element){
@@ -298,6 +307,7 @@ function tracker_printelements(&$tracker, $fields=null, $dest=false){
                 }
             }
         }
+    
         foreach ($used as $element){
 
         	if (!$element->active) continue;
@@ -306,6 +316,7 @@ function tracker_printelements(&$tracker, $fields=null, $dest=false){
             echo '<td align="right" valign="top">';
             echo '<b>' . format_string($element->description) . ':</b>';
             echo '</td>';
+            
             echo '<td align="left" colspan="3">';
             if ($dest == 'search'){
                 $element->viewsearch();
@@ -334,7 +345,7 @@ function tracker_printelements(&$tracker, $fields=null, $dest=false){
 * embedded. 
 */
 function tracker_constructsearchqueries($trackerid, $fields, $own = false){
-    global $CFG, $USER, $DB;
+    global $CFG, $USER;
 
     $keys = array_keys($fields);
 
@@ -346,7 +357,7 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false){
             $elementssearch = true;
         }
     }
-    $elementsSearchClause = ($elementssearch) ? " {tracker_issueattribute} AS ia, " : '' ;
+    $elementsSearchClause = ($elementssearch) ? " {$CFG->prefix}tracker_issueattribute AS ia, " : '' ;
 
     $elementsSearchConstraint = '';
     foreach ($keys as $key){
@@ -384,11 +395,13 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false){
 
         if (is_numeric($key)){
             foreach($fields[$key] as $value){
-                $elementsSearchConstraint .= ' AND i.id IN (SELECT issue FROM {tracker_issueattribute} WHERE elementdefinition=' . $key . ' AND elementitemid=' . $value . ')';
+                $elementsSearchConstraint .= ' AND i.id IN (SELECT issue FROM ' . $CFG->prefix . 'tracker_issueattribute WHERE elementdefinition=' . $key . ' AND elementitemid=' . $value . ')';
             }
         }
     }
+    
     if ($own == false){
+    
         $sql->search = "
             SELECT DISTINCT 
                 i.id, 
@@ -402,11 +415,11 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false){
                 u.firstname, 
                 u.lastname
             FROM 
-                {user} AS u, 
+                {$CFG->prefix}user AS u, 
                 $elementsSearchClause
-                {tracker_issue} i
+                {$CFG->prefix}tracker_issue i
             LEFT JOIN
-                {tracker_issuecc} cc
+                {$CFG->prefix}tracker_issuecc cc
             ON
                 cc.issueid = i.id           
             WHERE 
@@ -423,11 +436,12 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false){
                 u.firstname,
                 u.lastname
         ";
+    
         $sql->count = "
             SELECT COUNT(DISTINCT 
                 (i.id)) as reccount
             FROM 
-                {tracker_issue} i
+                {$CFG->prefix}tracker_issue i
                 $elementsSearchClause
             WHERE 
                 i.trackerid = {$trackerid} 
@@ -440,23 +454,24 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false){
                 COUNT(cc.userid) AS watches
             FROM 
                 $elementsSearchClause
-                {tracker_issue} i
+                {$CFG->prefix}tracker_issue i
             LEFT JOIN
-                {tracker_issuecc} cc
+                {$CFG->prefix}tracker_issuecc cc
             ON
                 cc.issueid = i.id           
             WHERE 
                 i.trackerid = {$trackerid} AND 
-                i.reportedby = {$USER->id} 
+                i.reportedby = $USER->id 
                 $elementsSearchConstraint
             GROUP BY
                 i.id, i.trackerid, i.summary, i.datereported, i.reportedby, i.assignedto, i.status
         ";
+    
         $sql->count = "
             SELECT COUNT(DISTINCT 
                 (i.id)) as reccount
             FROM 
-                {tracker_issue} i
+                {$CFG->prefix}tracker_issue i
                 $elementsSearchClause
             WHERE 
                 i.trackerid = {$trackerid} AND
@@ -482,34 +497,41 @@ function tracker_extractsearchparametersfrompost(){
                 $fields['id'][] = $issueid;
             }
             else{
-                print_error('errorbadlistformat', 'tracker', 'view.php?id=' . $this->tracker_getcoursemodule() . '&what=search');
+                error ('Only numbers (or a list of numbers seperated by a comma (",") allowed in the issue number field', 'view.php?id=' . $this->tracker_getcoursemodule() . '&what=search');
             }
         }
-     } else {
+    }
+    else{
         $checkdate = optional_param('checkdate', 0, PARAM_INT);
         if ($checkdate){
             $month = optional_param('month', '', PARAM_INT);
             $day = optional_param('day', '', PARAM_INT);
             $year = optional_param('year', '', PARAM_INT);
+        
             if (!empty($month) && !empty($day) && !empty($year)){
                 $datereported = make_timestamp($year, $month, $day);
                 $fields['datereported'][] = $datereported;
             }
         }
+        
         $description = optional_param('description', '', PARAM_CLEANHTML);
         if (!empty($description)){  
             $fields['description'][] = stripslashes($description);
         }
+        
         $reportedby = optional_param('reportedby', '', PARAM_INT);
         if (!empty($reportedby)){   
             $fields['reportedby'][] = $reportedby;
         }
+        
         $summary = optional_param('summary', '', PARAM_TEXT);
         if (!empty($summary)){  
             $fields['summary'][] = $summary;
         }
+                                
         $keys = array_keys($_POST);                         // get the key value of all the fields submitted
         $elementkeys = preg_grep('/element./' , $keys);     // filter out only the element keys
+        
         foreach ($elementkeys as $elementkey){
             preg_match('/element(.*)$/', $elementkey, $elementid);
             if (!empty($_POST[$elementkey])){
@@ -517,7 +539,8 @@ function tracker_extractsearchparametersfrompost(){
                     foreach ($_POST[$elementkey] as $elementvalue){
                         $fields[$elementid[1]][] = $elementvalue;
                     }
-                } else {
+                }
+                else{
                     $fields[$elementid[1]][] = $_POST[$elementkey];
                 }
             }
@@ -535,11 +558,13 @@ function tracker_extractsearchparametersfrompost(){
 * @return the inserted or updated queryid
 */
 function tracker_savesearchparameterstodb($query, $fields){
-    global $USER, $DB;
+    global $USER;
+        
     $query->userid = $USER->id;
     $query->published = 0;
     $query->fieldnames = '';
     $query->fieldvalues = '';
+    
     if (!empty($fields)){
         $keys = array_keys($fields);
         if (!empty($keys)){
@@ -548,7 +573,8 @@ function tracker_savesearchparameterstodb($query, $fields){
                     if (empty($query->fieldnames)){
                         $query->fieldnames = $key;
                         $query->fieldvalues = $value;
-                    } else {
+                    }
+                    else{
                         $query->fieldnames = $query->fieldnames . ', ' . $key;
                         $query->fieldvalues = $query->fieldvalues . ', '  . $value;
                     }
@@ -556,11 +582,12 @@ function tracker_savesearchparameterstodb($query, $fields){
             }       
         }
     }
+    
     if (!isset($query->id)) {           //if not given a $queryid, then insert record
-        $queryid = $DB->insert_record('tracker_query', $query);
+        $queryid = insert_record('tracker_query', $query, true);
     }
     else {                      //otherwise, update record
-        $queryid = $DB->update_record('tracker_query', $query, true);
+        $queryid = update_record('tracker_query', $query, true);
     }   
     return $queryid;        
 }
@@ -570,8 +597,6 @@ function tracker_savesearchparameterstodb($query, $fields){
 * @param array $fields
 */
 function tracker_printsearchfields($fields){
-	global $DB;
-	
     foreach($fields as $key => $value){
         switch(trim($key)){
             case 'datereported' :
@@ -591,7 +616,7 @@ function tracker_printsearchfields($fields){
                 $strs[] =  "('".implode("','", $value) ."') ".get_string('IN', 'tracker').' '.get_string('description');
                 break;
             case 'reportedby' :
-                $users = $DB->get_records_list('user', array('id' => implode(',',$value)), 'lastname', 'id,firstname,lastname');
+                $users = get_records_list('user', 'id', implode(',',$value), 'lastname', 'id,firstname,lastname');
                 $reporters = array();
                 if($users){
                     foreach($users as $user){
@@ -613,16 +638,15 @@ function tracker_printsearchfields($fields){
 *
 */
 function tracker_extractsearchparametersfromdb($queryid=null){
-	global $DB;
-	
-    if (!$queryid){
+    if (!$queryid)
         $queryid = optional_param('queryid', '', PARAM_INT);
-    }
-    $query_record = $DB->get_record('tracker_query', array('id' => $queryid));
+    $query_record = get_record('tracker_query', 'id', $queryid);
     $fields = null;
+    
     if (!empty($query_record)){
         $fieldnames = explode(',', $query_record->fieldnames);
         $fieldvalues = explode(',', $query_record->fieldvalues);
+        
         $count = 0;
         if (!empty($fieldnames)){
             foreach ($fieldnames as $fieldname){
@@ -634,6 +658,7 @@ function tracker_extractsearchparametersfromdb($queryid=null){
     else{
         error ("Invalid query id: " . $queryid);
     }
+    
     return $fields;
 }
 
@@ -645,6 +670,7 @@ function tracker_setsearchcookies($fields){
     $success = true;
     if (is_array($fields)){
         $keys = array_keys($fields);
+        
         foreach ($keys as $key){
             $cookie = '';
             foreach ($fields[$key] as $value){
@@ -655,6 +681,7 @@ function tracker_setsearchcookies($fields){
                     $cookie = $cookie . ', ' . $value;
                 }
             }
+            
             $result = setcookie("moodle_tracker_search_" . $key, $cookie);          
             $success = $success && $result;
         }
@@ -673,6 +700,7 @@ function tracker_setsearchcookies($fields){
 function tracker_extractsearchcookies(){
     $keys = array_keys($_COOKIE);                                           // get the key value of all the cookies
     $cookiekeys = preg_grep('/moodle_tracker_search./' , $keys);            // filter all search cookies
+    
     $fields = null;
     foreach ($cookiekeys as $cookiekey){
         preg_match('/moodle_tracker_search_(.*)$/', $cookiekey, $fieldname);
@@ -691,6 +719,7 @@ function tracker_clearsearchcookies(){
     $success = true;
     $keys = array_keys($_COOKIE);                                           // get the key value of all the cookies
     $cookiekeys = preg_grep('/moodle_tracker_search./' , $keys);            // filter all search cookies
+    
     foreach ($cookiekeys as $cookiekey){
         $result = setcookie($cookiekey, '');
         $success = $success && $result;
@@ -711,14 +740,15 @@ function tracker_searchforissues(&$tracker, $cmid){
     tracker_clearsearchcookies($tracker->id);
     $fields = tracker_extractsearchparametersfrompost($tracker->id);
     $success = tracker_setsearchcookies($fields);
+    
     if ($success){
-        if ($tracker->supportmode == 'bugtracker'){
+        if ($tracker->supportmode == 'bugtracker')
             redirect ("view.php?id={$cmid}&amp;view=view&amp;page=browse");
-        } else { 
-            redirect("view.php?id={$cmid}&amp;view=view&amp;page=mytickets");
-        }
-    } else {
-        print_error('errorcookie', 'tracker', '', $cookie);
+        else 
+            redirect ("view.php?id={$cmid}&amp;view=view&amp;page=mytickets");
+    }
+    else{
+        error ("Failed to set cookie: " . $cookie . "<br>");
     }
 }
 
@@ -729,7 +759,7 @@ function tracker_searchforissues(&$tracker, $cmid){
 * @param int $status if status is positive or null, filters by status
 */
 function tracker_getnumissuesreported($trackerid, $status='*', $reporterid = '*', $resolverid='*', $developerids='', $adminid='*'){ 
-    global $CFG, $DB;
+    global $CFG;
     
     $statusClause = ($status !== '*') ? " AND i.status = $status " : '' ;
     $reporterClause = ($reporterid != '*') ? " AND i.reportedby = $reporterid " : '' ;
@@ -741,9 +771,9 @@ function tracker_getnumissuesreported($trackerid, $status='*', $reporterid = '*'
         SELECT
             COUNT(DISTINCT(i.id))
         FROM
-            {tracker_issue} i
+            {$CFG->prefix}tracker_issue i
         LEFT JOIN
-            {tracker_issueownership} io
+            {$CFG->prefix}tracker_issueownership io
         ON 
             i.id = io.issueid
         WHERE
@@ -754,7 +784,7 @@ function tracker_getnumissuesreported($trackerid, $status='*', $reporterid = '*'
             $resolverClause
             $adminClause
     ";
-    return $DB->count_records_sql($sql); 
+    return count_records_sql($sql); 
 }
 
 //// User related 
@@ -781,7 +811,7 @@ function tracker_getresolvers($context){
 * @param int $trackerid
 */
 function tracker_getreporters($trackerid){
-    global $CFG, $DB;
+    global $CFG;
     
     $sql = "
         SELECT
@@ -789,13 +819,13 @@ function tracker_getreporters($trackerid){
             u.firstname,
             u.lastname
         FROM
-            {tracker_issue} i,
-            {user} u
+            {$CFG->prefix}tracker_issue i,
+            {$CFG->prefix}user u
         WHERE
             i.reportedby = u.id AND
-            i.trackerid = ?
+            i.trackerid = $trackerid
     ";
-    return $DB->get_records_sql($sql, array($trackerid));
+    return get_records_sql($sql);
 }
 
 /**
@@ -811,7 +841,7 @@ function tracker_getdevelopers($context){
 *
 */
 function tracker_getassignees($userid){
-    global $CFG, $DB;
+    global $CFG;
     
     $sql = "
         SELECT DISTINCT 
@@ -824,11 +854,11 @@ function tracker_getassignees($userid){
             u.maildisplay,
             COUNT(i.id) as issues
         FROM
-            {tracker_issue} i,
-            {user} u
+            {$CFG->prefix}tracker_issue i,
+            {$CFG->prefix}user u
         WHERE
             i.assignedto = u.id AND
-            i.bywhomid = ?
+            i.bywhomid = {$userid}
         GROUP BY
             u.id, 
             u.firstname, 
@@ -838,7 +868,7 @@ function tracker_getassignees($userid){
             u.emailstop, 
             u.maildisplay
     ";
-    return $DB->get_records_sql($sql, array($userid));
+    return get_records_sql($sql);
 }
 
 /**
@@ -847,7 +877,7 @@ function tracker_getassignees($userid){
 * @param int $trackerid the current tracker
 */
 function tracker_submitanissue(&$tracker){
-    global $CFG, $DB;
+    global $CFG;
     
     $issue->datereported = required_param('datereported', PARAM_INT);
     $issue->summary = required_param('summary', PARAM_TEXT);
@@ -860,17 +890,18 @@ function tracker_submitanissue(&$tracker){
     $issue->reportedby = required_param('reportedby', PARAM_INT);
 
     // fetch max actual priority
-    $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', " trackerid = {$tracker->id} GROUP BY trackerid ");
+    $maxpriority = get_field_select('tracker_issue', 'MAX(resolutionpriority)', " trackerid = {$tracker->id} GROUP BY trackerid ");
     $issue->resolutionpriority = $maxpriority + 1;
 
-    $issue->id = $DB->insert_record('tracker_issue', $issue);
+    $issue->id = insert_record('tracker_issue', $issue, true);
+    
     if ($issue->id){
         tracker_recordelements($issue);
         // if not CCed, the assignee should be
         tracker_register_cc($tracker, $issue, $issue->reportedby);
         return $issue;
     } else {
-         print_error('errorrecordissue', 'tracker');
+         error("Could not submit issue");
     }
 }
 
@@ -881,11 +912,12 @@ function tracker_submitanissue(&$tracker){
 * @param int $userid an eventual userid
 */
 function tracker_getownedissuesforresolve($trackerid, $userid = null){
-    global $USER, $DB;
+    global $USER;
+    
     if (empty($userid)){
         $userid = $USER->id;
     }
-    return $DB->get_records_select('tracker_issue', "trackerid = {$trackerid} AND assignedto = {$userid} ");
+    return get_records_select('tracker_issue', "trackerid = {$trackerid} AND assignedto = {$userid} ");
 }
 
 /**
@@ -894,7 +926,7 @@ function tracker_getownedissuesforresolve($trackerid, $userid = null){
 * @param object $issue
 */
 function tracker_recordelements(&$issue){
-    global $CFG, $COURSE, $DB;
+    global $CFG, $COURSE;
     
     $keys = array_keys($_POST);                 // get the key value of all the fields submitted
     $keys = preg_grep('/element./' , $keys);    // filter out only the element keys
@@ -903,41 +935,46 @@ function tracker_recordelements(&$issue){
     $filekeys = preg_grep('/element./' , $filekeys);    // filter out only the element keys    
 
     $keys = array_merge($keys, $filekeys);
+    
     foreach ($keys as $key){
         preg_match('/element(.*)$/', $key, $elementid);
+        
         $elementname = $elementid[1];
+        
         $sql = "
             SELECT 
               e.id as elementid,
               e.type as type
             FROM
-                {tracker_elementused} eu,
-                {tracker_element} e
+                {$CFG->prefix}tracker_elementused eu,
+                {$CFG->prefix}tracker_element e
             WHERE
                 eu.elementid = e.id AND
-                e.name = ? AND
-                eu.trackerid = ? 
+                e.name = '{$elementname}' AND
+                eu.trackerid = {$issue->trackerid} 
         ";
-        $attribute = $DB->get_record_sql($sql, array($elementname, $issue->trackerid));
+        $attribute = get_record_sql($sql);
         $attribute->timemodified = $issue->datereported;
         $values = optional_param($key, '', PARAM_CLEANHTML);
         $attribute->issueid = $issue->id;
         $attribute->trackerid = $issue->trackerid;
+        
         /// For those elements where more than one option can be selected
         if (is_array($values)){
             foreach ($values as $value){
                 $attribute->elementitemid = $value;
-                $attributeid = $DB->insert_record('tracker_issueattribute', $attribute);
+                $attributeid = insert_record('tracker_issueattribute', $attribute);
+    
                 if (!$attributeid){
-                    print_error('erroraddissueattribute', 'tracker', '', 1);
+                    error("Could not submit issue(s) attribute(s): issue:{$issue->id} issueid:$elementid[1] elementitemid:$attribute->elementitemid");
                 }
             }
         } else {  //For the rest of the elements that can only support one answer
             if ($attribute->type != 'file'){
                 $attribute->elementitemid = addslashes($values);
-                $attributeid = $DB->insert_record('tracker_issueattribute', $attribute);    
+                $attributeid = insert_record('tracker_issueattribute', $attribute);    
 	            if (empty($attributeid)){
-	                print_error('erroraddissueattribute', 'tracker', '', 2);
+	                error("Could not submit issue attribute: issue:{$issue->id} elementid:$elementid[1] elementitemid:{$attribute->elementitemid}");
 	            }
             } else {
                 require_once($CFG->libdir.'/uploadlib.php');
@@ -954,9 +991,9 @@ function tracker_recordelements(&$issue){
                     $uploader->save_files($storebase);
                     filesystem_move_file($storebase.'/'.$newfilename, $storebase.'/'.$encodedfilename);
                     $attribute->elementitemid = $encodedfilename;
-                    $attributeid = $DB->insert_record('tracker_issueattribute', $attribute);    
+                    $attributeid = insert_record('tracker_issueattribute', $attribute);    
 		            if (empty($attributeid)){
-	                	print_error('erroraddissueattribute', 'tracker', '', 3);
+		                error("Could not submit issue attribute: issue:{$issue->id} elementid:$elementid[1] elementitemid:{$attribute->elementitemid}");
 		            }
                 }                
             }
@@ -971,20 +1008,21 @@ function tracker_recordelements(&$issue){
 * @param int $issueid the issue
 */
 function tracker_clearelements($issueid){
-    global $CFG, $COURSE, $DB;
+    global $CFG, $COURSE;
 
-    if (!$issue = $DB->get_record('tracker_issue', array('id' => "$issueid"))){
+    if (!$issue = get_record('tracker_issue', 'id', "$issueid")){
         return;
     }
 
     // find all files elements to protect
+    
    $sql = "
             SELECT
                 e.id,
                 e.type
             FROM
-                {tracker_element} e,
-                {tracker_elementused} eu
+                {$CFG->prefix}tracker_element e,
+                {$CFG->prefix}tracker_elementused eu
             WHERE
                 e.id = eu.elementid AND
                 e.type = 'file' AND
@@ -992,11 +1030,12 @@ function tracker_clearelements($issueid){
     ";
 
     $nofileclause = '';
-    if($fileelements = $DB->get_records_sql($sql)){
+    if($fileelements = get_records_sql($sql)){
         $fileelementlist = implode("','", array_keys($fileelements));
         $nofileclause = " AND elementid NOT IN ('$fileelementlist') ";
     }
-    if (!$DB->delete_records_select('tracker_issueattribute', "issueid = $issueid $nofileclause")){
+    
+    if (!delete_records_select('tracker_issueattribute', "issueid = $issueid $nofileclause")){
         error("Could not clear elements for issue $issueid");
     }
 
@@ -1011,12 +1050,12 @@ function tracker_clearelements($issueid){
         	debug_trace('TRACKER deletes file '.$deletedkey);
             if (preg_match("/deleteelement(.*)$/", $deletedkey, $matches)){
                 $elementname = $matches[1];
-                $element = $DB->get_record('tracker_element', array('name' => $elementname));
-                if ($elementitem = $DB->get_record('tracker_issueattribute', array('elementid' => $element->id, 'issueid' => $issueid))){
+                $element = get_record('tracker_element', 'name', $elementname);
+                if ($elementitem = get_record('tracker_issueattribute', 'elementid', $element->id, 'issueid', $issueid)){
                     if (!empty($elementitem->elementitemid)){
                         filesystem_delete_file($storebase.'/'.$elementitem->elementitemid);
                     }
-                    $DB->delete_records('tracker_issueattribute', array('id' => $elementitem->id));
+                    delete_records('tracker_issueattribute', 'id', $elementitem->id);
                 }
             }
         }
@@ -1025,18 +1064,19 @@ function tracker_clearelements($issueid){
     // remove all reloaded files
     $keys = array_keys($_FILES);
     $reloadedfilekeys = preg_grep('/element./' , $keys);    // filter out only the reloaded element keys    
+    
     if (!empty($reloadedfilekeys)){
         foreach($reloadedfilekeys as $reloadedkey){
         	if (!empty($_FILES[$reloadedkey]['name'])){ // file is reloaded with another entry
         		debug_trace('removing reloaded '.$reloadedkey);
 	            if (preg_match("/element(.*)$/", $reloadedkey, $matches)){
 	                $elementname = $matches[1];
-	                $element = $DB->get_record('tracker_element', array('name' => $elementname));
-	                if ($elementitem = $DB->get_record('tracker_issueattribute', array('elementid' => $element->id, 'issueid' => $issueid))){
+	                $element = get_record('tracker_element', 'name', $elementname);
+	                if ($elementitem = get_record('tracker_issueattribute', 'elementid', $element->id, 'issueid', $issueid)){
 	                    if (!empty($elementitem->elementitemid)){
 	                        filesystem_delete_file($storebase.'/'.$elementitem->elementitemid);
 	                    }
-	                    $DB->delete_records('tracker_issueattribute', array('id' => $elementitem->id));
+	                    delete_records('tracker_issueattribute', 'id', $elementitem->id);
 	                }
 	            }
 	        }
@@ -1070,20 +1110,20 @@ if (!function_exists('print_error_class')){
 * @param int $userid the cced user's ID
 */
 function tracker_register_cc(&$tracker, &$issue, $userid){
-	global $DB;
-	
-    if ($userid && !$DB->get_record('tracker_issuecc', array('trackerid' => $tracker->id, 'issueid' => $issue->id, 'userid' => $userid))){
+
+    if ($userid && !get_record('tracker_issuecc', 'trackerid', $tracker->id, 'issueid', $issue->id, 'userid', $userid)){
         // Add new the assignee as new CC !!
         // we do not discard the old one as he may be still concerned
         $eventmask = 127;
-        if ($userprefs = $DB->get_record('tracker_preferences', array('trackerid' => $tracker->id, 'userid' => $userid, 'name' => 'eventmask'))){
+        if ($userprefs = get_record('tracker_preferences', 'trackerid', $tracker->id, 'userid', $userid, 'name', 'eventmask')){
             $eventmask = $userprefs->value;
         }
+        
         $cc->trackerid = $tracker->id;
         $cc->issueid = $issue->id;
         $cc->userid = $userid;
         $cc->events = $eventmask;
-        $DB->insert_record('tracker_issuecc', $cc);
+        insert_record('tracker_issuecc', $cc);
     }    
 
 }
@@ -1095,16 +1135,16 @@ function tracker_register_cc(&$tracker, &$issue, $userid){
 * @param object $user the user record
 */
 function tracker_print_user($user){
-    global $COURSE, $CFG, $OUTPUT;
+    global $COURSE, $CFG;
 
     if ($user){
-        echo $OUTPUT->user_picture ($user, array('courseid' => $COURSE->id, 'size' => 25));
+        print_user_picture ($user->id, $COURSE->id, !empty($user->picture));
         if ($CFG->messaging){
-            echo "&nbsp;<a href=\"$CFG->wwwroot/user/view.php?id={$user->id}&amp;course={$COURSE->id}\">".fullname($user)."</a> <a href=\"\" onclick=\"this.target='message'; return openpopup('/message/discussion.php?id={$user->id}', 'message', 'menubar=0,location=0,scrollbars,status,resizable,width=400,height=500', 0);\" ><img src=\"".$OUTPUT->pix_url('t/message.gif', 'core')."\"></a>";
+            echo "<a href=\"$CFG->wwwroot/user/view.php?id={$user->id}&amp;course={$COURSE->id}\">".fullname($user)."</a> <a href=\"\" onclick=\"this.target='message'; return openpopup('/message/discussion.php?id={$user->id}', 'message', 'menubar=0,location=0,scrollbars,status,resizable,width=400,height=500', 0);\" ><img src=\"$CFG->pixpath/t/message.gif\"></a>";
         } elseif (!$user->emailstop && $user->maildisplay){
-            echo "&nbsp;<a href=\"$CFG->wwwroot/user/view.php?id={$user->id}&amp;course={$COURSE->id}\">".fullname($user)."</a> <a href=\"mailto:{$user->email}\"><img src=\"".$OUTPUT->pix_url('t/mail.gif', 'core')."\"></a>";
+            echo "<a href=\"$CFG->wwwroot/user/view.php?id={$user->id}&amp;course={$COURSE->id}\">".fullname($user)."</a> <a href=\"mailto:{$user->email}\"><img src=\"$CFG->pixpath/t/mail.gif\"></a>";
         } else {
-            echo '&nbsp;'.fullname($user);
+            echo fullname($user);
         }
     }
 }
@@ -1115,12 +1155,12 @@ function tracker_print_user($user){
 * @param int $issueid
 */
 function tracker_printcomments($issueid){
-    global $CFG, $DB;
+    global $CFG;
     
-    $comments = $DB->get_records('tracker_issuecomment', array('issueid' => $issueid), 'datecreated');
+    $comments = get_records('tracker_issuecomment', 'issueid', $issueid, 'datecreated');
     if ($comments){
         foreach ($comments as $comment){
-            $user = $DB->get_record('user', array('id' => $comment->userid));
+            $user = get_record('user', 'id', $comment->userid);
             echo '<tr>';
             echo '<td valign="top" class="commenter" width="30%">';
             tracker_print_user($user);
@@ -1142,8 +1182,8 @@ function tracker_printcomments($issueid){
 * @param int $issueid
 */
 function tracker_getpotentialdependancies($trackerid, $issueid){
-    global $CFG, $DB;
-
+    global $CFG;
+    
     $subtreelist = tracker_get_subtree_list($trackerid, $issueid);
     $subtreeClause = (!empty($subtreelist)) ? "AND i.id NOT IN ({$subtreelist}) " : '' ;
 
@@ -1154,9 +1194,9 @@ function tracker_getpotentialdependancies($trackerid, $issueid){
           id.childid as isparent,
           summary
        FROM
-          {tracker_issue} i
+          {$CFG->prefix}tracker_issue i
        LEFT JOIN
-          {tracker_issuedependancy} id
+          {$CFG->prefix}tracker_issuedependancy id
        ON
           i.id = id.parentid
        WHERE
@@ -1172,7 +1212,7 @@ function tracker_getpotentialdependancies($trackerid, $issueid){
           summary
     ";
     // echo $sql;
-    return $DB->get_records_sql($sql);
+    return get_records_sql($sql);
 }
 
 /**
@@ -1182,9 +1222,7 @@ function tracker_getpotentialdependancies($trackerid, $issueid){
 * @return a comma separated list of nodes
 */
 function tracker_get_subtree_list($trackerid, $id){
-	global $DB;
-	
-    $res = $DB->get_records_menu('tracker_issuedependancy', array('parentid' => $id), '', 'id,childid');
+    $res = get_records_menu('tracker_issuedependancy', 'parentid', $id, '', 'id,childid');
     $ids = array();
     if (is_array($res)){
         foreach(array_values($res) as $aSub){
@@ -1208,8 +1246,8 @@ function tracker_get_subtree_list($trackerid, $id){
 * @return the HTML
 */
 function tracker_printchilds(&$tracker, $issueid, $return=false, $indent=''){
-    global $CFG, $STATUSCODES, $STATUSKEYS, $DB;
-
+    global $CFG, $STATUSCODES, $STATUSKEYS;
+    
     $str = '';
     $sql = "
        SELECT
@@ -1217,14 +1255,14 @@ function tracker_printchilds(&$tracker, $issueid, $return=false, $indent=''){
           summary,
           status
        FROM
-          {tracker_issuedependancy} id,
-          {tracker_issue} i
+          {$CFG->prefix}tracker_issuedependancy id,
+          {$CFG->prefix}tracker_issue i
        WHERE
           i.id = id.childid AND
           id.parentid = {$issueid} AND
           i.trackerid = {$tracker->id}
     ";
-    $res = $DB->get_records_sql($sql);
+    $res = get_records_sql($sql);
     if ($res){
         foreach($res as $aSub){
             $str .= "<span style=\"position : relative; left : {$indent}px\"><a href=\"view.php?a={$tracker->id}&amp;what=viewanissue&amp;issueid={$aSub->childid}\">".$tracker->ticketprefix.$aSub->childid.' - '.format_string($aSub->summary)."</a>";
@@ -1249,8 +1287,8 @@ function tracker_printchilds(&$tracker, $issueid, $return=false, $indent=''){
 * @return the HTML
 */
 function tracker_printparents(&$tracker, $issueid, $return=false, $indent=''){
-    global $CFG, $STATUSCODES, $STATUSKEYS, $DB;
-
+    global $CFG, $STATUSCODES, $STATUSKEYS;
+    
     $str = '';
     $sql = "
        SELECT
@@ -1258,14 +1296,14 @@ function tracker_printparents(&$tracker, $issueid, $return=false, $indent=''){
           summary,
           status
        FROM
-          {tracker_issuedependancy} id,
-          {tracker_issue} i
+          {$CFG->prefix}tracker_issuedependancy id,
+          {$CFG->prefix}tracker_issue i
        WHERE
           i.id = id.parentid AND
-          id.childid = ? AND
-          i.trackerid = ?
+          id.childid = {$issueid} AND
+          i.trackerid = {$tracker->id}
     ";
-    $res = $DB->get_records_sql($sql, array($issueid, $tracker->id));
+    $res = get_records_sql($sql);
     if ($res){
         foreach($res as $aSub){
             $indent = $indent - 20;
@@ -1286,27 +1324,29 @@ function tracker_printparents(&$tracker, $issueid, $return=false, $indent=''){
 * @param int userid the user
 */
 function tracker_getwatches($trackerid, $userid){
-    global $CFG, $DB;
-
+    global $CFG;
+    
     $sql = "
         SELECT
             w.*,
             i.summary
         FROM
-            {tracker_issuecc} w,
-            {tracker_issue} i
+            {$CFG->prefix}tracker_issuecc w,
+            {$CFG->prefix}tracker_issue i
         WHERE
             w.issueid = i.id AND
-            i.trackerid = ? AND
-            w.userid = ?
+            i.trackerid = {$trackerid} AND
+            w.userid = {$userid}            
     ";
-    $watches = $DB->get_records_sql($sql, array($trackerid, $userid));
+    
+    $watches = get_records_sql($sql);
     if ($watches){
         foreach($watches as $awatch){
-            $people = $DB->count_records('tracker_issuecc', array('issueid' => $awatch->issueid));
+            $people = count_records('tracker_issuecc', 'issueid', $awatch->issueid);
             $watches[$awatch->id]->people = $people;
         }
     }
+    
     return $watches;
 }
 
@@ -1318,15 +1358,15 @@ function tracker_getwatches($trackerid, $userid){
 * @param object $tracker
 */
 function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = null){
-    global $COURSE, $SITE, $CFG, $USER, $DB;
+    global $COURSE, $SITE, $CFG, $USER;
 
     if (empty($tracker)){ // database access optimization in case we have a tracker from somewhere else
-        $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
+        $tracker = get_record('tracker', 'id', $issue->trackerid);
     }
-    $context = context_module::instance($cm->id);
+    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
     $managers = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,firstname,lastname,lang,email,emailstop,mailformat,mnethostid', 'lastname');
 
-    $by = $DB->get_record('user', array('id' => $issue->reportedby));
+    $by = get_record('user', 'id', $issue->reportedby);
     $urgentrequest = '';
     if ($urgent){
         $urgentrequest = get_string('urgentsignal', 'tracker');
@@ -1355,7 +1395,7 @@ function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = 
         }
     }
 
-    $systemcontext = context_system::instance();
+    $systemcontext = get_context_instance(CONTEXT_SYSTEM);
     $admins = get_users_by_capability($systemcontext, 'moodle/site:doanything', 'u.id,firstname,lastname,lang,email,emailstop,mailformat,mnethostid', 'lastname');
 
     if (!empty($admins)){
@@ -1377,15 +1417,15 @@ function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = 
 * @param object $tracker
 */
 function tracker_notify_submission($issue, &$cm, $tracker = null){
-    global $COURSE, $SITE, $CFG, $USER, $DB;
+    global $COURSE, $SITE, $CFG, $USER;
 
     if (empty($tracker)){ // database access optimization in case we have a tracker from somewhere else
-        $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
+        $tracker = get_record('tracker', 'id', $issue->trackerid);
     }
-    $context = context_module::instance($cm->id);
+    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
     $managers = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,firstname,lastname,lang,email,emailstop,mailformat,mnethostid', 'lastname');
 
-    $by = $DB->get_record('user', array('id' => $issue->reportedby));
+    $by = get_record('user', 'id', $issue->reportedby);
     if (!empty($managers)){
         $vars = array('COURSE_SHORT' => $COURSE->shortname, 
                       'COURSENAME' => format_string($COURSE->fullname), 
@@ -1414,15 +1454,15 @@ function tracker_notify_submission($issue, &$cm, $tracker = null){
 * @param object $tracker
 */
 function tracker_notifyccs_changeownership($issueid, $tracker = null){
-    global $COURSE, $SITE, $CFG, $USER, $DB;
+    global $COURSE, $SITE, $CFG, $USER;
 
-    $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
+    $issue = get_record('tracker_issue', 'id', $issueid);
     if (empty($tracker)){ // database access optimization in case we have a tracker from somewhere else
-        $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
+        $tracker = get_record('tracker', 'id', $issue->trackerid);
     }
 
-    $issueccs = $DB->get_records('tracker_issuecc', array('issueid' => $issue->id));
-    $assignee = $DB->get_record('user', array('id' => $issue->assignedto));
+    $issueccs = get_records('tracker_issuecc', 'issueid', $issue->id);
+    $assignee = get_record('user', 'id', $issue->assignedto);
     if (!empty($issueccs)){
         $vars = array('COURSE_SHORT' => $COURSE->shortname, 
                       'COURSENAME' => format_string($COURSE->fullname), 
@@ -1435,7 +1475,7 @@ function tracker_notifyccs_changeownership($issueid, $tracker = null){
                       );
         include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
         foreach($issueccs as $cc){
-            $ccuser = $DB->get_record('user', array('id' => $cc->userid));
+            $ccuser = get_record('user', 'id', $cc->userid);
             $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
             $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
             $notification = compile_mail_template('ownershipchanged', $vars, 'tracker', $ccuser->lang);
@@ -1454,16 +1494,17 @@ function tracker_notifyccs_changeownership($issueid, $tracker = null){
 * @param object $newtracker
 */
 function tracker_notifyccs_moveissue($issueid, $tracker, $newtracker = null){
-    global $COURSE, $SITE, $CFG, $USER, $DB;
+    global $COURSE, $SITE, $CFG, $USER;
 
-    $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
+    $issue = get_record('tracker_issue', 'id', $issueid);
     if (empty($tracker)){ // database access optimization in case we have a tracker from somewhere else
-        $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
+        $tracker = get_record('tracker', 'id', $issue->trackerid);
     }
-    $newcourse = $DB->get_record('course', array('id' => $newtracker->course));
+    
+    $newcourse = get_record('course', 'id', $newtracker->course);
 
-    $issueccs = $DB->get_records('tracker_issuecc', array('issueid' => $issue->id));
-    $assignee = $DB->get_record('user', array('id' => $issue->assignedto));
+    $issueccs = get_records('tracker_issuecc', 'issueid', $issue->id);
+    $assignee = get_record('user', 'id', $issue->assignedto);
     if (!empty($issueccs)){
         $vars = array('COURSE_SHORT' => $COURSE->shortname, 
                       'COURSENAME' => format_string($COURSE->fullname), 
@@ -1479,7 +1520,7 @@ function tracker_notifyccs_moveissue($issueid, $tracker, $newtracker = null){
                       );
         include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
         foreach($issueccs as $cc){
-            $ccuser = $DB->get_record('user', array('id' => $cc->userid));
+            $ccuser = get_record('user', 'id', $cc->userid);
             $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
             $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
             $notification = compile_mail_template('issuemoved', $vars, 'tracker', $ccuser->lang);
@@ -1497,13 +1538,13 @@ function tracker_notifyccs_moveissue($issueid, $tracker, $newtracker = null){
 * @param object $tracker
 */
 function tracker_notifyccs_changestate($issueid, $tracker = null){
-    global $COURSE, $SITE, $CFG, $USER, $DB;
+    global $COURSE, $SITE, $CFG, $USER;
 
-    $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
+    $issue = get_record('tracker_issue', 'id', $issueid);
     if (empty($tracker)){ // database access optimization in case we have a tracker from somewhere else
-        $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
+        $tracker = get_record('tracker', 'id', $issue->trackerid);
     }
-    $issueccs = $DB->get_records('tracker_issuecc', array('issueid' => $issueid));
+    $issueccs = get_records('tracker_issuecc', 'issueid', $issueid);
 
     if (!empty($issueccs)){    
         $vars = array('COURSE_SHORT' => $COURSE->shortname, 
@@ -1517,7 +1558,7 @@ function tracker_notifyccs_changestate($issueid, $tracker = null){
         foreach($issueccs as $cc){
             unset($notification);
             unset($notification_html);
-            $ccuser = $DB->get_record('user', array('id' => $cc->userid));
+            $ccuser = get_record('user', 'id', $cc->userid);
             $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
             $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
             switch($issue->status){
@@ -1577,6 +1618,13 @@ function tracker_notifyccs_changestate($issueid, $tracker = null){
                         $notification_html = compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
                     }
                 break;
+                case VALIDATED : 
+                    if($cc->events & EVENT_VALIDATED){
+                        $vars['EVENT'] = get_string('validated', 'tracker');
+                        $notification = compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
+                        $notification_html = compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                    }
+                break;
                 default:
             }
             if (!empty($notification)){
@@ -1594,14 +1642,14 @@ function tracker_notifyccs_changestate($issueid, $tracker = null){
 * @param object $tracker
 */
 function tracker_notifyccs_comment($issueid, $comment, $tracker = null){
-    global $COURSE, $SITE, $CFG, $USER, $DB;
+    global $COURSE, $SITE, $CFG, $USER;
 
-    $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
+    $issue = get_record('tracker_issue', 'id', $issueid);
     if (empty($tracker)){ // database access optimization in case we have a tracker from somewhere else
-        $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
+        $tracker = get_record('tracker', 'id', $issue->trackerid);
     }
 
-    $issueccs = $DB->get_records('tracker_issuecc', array('issueid' => $issue->id));
+    $issueccs = get_records('tracker_issuecc', 'issueid', $issue->id);
     if (!empty($issueccs)){
         $vars = array('COURSE_SHORT' => $COURSE->shortname, 
                       'COURSENAME' => format_string($COURSE->fullname), 
@@ -1613,7 +1661,7 @@ function tracker_notifyccs_comment($issueid, $comment, $tracker = null){
                       );
         include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
         foreach($issueccs as $cc){
-            $ccuser = $DB->get_record('user', array('id' => $cc->userid));
+            $ccuser = get_record('user', 'id', $cc->userid);
             if ($cc->events & ON_COMMENT){
                 $vars['CONTRIBUTOR'] = fullname($USER);
                 $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
@@ -1634,9 +1682,11 @@ function tracker_notifyccs_comment($issueid, $comment, $tracker = null){
 * @param int $userid the user the preferences belong to
 */
 function tracker_loadpreferences($trackerid, $userid = 0){
-    global $USER, $DB;
+    global $USER;
+    
     if ($userid == 0) $userid = $USER->id;
-    $preferences = $DB->get_records_select('tracker_preferences', "trackerid = $trackerid AND userid = $userid");
+    
+    $preferences = get_records_select('tracker_preferences', "trackerid = $trackerid AND userid = $userid");
     if ($preferences){
         foreach($preferences as $preference){
             $USER->trackerprefs->{$preference->name} = $preference->value;
@@ -1650,7 +1700,8 @@ function tracker_loadpreferences($trackerid, $userid = 0){
 *
 */
 function tracker_print_transfer_link(&$tracker, &$issue){
-    global $CFG, $DB;
+    global $CFG;
+    
     if (empty($tracker->parent)) return '';
     if (is_numeric($tracker->parent)){
         if (!empty($issue->followid)){
@@ -1660,7 +1711,7 @@ function tracker_print_transfer_link(&$tracker, &$issue){
         }
     } else {
         list($parentid, $hostroot) = explode('@', $tracker->parent);
-        $mnet_host = $DB->get_record('mnet_host', array('wwwroot' => $hostroot));
+        $mnet_host = get_record('mnet_host', 'wwwroot', $hostroot);
         $remoteurl = urlencode("/mod/tracker/view.php?view=view&amp;screen=viewanissue&amp;a={$parentid}&amp;issueid={$issue->id}");
         $href = "<a href=\"{$CFG->wwwroot}/auth/mnet/jump.php?hostid={$mnet_host->id}&amp;wantsurl={$remoteurl}\">".get_string('follow', 'tracker')."</a>";
     }
@@ -1703,6 +1754,7 @@ function tracker_display_elementmatch($local, $remote){
             }
         }
     }
+    
     echo "</ul>";
     return $match;
 }
@@ -1732,45 +1784,47 @@ function tracker_add_cascade_backlink(&$cm, &$issue){
 * @param $reference $tracker
 */
 function tracker_update_priority_stack(&$tracker){
-    global $CFG, $DB;
+    global $CFG;
     
     /// discards resolved, transferred or abandoned
     $sql = "
        UPDATE 
-           {tracker_issue}
+           {$CFG->prefix}tracker_issue
        SET
            resolutionpriority = 0
        WHERE
            trackerid = $tracker->id AND
            status IN (".RESOLVED.','.ABANDONNED.','.TRANSFERED.')';
-    $DB->execute($sql);
+    execute_sql($sql);
 
     /// fetch prioritarized by order
-    $issues = $DB->get_records_select('tracker_issue', "trackerid = {$tracker->id} AND resolutionpriority != 0 ", 'resolutionpriority', 'id, resolutionpriority');
+    $issues = get_records_select('tracker_issue', "trackerid = {$tracker->id} AND resolutionpriority != 0 ", 'resolutionpriority', 'id, resolutionpriority');
     $i = 1;
     if (!empty($issues)){
         foreach ($issues as $issue){
             $issue->resolutionpriority = $i;
-            $DB->update_record('tracker_issue', $issue);
+            update_record('tracker_issue', $issue);
             $i++;
         }
     }
 }
 
 function tracker_get_stats(&$tracker, $from = null, $to = null){
-	global $CFG, $DB;
+	global $CFG;
+	
 	$sql = "
 		SELECT
 			status,
 			count(*) as value
 		FROM
-			{tracker_issue}
+			{$CFG->prefix}tracker_issue
 		WHERE
 			trackerid = {$tracker->id}
 		GROUP BY
 			status
 	";
-	if ($results = $DB->get_records_sql($sql)){
+	
+	if ($results = get_records_sql($sql)){
 		foreach($results as $r){
 			$stats[$r->status] = $r->value;
 		}
@@ -1781,10 +1835,12 @@ function tracker_get_stats(&$tracker, $from = null, $to = null){
 		$stats[WAITING] = 0;
 		$stats[TESTING] = 0;
 		$stats[PUBLISHED] = 0;
+		$stats[VALIDATD] = 0;
 		$stats[RESOLVED] = 0;
 		$stats[ABANDONNED] = 0;
 		$stats[TRANSFERED] = 0;
 	}
+	
 	return $stats;
 }
 
@@ -1793,7 +1849,8 @@ function tracker_get_stats(&$tracker, $from = null, $to = null){
 *
 */
 function tracker_get_stats_by_month(&$tracker, $from = null, $to = null){
-	global $CFG, $DB;
+	global $CFG;
+	
 	$sql = "
 		SELECT
 			CONCAT(YEAR(FROM_UNIXTIME(datereported)), '-', DATE_FORMAT(FROM_UNIXTIME(datereported), '%m'), '-', status) as resultid,
@@ -1801,14 +1858,15 @@ function tracker_get_stats_by_month(&$tracker, $from = null, $to = null){
 			status,
 			count(*) as value
 		FROM
-			{tracker_issue}
+			{$CFG->prefix}tracker_issue
 		WHERE
 			trackerid = {$tracker->id}
 		GROUP BY
 			status, CONCAT(YEAR(FROM_UNIXTIME(datereported)), '-', DATE_FORMAT(FROM_UNIXTIME(datereported), '%m'))
 		ORDER BY period
 	";
-	if ($results = $DB->get_records_sql($sql)){
+	
+	if ($results = get_records_sql($sql)){
 		foreach($results as $r){
 			$stats[$r->period][$r->status] = $r->value;
 			$stats[$r->period]['sum'] = @$stats[$r->period]['sum'] + $r->value;
@@ -1826,7 +1884,7 @@ function tracker_get_stats_by_month(&$tracker, $from = null, $to = null){
 *
 */
 function tracker_backtrack_stats_by_month(&$tracker){
-	global $CFG, $DB;
+	global $CFG;
 
 	$sql = "
 		SELECT
@@ -1834,12 +1892,13 @@ function tracker_backtrack_stats_by_month(&$tracker){
 			CONCAT(YEAR(FROM_UNIXTIME(datereported)), '-', DATE_FORMAT(FROM_UNIXTIME(datereported), '%m')) as period,
 			status
 		FROM
-			{tracker_issue}
+			{$CFG->prefix}tracker_issue
 		WHERE
 			trackerid = {$tracker->id}
 		ORDER BY period
 	";
-	if ($issues = $DB->get_records_sql($sql)){
+		
+	if ($issues = get_records_sql($sql)){
 
 		// dispatch issue generating events and follow change tracks
 		foreach($issues as $is){
@@ -1852,25 +1911,30 @@ function tracker_backtrack_stats_by_month(&$tracker){
 					CONCAT(YEAR(FROM_UNIXTIME(timechange)), '-', DATE_FORMAT(FROM_UNIXTIME(timechange), '%m')) as period,
 					statusto
 				FROM
-					{tracker_state_change}
+					{$CFG->prefix}tracker_state_change
 				WHERE
 					issueid = {$is->id}
 				ORDER BY 
 					timechange
 			";
-			if ($changes = $DB->get_records_sql($sql)){
+			if ($changes = get_records_sql($sql)){
 				foreach($changes as $c){
 					$tracks[$c->period][$c->issueid] = $c->statusto;
 				}
 			}
 			$issuelist[$is->id] = -1;
 		}
+	
 		ksort($tracks);
+		
 		$availdates = array_keys($tracks);
 		$lowest = $availdates[0];
 		$highest = $availdates[count($availdates) - 1];
+		
 		list($low->year, $low->month) = split('-', $lowest);
+	
 		$dateiter = new date_iterator($low->year, $low->month);
+	
 		// scan table and snapshot issue states
 		$current = $dateiter->current();
 		while (strcmp($current, $highest) <= 0) {
@@ -1883,6 +1947,7 @@ function tracker_backtrack_stats_by_month(&$tracker){
 			$dateiter->next();
 			$current = $dateiter->current();
 		}
+		
 		// revert and summarize states	
 		foreach($monthtracks as $current => $monthtrack){
 			foreach($monthtrack as $issueid => $state){
@@ -1893,6 +1958,7 @@ function tracker_backtrack_stats_by_month(&$tracker){
 					$stats[$current]['sumunres'] = @$stats[$current]['sumunres'] + 1;
 			}
 		}
+	
 		return $stats;
 	}
 	return array();
@@ -1903,7 +1969,8 @@ function tracker_backtrack_stats_by_month(&$tracker){
 *
 */
 function tracker_get_stats_by_user(&$tracker, $userclass, $from = null, $to = null){
-	global $CFG, $DB;
+	global $CFG;
+	
 	$sql = "
 		SELECT
 			CONCAT(u.id, '-', i.status) as resultdid,
@@ -1913,9 +1980,9 @@ function tracker_get_stats_by_user(&$tracker, $userclass, $from = null, $to = nu
 			count(*) as value,
 			i.status
 		FROM
-			{tracker_issue} i
+			{$CFG->prefix}tracker_issue i
 		LEFT JOIN
-			{user} u			
+			{$CFG->prefix}user u			
 		ON
 			i.{$userclass} = u.id
 		WHERE
@@ -1925,7 +1992,8 @@ function tracker_get_stats_by_user(&$tracker, $userclass, $from = null, $to = nu
 		ORDER BY
 			u.lastname, u.firstname
 	";
-	if ($results = $DB->get_records_sql($sql)){
+	
+	if ($results = get_records_sql($sql)){
 		foreach($results as $r){
 			$stats[$r->id]->name = fullname($r);
 			$stats[$r->id]->status[$r->status] = $r->value;
@@ -1934,6 +2002,7 @@ function tracker_get_stats_by_user(&$tracker, $userclass, $from = null, $to = nu
 	} else {
 		$stats = array();
 	}
+	
 	return $stats;
 }
 
@@ -1946,6 +2015,7 @@ class date_iterator{
 	var $initmonth;
 	var $year;
 	var $month;
+	
 	function date_iterator($year, $month){
 		$this->year = $year;
 		$this->month = $month;
@@ -1957,6 +2027,7 @@ class date_iterator{
 		$this->year = $this->inityear;
 		$this->month = $this->initmonth;
 	}
+	
 	function next(){
 		$this->month++;
 		if ($this->month > 12){
@@ -1976,6 +2047,7 @@ class date_iterator{
 	function getmonth(){
 		return $this->month;
 	}
+	
 	function getiterations($highest){
 		$year = $this->year;
 		$month = $this->month;

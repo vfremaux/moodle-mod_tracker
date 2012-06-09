@@ -1,6 +1,8 @@
 <?php
-echo $OUTPUT->heading(get_string('reports', 'tracker'), 1);
-echo $OUTPUT->heading(get_string('evolution', 'tracker'), 2);
+
+print_heading(get_string('reports', 'tracker'), 'center', 1);
+print_heading(get_string('evolution', 'tracker'), 'center', 2);
+
 $STATUSKEYS = array(POSTED => get_string('posted', 'tracker'), 
                     OPEN => get_string('open', 'tracker'), 
                     RESOLVING => get_string('resolving', 'tracker'), 
@@ -10,29 +12,39 @@ $STATUSKEYS = array(POSTED => get_string('posted', 'tracker'),
                     RESOLVED => get_string('resolved', 'tracker'), 
                     ABANDONNED => get_string('abandonned', 'tracker'),
                     TRANSFERED => get_string('transfered', 'tracker'));
+
 $ticketsbymonth = tracker_get_stats_by_month($tracker);
 $ticketsprogressbymonth = tracker_backtrack_stats_by_month($tracker);
+
 if (!empty($ticketsbymonth)){
 	$availdates = array_keys($ticketsbymonth);
 	if (!empty($availdates)){
 		$lowest = $availdates[0];
 		$highest = $availdates[count($availdates) - 1];
+		
 		list($low->year, $low->month) = split('-', $lowest);
 	}
 	$dateiter = new date_iterator($low->year, $low->month);
 	$colwidth = 60 / $dateiter->getiterations($highest);
 }
-$alltickets = $DB->count_records('tracker_issue', array('trackerid' => $tracker->id));
+
+
+$alltickets = count_records('tracker_issue', 'trackerid', $tracker->id);
 if (!$alltickets){
-	echo $OUTPUT->notification(get_string('nodata', 'tracker'));
+	notify(get_string('nodata', 'tracker'));
 	return;
 }
+
 // tracker_print_evolution_form($tracker);
+
+
 ?>
 <table width="100%" cellpadding="5">
 	<tr valign="top">
 		<td>
-			<?php echo $OUTPUT->heading(get_string('countbymonth', 'tracker', $alltickets), 3) ?>
+			
+			<?php print_heading(get_string('countbymonth', 'tracker', $alltickets), 'center', 3) ?>
+
 			<table width="95%" class="generaltable">
 			<tr valign="top">
 				<td width="40%" align="left"><?php print_string('status', 'tracker') ?></td>
@@ -184,6 +196,7 @@ if (!$alltickets){
 				?>
 			</tr>
 			</table>
+		
 			<table width="95%" class="generaltable">
 			<tr valign="top">
 				<td width="40%" align="left" class="status_resolved"><?php echo $STATUSKEYS[RESOLVED] ?></td>
@@ -272,14 +285,19 @@ if (!$alltickets){
 				?>
 			</tr>
 			</table>
+
 		</td>
 	</tr>
 </table>
+
 <!-----  evolution ----->
+
 <table width="100%" cellpadding="5">
 	<tr valign="top">
 		<td>
-			<?php echo $OUTPUT->heading(get_string('evolutionbymonth', 'tracker', $alltickets), 3) ?>
+			
+			<?php print_heading(get_string('evolutionbymonth', 'tracker', $alltickets), 'center', 3) ?>
+
 		<table width="95%" class="generaltable">
 		<tr valign="top">
 			<td width="40%" align="left"><?php print_string('status', 'tracker') ?></td>
@@ -432,6 +450,7 @@ if (!$alltickets){
 			?>
 		</tr>
 		</table>
+		
 		<table width="95%" class="generaltable">
 		<tr valign="top">
 			<td width="40%" align="left" class="status_resolved"><?php echo $STATUSKEYS[RESOLVED] ?></td>
@@ -565,18 +584,22 @@ if (!$alltickets){
 			?>
 		</tr>
 		</table>
+		
 		<?php
 		if (file_exists($CFG->libdir.'/jqplotlib.php')){
+
 			/*			
 			foreach($trendsum as $k => $v){
 				$data[] = array($k,$v);
 			}*/
+
 			foreach($totalsum as $k => $v){
 				// $data[0][] = array($k, $v);
 				$data[0][] = array($k, $trendsum[$k]);
 				$data[1][] = array($k, $testsum[$k]);
 				$data[2][] = array($k, $ressum[$k]);
 			}
+			
 			$jqplot = array(
 				'title' => array(
 					'text' => get_string('generaltrend', 'tracker'),
@@ -613,10 +636,13 @@ if (!$alltickets){
 					array('color' => '#80FF80'),
 					array('color' => '#00C000'),
 				),
+					
 				);	
+				
 			jqplot_print_graph('plot1', $jqplot, $data, 550, 250, 'margin-top:20px;');		
 		}
 		?>
+
 		</td>
 	</tr>
 </table>

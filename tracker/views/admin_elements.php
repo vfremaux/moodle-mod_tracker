@@ -15,10 +15,10 @@ if (!defined('MOODLE_INTERNAL')) {
 
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID, or
 $a  = optional_param('a', 0, PARAM_INT);  // course ID	
-$OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'description');
+print_simple_box_start('center', '100%', '', '', 'generalbox', 'description');
 ?>
 <form name="addelement" method="post" action="view.php">
-<table border="0" width="100%">
+<table border="0" width="400">
 	<tr>
 		<td valign="top">
 			<b><?php print_string('createnewelement', 'tracker') ?>:</b>
@@ -31,8 +31,7 @@ $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'description');
 		            foreach($types as $type){
 		                $elementtypesmenu[$type] = get_string($type, 'tracker');
 		            }
-
-		            echo html_writer::select($elementtypesmenu, 'type', '', array('' => 'choose'), array('onchange' => 'document.forms[\'addelement\'].submit();'));
+		            choose_from_menu($elementtypesmenu, 'type', '', 'choose', 'document.forms[\'addelement\'].submit();');
 				?>
 		</td>
 	</tr>
@@ -40,10 +39,10 @@ $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'description');
 </form>
 
 <?php
-$OUTPUT->box_end(); 
-$OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'description');
+print_simple_box_end(); 
+print_simple_box_start('center', '100%', '', '', 'generalbox', 'description');
 tracker_loadelements($tracker, $elements);	
-echo $OUTPUT->heading(get_string('elements', 'tracker'));
+print_heading(get_string('elements', 'tracker'));
 
 $localstr = get_string('local', 'tracker');
 $namestr = get_string('name');
@@ -51,9 +50,8 @@ $typestr = get_string('type', 'tracker');
 $cmdstr = get_string('action', 'tracker');
 
 unset($table);
-$table = new html_table();
 $table->head = array("<b>$cmdstr</b>", "<b>$namestr</b>", "<b>$localstr</b>", "<b>$typestr</b>");
-$table->width = '100%';
+$table->width = 400;
 $table->size = array(100, 250, 50, 50);
 $table->align = array('left', 'center', 'center', 'center'); 
 
@@ -64,6 +62,7 @@ if (!empty($elements)){
             unset($elements[$id]);
         }
     }
+    
     /// make list
 	foreach ($elements as $element){
 
@@ -75,23 +74,24 @@ if (!empty($elements)){
 		if ($element->hasoptions() && empty($element->options)){
 		    $name .= ' <span class="error">('.get_string('nooptions', 'tracker').')</span>';
 		}
-		$actions = "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=addelement&amp;elementid={$element->id}\" title=\"".get_string('addtothetracker', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('t/moveleft', 'core') ."\" /></a>";
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=viewelementoptions&amp;elementid={$element->id}\" title=\"".get_string('editoptions', 'tracker')."\"><img src=\"".$OUTPUT->pix_url('editoptions', 'mod_tracker')."\" /></a>";
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=editelement&amp;elementid={$element->id}\" title=\"".get_string('editproperties', 'tracker')."\"><img src=\"".$OUTPUT->pix_url('t/edit', 'core') ."\" /></a>";
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=deleteelement&amp;elementid={$element->id}\" title=\"".get_string('delete')."\"><img src=\"".$OUTPUT->pix_url('t/delete', 'core') ."\" /></a>";
+		
+		$actions = "<a href=\"view.php?id={$cm->id}&amp;what=addelement&amp;elementid={$element->id}\" title=\"".get_string('addtothetracker', 'tracker')."\" ><img src=\"{$CFG->pixpath}/t/moveleft.gif\" /></a>";
+        $actions .= "<a href=\"view.php?id={$cm->id}&amp;what=viewelementoptions&amp;elementid={$element->id}\" title=\"".get_string('editoptions', 'tracker')."\"><img src=\"{$CFG->wwwroot}/mod/tracker/pix/editoptions.gif\" /></a>";
+        $actions .= "<a href=\"view.php?id={$cm->id}&amp;what=editelement&amp;elementid={$element->id}\" title=\"".get_string('editproperties', 'tracker')."\"><img src=\"{$CFG->pixpath}/t/edit.gif\" /></a>";
+        $actions .= "<a href=\"view.php?id={$cm->id}&amp;what=deleteelement&amp;elementid={$element->id}\" title=\"".get_string('delete')."\"><img src=\"{$CFG->pixpath}/t/delete.gif\" /></a>";
 
         $local = '';
         if ($element->course == $COURSE->id){
-    	    $local = "<img src=\"".$OUTPUT->pix_url('i/course', 'core') ."\" />";
+    	    $local = "<img src=\"{$CFG->pixpath}/i/course.gif\" />";
     	}
-		$type = "<img src=\"".$OUTPUT->pix_url("types/{$element->type}", 'mod_tracker')."\" />";
+		$type = "<img src=\"{$CFG->wwwroot}/mod/tracker/pix/types/{$element->type}.gif\" />";
 		$table->data[] = array($actions, $name, $local, $type);
 	}
-	echo html_writer::table($table);
+	print_table($table);
 } else {
     echo '<center>';
     print_string('noelements', 'tracker');
     echo '<br /></center>';
 }
-$OUTPUT->box_end(); 
+print_simple_box_end(); 
 ?>

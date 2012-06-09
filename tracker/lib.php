@@ -4,34 +4,12 @@
 * @package mod-tracker
 * @author Clifford Tham, Valery Fremaux > 1.8
 * @date 02/12/2007
-* @version Moodle 2.0
 *
 * Library of functions and constants for module tracker
 */
 
 include_once('classes/trackercategorytype/trackerelement.class.php');
 
-/**
- * List of features supported in tracker module
- * @param string $feature FEATURE_xx constant for requested feature
- * @return mixed True if module supports feature, false if not, null if doesn't know
- */
-function tracker_supports($feature) {
-    switch($feature) {
-        case FEATURE_MOD_ARCHETYPE:           return MOD_ARCHETYPE_OTHER;
-        case FEATURE_GROUPS:                  return false;
-        case FEATURE_GROUPINGS:               return false;
-        case FEATURE_GROUPMEMBERSONLY:        return false;
-        case FEATURE_MOD_INTRO:               return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS: return false;
-        case FEATURE_GRADE_HAS_GRADE:         return false;
-        case FEATURE_GRADE_OUTCOMES:          return false;
-        case FEATURE_BACKUP_MOODLE2:          return true;
-        case FEATURE_SHOW_DESCRIPTION:        return true;
-
-        default: return null;
-    }
-}
 
 /** 
 * Given an object containing all the necessary data, 
@@ -40,19 +18,21 @@ function tracker_supports($feature) {
 * of the new instance.
 * @param object $tracker
 */
-function tracker_add_instance($tracker, $mform) {
-	global $DB;
+function tracker_add_instance($tracker) {
 
     $tracker->timemodified = time();
+    
     if (empty($tracker->allownotifications)) $tracker->allownotifications = 0;
     if (empty($tracker->enablecomments)) $tracker->enablecomments = 0;
-    if (empty($tracker->format)) $tracker->format = FORMAT_MOODLE;
+    
+    if (empty($tracker->format)) $tracker->format = 'MOODLE';
 
 	if (is_array(@$tracker->subtrackers)){
 		$tracker->subtrackers = implode(',', $tracker->subtrackers);
 	}
 
-    return $DB->insert_record('tracker', $tracker);
+
+    return insert_record('tracker', $tracker);
 }
 
 /**
@@ -60,8 +40,7 @@ function tracker_add_instance($tracker, $mform) {
 * (defined by the form in mod.html) this function 
 * will update an existing instance with new data.
 */
-function tracker_update_instance($tracker, $mform) {
-	global $DB;
+function tracker_update_instance($tracker) {
 
     $tracker->timemodified = time();
     $tracker->id = $tracker->instance;
@@ -70,7 +49,7 @@ function tracker_update_instance($tracker, $mform) {
 		$tracker->subtrackers = implode(',', $tracker->subtrackers);
 	}
 
-    return $DB->update_record('tracker', $tracker);
+    return update_record('tracker', $tracker);
 }
 
 /**
@@ -79,23 +58,21 @@ function tracker_update_instance($tracker, $mform) {
 * and any data that depends on it.  
 */
 function tracker_delete_instance($id) {
-	global $DB;
-
-    if (! $tracker = $DB->get_record('tracker', array('id' => "$id"))) {
+    if (! $tracker = get_record('tracker', 'id', "$id")) {
         return false;
     }
 
     $result = true;
 
     /// Delete any dependent records here 
-    $DB->delete_records('tracker_issue', array('trackerid' => "$tracker->id"));
-    $DB->delete_records('tracker_elementused', array('trackerid' => "$tracker->id"));
-    $DB->delete_records('tracker_query', array('trackerid' => "$tracker->id"));
-    $DB->delete_records('tracker_issuedependancy', array('trackerid' => "$tracker->id"));
-    $DB->delete_records('tracker_issueownership', array('trackerid' => "$tracker->id"));
-    $DB->delete_records('tracker_issueattribute', array('trackerid' => "$tracker->id"));
-    $DB->delete_records('tracker_issuecc', array('trackerid' => "$tracker->id"));
-    $DB->delete_records('tracker_issuecomment', array('trackerid' => "$tracker->id"));
+    delete_records('tracker_issue', 'trackerid', "$tracker->id");
+    delete_records('tracker_elementused', 'trackerid', "$tracker->id");
+    delete_records('tracker_query', 'trackerid', "$tracker->id");
+    delete_records('tracker_issuedependancy', 'trackerid', "$tracker->id");
+    delete_records('tracker_issueownership', 'trackerid', "$tracker->id");
+    delete_records('tracker_issueattribute', 'trackerid', "$tracker->id");
+    delete_records('tracker_issuecc', 'trackerid', "$tracker->id");
+    delete_records('tracker_issuecomment', 'trackerid', "$tracker->id");
 
     return $result;
 }
@@ -127,8 +104,8 @@ function tracker_user_complete($course, $user, $mod, $tracker) {
 * Return true if there was output, or false is there was none.
 */
 function tracker_print_recent_activity($course, $isteacher, $timestart) {
-	global $DB, $CFG;
-	
+    global $CFG;
+    
     $sql = "
         SELECT
             t.name,
@@ -139,14 +116,14 @@ function tracker_print_recent_activity($course, $isteacher, $timestart) {
             ti.reportedby,
             ti.datereported
          FROM
-            {tracker} t,
-            {tracker_issue} ti
+            {$CFG->prefix}tracker t,
+            {$CFG->prefix}tracker_issue ti
          WHERE
             t.id = ti.trackerid AND
             t.course = $course->id AND
             ti.datereported > $timestart
     ";
-    $newstuff = $DB->get_records_sql($sql);
+    $newstuff = get_records_sql($sql);
     if ($newstuff){
         foreach($newstuff as $anissue){
             echo "<span style=\"font-size:0.8em\">"; 
@@ -157,6 +134,7 @@ function tracker_print_recent_activity($course, $isteacher, $timestart) {
         }
         return true;
     }
+    
     return false;  //  True if anything was printed, otherwise false 
 }
 
@@ -193,22 +171,21 @@ function tracker_grades($trackerid) {
 * See other modules as example.
 */
 function tracker_get_participants($trackerid) {
-	global $DB;
-
-    $resolvers = $DB->get_records('tracker_issueownership', array('trackerid' => $trackerid), '', 'id,id');
+    $resolvers = get_records('tracker_issueownership', 'trackerid', $trackerid, '', 'id,id');
     if(!$resolvers) $resolvers = array();
-    $developers = $DB->get_records('tracker_issuecc', array('trackerid' => $trackerid), '', 'id,id');
+    $developers = get_records('tracker_issuecc', 'trackerid', $trackerid, '', 'id,id');
     if(!$developers) $developers = array();
-    $reporters = $DB->get_records('tracker_issue', array('trackerid' => $trackerid), '', 'reportedby,reportedby');
+    $reporters = get_records('tracker_issue', 'trackerid', $trackerid, '', 'reportedby,reportedby');
     if(!$reporters) $reporters = array();
-    $admins = $DB->get_records('tracker_issueownership', array('trackerid' => $trackerid), '', 'bywhomid,bywhomid');
+    $admins = get_records('tracker_issueownership', 'trackerid', $trackerid, '', 'bywhomid,bywhomid');
     if(!$admins) $admins = array();
-    $commenters = $DB->get_records('tracker_issuecomment', array('trackerid' => $trackerid), '', 'userid,userid');
+    $commenters = get_records('tracker_issuecomment', 'trackerid', $trackerid, '', 'userid,userid');
     if(!$commenters) $commenters = array();
     $participants = array_merge(array_keys($resolvers), array_keys($developers), array_keys($reporters), array_keys($admins));
     $participantlist = implode(',', array_unique($participants));
+    
     if (!empty($participantlist)){
-        return $DB->get_records_list('user', array('id' => $participantlist));   
+        return get_records_list('user', 'id', $participantlist);   
     }
     return array();
 }
@@ -220,6 +197,7 @@ function tracker_get_participants($trackerid) {
 * as reference.
 */
 function tracker_scale_used ($trackerid, $scaleid) {
+   
     $return = false;
 
     //$rec = get_record("tracker","id","$trackerid","scale","-$scaleid");
@@ -227,6 +205,7 @@ function tracker_scale_used ($trackerid, $scaleid) {
     //if (!empty($rec)  && !empty($scaleid)) {
     //    $return = true;
     //}
+   
     return $return;
 }
 
@@ -235,19 +214,19 @@ function tracker_scale_used ($trackerid, $scaleid) {
 *
 */
 function tracker_install(){
-	global $DB;
-
+    
     $result = true;
 
-    if (!$DB->get_record('mnet_service', array('name' => 'tracker_cascade'))){
+    if (!get_record('mnet_service', 'name', 'tracker_cascade')){
         $service->name = 'tracker_cascade';
         $service->description = get_string('transferservice', 'tracker');
         $service->apiversion = 1;
         $service->offer = 1;
-        if (!$serviceid = $DB->insert_record('mnet_service', $service)){
-            echo $OUTPUT->notification('Error installing tracker_cascade service.');
+        if (!$serviceid = insert_record('mnet_service', $service)){
+            notify('Error installing tracker_cascade service.');
             $result = false;
         }
+        
         $rpc->function_name = 'tracker_rpc_get_instances';
         $rpc->xmlrpc_path = 'mod/tracker/rpclib.php/tracker_rpc_get_instances';
         $rpc->parent_type = 'mod';  
@@ -255,13 +234,14 @@ function tracker_install(){
         $rpc->enabled = 0; 
         $rpc->help = 'Get instances of available trackers for cascading.';
         $rpc->profile = '';
-        if (!$rpcid = $DB->insert_record('mnet_rpc', $rpc)){
-            echo $OUTPUT->notification('Error installing tracker_cascade RPC calls.');
+        if (!$rpcid = insert_record('mnet_rpc', $rpc)){
+            notify('Error installing tracker_cascade RPC calls.');
             $result = false;
         }
         $rpcmap->serviceid = $serviceid;
         $rpcmap->rpcid = $rpcid;
-        $DB->insert_record('mnet_service2rpc', $rpcmap);
+        insert_record('mnet_service2rpc', $rpcmap);
+        
         $rpc->function_name = 'tracker_rpc_get_infos';
         $rpc->xmlrpc_path = 'mod/tracker/rpclib.php/tracker_rpc_get_infos';
         $rpc->parent_type = 'mod';  
@@ -269,12 +249,12 @@ function tracker_install(){
         $rpc->enabled = 0; 
         $rpc->help = 'Get information about one tracker.';
         $rpc->profile = '';
-        if (!$rpcid = $DB->insert_record('mnet_rpc', $rpc)){
-            echo $OUTPUT->notification('Error installing tracker_cascade RPC calls.');
+        if (!$rpcid = insert_record('mnet_rpc', $rpc)){
+            notify('Error installing tracker_cascade RPC calls.');
             $result = false;
         }
         $rpcmap->rpcid = $rpcid;
-        $DB->insert_record('mnet_service2rpc', $rpcmap);
+        insert_record('mnet_service2rpc', $rpcmap);
 
         $rpc->function_name = 'tracker_rpc_post_issue';
         $rpc->xmlrpc_path = 'mod/tracker/rpclib.php/tracker_rpc_post_issue';
@@ -283,13 +263,14 @@ function tracker_install(){
         $rpc->enabled = 0; 
         $rpc->help = 'Cascades an issue.';
         $rpc->profile = '';
-        if (!$rpcid = $DB->insert_record('mnet_rpc', $rpc)){
-            echo $OUTPUT->notification('Error installing tracker_cascade RPC calls.');
+        if (!$rpcid = insert_record('mnet_rpc', $rpc)){
+            notify('Error installing tracker_cascade RPC calls.');
             $result = false;
         }
         $rpcmap->rpcid = $rpcid;
-        $DB->insert_record('mnet_service2rpc', $rpcmap);
+        insert_record('mnet_service2rpc', $rpcmap);
     }
+    
     return $result;
 }
 
@@ -298,17 +279,18 @@ function tracker_install(){
 *
 */
 function tracker_uninstall(){
-	global $DB;
-
+    
     $return = true;
+    
     // delete all tracker related mnet services and MNET bindings
-    $service = $DB->get_record('mnet_service', array('name' => 'tracker_cascade'));
+    $service = get_record('mnet_service', 'name', 'tracker_cascade');
     if ($service){
-        $DB->delete_records('mnet_host2service', array('serviceid' => $service->id));
-        $DB->delete_records('mnet_service2rpc', array('serviceid' => $service->id));
-        $DB->delete_records('mnet_rpc', array('parent' => 'tracker'));
-        $DB->delete_records('mnet_service', array('name' => 'tracker_cascade'));
+        delete_records('mnet_host2service', 'serviceid', $service->id);
+        delete_records('mnet_service2rpc', 'serviceid', $service->id);
+        delete_records('mnet_rpc', 'parent', 'tracker');
+        delete_records('mnet_service', 'name', 'tracker_cascade');
     }
+    
     return $return;
 }
 ?>

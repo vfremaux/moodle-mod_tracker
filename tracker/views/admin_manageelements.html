@@ -16,13 +16,13 @@ if (!defined('MOODLE_INTERNAL')) {
 ?>
 
 <table width="100%">
-	<tr valign="top" width="50%">
-		<td align="center">
+	<tr>
+		<td valign="top">
 			<?php
 				include $CFG->dirroot.'/mod/tracker/views/admin_elements_used.php'; 
 			?>
 		</td>
-		<td align="center" width="50%">
+		<td valign="top">
 			<?php
 				include $CFG->dirroot.'/mod/tracker/views/admin_elements.php'; 
 			?>
@@ -30,4 +30,5 @@ if (!defined('MOODLE_INTERNAL')) {
 	</tr>
 </table>
 <?php
+$nohtmleditorneeded = true;
 ?>

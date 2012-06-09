@@ -63,7 +63,7 @@ elseif ($action == 'viewquery'){
 /******************************** ask for editing a personal search query **************************/
 elseif ($action == 'editquery'){
     $form->queryid = required_param('queryid', PARAM_INT);
-    $query = $DB->get_record('tracker_query', array('id' => $form->queryid));
+    $query = get_record('tracker_query', 'id', $form->queryid);
     $fields = tracker_extractsearchparametersfromdb($form->queryid);
     $form->name = $query->name;
     $form->checkdate = (empty($fields['datereported'])) ? false : true ;
@@ -78,6 +78,7 @@ elseif ($action == 'editquery'){
 elseif ($action == 'updatequery'){
 	$query->id = required_param('queryid', PARAM_INT);
 	$fields = tracker_extractsearchparametersfrompost();
+		
 	$query->trackerid = $tracker->id;
 	if(! tracker_savesearchparameterstodb($query, $fields)){
 		error ('Unable to update query id" ' . $query->id, 'view.php?a={$tracker->id}&amp;page=myqueries');
@@ -86,43 +87,43 @@ elseif ($action == 'updatequery'){
 /******************************** deletes a personal search query **************************/
 elseif ($action == 'deletequery'){
 	$queryid = optional_param('queryid', '', PARAM_INT);
-	if (! $DB->delete_records ('tracker_query', 'id', $queryid, 'trackerid', $tracker->id, 'userid', $USER->id)){
+	if (! delete_records ('tracker_query', 'id', $queryid, 'trackerid', $tracker->id, 'userid', $USER->id)){
 		error ("Cannot delete query id: " . $queryid);
 	}
 }
 /******************************** register to an issue **************************/
 elseif ($action == 'register'){
 	$issueid = optional_param('issueid', '', PARAM_INT);
-	if (!$DB->get_record('tracker_issuecc', array('trackerid' => $tracker->id, 'issueid' => $issueid, 'userid' => $USER->id))){
+	if (!get_record('tracker_issuecc', 'trackerid', $tracker->id, 'issueid', $issueid, 'userid', $USER->id)){
 	    $cc->trackerid = $tracker->id;
 	    $cc->issueid = $issueid;
 	    $cc->userid = $USER->id;
 	    $cc->events = (isset($USER->trackerprefs->eventmask)) ? $USER->trackerprefs->eventmask : ALL_EVENTS ;
-	    $DB->insert_record('tracker_issuecc', $cc);
+	    insert_record('tracker_issuecc', $cc);
 	}
 }
 /******************************** unregister a watch on an issue **************************/
 elseif ($action == 'unregister'){
 	$issueid = required_param('issueid', PARAM_INT);
 	$ccid = required_param('ccid', PARAM_INT);
-	if (!$DB->delete_records ('tracker_issuecc', 'trackerid', $tracker->id, 'issueid', $issueid, 'userid', $ccid)){
+	if (!delete_records ('tracker_issuecc', 'trackerid', $tracker->id, 'issueid', $issueid, 'userid', $ccid)){
 		error ("Cannot delete carbon copy {$tracker->ticketprefix}{$issueid} for user : " . $ccid);
 	}
 }
 /******************************** unregister all my watches **************************/
 elseif ($action == 'unregisterall'){
 	$userid = required_param('userid', PARAM_INT);
-	if (! $DB->delete_records ('tracker_issuecc', 'trackerid', $tracker->id, 'userid', $userid)){
+	if (! delete_records ('tracker_issuecc', 'trackerid', $tracker->id, 'userid', $userid)){
 		error ("Cannot delete carbon copies for user : " . $userid);
 	}
 }
 /************************** ask for editing the watchers configuration **************************/
 elseif ($action == 'editwatch'){
 	$ccid = optional_param('ccid', '', PARAM_INT);
-	if (!$form = $DB->get_record('tracker_issuecc', array('id' => $ccid))){
+	if (!$form = get_record('tracker_issuecc', 'id', $ccid)){
 	    error("Cannot edit this watch");
 	}
-	$issue = $DB->get_record('tracker_issue', array('id' => $form->issueid));
+	$issue = get_record('tracker_issue', 'id', $form->issueid);
 	$form->summary = $issue->summary;
 
 	include "views/editwatch.html";
@@ -136,10 +137,11 @@ elseif ($action == 'updatewatch'){
 	$waiting = optional_param('waiting', '', PARAM_INT);
 	$testing = optional_param('testing', '', PARAM_INT);
 	$published = optional_param('published', '', PARAM_INT);
+	$validated = optional_param('validated', '', PARAM_INT);
 	$resolved = optional_param('resolved', '', PARAM_INT);
 	$abandonned = optional_param('abandonned', '', PARAM_INT);
 	$oncomment = optional_param('oncomment', '', PARAM_INT);
-	$cc->events = $DB->get_field('tracker_issuecc', 'events', array('id' => $cc->id));
+	$cc->events = get_field('tracker_issuecc', 'events', 'id', $cc->id);
 	if (is_numeric($open))
         $cc->events = ($open === 1) ? $cc->events | EVENT_OPEN : $cc->events & ~EVENT_OPEN ;
 	if (is_numeric($resolving))
@@ -150,6 +152,8 @@ elseif ($action == 'updatewatch'){
         $cc->events = ($testing === 1) ? $cc->events | EVENT_TESTING : $cc->events & ~EVENT_TESTING ;
 	if (is_numeric($published))
         $cc->events = ($published === 1) ? $cc->events | EVENT_PUBLISHED : $cc->events & ~EVENT_PUBLISHED ;
+	if (is_numeric($validated))
+        $cc->events = ($validated === 1) ? $cc->events | EVENT_VALIDATED : $cc->events & ~EVENT_VALIDATED ;
 	if (is_numeric($resolved))
         $cc->events = ($resolved === 1) ? $cc->events | EVENT_RESOLVED : $cc->events & ~EVENT_RESOLVED ;
 	if (is_numeric($abandonned))
@@ -157,8 +161,8 @@ elseif ($action == 'updatewatch'){
 	if (is_numeric($oncomment))
         $cc->events = ($oncomment === 1) ? $cc->events | ON_COMMENT : $cc->events & ~ON_COMMENT ;
 
-    if (!$DB->update_record('tracker_issuecc', $cc)){
-        print_error('errorcannotupdatewatcher', 'tracker');
+    if (!update_record('tracker_issuecc', $cc)){
+        error("Could not update watch $ccid");
     }
 }
 /********************************* saves the user's preferences **************************/
@@ -168,21 +172,24 @@ elseif ($action == 'saveprefs'){
     $waiting = optional_param('waiting', 1, PARAM_INT);
     $testing = optional_param('testing', 1, PARAM_INT);
     $published = optional_param('published', 1, PARAM_INT);
+    $validated = optional_param('validated', 1, PARAM_INT);
     $resolved = optional_param('resolved', 1, PARAM_INT);
     $abandonned = optional_param('abandonned', 1, PARAM_INT);
     $oncomment = optional_param('oncomment', 1, PARAM_INT);
+    
     $pref->trackerid = $tracker->id;
     $pref->userid = $USER->id;
     $pref->name = 'eventmask';
-    $pref->value = $open * EVENT_OPEN + $resolving * EVENT_RESOLVING + $waiting * EVENT_WAITING + $resolved * EVENT_RESOLVED + $abandonned * EVENT_ABANDONNED + $oncomment * ON_COMMENT + $testing * EVENT_TESTING + $published * EVENT_PUBLISHED;
-    if (!$oldpref = $DB->get_record('tracker_preferences', array('trackerid' => $tracker->id, 'userid' => $USER->id, 'name' => 'eventmask'))){
-        if (!$DB->insert_record('tracker_preferences', $pref)){
-            print_error('errorcannotsaveprefs', 'tracker');
+    $pref->value = $open * EVENT_OPEN + $resolving * EVENT_RESOLVING + $waiting * EVENT_WAITING + $resolved * EVENT_RESOLVED + $abandonned * EVENT_ABANDONNED + $oncomment * ON_COMMENT + $testing * EVENT_TESTING + $published * EVENT_PUBLISHED + $validated * EVENT_VALIDATED;
+
+    if (!$oldpref = get_record('tracker_preferences', 'trackerid', $tracker->id, 'userid', $USER->id, 'name', 'eventmask')){
+        if (!insert_record('tracker_preferences', $pref)){
+            error("Could not insert preference record");
         }
     } else {
         $pref->id = $oldpref->id;
-        if (!$DB->update_record('tracker_preferences', $pref)){
-            print_error('errorcannotupdateprefs', 'tracker');
+        if (!update_record('tracker_preferences', $pref)){
+            error("Could not update preference record");
         }
     }
 }

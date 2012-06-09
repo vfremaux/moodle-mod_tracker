@@ -13,55 +13,62 @@
 	require_once("../../config.php");
 	require_once($CFG->dirroot."/mod/tracker/lib.php");
 	require_once($CFG->dirroot."/mod/tracker/locallib.php");
+	
 	$usehtmleditor = false;
 	$editorfields = '';
+	
 	/// Check for required parameters - Course Module Id, trackerID, 
+	    
 	$id = optional_param('id', 0, PARAM_INT); // Course Module ID, or
 	$a  = optional_param('a', 0, PARAM_INT);  // tracker ID
 	$issueid = optional_param('issueid', '', PARAM_INT);  // issue number
+	
 	// PART OF MVC Implementation
 	$action = optional_param('what', '', PARAM_ALPHA);
 	$screen = optional_param('screen', '', PARAM_ALPHA);
 	$view = optional_param('view', '', PARAM_ALPHA);
 	// !PART OF MVC Implementation
+	        
 	if ($id) {
 	    if (! $cm = get_coursemodule_from_id('tracker', $id)) {
 	        print_error('errorcoursemodid', 'tracker');
 	    }
-	    if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
+	
+	    if (! $course = get_record('course', 'id', $cm->course)) {
 	        print_error('errorcoursemisconfigured', 'tracker');
 	    }
-	    if (! $tracker = $DB->get_record('tracker', array('id' => $cm->instance))) {
+	
+	    if (! $tracker = get_record('tracker', 'id', $cm->instance)) {
 	        print_error('errormoduleincorrect', 'tracker');
 	    }
 	} else {
-	    if (! $tracker = $DB->get_record('tracker', array('id' => $a))) {
+	    if (! $tracker = get_record('tracker', 'id', $a)) {
 	        print_error('errormoduleincorrect', 'tracker');
 	    }
-	    if (! $course = $DB->get_record('course', array('id' => $tracker->course))) {
+	    if (! $course = get_record('course', 'id', $tracker->course)) {
 	        print_error('errorcoursemisconfigured', 'tracker');
 	    }
 	    if (! $cm = get_coursemodule_from_instance("tracker", $tracker->id, $course->id)) {
 	        print_error('errorcoursemodid', 'tracker');
 	    }
 	}
-
-	// redirect (before outputting) traps
-	if ($view == "view" && (empty($screen) || $screen == 'viewanissue' || $screen == 'editanissue') && empty($issueid)){
-        redirect("view.php?id={$cm->id}&amp;screen=browse");
-	}
-
-	$context = context_module::instance($cm->id);
+	
+	$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+	    
 	require_login($course->id);
+	
 	add_to_log($course->id, 'tracker', "$view:$screen/$action", "view.php?id=$cm->id", "$tracker->id", $cm->id);
+	
 	$usehtmleditor = can_use_html_editor();
 	$defaultformat = FORMAT_MOODLE;
 	tracker_loadpreferences($tracker->id, $USER->id);
+	    
 	/// Search controller - special implementation
 	// TODO : consider incorporing this controller back into standard MVC
 	if ($action == 'searchforissues'){
 	    $search = optional_param('search', null, PARAM_CLEANHTML);
 	    $saveasreport = optional_param('saveasreport', null, PARAM_CLEANHTML);
+	        
 	    if (!empty($search)){       //search for issues
 	        tracker_searchforissues($tracker, $cm->id);
 	    } elseif (!empty ($saveasreport)){        //save search as a report
@@ -75,25 +82,24 @@
 	        redirect("view.php?id={$cm->id}&amp;screen={$returnview}");
 	    }
 	}
+	            
 	$strtrackers = get_string('modulenameplural', 'tracker');
 	$strtracker  = get_string('modulename', 'tracker');
+	
 	$navigation = build_navigation('', $cm);
+	
 	if (file_exists($CFG->libdir.'/jqplotlib.php')){
 		include_once $CFG->libdir.'/jqplotlib.php';
 		require_jqplot_libs();
 	}
-	$PAGE->set_title(format_string($tracker->name));
-	$PAGE->set_heading("");
-	/* SCANMSG: may be additional work required for $navigation variable */
-	$PAGE->set_focuscontrol("");
-	$PAGE->set_url($CFG->wwwroot.'/mod/tracker/view.php?id='.$cm->id);
-	$PAGE->set_cacheable(true);
-	$PAGE->set_button(update_module_button($cm->id, $course->id, $strtracker));
-	$PAGE->set_headingmenu(navmenu($course, $cm));
-	echo $OUTPUT->header();
+	
+	print_header_simple(format_string($tracker->name), "",
+	                  $navigation, "", "", true,
+	                  update_module_button($cm->id, $course->id, $strtracker), navmenu($course, $cm));
 
 	/// integrate module specific stylesheets (calls an eventual theme override)
-	echo '<link rel="stylesheet" href="'.$CFG->wwwroot.'/theme/'.$PAGE->theme->name.'/tracker.css" type="text/css" />';
+	echo '<link rel="stylesheet" href="'.$CFG->themewww.'/'.current_theme().'/tracker.css" type="text/css" />';
+	
 	// PART OF MVC Implementation
 	/// memorizes current view - typical session switch
 	if (!empty($view)){
@@ -102,6 +108,7 @@
 	    $_SESSION['currentview'] = 'reportanissue';
 	}
 	$view = $_SESSION['currentview'];
+	
 	/// memorizes current screen - typical session switch
 	if (!empty($screen)){
 	    $_SESSION['currentscreen'] = $screen;
@@ -110,9 +117,11 @@
 	}
 	$screen = $_SESSION['currentscreen'];
 	// !PART OF MVC Implementation
-	echo $OUTPUT->box_start('', 'tracker-view');
-	$totalissues = $DB->count_records_select('tracker_issue', "trackerid = {$tracker->id} AND status <> ".RESOLVED." AND status <> ".ABANDONNED);
-	$totalresolvedissues = $DB->count_records_select('tracker_issue', "trackerid = $tracker->id AND (status = ".RESOLVED." OR status = ".ABANDONNED.")");
+	
+	print_box_start('', 'tracker-view');
+	
+	$totalissues = count_records_select('tracker_issue', "trackerid = {$tracker->id} AND status <> ".RESOLVED." AND status <> ".ABANDONNED);
+	$totalresolvedissues = count_records_select('tracker_issue', "trackerid = $tracker->id AND (status = ".RESOLVED." OR status = ".ABANDONNED.")");
 	/// Print tabs with options for user
 	$rows[0][] = new tabobject('reportanissue', "view.php?id={$cm->id}&amp;view=reportanissue", get_string('newissue', 'tracker'));
 	$rows[0][] = new tabobject('view', "view.php?id={$cm->id}&amp;view=view", get_string('view', 'tracker').' ('.$totalissues.' '.get_string('issues','tracker').')');
@@ -124,6 +133,7 @@
 	if (has_capability('mod/tracker:configure', $context)){
 	    $rows[0][] = new tabobject('admin', "view.php?id={$cm->id}&amp;view=admin", get_string('administration', 'tracker'));
 	}
+	        
 	/// submenus
 	$selected = null;
 	$activated = null;
@@ -133,8 +143,9 @@
 	        $selected = $view;
 	    	break;
 	    case 'view' :
-	        if (!preg_match("/mytickets|browse|search|viewanissue|editanissue/", $screen)) $screen = 'mytickets';
+	        if (!preg_match("/mytickets|mywork|browse|search|viewanissue|editanissue/", $screen)) $screen = 'mytickets';
 	        $rows[1][] = new tabobject('mytickets', "view.php?id={$cm->id}&amp;view=view&amp;screen=mytickets", get_string('mytickets', 'tracker'));
+	        $rows[1][] = new tabobject('mywork', "view.php?id={$cm->id}&amp;view=view&amp;screen=mywork", get_string('mywork', 'tracker'));
 	        if (has_capability('mod/tracker:viewallissues', $context) || $tracker->supportmode == 'bugtracker'){
 	            $rows[1][] = new tabobject('browse', "view.php?id={$cm->id}&amp;view=view&amp;screen=browse", get_string('browse', 'tracker'));
 	        }
@@ -143,6 +154,7 @@
 	    case 'resolved' :
 	        if (!preg_match("/mytickets|browse/", $screen)) $screen = 'mytickets';
 	        $rows[1][] = new tabobject('mytickets', "view.php?id={$cm->id}&amp;view=resolved&amp;screen=mytickets", get_string('mytickets', 'tracker'));
+	        $rows[1][] = new tabobject('mywork', "view.php?id={$cm->id}&amp;view=view&amp;screen=mywork", get_string('mywork', 'tracker'));
 	        if (has_capability('mod/tracker:viewallissues', $context) || $tracker->supportmode == 'bugtracker'){
 	            $rows[1][] = new tabobject('browse', "view.php?id={$cm->id}&amp;view=resolved&amp;screen=browse", get_string('browse', 'tracker'));
 	        }
@@ -176,15 +188,19 @@
 	} else {
 	    $selected = $view;
 	}
-	echo $OUTPUT->container_start('mod-header');
+	print_container_start(true, 'mod-header');
 	print_tabs($rows, $selected, '', $activated);
-	echo $OUTPUT->container_end();
+	echo '<br/>';
+	print_container_end();
+	                  
 	//=====================================================================
 	// Print the main part of the page
 	//
 	//=====================================================================
+	    
 	/// routing to appropriate view against situation
 	// echo "routing : $view:$screen:$action ";
+	
 	if ($view == 'reportanissue'){
 	    if (has_capability('mod/tracker:report', $context)){
 	        include "views/issuereportform.html";
@@ -202,6 +218,10 @@
 	                $resolved = 0;
 	                include "views/viewmyticketslist.php";
 	                break;
+	            case 'mywork': 
+	                $resolved = 0;
+	                include "views/viewmyassignedticketslist.php";
+	                break;
 	            case 'browse': 
 	                if (!has_capability('mod/tracker:viewallissues', $context)){
 	                    print_error ('errornoaccessallissues', 'tracker');
@@ -215,18 +235,26 @@
 	                break;
 	            case 'viewanissue' :
 	                ///If user it trying to view an issue, check to see if user has privileges to view this issue
-                    if (!has_capability('mod/tracker:seeissues', $context)){
-                        print_error('errornoaccessissue', 'tracker');
-                    } else {
-                        include "views/viewanissue.html";
-                    }
+	                if ($issueid != ''){
+	                    if (!has_capability('mod/tracker:seeissues', $context)){
+	                        print_error('errornoaccessissue', 'tracker');
+	                    } else {
+	                        include "views/viewanissue.html";
+	                    }
+	                } else {
+	                    redirect("view.php?id={$cm->id}&amp;page=browse");
+	                }
 	                break;
 	            case 'editanissue' :
-                    if (!has_capability('mod/tracker:manage', $context)){
-                        print_error('errornoaccessissue', 'tracker');
-                    } else {
-                        include "views/editanissue.html";   
-                    }
+	                if ($issueid != ''){
+	                    if (!has_capability('mod/tracker:manage', $context)){
+	                        print_error('errornoaccessissue', 'tracker');
+	                    } else {
+	                        include "views/editanissue.html";   
+	                    }
+	                } else {
+	                    redirect("view.php?id={$cm->id}&amp;page=browse");
+	                }
 	                break;
 	        }
 	    }
@@ -309,6 +337,12 @@
 	} else {
 	    print_error('errorfindingaction', 'tracker', $action);
 	}
-	echo $OUTPUT->box_end();
-	echo $OUTPUT->footer($course);
+	
+	print_box_end();
+	
+	/// Finish the page
+	if (empty($nohtmleditorneeded) and $usehtmleditor) {
+	    use_html_editor($editorfields);
+	}
+	print_footer($course);
 ?>

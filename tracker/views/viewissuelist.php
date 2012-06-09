@@ -20,6 +20,7 @@ $STATUSKEYS = array(POSTED => get_string('posted', 'tracker'),
                     RESOLVING => get_string('resolving', 'tracker'), 
                     WAITING => get_string('waiting', 'tracker'), 
                     TESTING => get_string('testing', 'tracker'), 
+                    VALIDATED => get_string('validated', 'tracker'), 
                     PUBLISHED => get_string('published', 'tracker'), 
                     RESOLVED => get_string('resolved', 'tracker'), 
                     ABANDONNED => get_string('abandonned', 'tracker'),
@@ -51,7 +52,7 @@ if (isset($searchqueries)){
     echo " <b>search using :</b> ".str_replace("\n", "<br/>", $strsql)." <br/></div>";
     */
     $sql = $searchqueries->search;
-    $numrecords = $DB->count_records_sql($searchqueries->count);
+    $numrecords = count_records_sql($searchqueries->count);
 } else {
     // check we display only resolved tickets or working
     if ($resolved){
@@ -75,14 +76,14 @@ if (isset($searchqueries)){
             i.assignedto, 
             i.status,
             i.resolutionpriority,
-            u.firstname firstname, 
-            u.lastname lastname,
-            COUNT(ic.issueid) watches
+            u.firstname ".sql_as()." firstname, 
+            u.lastname ".sql_as()." lastname,
+            COUNT(ic.issueid) ".sql_as()." watches
         FROM 
-            {user} u,
-            {tracker_issue} i
+            {$CFG->prefix}user u,
+            {$CFG->prefix}tracker_issue i
         LEFT JOIN
-            {tracker_issuecc} ic 
+            {$CFG->prefix}tracker_issuecc ic 
         ON
             ic.issueid = i.id
         WHERE 
@@ -105,14 +106,14 @@ if (isset($searchqueries)){
         SELECT 
             COUNT(*)
         FROM 
-            {tracker_issue} i, 
-            {user} u
+            {$CFG->prefix}tracker_issue i, 
+            {$CFG->prefix}user u
         WHERE 
             i.reportedby = u.id AND 
             i.trackerid = {$tracker->id}
             $resolvedclause
     ";
-    $numrecords = $DB->count_records_sql($sqlcount);
+    $numrecords = count_records_sql($sqlcount);
 }
 
 
@@ -229,9 +230,9 @@ $sql = $sql . ' LIMIT ' . $limit . ',' . $offset;
 */
 //
 
-$issues = $DB->get_records_sql($sql, null, $table->get_page_start(), $table->get_page_size());
+$issues = get_records_sql($sql, $table->get_page_start(), $table->get_page_size());
 
-$maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', " trackerid = $tracker->id GROUP BY trackerid ");
+$maxpriority = get_field_select('tracker_issue', 'MAX(resolutionpriority)', " trackerid = $tracker->id GROUP BY trackerid ");
 
 if (!empty($issues)){
     /// product data for table
@@ -239,24 +240,24 @@ if (!empty($issues)){
         $issuenumber = "<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}\">{$tracker->ticketprefix}{$issue->id}</a>";
         $summary = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}\">".format_string($issue->summary).'</a>';
         $datereported = date('Y/m/d h:i', $issue->datereported);
-        $user = $DB->get_record('user', array('id' => $issue->reportedby));
+        $user = get_record('user', 'id', $issue->reportedby);
         $reportedby = fullname($user);
-        $user = $DB->get_record('user', array('id' => $issue->assignedto));
+        $user = get_record('user', 'id', $issue->assignedto);
         if (has_capability('mod/tracker:manage', $context)){ // managers can assign bugs
-            $status = html_writer::select($STATUSKEYS, "status{$issue->id}", $issue->status, array('' => 'choose'), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")). "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
+            $status = choose_from_menu($STATUSKEYS, "status{$issue->id}", $issue->status, '', "document.forms['manageform'].schanged{$issue->id}.value = 1;", '', true). "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
             $developers = tracker_getdevelopers($context);
             foreach($developers as $developer){
                 $developersmenu[$developer->id] = fullname($developer);
             }
-            $assignedto = html_writer::select($developersmenu, "assignedto{$issue->id}", $issue->assignedto, array('' => get_string('unassigned', 'tracker')), array('onchange' => "document.forms['manageform'].changed{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"changed{$issue->id}\" value=\"0\" />";
+            $assignedto = choose_from_menu($developersmenu, "assignedto{$issue->id}", $issue->assignedto, get_string('unassigned', 'tracker'), "document.forms['manageform'].changed{$issue->id}.value = 1;", '', true) . "<input type=\"hidden\" name=\"changed{$issue->id}\" value=\"0\" />";
         } elseif (has_capability('mod/tracker:resolve', $context)){ // resolvers can give a bug back to managers
-            $status = html_writer::select($STATUSKEYS, "status{$issue->id}", $issue->status, array('' => 'choose'), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
+            $status = choose_from_menu($STATUSKEYS, "status{$issue->id}", $issue->status, '', "document.forms['manageform'].schanged{$issue->id}.value = 1;", '', true) . "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
             $managers = tracker_getadministrators($context);
             foreach($managers as $manager){
                 $managersmenu[$manager->id] = fullname($manager);
             }
             $managersmenu[$USER->id] = fullname($USER);
-            $assignedto = html_writer($developersmenu, "assignedto{$issue->id}", $issue->assignedto, array('' => get_string('unassigned', 'tracker')), array('onchange' => "document.forms['manageform'].changed{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"changed{$issue->id}\" value=\"0\" />";
+            $assignedto = choose_from_menu($developersmenu, "assignedto{$issue->id}", $issue->assignedto, get_string('unassigned', 'tracker'), "document.forms['manageform'].changed{$issue->id}.value = 1;", '', true) . "<input type=\"hidden\" name=\"changed{$issue->id}\" value=\"0\" />";
         } else {
             $status = $STATUSKEYS[0 + $issue->status]; 
             $assignedto = fullname($user);
@@ -266,26 +267,26 @@ if (!empty($issues)){
         $solution = ($hassolution) ? "<img src=\"{$CFG->wwwroot}/mod/tracker/pix/solution.gif\" height=\"15\" alt=\"".get_string('hassolution','tracker')."\" />" : '' ;
         $actions = '';
         if (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context)){
-            $actions = "<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&screen=editanissue\" title=\"".get_string('update')."\" ><img src=\"".$OUTPUT->pix_url('t/edit', 'core')."\" border=\"0\" /></a>";
+            $actions = "<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&screen=editanissue\" title=\"".get_string('update')."\" ><img src=\"{$CFG->pixpath}/t/edit.gif\" border=\"0\" /></a>";
         }
         if (has_capability('mod/tracker:manage', $context)){
-            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=delete\" title=\"".get_string('delete')."\" ><img src=\"".$OUTPUT->pix_url('t/delete', 'core')."\" border=\"0\" /></a>";
+            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=delete\" title=\"".get_string('delete')."\" ><img src=\"{$CFG->pixpath}/t/delete.gif\" border=\"0\" /></a>";
         }
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;screen=mywatches&amp;issueid={$issue->id}&what=register\" title=\"".get_string('register', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('register', 'mod_tracker')."\" border=\"0\" /></a>";
+        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;screen=mywatches&amp;issueid={$issue->id}&what=register\" title=\"".get_string('register', 'tracker')."\" ><img src=\"{$CFG->wwwroot}/mod/tracker/pix/register.gif\" border=\"0\" /></a>";
         if (preg_match('/^resolutionpriority/', $sort) && has_capability('mod/tracker:managepriority', $context)){
             if ($issue->resolutionpriority < $maxpriority){
-                $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=raisetotop\" title=\"".get_string('raisetotop', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('totop', 'mod_tracker')."\" border=\"0\" /></a>";
-                $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=raisepriority\" title=\"".get_string('raisepriority', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('up', 'mod_tracker')."\" border=\"0\" /></a>";
+                $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=raisetotop\" title=\"".get_string('raisetotop', 'tracker')."\" ><img src=\"{$CFG->wwwroot}/mod/tracker/pix/totop.gif\" border=\"0\" /></a>";
+                $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=raisepriority\" title=\"".get_string('raisepriority', 'tracker')."\" ><img src=\"{$CFG->wwwroot}/mod/tracker/pix/up.gif\" border=\"0\" /></a>";
             } else {
-                $actions .= "&nbsp;<img src=\"".$OUTPUT->pix_url('up_shadow', 'mod_tracker')."\" border=\"0\" />";
-                $actions .= "&nbsp;<img src=\"".$OUTPUT->pix_url('totop_shadow', 'mod_tracker')."\" border=\"0\" />";
+                $actions .= "&nbsp;<img src=\"{$CFG->wwwroot}/mod/tracker/pix/up_shadow.gif\" border=\"0\" />";
+                $actions .= "&nbsp;<img src=\"{$CFG->wwwroot}/mod/tracker/pix/totop_shadow.gif\" border=\"0\" />";
             }
             if ($issue->resolutionpriority > 1){
-                $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=lowerpriority\" title=\"".get_string('lowerpriority', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('down', 'mod_tracker')."\" border=\"0\" /></a>";
-                $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=lowertobottom\" title=\"".get_string('lowertobottom', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('tobottom', 'mod_tracker')."\" border=\"0\" /></a>";
+                $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=lowerpriority\" title=\"".get_string('lowerpriority', 'tracker')."\" ><img src=\"{$CFG->wwwroot}/mod/tracker/pix/down.gif\" border=\"0\" /></a>";
+                $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=lowertobottom\" title=\"".get_string('lowertobottom', 'tracker')."\" ><img src=\"{$CFG->wwwroot}/mod/tracker/pix/tobottom.gif\" border=\"0\" /></a>";
             } else {
-                $actions .= "&nbsp;<img src=\"".$OUTPUT->pix_url('down_shadow', 'mod_tracker')."\" border=\"0\" />";
-                $actions .= "&nbsp;<img src=\"".$OUTPUT->pix_url('tobottom_shadow', 'mod_tracker')."\" border=\"0\" />";
+                $actions .= "&nbsp;<img src=\"{$CFG->wwwroot}/mod/tracker/pix/down_shadow.gif\" border=\"0\" />";
+                $actions .= "&nbsp;<img src=\"{$CFG->wwwroot}/mod/tracker/pix/tobottom_shadow.gif\" border=\"0\" />";
             }
         }
         if ($resolved){

@@ -13,14 +13,13 @@ $strname = get_string('name');
 $strdescription = get_string('description');
 $straction = get_string('action');
 ?>
-<center>
 <form name="updateoptionform" method="post" action="view.php">
 <input type="hidden" name="id" value="<?php p($cm->id) ?>" />
 <input type="hidden" name="what" value="updateelementoption" />
 <input type="hidden" name="type" value="<?php p($form->type) ?>" />
 <input type="hidden" name="elementid" value="<?php p($form->elementid) ?>" />
 <input type="hidden" name="optionid" value="<?php p($form->optionid) ?>" />
-<table border="1" width="90%">
+<table border="1" width="800">
 	<tr>
 		<td width="100">&nbsp;</td>
 		<td width="110" align="center">
@@ -41,6 +40,7 @@ $straction = get_string('action');
 	</tr>
 </table>
 
+<center>
 <br/>
 <input type="button" name="go_btn" value="<?php print_string('update') ?>" onclick="document.forms['updateoptionform'].submit();" />
 <input type="button" name="cancel_btn" value="<?php print_string('cancel') ?>" onclick="document.forms['updateoptionform'].what.value = 'viewelementoptions'; document.forms['updateoptionform'].submit();" />

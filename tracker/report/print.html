@@ -1,6 +1,6 @@
 <?php
 
-if ($issues = $DB->get_records_select('tracker_issue', " trackerid = ? AND status != ".RESOLVED." AND status != ".ABANDONNED." ", array($tracker->id), 'status,datereported')){
+if ($issues = get_records_select('tracker_issue', " trackerid = $tracker->id AND status != ".RESOLVED." AND status != ".ABANDONNED." ", 'status,datereported')){
 
 	$prevstate = '';
 	foreach($issues as $issue){
@@ -11,7 +11,7 @@ if ($issues = $DB->get_records_select('tracker_issue', " trackerid = ? AND statu
 			echo '</tr>';
 			echo '</table>';
 		}
-		$assigneduser = $DB->get_record('user', array('id' => $issue->assignedto));
+		$assigneduser = get_record('user', 'id', $issue->assignedto);
 		$assigned = ($assigneduser) ? fullname($assigneduser) : get_string('unassigned', 'tracker');
 		echo "<table width=\"100%\" class=\"tracker-printtable\">";
 		echo '<tr>';

@@ -1,6 +1,8 @@
 <?php
-echo $OUTPUT->heading(get_string('reports', 'tracker'), 1);
-echo $OUTPUT->heading(get_string('status', 'tracker'), 2);
+
+print_heading(get_string('reports', 'tracker'), 'center', 1);
+print_heading(get_string('status', 'tracker'), 'center', 2);
+
 $STATUSKEYS = array(POSTED => get_string('posted', 'tracker'), 
                     OPEN => get_string('open', 'tracker'), 
                     RESOLVING => get_string('resolving', 'tracker'), 
@@ -10,6 +12,7 @@ $STATUSKEYS = array(POSTED => get_string('posted', 'tracker'),
                     RESOLVED => get_string('resolved', 'tracker'), 
                     ABANDONNED => get_string('abandonned', 'tracker'),
                     TRANSFERED => get_string('transfered', 'tracker'));
+
 $STATUSCODES = array(POSTED => 'posted', 
                     OPEN => 'open', 
                     RESOLVING => 'resolving', 
@@ -19,15 +22,19 @@ $STATUSCODES = array(POSTED => 'posted',
                     RESOLVED => 'resolved', 
                     ABANDONNED => 'abandonned',
                     TRANSFERED => 'transfered');
+
 $tickets = tracker_get_stats($tracker);
 $statsbyassignee = tracker_get_stats_by_user($tracker, 'assignedto');
 $statsbyreporter = tracker_get_stats_by_user($tracker, 'reportedby');
-$alltickets = $DB->count_records('tracker_issue', array('trackerid' => $tracker->id));
+$alltickets = count_records('tracker_issue', 'trackerid', $tracker->id);
+
 ?>
 <table width="100%" cellpadding="20">
 	<tr valign="top">
 		<td width="33%">
-			<?php echo $OUTPUT->heading(get_string('countbystate', 'tracker', $alltickets), 3) ?>
+			
+			<?php print_heading(get_string('countbystate', 'tracker', $alltickets), 'center', 3) ?>
+
 		<table width="80%">
 		<tr>
 			<td width="40%" align="left"><?php print_string('status', 'tracker') ?></td>
@@ -60,6 +67,7 @@ $alltickets = $DB->count_records('tracker_issue', array('trackerid' => $tracker-
 			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[TESTING])/$alltickets) * 100).' %' : '0 %'; ?></td>
 		</tr>
 		</table>
+		
 		<table width="80%">
 		<tr>
 			<td width="40%" align="left" class="status_resolved"><?php echo $STATUSKEYS[RESOLVED] ?></td>
@@ -77,9 +85,11 @@ $alltickets = $DB->count_records('tracker_issue', array('trackerid' => $tracker-
 			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[TRANSFERED])/$alltickets) * 100).' %' : '0 % '; ?></td>
 		</tr>
 		</table>
+
 		</td>
 		<td width="33%">
-			<?php echo $OUTPUT->heading(get_string('countbyassignee', 'tracker', $alltickets), 3) ?>
+			<?php print_heading(get_string('countbyassignee', 'tracker', $alltickets), 'center', 3) ?>
+			
 			<?php 
 				if (empty($statsbyassignee)){
 					print_string('noticketsorassignation', 'tracker');
@@ -99,6 +109,7 @@ $alltickets = $DB->count_records('tracker_issue', array('trackerid' => $tracker-
 							echo "<span class=\"status_$statcode\">$subresult</span> "; 
 						}
 						echo '</td>';
+
 						echo "</tr>";
 						$line = ($line + 1) % 2;
 					}
@@ -107,7 +118,8 @@ $alltickets = $DB->count_records('tracker_issue', array('trackerid' => $tracker-
 			?>
 		</td>
 		<td width="33%">
-			<?php echo $OUTPUT->heading(get_string('countbyreporter', 'tracker', $alltickets), 3) ?>
+			<?php print_heading(get_string('countbyreporter', 'tracker', $alltickets), 'center', 3) ?>
+			
 			<?php 
 				if (empty($statsbyreporter)){
 					print_string('notickets', 'tracker');

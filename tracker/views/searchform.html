@@ -5,7 +5,6 @@
 * @category mod
 * @author Clifford Tham, Valery Fremaux > 1.8
 * @date 02/12/2007
-* @version moodle 2.x
 *
 * Prints prints user's profile and stats
 */
@@ -13,7 +12,7 @@
         die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
     }
 
-    $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'bugreport');
+    print_simple_box_start('center', '80%', '', '', 'generalbox', 'bugreport');
 ?>
 
 <center>
@@ -38,8 +37,8 @@
 </table>
 </form>
 <?php
-    $OUTPUT->box_end();
-    $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'bugreport');
+    print_simple_box_end();
+    print_simple_box_start('center', '80%', '', '', 'generalbox', 'bugreport');
 ?>
 <form name="searchform" action="view.php" method="get">
 <input type="hidden" name="what" value="searchforissues" />
@@ -62,7 +61,7 @@ var datereporteditems = ['day','month','year'];
         foreach($reporters as $reporter){
             $reportersmenu[$reporter->id] = fullname($reporter);
         }
-        echo html_writer::select($reportersmenu, 'reportedby', '', array('' => get_string('any', 'tracker')));
+        choose_from_menu($reportersmenu, 'reportedby', '', get_string('any', 'tracker'));
     }
     else{
         print_string('noreporters', 'tracker');
@@ -72,11 +71,7 @@ var datereporteditems = ['day','month','year'];
         <td align="right" width="200"><b><?php print_string('datereported', 'tracker') ?>:</b></td>
         <td width="240" valign="top" align="left">
             <input type="checkbox" name="checkdate" value="1" onclick="return lockoptions('searchform', 'checkdate', datereporteditems)" checked="checked" />
-            <?php
-            echo html_writer::select_time('days', 'days'); 
-            echo html_writer::select_time('months', 'month'); 
-            echo html_writer::select_time('years', 'year'); 
-            ?>
+            <?php print_date_selector('day', 'month', 'year', '');  ?>
         </td>
         <td>&nbsp;</td>
     </tr>
@@ -111,7 +106,7 @@ var datereporteditems = ['day','month','year'];
 </table>
 </form>
 <?php
-$OUTPUT->box_end();
+print_simple_box_end();
 $nohtmleditorneeded = true;
 ?>
 </center>

@@ -17,14 +17,14 @@ if (!defined('MOODLE_INTERNAL')) {
 <center>
 <!-- Print Bug Tracker Description -->
 <?php
-echo $OUTPUT->heading(format_string($tracker->name));
+print_heading(format_string($tracker->name), 'CENTER');
 if (!empty($tracker->description)){
-    $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'description');
+    print_simple_box_start('center', '80%', '', '', 'generalbox', 'description');
     echo format_text($tracker->description);
     echo '<br/>';
-    $OUTPUT->box_end();
+    print_simple_box_end();
 }
-$OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'bugreport');
+print_simple_box_start('center', '80%', '', '', 'generalbox', 'bugreport');
 
 $enctype = '';
 if (tracker_requiresfile($tracker->id)){
@@ -63,6 +63,7 @@ if (tracker_requiresfile($tracker->id)){
             <input type="text" name="summary" size="70" value="">
         </td>
     </tr>
+    
     <tr valign="top">
         <td align="right">
             <b><?php print_string('description') ?>:</b>
@@ -75,13 +76,13 @@ if (tracker_requiresfile($tracker->id)){
             } 
             else {
                 echo '<p align="right">';
-                $OUTPUT->help_icon('textformat', 'moodle');
+                helpbutton('textformat', get_string('formattexttype'));
                 print_string('formattexttype');
                 echo ':&nbsp;';
                 if (empty($form->format)) {
                     $form->format = "MOODLE";
                 }
-                echo hmtl_writer::select(format_text_menu(), 'format', $form->format); 
+                choose_from_menu(format_text_menu(), 'format', $form->format, ""); 
                 echo '</p>';
             }
 ?>
@@ -100,6 +101,6 @@ if (tracker_requiresfile($tracker->id)){
 </table>
 </form>
 <?php
-$OUTPUT->box_end();
+print_simple_box_end();
 ?>
 </center>

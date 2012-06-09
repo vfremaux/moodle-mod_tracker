@@ -13,7 +13,7 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
 }
 
-$OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'bugreport'); 
+print_simple_box_start('center', '100%', '', '', 'generalbox', 'bugreport'); 
 ?>
 <center>
 <table border="1" cellpadding="3" width="100%">
@@ -26,7 +26,7 @@ $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'bugreport');
 	<tr valign="top">
 		<td align="right" valign="top"><b><?php print_string('description') ?>:</b></td>
 		<td align="left">
-			<?php echo format_string($tracker->intro) ?>
+			<?php echo format_string($tracker->description) ?>
 		</td>
 	</tr>
 	<tr valign="top">
@@ -132,5 +132,5 @@ $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'bugreport');
 		</td>
 	</tr>
 </table>
-<?php $OUTPUT->box_end() ?>
+<?php print_simple_box_end() ?>
 </center>

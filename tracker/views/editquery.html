@@ -9,8 +9,8 @@
 * A form for updating a stored query
 */
 
-echo $OUTPUT->heading(get_string('editquery', 'tracker'));
-$OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'bugreport');
+print_heading(get_string('editquery', 'tracker'));
+print_simple_box_start('center', '100%', '', '', 'generalbox', 'bugreport');
 $checkdate = ($form->checkdate) ? "checked=\"checked\"" : '' ;
 ?>
 <center>
@@ -38,11 +38,12 @@ var datereporteditems = ['day','month','year'];
         <td width="150" align="left">
             <?php
                 $reporters = tracker_getreporters($tracker->id);
+            
                 $reportersmenu = array();
                 foreach($reporters as $reporter){
                     $reportersmenu[$reporter->id] = fullname($reporter);
                 }
-                echo html_writer::select($reportersmenu, 'reportedby', implode('', $fields['reportedby']), array('' => get_string('any', 'tracker')));
+                choose_from_menu($reportersmenu, 'reportedby', implode('', $fields['reportedby']), get_string('any', 'tracker'));
             ?>
         </td>
         <td align="right" width="150"><b><?php print_string('datereported', 'tracker') ?>:</b></td>
@@ -52,6 +53,7 @@ var datereporteditems = ['day','month','year'];
         </td>
         <td>&nbsp;</td>
     </tr>
+    
     <tr>
         <td align="right"><b><?php print_string('summary', 'tracker') ?>:</b></td>
         <td colspan="3" align="left">
@@ -64,6 +66,7 @@ var datereporteditems = ['day','month','year'];
              <input name="description" type="text" value="<?php echo implode(',', $fields['description']) ?>" size="70" maxlength="100" />
         </td>
     </tr>
+    
     <!--Print Bug Category Dropdowns-->
     <tr>
         <td>
@@ -79,7 +82,7 @@ var datereporteditems = ['day','month','year'];
 </table>
 </form>
 <?php
-$OUTPUT->box_end();
+print_simple_box_end();
 $nohtmleditorneeded = true;
 ?>
 </center>

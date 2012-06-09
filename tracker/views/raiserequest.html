@@ -6,7 +6,6 @@
 * @category mod
 * @author Valery Fremaux > 1.8
 * @date 06/05/2009
-* @version moodle 2.x
 *
 * Prints a request for raising priority form
 */
@@ -16,7 +15,7 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 echo "<br/><center>";
-echo $OUTPUT->heading(get_string('raiserequesttitle', 'tracker'));
+print_heading(get_string('raiserequesttitle', 'tracker'));
 ?>
 <form name="raiserequest" method="post" action="#">
 <input type="hidden" name="issueid" value="<?php p($issueid) ?>" />
@@ -31,7 +30,7 @@ echo $OUTPUT->heading(get_string('raiserequesttitle', 'tracker'));
 <tr valign="top">
     <td align="right" width="30%">
         <b><?php print_string('emergency', 'tracker') ?>:</b>
-        <?php $OUTPUT->help_icon('urgentquery', 'tracker'); ?>
+        <?php helpbutton('urgentquery', get_string('urgency', 'tracker'), 'tracker'); ?>
     </td>
     <td align="left" width="70%">
         <input type="checkbox" name="urgent" value="1">

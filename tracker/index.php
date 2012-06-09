@@ -16,8 +16,8 @@
 
     $id = required_param('id', PARAM_INT);   // course
 
-    if (! $course = $DB->get_record('course', array('id' => $id))) {
-        print_error('invalidcourseid');
+    if (! $course = get_record('course', 'id', $id)) {
+        error("Course ID is incorrect");
     }
 
     require_login($course->id);
@@ -34,14 +34,7 @@
 /// Print the header
 
     $navigation = build_navigation($strtrackers);
-    $PAGE->set_title($strtrackers);
-    $PAGE->set_heading('');
-    /* SCANMSG: may be additional work required for $navigation variable */
-    $PAGE->set_focuscontrol('');
-    $PAGE->set_cacheable(true);
-    $PAGE->set_button('');
-    $PAGE->set_headingmenu(navmenu($course));
-    echo $OUTPUT->header();
+    print_header_simple($strtrackers, '', $navigation, '', '', true, '', navmenu($course));
 
 /// Get all the appropriate data
 
@@ -87,10 +80,10 @@
 
     echo '<br />';
 
-    echo html_writer::table($table);
+    print_table($table);
 
 /// Finish the page
 
-    echo $OUTPUT->footer($course);
+    print_footer($course);
 
 ?>

@@ -9,9 +9,8 @@
 * Form for editing an elements
 */
 
-echo $OUTPUT->heading(get_string("{$form->action}{$form->type}", 'tracker'));
+print_heading(get_string("{$form->action}{$form->type}", 'tracker'));
 ?>
-<center>
 <form name="editelementform" method="post" action="view.php">
 <input type="hidden" name="id" value="<?php p($cm->id) ?>" />
 <input type="hidden" name="what" value="<?php p($form->action) ?>" />
@@ -24,19 +23,19 @@ if (!has_capability('mod/tracker:shareelements', $context)){
 	echo "<input type=\"hidden\" name=\"shared\" value=\"0\" />";
 }
 ?>
-<table border="1" width="90%">
+<table border="1" width="800">
 	<tr>
 		<td valign="top" align="right"><b><?php print_string('name') ?>:</b></td>		
 		<td align="left">
             <input type="text" name="name" value="<?php echo @$form->name ?>" size="32" maxlength="32" />
-            <?php $OUTPUT->help_icon('elements', 'tracker'); ?>			
+            <?php helpbutton('elements', get_string('name'), 'tracker'); ?>			
 		</td>
 	</tr>
 	<tr>
 		<td valign="top" align="right"><b><?php print_string('description') ?>:</b></td>
 		<td colspan="3" align="left">
             <input type="text" name="description" value="<?php echo htmlspecialchars(stripslashes(@$form->description)) ?>" size="80" maxlength="255" />			
-            <?php $OUTPUT->help_icon('elements', 'tracker'); ?>			
+            <?php helpbutton('elements', get_string('description'), 'tracker'); ?>			
 		</td>
 	</tr>
 <?php
@@ -63,4 +62,6 @@ if (has_capability('mod/tracker:shareelements', $context)){
 	</tr>
 </table>
 </form>
-</center>
+<?php
+$nohtmleditorneeded = true;
+?>
