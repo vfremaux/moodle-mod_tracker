@@ -4,6 +4,7 @@ moodle-mod_tracker
 Ticketting tracker for Moodle used as user support or bug report
 
 Component class : Moodle Activity Module
+
 Version : 1.9
 
 Original record
