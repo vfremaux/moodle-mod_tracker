@@ -1,6 +1,8 @@
 <?php
+
 echo $OUTPUT->heading(get_string('reports', 'tracker'), 1);
 echo $OUTPUT->heading(get_string('evolution', 'tracker'), 2);
+
 $STATUSKEYS = array(POSTED => get_string('posted', 'tracker'), 
                     OPEN => get_string('open', 'tracker'), 
                     RESOLVING => get_string('resolving', 'tracker'), 
@@ -10,15 +12,21 @@ $STATUSKEYS = array(POSTED => get_string('posted', 'tracker'),
                     RESOLVED => get_string('resolved', 'tracker'), 
                     ABANDONNED => get_string('abandonned', 'tracker'),
                     TRANSFERED => get_string('transfered', 'tracker'));
+
 $ticketsbymonth = tracker_get_stats_by_month($tracker);
 $ticketsprogressbymonth = tracker_backtrack_stats_by_month($tracker);
+
 if (!empty($ticketsbymonth)){
-	$availdates = array_keys($ticketsbymonth);
+	$ticketdates = $ticketsbymonth;
+	unset($ticketdates['sum']);
+	$availdates = array_keys($ticketdates);
 	if (!empty($availdates)){
 		$lowest = $availdates[0];
+		
 		$highest = $availdates[count($availdates) - 1];
 		list($low->year, $low->month) = split('-', $lowest);
 	}
+	
 	$dateiter = new date_iterator($low->year, $low->month);
 	$colwidth = 60 / $dateiter->getiterations($highest);
 }

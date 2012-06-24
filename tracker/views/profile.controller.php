@@ -38,7 +38,7 @@ if ($action == 'savequery'){ // collects name and description on the way
 elseif ($action == 'dosaveasquery'){
     $query->format = required_param('format', PARAM_INT);
 	$query->name = required_param('name', PARAM_TEXT);
-	$query->description = addslashes(required_param('description', PARAM_CLEANHTML));
+	$query->description = str_replace("'", "''", required_param('description', PARAM_CLEANHTML));
 
     if (empty($query->name)){
         $error->message = get_string('namecannotbeblank', 'tracker');
@@ -52,7 +52,7 @@ elseif ($action == 'dosaveasquery'){
 	$fields = unserialize(stripslashes(required_param('fields', PARAM_RAW)));
 	$query->trackerid = $tracker->id;
 	if (! tracker_savesearchparameterstodb($query, $fields)){
-		error ('Unable to save query as query', "view.php?a={$tracker->id}&amp;what=search");
+		print_error('errorunabletosavequery', 'traker', '', "view.php?a={$tracker->id}&amp;what=search");
 	}
 }
 /******************************** ask for viewing a personal search query **************************/
@@ -80,14 +80,14 @@ elseif ($action == 'updatequery'){
 	$fields = tracker_extractsearchparametersfrompost();
 	$query->trackerid = $tracker->id;
 	if(! tracker_savesearchparameterstodb($query, $fields)){
-		error ('Unable to update query id" ' . $query->id, 'view.php?a={$tracker->id}&amp;page=myqueries');
+		print_error('errorunabletosavequeryid', 'tracker', $query->id, 'view.php?a={$tracker->id}&amp;page=myqueries');
 	}
 }
 /******************************** deletes a personal search query **************************/
 elseif ($action == 'deletequery'){
 	$queryid = optional_param('queryid', '', PARAM_INT);
 	if (! $DB->delete_records ('tracker_query', 'id', $queryid, 'trackerid', $tracker->id, 'userid', $USER->id)){
-		error ("Cannot delete query id: " . $queryid);
+		print_error('errorcannotdeletequeryid', 'tracker', $queryid);
 	}
 }
 /******************************** register to an issue **************************/
@@ -106,21 +106,23 @@ elseif ($action == 'unregister'){
 	$issueid = required_param('issueid', PARAM_INT);
 	$ccid = required_param('ccid', PARAM_INT);
 	if (!$DB->delete_records ('tracker_issuecc', 'trackerid', $tracker->id, 'issueid', $issueid, 'userid', $ccid)){
-		error ("Cannot delete carbon copy {$tracker->ticketprefix}{$issueid} for user : " . $ccid);
+		$e->issue = $tracker->ticketprefix.$issueid;
+		$e->userid = $ccid;
+		print_error('errorcannotdeletecarboncopyforuser', 'tracker', $e);
 	}
 }
 /******************************** unregister all my watches **************************/
 elseif ($action == 'unregisterall'){
 	$userid = required_param('userid', PARAM_INT);
 	if (! $DB->delete_records ('tracker_issuecc', 'trackerid', $tracker->id, 'userid', $userid)){
-		error ("Cannot delete carbon copies for user : " . $userid);
+		print_error('errorcannotdeletecarboncopies', 'tracker', $userid);
 	}
 }
 /************************** ask for editing the watchers configuration **************************/
 elseif ($action == 'editwatch'){
 	$ccid = optional_param('ccid', '', PARAM_INT);
 	if (!$form = $DB->get_record('tracker_issuecc', array('id' => $ccid))){
-	    error("Cannot edit this watch");
+	    print_error('errorcannoteditwatch', 'tracker');
 	}
 	$issue = $DB->get_record('tracker_issue', array('id' => $form->issueid));
 	$form->summary = $issue->summary;

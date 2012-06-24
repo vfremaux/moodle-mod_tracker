@@ -94,6 +94,9 @@ if (has_capability('mod/tracker:resolve', $context)){
 	                $resolversmenu[$resolver->id] = fullname($resolver);
 	            }
 	            echo html_writer::select($resolversmenu, 'assignedto', @$issue->assignedto);
+	        } else {
+	        	print_string('noresolvers', 'tracker');
+	        	echo '<input type="hidden" name="assignedto" value="0" />';
 	        }
             ?>
         </td>

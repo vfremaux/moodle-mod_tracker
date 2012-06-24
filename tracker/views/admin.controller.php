@@ -388,7 +388,7 @@ if ($action == 'addelement'){
 		/// get last sort order
 		$sortorder = 0 + $DB->get_field_select('tracker_elementused', 'MAX(sortorder)', "trackerid = {$tracker->id} GROUP BY trackerid");
 		$used->sortorder = $sortorder + 1;
-		if (!insert_record ('tracker_elementused', $used)){	
+		if (!$DB->insert_record ('tracker_elementused', $used)){	
 			print_error('errorcannotaddelementtouse', 'tracker');
 		}		
 	} else {

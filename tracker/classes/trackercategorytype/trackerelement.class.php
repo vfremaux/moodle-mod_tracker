@@ -2,9 +2,9 @@
 
 /**
 * @package tracker
-* @author Clifford Tham
-* @review Valery Fremaux / 1.8
-* @date 02/12/2007
+* @review Valery Fremaux
+* @version Moodle > 2.2
+* @date 02/12/2012
 *
 * A generic class for collecting all that is common to all elements
 */
@@ -99,13 +99,13 @@ class trackerelement{
         $table->head = array('', "<b>$strname</b>","<b>$strdescription</b>","<b>$straction</b>");
         if (!empty($this->options)){
         	foreach ($this->options as $option){
-                $actions  = "<a href=\"view.php?id={$cm->id}&amp;what=editelementoption&amp;optionid={$option->id}&amp;elementid={$option->elementid}\" title=\"".get_string('edit')."\"><img src=\"".$OUTPUT->pix_url('/t/edit.gif', 'core')."\" /></a>&nbsp;" ;
+                $actions  = "<a href=\"view.php?id={$cm->id}&amp;what=editelementoption&amp;optionid={$option->id}&amp;elementid={$option->elementid}\" title=\"".get_string('edit')."\"><img src=\"".$OUTPUT->pix_url('/t/edit', 'core')."\" /></a>&nbsp;" ;
                 $img = ($option->sortorder > 1) ? 'up' : 'up_shadow' ;
-                $actions .= "<a href=\"view.php?id={$cm->id}&amp;what=moveelementoptionup&amp;optionid={$option->id}&amp;elementid={$option->elementid}\" title=\"".get_string('up')."\"><img src=\"".$OUTPUT->pix_url("{$img}.gif", 'tracker')."\"></a>&nbsp;";
+                $actions .= "<a href=\"view.php?id={$cm->id}&amp;what=moveelementoptionup&amp;optionid={$option->id}&amp;elementid={$option->elementid}\" title=\"".get_string('up')."\"><img src=\"".$OUTPUT->pix_url("{$img}", 'mod_tracker')."\"></a>&nbsp;";
                 $img = ($option->sortorder < $this->maxorder) ? 'down' : 'down_shadow' ;
-                $actions .= "<a href=\"view.php?id={$cm->id}&amp;what=moveelementoptiondown&amp;optionid={$option->id}&amp;elementid={$option->elementid}\" title=\"".get_string('down')."\"><img src=\"".$OUTPUT->pix_url("{$img}.gif", 'tracker')."\"></a>&nbsp;";
+                $actions .= "<a href=\"view.php?id={$cm->id}&amp;what=moveelementoptiondown&amp;optionid={$option->id}&amp;elementid={$option->elementid}\" title=\"".get_string('down')."\"><img src=\"".$OUTPUT->pix_url("{$img}", 'mod_tracker')."\"></a>&nbsp;";
 
-                $actions .= "<a href=\"view.php?id={$cm->id}&amp;what=deleteelementoption&amp;optionid={$option->id}&amp;elementid={$option->elementid}\" title=\"".get_string('delete')."\"><img src=\"".$OUTPUT->pix_url('/t/delete.gif', 'core')."\"></a>";
+                $actions .= "<a href=\"view.php?id={$cm->id}&amp;what=deleteelementoption&amp;optionid={$option->id}&amp;elementid={$option->elementid}\" title=\"".get_string('delete')."\"><img src=\"".$OUTPUT->pix_url('/t/delete', 'core')."\"></a>";
         	    $table->data[] = array('<b> '.get_string('option', 'tracker').' '.$option->sortorder.':</b>',$option->name, format_string($option->description, true, $COURSE->id), $actions);
         	}
         }

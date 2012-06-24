@@ -63,10 +63,10 @@ elseif ($action == 'updateanissue'){
     $issue->status = required_param('status', PARAM_INT);
     $issue->assignedto = required_param('assignedto', PARAM_INT);
     $issue->summary = required_param('summary', PARAM_TEXT);
-    $issue->description = addslashes(required_param('description', PARAM_CLEANHTML));
+    $issue->description = str_replace("'", "''", required_param('description', PARAM_CLEANHTML));
     $issue->format = required_param('format', PARAM_INT);
     $issue->datereported = required_param('datereported', PARAM_INT);
-    $issue->resolution = addslashes(required_param('resolution', PARAM_CLEANHTML));
+    $issue->resolution = required_param('resolution', PARAM_CLEANHTML);
     $issue->resolutionformat = required_param('resolutionformat', PARAM_INT);
     $issue->trackerid = $tracker->id;
 
@@ -238,7 +238,7 @@ elseif ($action == 'addacomment'){
 /***************************************** add a comment ***********************************/
 elseif ($action == 'doaddcomment'){
     $issueid = required_param('issueid', PARAM_INT);
-    $comment->comment = addslashes(required_param('comment', PARAM_CLEANHTML));
+    $comment->comment = str_replace("'", "''", required_param('comment', PARAM_CLEANHTML));
     $comment->commentformat = required_param('commentformat', PARAM_INT);
     $comment->userid = $USER->id;
     $comment->trackerid = $tracker->id;
@@ -317,7 +317,6 @@ elseif ($action == 'cascade'){
 	$oldstatus = $issue->status;
 	$issue->description = tracker_add_cascade_backlink($cm, $issue) . $issue->description;
 
-    include_once $CFG->libdir."/pear/HTML/AJAX/JSON.php";
     include_once($CFG->dirroot.'/mod/tracker/rpclib.php');
 
     if (is_numeric($tracker->parent)){

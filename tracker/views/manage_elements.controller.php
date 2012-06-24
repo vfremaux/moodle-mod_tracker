@@ -51,7 +51,7 @@ elseif ($action == 'doaddelement'){
 
     if(!count($errors)){
     	$element->name = $form->name;
-    	$element->description = addslashes($form->description);
+    	$element->description = str_replace("'", "''", $form->description);
     	$form->type = $element->type = $form->type;
     	$element->course = ($form->shared) ? 0 : $COURSE->id;
     	if (!$form->elementid = $DB->insert_record('tracker_element', $element)){
@@ -78,7 +78,7 @@ elseif ($action == 'editelement'){
 	    $element = tracker_getelement($form->elementid);
 		$form->type = $element->type;
 		$form->name = $element->name;
-		$form->description = addslashes($element->description);
+		$form->description = str_replace("'", "''", $element->description);
 		$form->format = $element->format;
 		$form->shared = ($element->course == 0) ;
 		$form->action = 'doupdateelement';
@@ -112,7 +112,7 @@ if ($action == 'doupdateelement'){
     	$element->id = $form->elementid;
     	$element->name = $form->name;
     	$element->type = $form->type;
-    	$element->description = addslashes($form->description);
+    	$element->description = str_replace("'", "''", $form->description);
     	$element->format = $form->format;
     	$element->course = ($form->shared) ? 0 : $COURSE->id ;
     	if (!$DB->update_record('tracker_element', $element)){
@@ -165,7 +165,7 @@ if ($action == 'submitelementoption'){
 	}
 	if (!count($errors)){
     	$option->name = strtolower($form->name);
-    	$option->description = addslashes($form->description);
+    	$option->description = str_replace("'", "''", $form->description);
     	$option->elementid = $form->elementid;
         $countoptions = 0 + $DB->count_records('tracker_elementitem', array('elementid' => $form->elementid));
     	$option->sortorder = $countoptions + 1;
@@ -286,7 +286,7 @@ if ($action == 'updateelementoption'){
     if (!count($errors)){
     	$update->id = $form->optionid;
     	$update->name = $form->name;
-    	$update->description = addslashes($form->description);
+    	$update->description = str_replace("'", "''", $form->description);
     	$update->format = $form->format;
     	if ($DB->update_record('tracker_elementitem', $update)){
             echo $OUTPUT->heading(get_string('editoptions', 'tracker'));
@@ -303,7 +303,7 @@ if ($action == 'updateelementoption'){
         foreach($errors as $anError){
             $errorstrs[] = $anError->message;
         }
-        print_simple_box(implode("<br/>", $errorstrs), 'center', '70%', '', 5, 'errorbox');
+        echo $OUTPUT->box(implode("<br/>", $errorstrs), 'center', '70%', '', 5, 'errorbox');
 	    include $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/updateoptionform.html';
     }
 	return -1;
@@ -324,10 +324,10 @@ if ($action == 'moveelementoptionup'){
 	    $previousoption->sortorder = $sortorder;
 	    // swap options in database
     	if (!$DB->update_record('tracker_elementitem', addslashes_recursive($option))){
-    		error ("Could not update element");
+    		print_error('errorupdateelement', 'tracker');
     	}
     	if (!$DB->update_record('tracker_elementitem', addslashes_recursive($previousoption))){
-    		error ("Could not update element");
+    		print_error('errorupdateelement', 'tracker');
     	}
 	}	
     echo $OUTPUT->heading(get_string('editoptions', 'tracker'));
@@ -354,10 +354,10 @@ if ($action == 'moveelementoptiondown'){
 	    $nextoption->sortorder = $sortorder;
 	    // swap options in database
     	if (!$DB->update_record('tracker_elementitem', addslashes_recursive($option))){
-    		error ("Could not update element");
+    		print_error('errorupdateelement', 'tracker');
     	}
     	if (!$DB->update_record('tracker_elementitem', addslashes_recursive($nextoption))){
-    		error ("Could not update element");
+    		print_error('errorupdateelement', 'tracker');
     	}
     }
     echo $OUTPUT->heading(get_string('editoptions', 'tracker'));
@@ -381,18 +381,18 @@ if ($action == 'addelement'){
 		$sortorder = 0 + $DB->get_field_select('tracker_elementused', 'MAX(sortorder)', "trackerid = {$tracker->id} GROUP BY trackerid");
 		$used->sortorder = $sortorder + 1;
 		if (!insert_record ('tracker_elementused', $used)){	
-			error ("Cannot add element to list of elements to use for this tracker");
+    		print_error('errorcannotaddelementtouse', 'tracker');
 		}		
 	} else {
 		//Feedback message that element is already in use
-		error ('Element already in use', "view.php?id={$cm->id}&amp;what=manageelements");
+		print_error('errorelementinuse', 'tracker', '', "view.php?id={$cm->id}&amp;what=manageelements");
 	}		
 }	
 /****************************** remove an element from usable list **********************/
 if ($action == 'removeelement'){
 	$usedid = required_param('usedid', PARAM_INT);
 	if (!$DB->delete_records ('tracker_elementused', 'elementid', $usedid, 'trackerid', $tracker->id)){	
-		error ("Cannot delete element from list of elements to use for this tracker");
+		print_error('errorcannotdeleteelementtouse', 'tracker');
 	}
 }	
 ?>

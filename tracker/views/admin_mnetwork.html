@@ -20,10 +20,9 @@ if (!defined('MOODLE_INTERNAL')) {
 
 include_once $CFG->dirroot.'/mnet/xmlrpc/client.php';
 include_once $CFG->dirroot.'/mod/tracker/rpclib.php';
-include_once $CFG->dirroot.'/mod/tracker/utils/AJAX/JSON.php';
 
 echo "<br/>";
-$OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'bugreport'); 
+echo $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'bugreport'); 
 
 /// gets current parent information
 
@@ -52,7 +51,7 @@ if (!empty($tracker->parent)){
         $parent_mnet->set_wwwroot($mnet_host);
         if (!empty($parent_mnet->wwwroot)){
             if (!$rpcclient->send($parent_mnet)){
-                error(implode("<br/>", $rpcclient->error));
+                print_error('errorremote', 'tracker', implode("<br/>", $rpcclient->error));
             }
             $parent = json_decode($rpcclient->response);
             // fix a bug in XML-RPC transfer of arrays
@@ -248,6 +247,6 @@ if ($step == 2){
 </form></p>
 <?php
 
-$OUTPUT->box_end() 
+echo $OUTPUT->box_end();
 ?>
 </center>

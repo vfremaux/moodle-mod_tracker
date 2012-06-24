@@ -1,4 +1,4 @@
-<?PHP  // $Id: rpclib.php,v 1.3 2012-01-09 12:53:04 vf Exp $
+<?PHP  // $Id: rpclib.php,v 1.2 2012-06-01 18:53:06 vf Exp $
 
 /**
 * @package mod-tracker
@@ -9,8 +9,6 @@
 * Library of functions for rpc remote calls at tracker. All complex
 * variables transport are performed using JSON format. 
 */
-
-include_once $CFG->dirroot.'/mod/tracker/utils/AJAX/JSON.php';
 
 /**
 * Constants

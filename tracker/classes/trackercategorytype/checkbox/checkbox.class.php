@@ -12,9 +12,10 @@
 include_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php';
 
 class checkboxelement extends trackerelement{
+
 	var $options;
 	
-	function checkboxelement(&$tracker, $id=null){
+	function __construct(&$tracker, $id = null){
 	    $this->tracker = $tracker;
 		if (isset($id)){
 			$this->id = $id;
@@ -59,6 +60,6 @@ class checkboxelement extends trackerelement{
     			}
 			}		
 		}
-	}	
+	}
 }
 ?>

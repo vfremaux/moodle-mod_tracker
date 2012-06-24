@@ -14,6 +14,7 @@
 */
 require_once $CFG->dirroot.'/mod/tracker/filesystemlib.php';
 require_once $CFG->dirroot.'/lib/uploadlib.php';
+require_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
 
 // statusses
 define('POSTED', 0);
@@ -25,6 +26,7 @@ define('ABANDONNED', 5);
 define('TRANSFERED', 6);
 define('TESTING', 7);
 define('PUBLISHED', 8);
+define('VALIDATED', 9);
 
 // states && eventmasks
 define('EVENT_POSTED', 0);
@@ -322,6 +324,40 @@ function tracker_printelements(&$tracker, $fields=null, $dest=false){
     }
 }
 
+
+/**
+* print additional user defined elements in several contexts
+* @param int $trackerid the current tracker
+* @param array $fields the array of fields to be printed
+*
+function tracker_printelements(&$mform, &$tracker, $fields=null, $dest=false){
+    tracker_loadelementsused($tracker, $used);
+    if (!empty($used)){
+        if (!empty($fields)){
+            foreach ($used as $element){
+                if (isset($fields[$element->id])){
+                    foreach($fields[$element->id] as $value){
+                        $element->value = $value;
+                    }
+                }
+            }
+        }
+        foreach ($used as $element){
+
+        	if (!$element->active) continue;
+        	
+            if ($dest == 'search'){
+                $element->viewsearch($mform);
+            }
+            elseif ($dest == 'query'){
+                $element->viewquery($mform);
+            } else {
+            	$element->view($mform);
+            } 
+        }
+    }
+}
+*/
 
 /// Search engine 
 
@@ -920,7 +956,11 @@ function tracker_recordelements(&$issue){
         ";
         $attribute = $DB->get_record_sql($sql, array($elementname, $issue->trackerid));
         $attribute->timemodified = $issue->datereported;
-        $values = optional_param($key, '', PARAM_CLEANHTML);
+        if (is_array(@$_POST[$key])){
+	        $values = optional_param_array($key, '', PARAM_TEXT);
+	    } else {
+	        $values = optional_param($key, '', PARAM_TEXT);
+	    }
         $attribute->issueid = $issue->id;
         $attribute->trackerid = $issue->trackerid;
         /// For those elements where more than one option can be selected
@@ -934,31 +974,35 @@ function tracker_recordelements(&$issue){
             }
         } else {  //For the rest of the elements that can only support one answer
             if ($attribute->type != 'file'){
-                $attribute->elementitemid = addslashes($values);
+                $attribute->elementitemid = str_replace("'", "''", $values);
                 $attributeid = $DB->insert_record('tracker_issueattribute', $attribute);    
 	            if (empty($attributeid)){
 	                print_error('erroraddissueattribute', 'tracker', '', 2);
 	            }
             } else {
-                require_once($CFG->libdir.'/uploadlib.php');
-                $uploader = new upload_manager($key, false, false, $COURSE->id, true, 0, true);
-                $uploader->preprocess_files();
-                $newfilename = $uploader->get_new_filename();
-                $encodedfilename = '';
-                if (!empty($newfilename)){
-                    $encodedfilename = md5(time()).'_'.$newfilename;
-                    $storebase = "{$COURSE->id}/moddata/tracker/{$issue->trackerid}/{$issue->id}";
-                    if (!filesystem_is_dir($storebase)){
-                        filesystem_create_dir($storebase, FS_RECURSIVE);
-                    }
-                    $uploader->save_files($storebase);
-                    filesystem_move_file($storebase.'/'.$newfilename, $storebase.'/'.$encodedfilename);
-                    $attribute->elementitemid = $encodedfilename;
-                    $attributeid = $DB->insert_record('tracker_issueattribute', $attribute);    
-		            if (empty($attributeid)){
-	                	print_error('erroraddissueattribute', 'tracker', '', 3);
-		            }
-                }                
+				$fs = get_file_storage();
+				if (!empty($_FILES[$key]['name'])){
+				 
+					// Prepare file record object
+					$context = context_module::instance($issue->trackerid);
+					$fileinfo = array(
+					    'contextid' => $context->id, // ID of context
+					    'component' => 'mod_tracker',     // usually = table name
+					    'filearea' => 'attachment',     // usually = table name
+					    'itemid' => $issue->id,               // usually = ID of row in table
+					    'filepath' => '/',           // any path beginning and ending in /
+					    'filename' => $_FILES[$key]['name']); // any filename
+					    
+					// Get previous file and delete it
+					if ($file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], 
+					        $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename'])){
+					    $file->delete();
+					}
+					    				 
+					$fs->create_file_from_pathname($fileinfo, $_FILES[$key]['tmp_name']);
+					$attribute->elementitemid = $_FILES[$key]['name'];
+	                $attributeid = $DB->insert_record('tracker_issueattribute', $attribute);
+	            }
             }
 
         }   
@@ -997,7 +1041,7 @@ function tracker_clearelements($issueid){
         $nofileclause = " AND elementid NOT IN ('$fileelementlist') ";
     }
     if (!$DB->delete_records_select('tracker_issueattribute', "issueid = $issueid $nofileclause")){
-        error("Could not clear elements for issue $issueid");
+        print_error('errorcannotlearelementsforissue', 'tracker', $issueid);
     }
 
     $storebase = "{$COURSE->id}/moddata/tracker/{$issue->trackerid}/{$issue->id}";
@@ -1008,14 +1052,31 @@ function tracker_clearelements($issueid){
 
     if (!empty($deletefilekeys)){
         foreach($deletefilekeys as $deletedkey){
-        	debug_trace('TRACKER deletes file '.$deletedkey);
             if (preg_match("/deleteelement(.*)$/", $deletedkey, $matches)){
                 $elementname = $matches[1];
                 $element = $DB->get_record('tracker_element', array('name' => $elementname));
                 if ($elementitem = $DB->get_record('tracker_issueattribute', array('elementid' => $element->id, 'issueid' => $issueid))){
-                    if (!empty($elementitem->elementitemid)){
-                        filesystem_delete_file($storebase.'/'.$elementitem->elementitemid);
-                    }
+                    if (!empty($elementitem->elementitemid)){                    	
+						$fs = get_file_storage();
+						$context = context_module::instance($issue->trackerid);
+						// Prepare file record object
+						$fileinfo = array(
+						    'component' => 'mod_tracker',
+						    'filearea' => 'attachment',     // usually = table name
+						    'itemid' => $issue->id,               // usually = ID of row in table
+						    'contextid' => $context->id, // ID of context
+						    'filepath' => '/',           // any path beginning and ending in /
+						    'filename' => $elementitem->value); // any filename
+						 
+						// Get file
+						$file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], 
+						        $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename']);
+						 
+						// Delete it if it exists
+						if ($file) {
+						    $file->delete();
+						}
+					}
                     $DB->delete_records('tracker_issueattribute', array('id' => $elementitem->id));
                 }
             }
@@ -1028,7 +1089,6 @@ function tracker_clearelements($issueid){
     if (!empty($reloadedfilekeys)){
         foreach($reloadedfilekeys as $reloadedkey){
         	if (!empty($_FILES[$reloadedkey]['name'])){ // file is reloaded with another entry
-        		debug_trace('removing reloaded '.$reloadedkey);
 	            if (preg_match("/element(.*)$/", $reloadedkey, $matches)){
 	                $elementname = $matches[1];
 	                $element = $DB->get_record('tracker_element', array('name' => $elementname));
@@ -1100,9 +1160,9 @@ function tracker_print_user($user){
     if ($user){
         echo $OUTPUT->user_picture ($user, array('courseid' => $COURSE->id, 'size' => 25));
         if ($CFG->messaging){
-            echo "&nbsp;<a href=\"$CFG->wwwroot/user/view.php?id={$user->id}&amp;course={$COURSE->id}\">".fullname($user)."</a> <a href=\"\" onclick=\"this.target='message'; return openpopup('/message/discussion.php?id={$user->id}', 'message', 'menubar=0,location=0,scrollbars,status,resizable,width=400,height=500', 0);\" ><img src=\"".$OUTPUT->pix_url('t/message.gif', 'core')."\"></a>";
+            echo "&nbsp;<a href=\"$CFG->wwwroot/user/view.php?id={$user->id}&amp;course={$COURSE->id}\">".fullname($user)."</a> <a href=\"\" onclick=\"this.target='message'; return openpopup('/message/discussion.php?id={$user->id}', 'message', 'menubar=0,location=0,scrollbars,status,resizable,width=400,height=500', 0);\" ><img src=\"".$OUTPUT->pix_url('t/message', 'core')."\"></a>";
         } elseif (!$user->emailstop && $user->maildisplay){
-            echo "&nbsp;<a href=\"$CFG->wwwroot/user/view.php?id={$user->id}&amp;course={$COURSE->id}\">".fullname($user)."</a> <a href=\"mailto:{$user->email}\"><img src=\"".$OUTPUT->pix_url('t/mail.gif', 'core')."\"></a>";
+            echo "&nbsp;<a href=\"$CFG->wwwroot/user/view.php?id={$user->id}&amp;course={$COURSE->id}\">".fullname($user)."</a> <a href=\"mailto:{$user->email}\"><img src=\"".$OUTPUT->pix_url('t/mail', 'core')."\"></a>";
         } else {
             echo '&nbsp;'.fullname($user);
         }
@@ -1348,8 +1408,8 @@ function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = 
 
     if (!empty($managers)){
         foreach($managers as $manager){
-            $notification = compile_mail_template('raiserequest', $vars, 'tracker', $manager->lang);
-            $notification_html = compile_mail_template('raiserequest_html', $vars, 'tracker', $manager->lang);
+            $notification = tracker_compile_mail_template('raiserequest', $vars, 'tracker', $manager->lang);
+            $notification_html = tracker_compile_mail_template('raiserequest_html', $vars, 'tracker', $manager->lang);
             if ($CFG->debugsmtp) echo "Sending Raise Request Mail Notification to " . fullname($manager) . '<br/>'.$notification_html;
             email_to_user($manager, $USER, get_string('raiserequestcaption', 'tracker', $SITE->shortname.':'.format_string($tracker->name)), $notification, $notification_html);
         }
@@ -1360,8 +1420,8 @@ function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = 
 
     if (!empty($admins)){
         foreach($admins as $admin){
-            $notification = compile_mail_template('raiserequest', $vars, 'tracker', $admin->lang);
-            $notification_html = compile_mail_template('raiserequest_html', $vars, 'tracker', $admin->lang);
+            $notification = tracker_compile_mail_template('raiserequest', $vars, 'tracker', $admin->lang);
+            $notification_html = tracker_compile_mail_template('raiserequest_html', $vars, 'tracker', $admin->lang);
             if ($CFG->debugsmtp) echo "Sending Raise Request Mail Notification to " . fullname($admin) . '<br/>'.$notification_html;
             email_to_user($admin, $USER, get_string('urgentraiserequestcaption', 'tracker', $SITE->shortname.':'.format_string($tracker->name)), $notification, $notification_html);
         }
@@ -1399,8 +1459,8 @@ function tracker_notify_submission($issue, &$cm, $tracker = null){
                       );
         include_once($CFG->dirroot."/mod/tracker/mailtemplatelib.php");
         foreach($managers as $manager){
-            $notification = compile_mail_template('submission', $vars, 'tracker', $manager->lang);
-            $notification_html = compile_mail_template('submission_html', $vars, 'tracker', $manager->lang);
+            $notification = tracker_compile_mail_template('submission', $vars, 'tracker', $manager->lang);
+            $notification_html = tracker_compile_mail_template('submission_html', $vars, 'tracker', $manager->lang);
             if ($CFG->debugsmtp) echo "Sending Submission Mail Notification to " . fullname($manager) . '<br/>'.$notification_html;
             email_to_user($manager, $USER, get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name)), $notification, $notification_html);
         }
@@ -1438,8 +1498,8 @@ function tracker_notifyccs_changeownership($issueid, $tracker = null){
             $ccuser = $DB->get_record('user', array('id' => $cc->userid));
             $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
             $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
-            $notification = compile_mail_template('ownershipchanged', $vars, 'tracker', $ccuser->lang);
-            $notification_html = compile_mail_template('ownershipchanged_html', $vars, 'tracker', $ccuser->lang);
+            $notification = tracker_compile_mail_template('ownershipchanged', $vars, 'tracker', $ccuser->lang);
+            $notification_html = tracker_compile_mail_template('ownershipchanged_html', $vars, 'tracker', $ccuser->lang);
             if ($CFG->debugsmtp) echo "Sending Ownership Change Mail Notification to " . fullname($ccuser) . '<br/>'.$notification_html;
             email_to_user($ccuser, $USER, get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name)), $notification, $notification_html);
         }
@@ -1477,13 +1537,12 @@ function tracker_notifyccs_moveissue($issueid, $tracker, $newtracker = null){
                       'ASSIGNEDTO' => fullname($assignee), 
                       'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$newtracker->id}&amp;view=view&amp;page=viewanissue&amp;issueid={$issue->id}",
                       );
-        include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
         foreach($issueccs as $cc){
             $ccuser = $DB->get_record('user', array('id' => $cc->userid));
             $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
             $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
-            $notification = compile_mail_template('issuemoved', $vars, 'tracker', $ccuser->lang);
-            $notification_html = compile_mail_template('issuemoved_html', $vars, 'tracker', $ccuser->lang);
+            $notification = tracker_compile_mail_template('issuemoved', $vars, 'tracker', $ccuser->lang);
+            $notification_html = tracker_compile_mail_template('issuemoved_html', $vars, 'tracker', $ccuser->lang);
             if ($CFG->debugsmtp) echo "Sending Issue Moving Mail Notification to " . fullname($ccuser) . '<br/>'.$notification_html;
             email_to_user($ccuser, $USER, get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name)), $notification, $notification_html);
         }
@@ -1524,57 +1583,57 @@ function tracker_notifyccs_changestate($issueid, $tracker = null){
                 case OPEN : 
                     if($cc->events & EVENT_OPEN){
                         $vars['EVENT'] = get_string('open', 'tracker');
-                        $notification = compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
-                        $notification_html = compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                        $notification = tracker_compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
+                        $notification_html = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
                     }
                 break;
                 case RESOLVING : 
                     if($cc->events & EVENT_RESOLVING){
                         $vars['EVENT'] = get_string('resolving', 'tracker');
-                        $notification = compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
-                        $notification_html = compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                        $notification = tracker_compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
+                        $notification_html = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
                     }
                 break;
                 case WAITING : 
                     if($cc->events & EVENT_WAITING){
                         $vars['EVENT'] = get_string('waiting', 'tracker');
-                        $notification = compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
-                        $notification_html = compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                        $notification = tracker_compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
+                        $notification_html = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
                     }
                 break;
                 case RESOLVED : 
                     if($cc->events & EVENT_RESOLVED){
                         $vars['EVENT'] = get_string('resolved', 'tracker');
-                        $notification = compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
-                        $notification_html = compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                        $notification = tracker_compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
+                        $notification_html = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
                     }
                 break;
                 case ABANDONNED : 
                     if($cc->events & EVENT_ABANDONNED){
                         $vars['EVENT'] = get_string('abandonned', 'tracker');
-                        $notification = compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
-                        $notification_html = compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                        $notification = tracker_compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
+                        $notification_html = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
                     }
                 break;
                 case TRANSFERED : 
                     if($cc->events & EVENT_TRANSFERED){
                         $vars['EVENT'] = get_string('transfered', 'tracker');
-                        $notification = compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
-                        $notification_html = compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                        $notification = tracker_compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
+                        $notification_html = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
                     }
                 break;
                 case TESTING : 
                     if($cc->events & EVENT_TESTING){
                         $vars['EVENT'] = get_string('testing', 'tracker');
-                        $notification = compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
-                        $notification_html = compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                        $notification = tracker_compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
+                        $notification_html = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
                     }
                 break;
                 case PUBLISHED : 
                     if($cc->events & EVENT_PUBLISHED){
                         $vars['EVENT'] = get_string('published', 'tracker');
-                        $notification = compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
-                        $notification_html = compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                        $notification = tracker_compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
+                        $notification_html = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
                     }
                 break;
                 default:
@@ -1618,8 +1677,8 @@ function tracker_notifyccs_comment($issueid, $comment, $tracker = null){
                 $vars['CONTRIBUTOR'] = fullname($USER);
                 $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
                 $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
-                $notification = compile_mail_template('addcomment', $vars, 'tracker', $ccuser->lang);
-                $notification_html = compile_mail_template('addcomment_html', $vars, 'tracker', $ccuser->lang);
+                $notification = tracker_compile_mail_template('addcomment', $vars, 'tracker', $ccuser->lang);
+                $notification_html = tracker_compile_mail_template('addcomment_html', $vars, 'tracker', $ccuser->lang);
                 if ($CFG->debugsmtp) echo "Sending Comment Notification to " . fullname($ccuser) . '<br/>'.$notification_html;
                 email_to_user($ccuser, $USER, get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name)), $notification, $notification_html);
             }
@@ -1993,4 +2052,5 @@ class date_iterator{
 		return $i;
 	}
 }
+
 ?>

@@ -31,7 +31,7 @@ class dropdownelement extends trackerelement{
 		        foreach($this->options as $option){
 		            $optionsmenu[$option->id] = format_string($option->description);
 		        }
-    	        choose_from_menu($optionsmenu, "element$this->name", $this->value, 'choose');
+    	        echo html_writer::select($optionsmenu, "element$this->name", $this->value);
 		    } else {
 				echo "\t\t" . get_string('nooptions', 'tracker');
 		    }

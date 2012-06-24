@@ -336,7 +336,7 @@ if ($showccslink){
                     <td align="right">
                         <?php
                         if (has_capability('mod/tracker:managewatches', $context)){
-                            echo "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=unregister&amp;issueid={$issueid}&amp;ccid={$cc->userid}\" title=\"".get_string('delete')."\"><img src=\"".$OUTPUT->pix_url('t/delete.gif', 'core')."\" /></a>";
+                            echo "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=unregister&amp;issueid={$issueid}&amp;ccid={$cc->userid}\" title=\"".get_string('delete')."\"><img src=\"".$OUTPUT->pix_url('t/delete', 'core')."\" /></a>";
                         }
                         ?>
                     </td>

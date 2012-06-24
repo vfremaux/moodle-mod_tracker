@@ -22,12 +22,12 @@ if (!function_exists('compile_mail_template')){
     * @param infomap a hash containing pairs of parm => data to replace in template
     * @return a fully resolved template where all data has been injected
     */
-    function compile_mail_template($template, $infomap, $module, $lang = '') {
+    function tracker_compile_mail_template($template, $infomap, $module, $lang = '') {
         global $USER;
         
         if (empty($lang)) $lang = $USER->lang; 
         
-        $notification = implode('', get_mail_template($template, $module, $lang));
+        $notification = implode('', tracker_get_mail_template($template, $module, $lang));
         foreach($infomap as $aKey => $aValue){
             $notification = str_replace("<%%$aKey%%>", $aValue, $notification);
         }
@@ -43,7 +43,7 @@ if (!function_exists('get_mail_template')){
     * @param lang if default language must be overriden
     * @return string the template's content or false if no template file is available
     */
-    function get_mail_template($virtual, $modulename, $lang = ''){
+    function tracker_get_mail_template($virtual, $modulename, $lang = ''){
         global $CFG;
     
         if ($lang == '') {
