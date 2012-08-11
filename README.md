@@ -5,7 +5,9 @@ Ticketting tracker for Moodle used as user support or bug report
 
 Component class : Moodle Activity Module
 
-Version : 2.x (branch "master")
+Version : 2.x < 2.3 (branch "master")
+
+Version : 2.3 (branch MOODLE_23) to come
 
 Original record
 =======================
