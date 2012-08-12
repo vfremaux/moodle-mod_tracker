@@ -3,8 +3,10 @@
 /**
 * @package mod-tracker
 * @category mod
-* @author Clifford Tham, Valery Fremaux > 1.8
-* @date 02/12/2007
+* @author Clifford Tham (original < 1.8)
+* @author Valery Fremaux
+* @date 02/12/2012
+* @version Moodle 2
 *
 * Library of functions for rpc remote calls at tracker. All complex
 * variables transport are performed using JSON format. 
@@ -23,6 +25,7 @@ if (!defined('RPC_SUCCESS')) {
 	    define('RPC_FAILURE_DATA', 503);
 	    define('RPC_FAILURE_CAPABILITY', 510);
 }
+
 /**
 * checks an user has local identity and comes from a known host
 * @param string $username the user's login

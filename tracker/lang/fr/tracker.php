@@ -123,6 +123,24 @@ $string['mode_bugtracker'] = 'Traqueur de défauts ';
 $string['mode_ticketting'] = 'Service support utilisateur ';
 $string['modulename'] = 'Gestionnaire de tickets';
 $string['modulenameplural'] = 'Gestionnaires de tickets';
+$string['modulename_help'] = 'Le gestionnaire de tickets permet la gestion de tickets d\'aide, de rapport de défaut, ou de toute activité ou tâche qui nécessite un suivi d\'état dans un cours.
+
+L\'activité permet de constituer un formulaire de dépôt en choisissant des attributs à partir d\'une liste d\'éléments configurable. Certains éléments peuvent même être partagés
+au niveau site pour être réutilisés dans d\'autres instances.
+
+Le ticket, (ou tâche représentée) peut être attribuée à un utilisateur.
+
+Le ticket prend un certain nombre d\'états et leur changement émettra des notifications à certains utilisateurs qui les ont autorisées. Chaque utilisateur peut choisir librement les
+différentes notificaitons qu\'il peut recevoir.
+
+Les tickets peuvent être liés par dépendance, permettant de remonter une chaine causale.
+
+Les changements d\'état sont historisés pour chaque ticket.
+
+Les gestionnaires peuvent être cascadés localement ou via MNET vers un gestionnaire collecteur de plus haut niveau.
+
+Les gestionnaires peuvent être associés à des sous-gestionnaires, facilitant et organisant le déplacement de tickets entre plusieurs gestionnaires. 
+';
 $string['month'] = 'Mois';
 $string['myassignees'] = 'Les résolveurs que j\'ai nommés ';
 $string['myissues'] = 'Les tickets que je gère ';
@@ -149,6 +167,7 @@ $string['nooptions'] = 'Pas d\'option';
 $string['noqueryssaved'] = 'Aucune recherche actuellement mémorisée';
 $string['noremotehosts'] = 'Aucun hôte réseau disponible';
 $string['noremotetrackers'] = 'Aucun tracker distant disponible';
+$string['nodevelopers'] = 'Pas de développeurs';
 $string['noreporters'] = 'Pas de rapporteurs, il n\'y a probablement pas de ticket dans ce gestionnaire.';
 $string['noresolvers'] = 'Pas de développeurs';
 $string['noresolvingissue'] = 'Pas de ticket attribué';
@@ -247,6 +266,7 @@ $string['thanks'] = 'Merci de votre contribution à l\'amélioration continue du
 $string['ticketprefix'] = 'Préfixe du ticket';
 $string['tickets'] = 'Tickets';
 $string['tracker-levelaccess'] = 'Mes possibilités dans ce traqueur ';
+$string['tracker:addinstance'] = 'Ajouter un gestionnaire de tickets';
 $string['tracker:canbecced'] = 'Peut être observateur';
 $string['tracker:comment'] = 'Commenter les tickets';
 $string['tracker:configure'] = 'Configurer le gestionnaire';
@@ -262,11 +282,12 @@ $string['tracker:shareelements'] = 'Partager des éléments au niveau site';
 $string['tracker:viewallissues'] = 'Voir les tickets de tous';
 $string['tracker:viewreports'] = 'Voir les rapports de traitement';
 $string['tracker:viewpriority'] = 'Voir la priorité de mes tickets';
-$string['tracker_cascade_description'] = '<p>La publication de ce service permet à des trackers du site {$a} de cascader leur collecte vers l\'un de vos trackeurs.</p>
+$string['tracker_description'] = '<p>La publication de ce service permet à des trackers du site {$a} de cascader leur collecte vers l\'un de vos trackeurs.</p>
 <ul><li><i>Dépendance</i> : Vous devez abonner le serveur {$a} à ce service.</li></ul>
 <p>L\'abonement à ce service permet à des trackeurs de cascader des tickets de support vers les trackeurs du site {$a}.</p>
 <ul><li><i>Dépendance</i> : Le site {$a} doit publier le service de cascade de trackeurs.</li></ul>';
-$string['tracker_cascade_name'] = 'Transfert en cascade des tickets de support (Module Tracker)';
+$string['tracker_name'] = 'Services du gestionnaire de tickets';
+$string['tracker_service_name'] = 'Services du gestionnaire de tickets';
 $string['trackerelements'] = 'Définition du trackeur ';
 $string['trackereventchanged'] = 'Changement d\'état du ticket dans le tracker [{$a]}';
 $string['trackerhost'] = 'Hôte du trackeur parent ';

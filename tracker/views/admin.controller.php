@@ -36,6 +36,7 @@ if (!defined('MOODLE_INTERNAL')) {
 
 /************************************* Create element form *****************************/
 if ($action == 'createelement'){
+	$form = new StdClass;
 	$form->type = required_param('type', PARAM_ALPHA);
 	// $elementid = optional_param('elementid', null, PARAM_INT);
     $form->action = 'doaddelement';
@@ -44,6 +45,7 @@ if ($action == 'createelement'){
 }
 /************************************* add an element *****************************/
 elseif ($action == 'doaddelement'){
+	$form = new StdClass;
 	$form->name = required_param('name', PARAM_ALPHANUM);
 	$form->description = required_param('description', PARAM_CLEANHTML);
 	$form->type = required_param('type', PARAM_ALPHA);
@@ -56,6 +58,7 @@ elseif ($action == 'doaddelement'){
 	}
 
     if(!count($errors)){
+    	$element = new StdClass;
     	$element->name = $form->name;
     	$element->description = addslashes($form->description);
     	$form->type = $element->type = $form->type;
@@ -70,8 +73,7 @@ elseif ($action == 'doaddelement'){
             $form->description = '';
             $action = 'viewelementoptions';
     	}
-	}
-	else{
+	} else {
         $form->name = '';
         $form->description = '';
 		include $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editelement.html';
@@ -79,6 +81,7 @@ elseif ($action == 'doaddelement'){
 }
 /************************************* Edit an element form *****************************/
 elseif ($action == 'editelement'){
+	$form = new StdClass;
 	$form->elementid = required_param('elementid', PARAM_INT);
 	if ($form->elementid != null){
 	    $element = tracker_getelement($tracker, $form->elementid);
@@ -96,6 +99,7 @@ elseif ($action == 'editelement'){
 }
 /************************************* Update an element *****************************/
 if ($action == 'doupdateelement'){
+	$form = new StdClass;
 	$form->elementid = required_param('elementid', PARAM_INT);
 	$form->name = required_param('name', PARAM_ALPHANUM);
 	$form->description = required_param('description', PARAM_CLEANHTML);
@@ -143,6 +147,7 @@ if ($action == 'deleteelement'){
 }	
 /************************************* add an element option *****************************/
 if ($action == 'submitelementoption'){
+	$form = new StdClass;
 	$form->elementid = required_param('elementid', PARAM_INT);
 	$form->name = required_param('name', PARAM_ALPHANUM);
 	$form->description = required_param('description', PARAM_CLEANHTML);
@@ -198,6 +203,7 @@ if ($action == 'submitelementoption'){
 }
 /************************************* edit an element option *****************************/
 if ($action == 'viewelementoptions'){
+	$form = new StdClass;
 	$form->elementid = optional_param('elementid', @$form->elementid, PARAM_INT);
 	if ($form->elementid != null){
 		$element = tracker_getelement($tracker, $form->elementid);
@@ -216,6 +222,7 @@ if ($action == 'viewelementoptions'){
 }
 /************************************* delete an element option *****************************/
 if ($action == 'deleteelementoption'){
+	$form = new StdClass;
 	$form->elementid = optional_param('elementid', null, PARAM_INT);
 	$form->optionid = required_param('optionid', PARAM_INT);
 	$element = tracker_getelement($tracker, $form->elementid);
@@ -249,6 +256,7 @@ if ($action == 'deleteelementoption'){
 }
 /************************************* edit an element option *****************************/
 if ($action == 'editelementoption'){
+	$form = new StdClass;
 	$form->elementid = required_param('elementid', PARAM_INT);
 	$form->optionid = required_param('optionid', PARAM_INT);
 	$element = tracker_getelement($tracker, $form->elementid);
@@ -318,6 +326,7 @@ if ($action == 'updateelementoption'){
 }
 /********************************** move an option up in list ***************************/
 if ($action == 'moveelementoptionup'){
+	$form = new StdClass;
 	$form->elementid = required_param('elementid', PARAM_INT);
 	$form->optionid = required_param('optionid', PARAM_INT);
 
@@ -348,6 +357,7 @@ if ($action == 'moveelementoptionup'){
 }
 /********************************** move an option down in list ***************************/
 if ($action == 'moveelementoptiondown'){
+	$form = new StdClass;
 	$form->elementid = required_param('elementid', PARAM_INT);
 	$form->optionid = required_param('optionid', PARAM_INT);
 
@@ -358,6 +368,7 @@ if ($action == 'moveelementoptiondown'){
 	$sortorder = $DB->get_field('tracker_elementitem', 'sortorder', array('elementid' => $form->elementid, 'id' => $form->optionid));
 	if ($sortorder < $element->maxorder){
 	    $option->sortorder = $sortorder + 1;
+	    $nextoption = new StdClass;
 	    $nextoption->id = $DB->get_field('tracker_elementitem', 'id', array('elementid' => $form->elementid, 'sortorder' => $sortorder + 1));
 	    $nextoption->sortorder = $sortorder;
 	    // swap options in database
@@ -382,6 +393,7 @@ if ($action == 'addelement'){
 
 	if(!tracker_iselementused($tracker->id, $elementid)){
 		/// Add element to element used table;
+		$used = new StdClass;
 		$used->elementid = $elementid;
 		$used->trackerid = $tracker->id;
 		$used->canbemodifiedby = $USER->id;
@@ -399,7 +411,7 @@ if ($action == 'addelement'){
 /****************************** remove an element from usable list **********************/
 if ($action == 'removeelement'){
 	$usedid = required_param('usedid', PARAM_INT);
-	if (!$DB->delete_records ('tracker_elementused', 'elementid', $usedid, 'trackerid', $tracker->id)){	
+	if (!$DB->delete_records ('tracker_elementused', array('elementid' => $usedid, 'trackerid' => $tracker->id))){	
 		print_error('errorcannotdeleteelement', 'tracker');
 	}
 }
@@ -462,14 +474,14 @@ if ($action == 'unbind'){
 /****************************** set a used element inactive for form **********************/
 if ($action == 'setinactive'){
 	$usedid = required_param('usedid', PARAM_INT);
-	if (!$DB->set_field_select('tracker_elementused', 'active', 0, " elementid = $usedid && trackerid = $tracker->id ")){	
+	if (!$DB->set_field_select('tracker_elementused', 'active', 0, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id))){	
 		print_error('errorcannothideelement', 'tracker');
 	}
 }	
 /****************************** set a used element active for form **********************/
 if ($action == 'setactive'){
 	$usedid = required_param('usedid', PARAM_INT);
-	if (!$DB->set_field_select('tracker_elementused', 'active', 1, " elementid = $usedid && trackerid = $tracker->id ")){	
+	if (!$DB->set_field_select('tracker_elementused', 'active', 1, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id))){	
 		print_error('errorcannotshowelement', 'tracker');
 	}
 }	

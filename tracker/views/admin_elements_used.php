@@ -45,8 +45,9 @@ if (!empty($used)){
     	    $actions .= "<img src=\"".$OUTPUT->pix_url('down_shadow', 'mod_tracker')."\" />";
     	}
 	    $actions .= "<a href=\"view.php?id={$cm->id}&amp;what=editelement&amp;elementid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/edit', 'core')."\" /></a>";
+		
 	    $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=viewelementoptions&amp;elementid={$element->id}\" title=\"".get_string('editoptions', 'mod_tracker')."\"><img src=\"".$OUTPUT->pix_url('editoptions', 'mod_tracker')."\" /></a>";
-	    $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=removeelement&amp;usedid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/moveright', 'core')."\" /></a>";
+	    $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=removeelement&amp;usedid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/right', 'core')."\" /></a>";
 	    if ($element->active){
 		    $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=setinactive&amp;usedid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/hide', 'core')."\" /></a>";
 	    } else {

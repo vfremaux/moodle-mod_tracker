@@ -32,6 +32,13 @@ defined('MOODLE_INTERNAL') || die();
  */
 class moodle1_mod_tracker_handler extends moodle1_mod_handler {
 
+    /** @var moodle1_file_manager */
+    protected $fileman = null;
+
+    /** @var int cmid */
+    protected $moduleid = null;
+
+
     /**
      * Declare the paths in moodle.xml we are able to convert
      *
@@ -50,9 +57,133 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
             new convert_path(
                 'tracker', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER',
                 array(
+                    'renamefields' => array(
+                        'description' => 'intro',
+                        'format' => 'introformat',
+                    ),
                 )
-            )
-        );
+            ),
+            new convert_path(
+                'tracker_elements', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER/ELEMENTS',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_element', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER/ELEMENTS/ELEMENT',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_elementitems', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER/ELEMENTITEMS',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_elementitem', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER/ELEMENTITEMS/ELEMENTITEM',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_usedelements', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER/ELEMENTSUSEDS',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_usedelement', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER/USEDELEMENTS/ELEMENTUSED',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_issues', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER/ISSUES',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_issue', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER/ISSUES/ISSUE',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_attributes', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER/ATTRIBUTES',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_attribute', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER/ATTRIBUTES/ATTRIBUTE',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_ccs', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER/CCS',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_cc', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER/CCS/CC',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_ownerships', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER/OWNERSHIPS',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_ownership', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER/OWNERSHIPS/OWNERSHIP',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_comments', '/MOODLE_BACKUP/COURSE/MODULES/MOD/COMMENTS',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_comment', '/MOODLE_BACKUP/COURSE/MODULES/MOD/COMMENTS/COMMENT',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_dependancies', '/MOODLE_BACKUP/COURSE/MODULES/MOD/DEPENDANCIES',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_dependancy', '/MOODLE_BACKUP/COURSE/MODULES/MOD/DEPENDANCIES/DEPENDANCY',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_preferences', '/MOODLE_BACKUP/COURSE/MODULES/MOD/PREFERENCES',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_preference', '/MOODLE_BACKUP/COURSE/MODULES/MOD/PREFERENCES/PREFERENCE',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_queries', '/MOODLE_BACKUP/COURSE/MODULES/MOD/QUERIES',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_query', '/MOODLE_BACKUP/COURSE/MODULES/MOD/QUERIES/QUERY',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_statechanges', '/MOODLE_BACKUP/COURSE/MODULES/MOD/STATECHANGES',
+                array(
+                )
+            ),
+            new convert_path(
+                'tracker_statechange', '/MOODLE_BACKUP/COURSE/MODULES/MOD/STATECHANGES/STATECHANGE',
+                array(
+                )
+            ),
+       );
     }
 
     /**
@@ -67,22 +198,24 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
         $contextid  = $this->converter->get_contextid(CONTEXT_MODULE, $moduleid);
 
         // get a fresh new file manager for this instance
-        $fileman = $this->converter->get_file_manager($contextid, 'mod_tracker');
+        $this->fileman = $this->converter->get_file_manager($contextid, 'mod_tracker');
 
         // convert course files embedded into the intro
-        $fileman->filearea = 'intro';
-        $fileman->itemid   = 0;
+        $this->fileman->filearea = 'intro';
+        $this->fileman->itemid   = 0;
+        /*
         $data['intro'] = $data['description'];
         $data['introformat'] = $data['format'];
         unset($data['description']);
         unset($data['format']);
-        $data['intro'] = moodle1_converter::migrate_referenced_files($data['intro'], $fileman);
+        */
+        $data['intro'] = moodle1_converter::migrate_referenced_files($data['intro'], $this->fileman);
 
         // write inforef.xml
         $this->open_xml_writer("activities/tracker_{$moduleid}/inforef.xml");
         $this->xmlwriter->begin_tag('inforef');
         $this->xmlwriter->begin_tag('fileref');
-        foreach ($fileman->get_fileids() as $fileid) {
+        foreach ($this->fileman->get_fileids() as $fileid) {
             $this->write_xml('file', array('id' => $fileid));
         }
         $this->xmlwriter->end_tag('fileref');
@@ -92,11 +225,342 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
         // write tracker.xml
         $this->open_xml_writer("activities/tracker_{$moduleid}/tracker.xml");
         $this->xmlwriter->begin_tag('activity', array('id' => $instanceid, 'moduleid' => $moduleid,
-            'modulename' => 'vodeclic', 'contextid' => $contextid));
-        $this->write_xml('tracker', $data, array('/tracker/id'));
-        $this->xmlwriter->end_tag('activity');
-        $this->close_xml_writer();
+            'modulename' => 'tracker', 'contextid' => $contextid));
+
+        $this->xmlwriter->begin_tag('tracker', array('id' => $instanceid));
+
+        foreach ($data as $field => $value) {
+            if ($field <> 'id') {
+                $this->xmlwriter->full_tag($field, $value);
+            }
+        }
 
         return $data;
     }
+
+    /**
+     * This is executed when we reach the closing </MOD> tag of our 'forum' path
+     */
+    public function on_tracker_end() {
+
+		// flush last pending tmp structure (issues)
+		$this->flushtmp();
+
+        // finish writing tracker.xml
+        $this->xmlwriter->end_tag('tracker');
+        $this->xmlwriter->end_tag('activity');
+        $this->close_xml_writer();
+
+        // write inforef.xml
+        $this->open_xml_writer("activities/tracker_{$this->moduleid}/inforef.xml");
+        $this->xmlwriter->begin_tag('inforef');
+        $this->xmlwriter->begin_tag('fileref');
+        foreach ($this->fileman->get_fileids() as $fileid) {
+            $this->write_xml('file', array('id' => $fileid));
+        }
+        $this->xmlwriter->end_tag('fileref');
+        $this->xmlwriter->end_tag('inforef');
+        $this->close_xml_writer();
+    }
+
+	/* ELEMENT and elementitem subs */
+	// need wait for all elements an elements item collected into memory structure as nesting change structure occurs
+    public function on_tracker_elements_start() {
+        $this->tmp->subs['elements'] = array();
+    }
+
+    public function on_tracker_elements_end() {
+    	// we should wait for elementitems processing
+    }
+
+	// process element in one single write
+    public function process_tracker_element($data) {
+
+		$instanceid = $data['id'];
+
+    	// process data
+
+		// store data within temp structure
+		$nestedelm = new StdClass;
+		$nestedelm->nodename = 'element';
+		$nestedelm->data = $data;
+		$nestedelm->subs = array();
+    	$this->tmp->subs['elements'][$instanceid] = $nestedelm;
+    }
+
+	/* ELEMENT ITEM */
+    public function on_tracker_elementitems_start() {
+    	// nothing to do, will be post processed when all elements/elementitems scanned
+    }
+
+    public function on_tracker_elementitems_end() {
+    	// nothing to do, will be post processed when all elements/elementitems scanned    	
+    }
+
+	// process elementitem in one single write
+    public function process_tracker_elementitem($data) {
+
+		$instanceid = $data['id'];
+		$elementid = $data['elementid'];
+
+		// actually process record
+
+    	// store elementitem in tmp    	
+		$nestedelm = new StdClass;
+		$nestedelm->nodename = 'elementitem';
+		$nestedelm->data = $data;
+    	$this->tmp->subs['elements'][$elementid]->subs['elementitems'][$instanceid] = $nestedelm;
+    }
+
+	/* USED ELEMENTS */
+    public function on_tracker_usedelements_start() {
+        $this->xmlwriter->begin_tag('usedelements');
+    }
+
+    public function on_tracker_usedelements_end() {
+        $this->xmlwriter->end_tag('usedelements');
+    }
+
+	// process usedelement in one single write
+    public function process_tracker_usedelement($data) {
+        $this->write_xml('usedelement', array('id' => $data['id']));
+    }
+
+	/* PREFERENCES */
+    public function on_tracker_preferences_start() {
+        $this->xmlwriter->begin_tag('preferences');
+    }
+
+    public function on_tracker_preferences_end() {
+        $this->xmlwriter->end_tag('preferences');
+    }
+
+	// process preference in one single write
+    public function process_tracker_preference($data) {
+        $this->write_xml('preference', array('id' => $data['id']));
+    }
+
+	/* QUERIES */
+    public function on_tracker_queries_start() {
+        $this->xmlwriter->begin_tag('queries');
+    }
+
+    public function on_tracker_queries_end() {
+        $this->xmlwriter->end_tag('queries');
+    }
+
+	// process query in one single write
+    public function process_tracker_query($data) {
+        $this->write_xml('query', array('id' => $data['id']));
+    }
+
+	/* DEPENDANCIES */
+    public function on_tracker_dependancies_start() {
+        $this->xmlwriter->begin_tag('dependancies');
+    }
+
+    public function on_tracker_dependancies_end() {
+        $this->xmlwriter->end_tag('dependancies');
+    }
+
+	// process dependancy in one single write
+    public function process_tracker_dependancy($data) {
+        $this->write_xml('dependancy', array('id' => $data['id']));
+    }
+
+	/* ISSUES and all subs */
+    public function on_tracker_issues_start() {
+        $this->tmp->subs['issues'] = array();
+    }
+
+    public function on_tracker_issues_end() {
+    	// we should wait for all issue subs processed
+    }
+
+	// process issue in one single write
+    public function process_tracker_issue($data) {
+
+ 		$instanceid     = $data['id'];
+
+   		// process data
+
+		// store data within temp structure
+		$nestedelm = new StdClass;
+		$nestedelm->nodename = 'issue';
+		$nestedelm->data = $data;
+		$nestedelm->subs = array();
+    	$this->tmp->subs['issues'][$instanceid] = $nestedelm;
+    }
+
+	/* ATTRIBUTES */
+    public function on_tracker_attributes_start() {
+    	// nothing to do, will be post processed when all issues/subs scanned
+    }
+
+    public function on_tracker_attributes_end() {
+    	// nothing to do, will be post processed when all issues/subs scanned
+    }
+
+	// process attribute in one single write
+    public function process_tracker_attribute($data) {
+
+		$instanceid = $data['id'];
+		$issueid = $data['issueid'];
+
+    	// process data
+
+		// store data within temp structure
+		$nestedelm = new StdClass;
+		$nestedelm->nodename = 'attribute';
+		$nestedelm->data = $data;
+		$nestedelm->subs = array();
+    	$this->tmp->subs['issues'][$issueid]->subs['attributes'][$instanceid] = $nestedelm;
+    }
+
+	/* CCS */
+    public function on_tracker_ccs_start() {
+    	// nothing to do, will be post processed when all issues/subs scanned
+    }
+
+    public function on_tracker_ccs_end() {
+    	// nothing to do, will be post processed when all issues/subs scanned
+    }
+
+	// process cc in one single write
+    public function process_tracker_cc($data) {
+
+		$instanceid = $data['id'];
+		$issueid = $data['issueid'];
+
+    	// process data
+
+		// store data within temp structure
+		$nestedelm = new StdClass;
+		$nestedelm->nodename = 'cc';
+		$nestedelm->data = $data;
+		$nestedelm->subs = array();
+    	$this->tmp->subs['issues'][$issueid]->subs['ccs'][$instanceid] = $nestedelm;
+    }
+
+	/* COMMENTS */
+    public function on_tracker_comments_start() {
+    	// nothing to do, will be post processed when all issues/subs scanned
+    }
+
+    public function on_tracker_comments_end() {
+    	// nothing to do, will be post processed when all issues/subs scanned
+    }
+
+	// process comment in one single write
+    public function process_tracker_comment($data) {
+
+		$instanceid = $data['id'];
+		$issueid = $data['issueid'];
+
+    	// process data
+
+		// store data within temp structure
+		$nestedelm = new StdClass;
+		$nestedelm->nodename = 'comment';
+		$nestedelm->data = $data;
+		$nestedelm->subs = array();
+    	$this->tmp->subs['issues'][$issueid]->subs['comments'][$instanceid] = $nestedelm;
+    }
+
+	/* OWNERSHIPS */
+    public function on_tracker_ownerships_start() {
+    	// nothing to do, will be post processed when all issues/subs scanned
+    }
+
+    public function on_tracker_ownerships_end() {
+    	// nothing to do, will be post processed when all issues/subs scanned
+    }
+
+	// process ownership in one single write
+    public function process_tracker_ownership($data) {
+
+		$instanceid = $data['id'];
+		$issueid = $data['issueid'];
+
+    	// process data
+
+		// store data within temp structure
+		$nestedelm = new StdClass;
+		$nestedelm->nodename = 'ownership';
+		$nestedelm->data = $data;
+		$nestedelm->subs = array();
+    	$this->tmp->subs['issues'][$issueid]->subs['ownerships'][$instanceid] = $nestedelm;
+    }
+
+	/* CHANGESTATES */
+    public function on_tracker_statechanges_start() {
+    	// nothing to do, will be post processed when all issues/subs scanned
+    }
+
+    public function on_tracker_statechanges_end() {
+    	// nothing to do, will be post processed when all issues/subs scanned
+    }
+
+	// process statechange in one single write
+    public function process_tracker_statechange($data) {
+
+		$instanceid = $data['id'];
+		$issueid = $data['issueid'];
+
+    	// process data
+
+		// store data within temp structure
+		$nestedelm = new StdClass;
+		$nestedelm->nodename = 'statechange';
+		$nestedelm->data = $data;
+		$nestedelm->subs = array();
+    	$this->tmp->subs['issues'][$issueid]->subs['statechanges'][$instanceid] = $nestedelm;
+    }    
+
+	/**
+	* pursuant a tmp structure is set, flushes in xml file all the structure in order.
+	* processes recursively through the tmp structure.
+	*/
+	protected function flushtmp($node = null){
+
+		if (is_null($node) && !isset($this->tmp)) return;
+		if (is_null($node)) $node = $this->tmp;
+		if (empty($node->subs)) return;
+		
+        
+        foreach($node->subs as $subset => $subdata){
+			// start element set
+	        $this->xmlwriter->begin_tag($subset);
+	        
+	        foreach($subdata as $sub){
+	        	
+	        	$instanceid = $sub->data['id'];
+
+				// start element
+	        	$this->xmlwriter->begin_tag($sub->nodename, array('id' => $instanceid));
+	
+	        	// write fields
+	        	if (isset($sub->data)){
+			        foreach ($sub->data as $field => $value) {
+			            if ($field <> 'id') {
+			                $this->xmlwriter->full_tag($field, $value);
+			            }
+			        }
+			    }
+	        	
+	        	// if has own subs, recurse
+	        	if (!empty($sub->subs)) $this->flushtmp($sub);
+	
+				// end element
+	        	$this->xmlwriter->end_tag($sub->nodename);
+	        }
+
+			// end element set
+	        $this->xmlwriter->end_tag($subset);
+        }
+		
+
+		// free some memory		
+		unset($node);
+	}
 }
