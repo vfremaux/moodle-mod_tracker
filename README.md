@@ -7,6 +7,8 @@ Component class : Moodle Activity Module
 
 Version : 2.x (branch "master")
 
+Version 2.3 : New brach MOODLE_23 for those additional adjustments
+
 Original record
 =======================
 
