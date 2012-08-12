@@ -159,6 +159,23 @@ $string['me'] = 'My profile';
 $string['mode_bugtracker'] = 'Team bug tracker';
 $string['mode_ticketting'] = 'User support ticketting';
 $string['modulename'] = 'User support - Tracker';
+$string['modulename_help'] = 'The Tracker activity allows tracking tickets for help, bug report, or also trackable activities in a course.
+
+The activity allows creating the tracking form with attributes elements from a list of configurable elements. Some elements can be shared at site
+level to be reused in other trackers.
+
+the ticket (or task) can be assigned for work to another user.
+
+The tracked ticket is a statefull ticket that sends state change notifications to any follower that has enabled notifications. A user can choose which state changes he tracks usually.
+
+Tickets can be chained in dependancy, so it may be easy to follow a cause/consequence ticket sequence.
+
+History of changes are tracked for each ticket.
+
+Ticket tracker can be cascaded locally or through MNET allowing a ticket manager to send a ticket to a remote (higher level) ticket collector.
+
+Trackers can now be chained so that ticket can be moved between trackers. 
+';
 $string['modulenameplural'] = 'User support - trackers';
 $string['month'] = 'Month';
 $string['myassignees'] = 'Resolver I assigned';
@@ -174,6 +191,7 @@ $string['namecannotbeblank'] = 'Name cannot be empty';
 $string['newissue'] = 'New ticket';
 $string['noassignees'] = 'No assignee';
 $string['nocomments'] = 'No comments';
+$string['nodevelopers'] = 'No developpers';
 $string['nodata'] = 'No data to show.';
 $string['noelements'] = 'No element';
 $string['noelementscreated'] = 'No element created';
@@ -275,11 +293,12 @@ $string['thanks'] = 'Thanks to contributing to the constant enhancement of this 
 $string['ticketprefix'] = 'Ticket prefix';
 $string['tickets'] = 'Tickets';
 $string['tracker-levelaccess'] = 'My capabilities in this tracker';
-$string['tracker_cascade_description'] = '<p>When publishing this service, you allow trackers from {$a} to cascade the support tickets to a local tracker.</p>
+$string['tracker_description'] = '<p>When publishing this service, you allow trackers from {$a} to cascade the support tickets to a local tracker.</p>
 <ul><li><i>Depends on</i>: You have to suscribe {$a} to this service.</li></ul>
 <p>Suscribing to this service allows local trackers to send support tickets to some tracker in {$a}.</p>
 <ul><li><i>Depends on</i>: You have to publish this service on {$a}.</li></ul>';
-$string['tracker_cascade_name'] = 'Support tickets transport (Tracker Module)';
+$string['tracker_name'] = 'Tracker module services';
+$string['tracker_service_name'] = 'Tracker module services';
 $string['trackerelements'] = 'Tracker\'s definition';
 $string['trackereventchanged'] = 'Issue state change in tracker [{$a]}';
 $string['trackerhost'] = 'Parent host for tracker';
