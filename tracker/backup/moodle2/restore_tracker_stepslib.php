@@ -26,7 +26,7 @@
  */
 
 /**
- * Structure step to restore one vodeclic activity
+ * Structure step to restore one tracker activity
  */
 class restore_tracker_activity_structure_step extends restore_activity_structure_step {
 
@@ -39,10 +39,10 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         $paths[] = $tracker;
         $elements = new restore_path_element('tracker_element', '/activity/tracker/elements/element');
         $paths[] = $elements;
-        $elementitems = new restore_path_element('tracker_elementitem', '/activity/tracker/elements/element/elementitems/elementitem');
-        $paths[] = $elementitems;
-        $usedelements = new restore_path_element('tracker_elementused', '/activity/tracker/usedelements/elementused');
-        $paths[] = $usedelements;
+        $elementitem = new restore_path_element('tracker_elementitem', '/activity/tracker/elements/element/elementitems/elementitem');
+        $paths[] = $elementitem;
+        $usedelement = new restore_path_element('tracker_usedelement', '/activity/tracker/usedelements/usedelement');
+        $paths[] = $usedelement;
         
         if ($userinfo){
 	        $paths[] = new restore_path_element('tracker_issue', '/activity/tracker/issues/issue');
@@ -76,6 +76,16 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
     }
 
     protected function after_execute() {
+    	global $DB;
+    	
+    	// remap element used to real values
+		if ($used = $DB->get_records('tracker_elementused', array('trackerid' => $this->get_new_parentid('tracker')))){
+			foreach($used as $u){
+		        $u->elementid = $this->get_mappingid('tracker_element', $u->elementid);
+		        $DB->update_record('tracker_elementused', $u);
+		     }
+		}		
+    	
         // Add tracker related files, no need to match by itemname (just internally handled context)
         $this->add_related_files('mod_tracker', 'intro', null);
         $this->add_related_files('mod_tracker', 'comment', null);
@@ -103,21 +113,20 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         $data = (object)$data;
         $oldid = $data->id;
 
-        $data->elementid = $this->get_new_parentid('tracker_element');
+        $data->elementid = $this->get_mappingid('tracker_element', $data->elementid);
 
         // The data is actually inserted into the database later in inform_new_usage_id.
         $newitemid = $DB->insert_record('tracker_elementitem', $data);
         $this->set_mapping('tracker_elementitem', $oldid, $newitemid, false); // Has no related files
     }
 
-    protected function process_tracker_elementused($data) {
+    protected function process_tracker_usedelement($data) {
     	global $DB;
     	
         $data = (object)$data;
         $oldid = $data->id;
 
         $data->trackerid = $this->get_new_parentid('tracker');
-        $data->elementid = $this->get_mappingid('tracker_element', $data->elementid);
         $data->canbemodifiedby = $this->get_mappingid('user', $data->canbemodifiedby);
 
         // The data is actually inserted into the database later in inform_new_usage_id.
