@@ -84,12 +84,12 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
                 )
             ),
             new convert_path(
-                'tracker_usedelements', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER/ELEMENTSUSEDS',
+                'tracker_usedelements', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER/ELEMENTUSEDS',
                 array(
                 )
             ),
             new convert_path(
-                'tracker_usedelement', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER/USEDELEMENTS/ELEMENTUSED',
+                'tracker_usedelement', '/MOODLE_BACKUP/COURSE/MODULES/MOD/TRACKER/ELEMENTUSEDS/ELEMENTUSED',
                 array(
                 )
             ),
@@ -323,7 +323,7 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
 
 	// process usedelement in one single write
     public function process_tracker_usedelement($data) {
-        $this->write_xml('usedelement', array('id' => $data['id']));
+        $this->write_xml('usedelement', array('id' => $data['id'], 'trackerid' => $data['trackerid'], 'elementid' => $data['elementid'], 'sortorder' => $data['sortorder'], 'canbemodifiedby' => $data['canbemodifiedby'], 'active' => $data['active']));
     }
 
 	/* PREFERENCES */
