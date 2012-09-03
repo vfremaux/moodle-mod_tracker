@@ -245,6 +245,7 @@ if (!empty($issues)){
         if (has_capability('mod/tracker:manage', $context)){ // managers can assign bugs
             $status = html_writer::select($STATUSKEYS, "status{$issue->id}", $issue->status, array('' => 'choose'), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")). "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
             $developers = tracker_getdevelopers($context);
+            $developersmenu = array();
             foreach($developers as $developer){
                 $developersmenu[$developer->id] = fullname($developer);
             }

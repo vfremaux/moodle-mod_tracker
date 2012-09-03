@@ -885,6 +885,7 @@ function tracker_getassignees($userid){
 function tracker_submitanissue(&$tracker){
     global $CFG, $DB;
     
+    $issue = new StdClass;
     $issue->datereported = required_param('datereported', PARAM_INT);
     $issue->summary = required_param('summary', PARAM_TEXT);
     $issue->description = addslashes(required_param('description', PARAM_CLEANHTML));
@@ -1139,6 +1140,7 @@ function tracker_register_cc(&$tracker, &$issue, $userid){
         if ($userprefs = $DB->get_record('tracker_preferences', array('trackerid' => $tracker->id, 'userid' => $userid, 'name' => 'eventmask'))){
             $eventmask = $userprefs->value;
         }
+        $cc = new StdClass;
         $cc->trackerid = $tracker->id;
         $cc->issueid = $issue->id;
         $cc->userid = $userid;

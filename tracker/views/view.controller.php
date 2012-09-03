@@ -37,6 +37,7 @@ if ($action == 'submitanissue'){
 	   print_error('errorcannotsubmitticket', 'tracker');
     }
     // log state change
+    $stc = new StdClass;
     $stc->userid = $USER->id;
     $stc->issueid = $issue->id;
     $stc->trackerid = $tracker->id;
@@ -59,6 +60,7 @@ if ($action == 'submitanissue'){
 }
 /************************************* update an issue *****************************/
 elseif ($action == 'updateanissue'){
+	$issue = new StdClass;
     $issue->id = required_param('issueid', PARAM_INT);
     $issue->status = required_param('status', PARAM_INT);
     $issue->assignedto = required_param('assignedto', PARAM_INT);
@@ -73,6 +75,7 @@ elseif ($action == 'updateanissue'){
     // if ownership has changed, prepare logging
     $oldrecord = $DB->get_record('tracker_issue', array('id' => $issue->id));
     if ($oldrecord->assignedto != $issue->assignedto){
+    	$ownership = new StdClass;
         $ownership->trackerid = $tracker->id;
         $ownership->issueid = $oldrecord->id;
         $ownership->userid = $oldrecord->assignedto;
@@ -98,6 +101,7 @@ elseif ($action == 'updateanissue'){
         tracker_notifyccs_changestate($issue->id, $tracker);
 
     	// log state change
+    	$stc = new StdClass;
 	    $stc->userid = $USER->id;
 	    $stc->issueid = $issue->id;
 	    $stc->trackerid = $tracker->id;
@@ -118,6 +122,7 @@ elseif ($action == 'updateanissue'){
         }
         // install back new one
         foreach($dependancies as $dependancy){
+        	$dependancyrec = new StdClass;
             $dependancyrec->trackerid = $tracker->id;
             $dependancyrec->parentid = $dependancy;
             $dependancyrec->childid = $issue->id;
@@ -169,6 +174,7 @@ elseif ($action == 'updatelist'){
 	    $issueid = str_replace('status', '', $akey);
 	    $haschanged = optional_param('schanged'.$issueid, 0, PARAM_INT);
 	    if ($haschanged){
+	    	$issue = new StdClass;
     	    $issue->id = $issueid;
     	    $issue->status = required_param($akey, PARAM_INT);
     	    $oldstatus = $DB->get_field('tracker_issue', 'status', array('id' => $issue->id));
@@ -200,6 +206,7 @@ elseif ($action == 'updatelist'){
 	        // save old assignement in history
             $oldassign = $DB->get_record('tracker_issue', array('id' => $issueid));
             if ($oldassign->assignedto != 0){
+            	$ownership = new StdClass;
                 $ownership->trackerid = $tracker->id;
                 $ownership->issueid = $issueid;
         	    $ownership->userid = $oldassign->assignedto;
@@ -211,6 +218,7 @@ elseif ($action == 'updatelist'){
         	}
 
             // update actual ticket
+            $issue = new StdClass;
     	    $issue->id = $issueid;
     	    $issue->bywhomid = $USER->id;
     	    $issue->timeassigned = time();
@@ -238,6 +246,7 @@ elseif ($action == 'addacomment'){
 /***************************************** add a comment ***********************************/
 elseif ($action == 'doaddcomment'){
     $issueid = required_param('issueid', PARAM_INT);
+    $comment = new StdClass;
     $comment->comment = str_replace("'", "''", required_param('comment', PARAM_CLEANHTML));
     $comment->commentformat = required_param('commentformat', PARAM_INT);
     $comment->userid = $USER->id;
@@ -348,6 +357,7 @@ elseif ($action == 'cascade'){
     if ($result){
         $response = json_decode($result);
         if ($response->status == RPC_SUCCESS){
+        	$issue = new StdClass;
             $issue->status = TRANSFERED;
             $issue->followid = $response->followid;
             if (!$DB->update_record('tracker_issue', addslashes_recursive($issue))){
