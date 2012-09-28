@@ -311,4 +311,3 @@ function tracker_uninstall(){
     }
     return $return;
 }
-?>

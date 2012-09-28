@@ -424,6 +424,6 @@ $string['defaultassignee_help'] = '
 
 You might require incoming tickets are preassigned to one of the available resolvers.';
 
-?>
+
 
 

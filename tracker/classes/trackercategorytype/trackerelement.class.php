@@ -126,4 +126,3 @@ class trackerelement{
 	    $this->view(true);
 	}	
 }
-?>
