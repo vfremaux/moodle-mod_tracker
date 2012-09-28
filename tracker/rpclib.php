@@ -3,7 +3,6 @@
 /**
 * @package mod-tracker
 * @category mod
-* @author Clifford Tham (original < 1.8)
 * @author Valery Fremaux
 * @date 02/12/2012
 * @version Moodle 2

@@ -136,8 +136,8 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
         // Define sources
         $tracker->set_source_table('tracker', array('id' => backup::VAR_ACTIVITYID));
         $element->set_source_table('tracker_element', array('course' => backup::VAR_COURSEID));
-        $elementitem->set_source_table('tracker_elementitem', array('elementid' => backup::VAR_PARENTID));
-        $elementused->set_source_table('tracker_elementused', array('trackerid' => backup::VAR_ACTIVITYID));
+        $item->set_source_table('tracker_elementitem', array('elementid' => backup::VAR_PARENTID));
+        $used->set_source_table('tracker_elementused', array('trackerid' => backup::VAR_ACTIVITYID));
 
         if ($userinfo) {
             $issue->set_source_table('tracker_issue', array('trackerid' => backup::VAR_PARENTID));
