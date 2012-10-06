@@ -52,7 +52,7 @@ class mod_tracker_mod_form extends moodleform_mod {
       	} else {
     		$mform->addElement('hidden', 'defaultassignee', 0);
       	}
-	  	if ($subtrackers = $DB->get_records_select('tracker', " id != '' " )){
+	  	if ($subtrackers = $DB->get_records_select('tracker', " id != 0 " )){
 			$trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
 	  		$subtrackersopts = array();
 	  		foreach($subtrackers as $st){
