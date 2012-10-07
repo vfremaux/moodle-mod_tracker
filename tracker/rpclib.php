@@ -1,8 +1,9 @@
-<?PHP  // $Id: rpclib.php,v 1.2 2012-06-01 18:53:06 vf Exp $
+<?PHP  // $Id: rpclib.php,v 1.4 2012-07-14 19:25:28 vf Exp $
 
 /**
 * @package mod-tracker
 * @category mod
+* @author Clifford Tham (original < 1.8)
 * @author Valery Fremaux
 * @date 02/12/2012
 * @version Moodle 2
