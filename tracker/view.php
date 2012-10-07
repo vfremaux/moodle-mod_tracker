@@ -1,4 +1,4 @@
-<?PHP  // $Id: view.php,v 1.5 2011-10-09 17:04:22 vf Exp $
+<?PHP  // $Id: view.php,v 1.7 2012-07-07 16:46:53 vf Exp $
 
 /**
 * @package mod-tracker
@@ -117,9 +117,9 @@
 	}
 	$screen = $_SESSION['currentscreen'];
 	// !PART OF MVC Implementation
-	
+
 	print_box_start('', 'tracker-view');
-	
+
 	$totalissues = count_records_select('tracker_issue', "trackerid = {$tracker->id} AND status <> ".RESOLVED." AND status <> ".ABANDONNED);
 	$totalresolvedissues = count_records_select('tracker_issue', "trackerid = $tracker->id AND (status = ".RESOLVED." OR status = ".ABANDONNED.")");
 	/// Print tabs with options for user
@@ -192,15 +192,14 @@
 	print_tabs($rows, $selected, '', $activated);
 	echo '<br/>';
 	print_container_end();
-	                  
+
 	//=====================================================================
 	// Print the main part of the page
 	//
 	//=====================================================================
-	    
 	/// routing to appropriate view against situation
 	// echo "routing : $view:$screen:$action ";
-	
+
 	if ($view == 'reportanissue'){
 	    if (has_capability('mod/tracker:report', $context)){
 	        include "views/issuereportform.html";

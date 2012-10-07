@@ -743,9 +743,9 @@ function tracker_searchforissues(&$tracker, $cmid){
     
     if ($success){
         if ($tracker->supportmode == 'bugtracker')
-            redirect ("view.php?id={$cmid}&amp;view=view&amp;page=browse");
+            redirect ("view.php?id={$cmid}&amp;view=view&amp;screen=browse");
         else 
-            redirect ("view.php?id={$cmid}&amp;view=view&amp;page=mytickets");
+            redirect ("view.php?id={$cmid}&amp;view=view&amp;screen=mytickets");
     }
     else{
         error ("Failed to set cookie: " . $cookie . "<br>");
@@ -1381,7 +1381,7 @@ function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = 
                   'URGENT' => $urgentrequest, 
                   'BY' => fullname($by),
                   'REQUESTEDBY' => fullname($USER),
-                  'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=view&amp;page=viewanissue&amp;issueid={$issue->id}",
+                  'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}",
                   );
 
     include_once($CFG->dirroot."/mod/tracker/mailtemplatelib.php");
@@ -1434,8 +1434,8 @@ function tracker_notify_submission($issue, &$cm, $tracker = null){
                       'SUMMARY' => format_string($issue->summary), 
                       'DESCRIPTION' => format_string(stripslashes($issue->description)), 
                       'BY' => fullname($by),
-                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=view&amp;page=viewanissue&amp;issueid={$issue->id}",
-                      'CCURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;issueid={$issue->id}&amp;what=register"
+                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}",
+                      'CCURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;issueid={$issue->id}&amp;what=register"
                       );
         include_once($CFG->dirroot."/mod/tracker/mailtemplatelib.php");
         foreach($managers as $manager){
@@ -1471,13 +1471,13 @@ function tracker_notifyccs_changeownership($issueid, $tracker = null){
                       'SUMMARY' => format_string($issue->summary), 
                       'ASSIGNEDTO' => fullname($assignee), 
                       'BY' => fullname($USER),
-                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=view&amp;page=viewanissue&amp;issueid={$issue->id}",
+                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}",
                       );
         include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
         foreach($issueccs as $cc){
             $ccuser = get_record('user', 'id', $cc->userid);
-            $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
-            $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
+            $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
+            $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
             $notification = compile_mail_template('ownershipchanged', $vars, 'tracker', $ccuser->lang);
             $notification_html = compile_mail_template('ownershipchanged_html', $vars, 'tracker', $ccuser->lang);
             if ($CFG->debugsmtp) echo "Sending Ownership Change Mail Notification to " . fullname($ccuser) . '<br/>'.$notification_html;
@@ -1516,13 +1516,13 @@ function tracker_notifyccs_moveissue($issueid, $tracker, $newtracker = null){
                       'ISSUE' => $newtracker->ticketprefix.$issue->id, 
                       'SUMMARY' => format_string($issue->summary), 
                       'ASSIGNEDTO' => fullname($assignee), 
-                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$newtracker->id}&amp;view=view&amp;page=viewanissue&amp;issueid={$issue->id}",
+                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$newtracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}",
                       );
         include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
         foreach($issueccs as $cc){
             $ccuser = get_record('user', 'id', $cc->userid);
-            $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
-            $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
+            $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
+            $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
             $notification = compile_mail_template('issuemoved', $vars, 'tracker', $ccuser->lang);
             $notification_html = compile_mail_template('issuemoved_html', $vars, 'tracker', $ccuser->lang);
             if ($CFG->debugsmtp) echo "Sending Issue Moving Mail Notification to " . fullname($ccuser) . '<br/>'.$notification_html;
@@ -1553,14 +1553,14 @@ function tracker_notifyccs_changestate($issueid, $tracker = null){
                       'ISSUE' => $tracker->ticketprefix.$issueid, 
                       'SUMMARY' => format_string($issue->summary), 
                       'BY' => fullname($USER),
-                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=view&amp;page=viewanissue&amp;issueid={$issueid}");
+                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issueid}");
         include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
         foreach($issueccs as $cc){
             unset($notification);
             unset($notification_html);
             $ccuser = get_record('user', 'id', $cc->userid);
-            $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
-            $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
+            $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
+            $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
             switch($issue->status){
                 case OPEN : 
                     if($cc->events & EVENT_OPEN){
@@ -1657,15 +1657,15 @@ function tracker_notifyccs_comment($issueid, $comment, $tracker = null){
                       'ISSUE' => $tracker->ticketprefix.$issue->id, 
                       'SUMMARY' => $issue->summary, 
                       'COMMENT' => format_string(stripslashes($comment)), 
-                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=view&amp;page=viewanissue&amp;issueid={$issue->id}",
+                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}",
                       );
         include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
         foreach($issueccs as $cc){
             $ccuser = get_record('user', 'id', $cc->userid);
             if ($cc->events & ON_COMMENT){
                 $vars['CONTRIBUTOR'] = fullname($USER);
-                $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
-                $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;page=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
+                $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
+                $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
                 $notification = compile_mail_template('addcomment', $vars, 'tracker', $ccuser->lang);
                 $notification_html = compile_mail_template('addcomment_html', $vars, 'tracker', $ccuser->lang);
                 if ($CFG->debugsmtp) echo "Sending Comment Notification to " . fullname($ccuser) . '<br/>'.$notification_html;
@@ -1772,7 +1772,7 @@ function tracker_add_cascade_backlink(&$cm, &$issue){
     $vieworiginalstr = get_string('vieworiginal', 'tracker');
     $str = get_string('cascadedticket', 'tracker', $SITE->shortname);
     $str .= '<br/>';
-    $str .= "<a href=\"{$CFG->wwwroot}/mod/tracker/view.php?id={$cm->id}&amp;view=view&amp;page=viewanissue&amp;issueid={$issue->id}\">{$vieworiginalstr}</a><br/>";
+    $str .= "<a href=\"{$CFG->wwwroot}/mod/tracker/view.php?id={$cm->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}\">{$vieworiginalstr}</a><br/>";
 
     return $str;    
 }
@@ -1835,7 +1835,7 @@ function tracker_get_stats(&$tracker, $from = null, $to = null){
 		$stats[WAITING] = 0;
 		$stats[TESTING] = 0;
 		$stats[PUBLISHED] = 0;
-		$stats[VALIDATD] = 0;
+		$stats[VALIDATED] = 0;
 		$stats[RESOLVED] = 0;
 		$stats[ABANDONNED] = 0;
 		$stats[TRANSFERED] = 0;

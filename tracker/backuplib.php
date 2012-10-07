@@ -1,4 +1,4 @@
-<?php //$Id: backuplib.php,v 1.3 2011-07-04 20:40:15 vf Exp $
+<?php //$Id: backuplib.php,v 1.4 2012-07-30 22:36:08 vf Exp $
 
 /**
 * @package mod-tracker
@@ -460,7 +460,7 @@
         //Now, if requested, the user_data
         if ($user_data) {
             $info[1][0] = get_string('issues', 'tracker');
-            if ($ids = tracker_issue_ids_by_course ($course)) {
+            if ($ids = tracker_issue_ids_by_course($course)) {
                 $info[1][1] = count($ids);
             } else {
                 $info[1][1] = 0;
@@ -508,7 +508,7 @@
     // INTERNAL FUNCTIONS. BASED IN THE MOD STRUCTURE
 
     //Returns an array of trackers id
-    function tracker_ids ($course) {
+    function tracker_ids($course) {
         global $CFG;
 
         $sql = "
@@ -524,7 +524,7 @@
     }
    
     //Returns an array of tracker issues id
-    function tracker_issue_ids_by_course ($course) {
+    function tracker_issue_ids_by_course($course) {
         global $CFG;
 
         $sql = "
@@ -542,7 +542,7 @@
     }
 
     //Returns an array of tracker issue attribute ids
-    function tracker_issueattribute_ids_by_course ($course) {
+    function tracker_issueattribute_ids_by_course($course) {
         global $CFG;
 
         $sql = "
@@ -560,7 +560,7 @@
     }
 
     //Returns an array of tracker issue comments ids
-    function tracker_issuecomment_ids_by_course ($course) {
+    function tracker_issuecomment_ids_by_course($course) {
         global $CFG;
 
         $sql = "
@@ -578,7 +578,7 @@
     }
 
     //Returns an array of tracker issue cc ids
-    function tracker_issuecc_ids_by_course ($course) {
+    function tracker_issuecc_ids_by_course($course) {
         global $CFG;
 
         $sql = "
@@ -596,7 +596,7 @@
     }
 
     //Returns an array of tracker issue dependancy ids
-    function tracker_issuedependancy_ids_by_course ($course) {
+    function tracker_issuedependancy_ids_by_course($course) {
         global $CFG;
 
         $sql = "
@@ -614,7 +614,7 @@
     }
 
     //Returns an array of tracker issue ownership ids
-    function tracker_issueownership_ids_by_course ($course) {
+    function tracker_issueownership_ids_by_course($course) {
         global $CFG;
 
         $sql = "
@@ -632,7 +632,7 @@
     }
 
     //Returns an array of tracker preferences ids
-    function tracker_preferences_ids_by_course ($course) {
+    function tracker_preferences_ids_by_course($course) {
         global $CFG;
 
         $sql = "
@@ -650,7 +650,7 @@
     }
 
     //Returns an array of user's queries ids
-    function tracker_queries_ids_by_course ($course) {
+    function tracker_queries_ids_by_course($course) {
         global $CFG;
 
         $sql = "
