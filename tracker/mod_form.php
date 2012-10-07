@@ -81,7 +81,7 @@ class mod_tracker_mod_form extends moodleform_mod {
 	function definition_after_data(){
 	  $mform    =& $this->_form;
 	  }*/
-	function validation($data, $files) {
+	function validation($data, $files = null) {
 	    $errors = array();
 	    return $errors;
 	}

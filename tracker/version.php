@@ -9,7 +9,7 @@ $module->version  = 2012080900;  // The current module version (Date: YYYYMMDDXX
 $module->requires = 2012062501;
 $module->component = 'mod_tracker';   // Full name of the plugin (used for diagnostics)
 $module->cron     = 0;           // Period for cron to check this module (secs)
-$module->maturity = 'MATURITY_BETA';
+$module->maturity = MATURITY_RC;
 $module->release = '2.3.0 (Build 2012080900)';
 
 ?>
