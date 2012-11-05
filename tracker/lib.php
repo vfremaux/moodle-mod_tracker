@@ -231,6 +231,13 @@ function tracker_scale_used ($trackerid, $scaleid) {
 }
 
 /**
+ *
+ **/
+function tracker_scale_used_anywhere($scaleid){
+    return false;
+}
+
+/**
 *
 *
 */
