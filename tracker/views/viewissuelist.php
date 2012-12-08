@@ -229,7 +229,6 @@ if ($limit > $numrecords){
 $sql = $sql . ' LIMIT ' . $limit . ',' . $offset;
 */
 //
-
 $issues = get_records_sql($sql, $table->get_page_start(), $table->get_page_size());
 
 $maxpriority = get_field_select('tracker_issue', 'MAX(resolutionpriority)', " trackerid = $tracker->id GROUP BY trackerid ");
@@ -311,10 +310,15 @@ if (!empty($issues)){
         $table->add_data($dataset);     
     }
     $table->print_html();
+    echo '<br/>';
 } else {
     if (!$resolved){
+    	echo '<br/>';
+    	echo '<br/>';
         notice(get_string('noissuesreported', 'tracker'), "view.php?id=$cm->id"); 
     } else {
+    	echo '<br/>';
+    	echo '<br/>';
         notice(get_string('noissuesresolved', 'tracker'), "view.php?id=$cm->id"); 
     }
 }

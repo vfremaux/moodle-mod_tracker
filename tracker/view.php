@@ -1,4 +1,4 @@
-<?PHP  // $Id: view.php,v 1.7 2012-07-07 16:46:53 vf Exp $
+<?PHP  // $Id: view.php,v 1.8 2012-12-08 15:39:54 vf Exp $
 
 /**
 * @package mod-tracker
@@ -222,7 +222,7 @@
 	                include "views/viewmyassignedticketslist.php";
 	                break;
 	            case 'browse': 
-	                if (!has_capability('mod/tracker:viewallissues', $context)){
+	                if (!(has_capability('mod/tracker:viewallissues', $context) || $tracker->supportmode == 'bugtracker')){
 	                    print_error ('errornoaccessallissues', 'tracker');
 	                } else {
 	                    $resolved = 0;
@@ -269,7 +269,7 @@
 	                include "views/viewmyticketslist.php";
 	                break;
 	            case 'browse': 
-	                if (!has_capability('mod/tracker:viewallissues', $context)){
+	                if (!(has_capability('mod/tracker:viewallissues', $context) || $tracker->supportmode == 'bugtracker')){
 	                    print_error('errornoaccessallissues', 'tracker');
 	                } else {
 	                    $resolved = 1;

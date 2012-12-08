@@ -410,6 +410,7 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false){
                 i.datereported, 
                 i.reportedby, 
                 i.assignedto, 
+                i.resolutionpriority, 
                 i.status,
                 COUNT(cc.userid) AS watches,
                 u.firstname, 
@@ -450,7 +451,14 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false){
     } else {
         $sql->search = "
             SELECT DISTINCT 
-                i.id, i.trackerid, i.summary, i.datereported, i.reportedby, i.assignedto, i.status,
+                i.id, 
+                i.trackerid, 
+                i.summary, 
+                i.datereported, 
+                i.resolutionpriority, 
+                i.reportedby, 
+                i.assignedto, 
+                i.status,
                 COUNT(cc.userid) AS watches
             FROM 
                 $elementsSearchClause
@@ -1156,8 +1164,9 @@ function tracker_print_user($user){
 */
 function tracker_printcomments($issueid){
     global $CFG;
-    
+
     $comments = get_records('tracker_issuecomment', 'issueid', $issueid, 'datecreated');
+	    
     if ($comments){
         foreach ($comments as $comment){
             $user = get_record('user', 'id', $comment->userid);

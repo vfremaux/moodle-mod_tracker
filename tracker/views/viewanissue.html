@@ -239,7 +239,7 @@ if ($tracker->enablecomments){
         $addcommentlink = "<a href=\"view.php?id={$cm->id}&amp;what=addacomment&amp;issueid={$issueid}\">".get_string('addacomment', 'tracker').'</a>';
     }
     $showcommentslink = '';
-    if (count_records('tracker_issuecomment', 'issueid', $issue->id)){
+    if ($commentscount = count_records('tracker_issuecomment', 'issueid', $issue->id)){
         $showcommentslink = "<a id=\"togglecommentlink\" href=\"javascript:togglecomments()\">".get_string('showcomments', 'tracker').'</a>&nbsp;-&nbsp;';
     }
     else{
@@ -287,6 +287,7 @@ if ($tracker->subtrackers && $issue->status != TRANSFERED && (has_capability('mo
     </tr>
 <?php
 if ($tracker->enablecomments){
+	if ($commentscount){
 ?>
     <tr>
         <td colspan="4">
@@ -298,6 +299,7 @@ if ($tracker->enablecomments){
         </td>
     </tr>
 <?php
+	}
 }
 ?>
     <tr>

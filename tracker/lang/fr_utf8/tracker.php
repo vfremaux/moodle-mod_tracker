@@ -1,4 +1,4 @@
-<?php // $Id: tracker.php,v 1.10 2012-07-30 22:46:39 vf Exp $ 
+<?php // $Id: tracker.php,v 1.11 2012-12-08 15:39:55 vf Exp $ 
       // tracker.php - created with Moodle 1.2 development (2003111400)
 
 $string['AND'] = 'ET';
@@ -299,5 +299,5 @@ $string['youneedanaccount'] = 'Vous devez posséder un compte dans cet espace po
 
 $string['tracker_cascade_description'] = '<p>La publication de ce service permet à des trackers du site $a de cascader leur collecte vers l\'un de vos trackeurs.</p>
 <ul><li><i>Dépendance</i> : Vous devez abonner le serveur $a à ce service.</li></ul>
-<p>L\'abonement à ce service permet à des trackeurs de cascader des tickets de support vers les trackeurs du site $a.</p>
+<p>L\'abonnement à ce service permet à des trackeurs de cascader des tickets de support vers les trackeurs du site $a.</p>
 <ul><li><i>Dépendance</i> : Le site $a doit publier le service de cascade de trackeurs.</li></ul>';
