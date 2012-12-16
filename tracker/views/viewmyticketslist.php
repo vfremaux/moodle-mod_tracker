@@ -21,6 +21,7 @@ $STATUSKEYS = array(POSTED => get_string('posted', 'tracker'),
                     RESOLVING => get_string('resolving', 'tracker'), 
                     WAITING => get_string('waiting', 'tracker'), 
                     TESTING => get_string('testing', 'tracker'), 
+                    VALIDATED => get_string('validated', 'tracker'), 
                     PUBLISHED => get_string('published', 'tracker'), 
                     RESOLVED => get_string('resolved', 'tracker'), 
                     ABANDONNED => get_string('abandonned', 'tracker'),
@@ -74,7 +75,7 @@ if (isset($searchqueries)){
             i.assignedto, 
             i.status,
             i.resolutionpriority,
-            COUNT(ic.issueid) watches
+            COUNT(ic.issueid) AS watches
         FROM 
             {tracker_issue} i
         LEFT JOIN
@@ -255,7 +256,8 @@ if (!empty($issues)){
         if (has_capability('mod/tracker:manage', $context)){
             $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=delete\" title=\"".get_string('delete')."\" ><img src=\"".$OUTPUT->pix_url('t/delete', 'core')."\" border=\"0\" /></a>";
         }
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;screen=mywatches&amp;issueid={$issue->id}&what=register\" title=\"".get_string('register', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('register', 'mod_tracker')."\" border=\"0\" /></a>";
+        // Ergo Report I3 2012 => self list displays owned tickets. Already registered
+        // $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;screen=mywatches&amp;issueid={$issue->id}&what=register\" title=\"".get_string('register', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('register', 'mod_tracker')."\" border=\"0\" /></a>";
         if ($issue->resolutionpriority < $maxpriority && has_capability('mod/tracker:viewpriority', $context) && !has_capability('mod/tracker:managepriority', $context)){
             $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&amp;what=askraise\" title=\"".get_string('askraise', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('askraise', 'mod_tracker')."\" border=\"0\" /></a>";
         }
@@ -279,6 +281,8 @@ if (!empty($issues)){
     }
     $table->print_html();
 } else {
+	echo '<br/>';
+	echo '<br/>';
     notice(get_string('notickets', 'tracker'), "view.php?id=$cm->id"); 
 }
 

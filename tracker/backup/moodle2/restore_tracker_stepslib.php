@@ -233,7 +233,7 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         // $this->set_mapping('tracker_ownership', $oldid, $newitemid, false); // Has no related files
     }
 
-    protected function process_tracker_issuepreferences($data) {
+    protected function process_tracker_preferences($data) {
     	global $DB;
     	
         $data = (object)$data;
@@ -242,7 +242,7 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         $data->userid = $this->get_mappingid('user', $data->userid);
 
         // The data is actually inserted into the database later in inform_new_usage_id.
-        $newitemid = $DB->insert_record('tracker_issuepreferences', $data);
+        $newitemid = $DB->insert_record('tracker_preferences', $data);
         // needs no mapping as terminal record
         // $this->set_mapping('tracker_preferences', $oldid, $newitemid, false); // Has no related files
     }

@@ -5,11 +5,11 @@
 ///  This fragment is called by moodle_needs_upgrading() and /admin/index.php
 /////////////////////////////////////////////////////////////////////////////////
 
-$module->version  = 2012080900;  // The current module version (Date: YYYYMMDDXX)
+$module->version  = 2012101701;  // The current module version (Date: YYYYMMDDXX)
 $module->requires = 2012062501;
 $module->component = 'mod_tracker';   // Full name of the plugin (used for diagnostics)
 $module->cron     = 0;           // Period for cron to check this module (secs)
 $module->maturity = MATURITY_RC;
-$module->release = '2.3.0 (Build 2012080900)';
+$module->release = '2.3.0 (Build 2012101701)';
 
 ?>

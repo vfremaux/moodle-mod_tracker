@@ -39,8 +39,9 @@ define('EVENT_TRANSFERED', 32);
 define('ON_COMMENT', 64);
 define('EVENT_TESTING', 128);
 define('EVENT_PUBLISHED', 256);
+define('EVENT_VALIDATED', 512);
 
-define('ALL_EVENTS', 255);
+define('ALL_EVENTS', 1023);
 
 global $STATUSCODES;
 global $STATUSKEYS;
@@ -52,7 +53,9 @@ $STATUSCODES = array(POSTED => 'posted',
                     ABANDONNED => 'abandonned',
                     TRANSFERED => 'transfered',
                     TESTING => 'testing',
-                    PUBLISHED => 'published');
+                    PUBLISHED => 'published',
+                    VALIDATED => 'validated',
+                    );
 
 $STATUSKEYS = array(POSTED => get_string('posted', 'tracker'), 
                     OPEN => get_string('open', 'tracker'), 
@@ -62,7 +65,9 @@ $STATUSKEYS = array(POSTED => get_string('posted', 'tracker'),
                     ABANDONNED => get_string('abandonned', 'tracker'),
                     TRANSFERED => get_string('transfered', 'tracker'),
                     TESTING => get_string('testing', 'tracker'),
-                    PUBLISHED => get_string('published', 'tracker'));
+                    PUBLISHED => get_string('published', 'tracker'),
+                    VALIDATED => get_string('validated', 'tracker'),
+                    );
 
 /**
 * loads all elements in memory
@@ -433,6 +438,7 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false){
                 i.datereported, 
                 i.reportedby, 
                 i.assignedto, 
+                i.resolutionpriority, 
                 i.status,
                 COUNT(cc.userid) AS watches,
                 u.firstname, 
@@ -472,7 +478,14 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false){
     } else {
         $sql->search = "
             SELECT DISTINCT 
-                i.id, i.trackerid, i.summary, i.datereported, i.reportedby, i.assignedto, i.status,
+                i.id, 
+                i.trackerid, 
+                i.summary, 
+                i.datereported, 
+                i.reportedby, 
+                i.resolutionpriority, 
+                i.assignedto, 
+                i.status,
                 COUNT(cc.userid) AS watches
             FROM 
                 $elementsSearchClause
@@ -527,25 +540,31 @@ function tracker_extractsearchparametersfrompost(){
             $month = optional_param('month', '', PARAM_INT);
             $day = optional_param('day', '', PARAM_INT);
             $year = optional_param('year', '', PARAM_INT);
+        
             if (!empty($month) && !empty($day) && !empty($year)){
                 $datereported = make_timestamp($year, $month, $day);
                 $fields['datereported'][] = $datereported;
             }
         }
+        
         $description = optional_param('description', '', PARAM_CLEANHTML);
         if (!empty($description)){  
             $fields['description'][] = stripslashes($description);
         }
+        
         $reportedby = optional_param('reportedby', '', PARAM_INT);
         if (!empty($reportedby)){   
             $fields['reportedby'][] = $reportedby;
         }
+        
         $summary = optional_param('summary', '', PARAM_TEXT);
         if (!empty($summary)){  
             $fields['summary'][] = $summary;
         }
+        
         $keys = array_keys($_POST);                         // get the key value of all the fields submitted
         $elementkeys = preg_grep('/element./' , $keys);     // filter out only the element keys
+        
         foreach ($elementkeys as $elementkey){
             preg_match('/element(.*)$/', $elementkey, $elementid);
             if (!empty($_POST[$elementkey])){
@@ -572,10 +591,12 @@ function tracker_extractsearchparametersfrompost(){
 */
 function tracker_savesearchparameterstodb($query, $fields){
     global $USER, $DB;
+	
     $query->userid = $USER->id;
     $query->published = 0;
     $query->fieldnames = '';
     $query->fieldvalues = '';
+	
     if (!empty($fields)){
         $keys = array_keys($fields);
         if (!empty($keys)){
@@ -592,6 +613,7 @@ function tracker_savesearchparameterstodb($query, $fields){
             }       
         }
     }
+	
     if (!isset($query->id)) {           //if not given a $queryid, then insert record
         $queryid = $DB->insert_record('tracker_query', $query);
     }
@@ -653,9 +675,10 @@ function tracker_extractsearchparametersfromdb($queryid=null){
 	
     if (!$queryid){
         $queryid = optional_param('queryid', '', PARAM_INT);
-    }
+	}
     $query_record = $DB->get_record('tracker_query', array('id' => $queryid));
     $fields = null;
+    
     if (!empty($query_record)){
         $fieldnames = explode(',', $query_record->fieldnames);
         $fieldvalues = explode(',', $query_record->fieldvalues);
@@ -666,10 +689,10 @@ function tracker_extractsearchparametersfromdb($queryid=null){
                 $count++;
             }
         }
-    }
-    else{
+    } else{
         error ("Invalid query id: " . $queryid);
     }
+    
     return $fields;
 }
 
@@ -681,6 +704,7 @@ function tracker_setsearchcookies($fields){
     $success = true;
     if (is_array($fields)){
         $keys = array_keys($fields);
+        
         foreach ($keys as $key){
             $cookie = '';
             foreach ($fields[$key] as $value){
@@ -691,6 +715,7 @@ function tracker_setsearchcookies($fields){
                     $cookie = $cookie . ', ' . $value;
                 }
             }
+            
             $result = setcookie("moodle_tracker_search_" . $key, $cookie);          
             $success = $success && $result;
         }
@@ -707,6 +732,7 @@ function tracker_setsearchcookies($fields){
 * @return an array of field desriptions
 */
 function tracker_extractsearchcookies(){
+
     $keys = array_keys($_COOKIE);                                           // get the key value of all the cookies
     $cookiekeys = preg_grep('/moodle_tracker_search./' , $keys);            // filter all search cookies
     $fields = null;
@@ -724,9 +750,11 @@ function tracker_extractsearchcookies(){
 * @return boolean true if succeeded
 */
 function tracker_clearsearchcookies(){
+
     $success = true;
     $keys = array_keys($_COOKIE);                                           // get the key value of all the cookies
     $cookiekeys = preg_grep('/moodle_tracker_search./' , $keys);            // filter all search cookies
+    
     foreach ($cookiekeys as $cookiekey){
         $result = setcookie($cookiekey, '');
         $success = $success && $result;
@@ -747,12 +775,13 @@ function tracker_searchforissues(&$tracker, $cmid){
     tracker_clearsearchcookies($tracker->id);
     $fields = tracker_extractsearchparametersfrompost($tracker->id);
     $success = tracker_setsearchcookies($fields);
+    
     if ($success){
         if ($tracker->supportmode == 'bugtracker'){
             redirect ("view.php?id={$cmid}&amp;view=view&amp;screen=browse");
-        } else { 
+        } else {
             redirect("view.php?id={$cmid}&amp;view=view&amp;screen=mytickets");
-        }
+		}
     } else {
         print_error('errorcookie', 'tracker', '', $cookie);
     }
@@ -940,9 +969,11 @@ function tracker_recordelements(&$issue){
     $filekeys = preg_grep('/element./' , $filekeys);    // filter out only the element keys    
 
     $keys = array_merge($keys, $filekeys);
+    
     foreach ($keys as $key){
         preg_match('/element(.*)$/', $key, $elementid);
         $elementname = $elementid[1];
+        
         $sql = "
             SELECT 
               e.id as elementid,
@@ -964,6 +995,7 @@ function tracker_recordelements(&$issue){
 	    }
         $attribute->issueid = $issue->id;
         $attribute->trackerid = $issue->trackerid;
+        
         /// For those elements where more than one option can be selected
         if (is_array($values)){
             foreach ($values as $value){
@@ -1023,6 +1055,7 @@ function tracker_clearelements($issueid){
     }
 
     // find all files elements to protect
+    
    $sql = "
             SELECT
                 e.id,
@@ -1087,6 +1120,7 @@ function tracker_clearelements($issueid){
     // remove all reloaded files
     $keys = array_keys($_FILES);
     $reloadedfilekeys = preg_grep('/element./' , $keys);    // filter out only the reloaded element keys    
+    
     if (!empty($reloadedfilekeys)){
         foreach($reloadedfilekeys as $reloadedkey){
         	if (!empty($_FILES[$reloadedkey]['name'])){ // file is reloaded with another entry
@@ -1638,6 +1672,13 @@ function tracker_notifyccs_changestate($issueid, $tracker = null){
                         $notification_html = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
                     }
                 break;
+                case VALIDATED : 
+                    if($cc->events & EVENT_VALIDATED){
+                        $vars['EVENT'] = get_string('validated', 'tracker');
+                        $notification = tracker_compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
+                        $notification_html = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                    }
+                break;
                 default:
             }
             if (!empty($notification)){
@@ -1764,6 +1805,7 @@ function tracker_display_elementmatch($local, $remote){
             }
         }
     }
+    
     echo "</ul>";
     return $match;
 }
@@ -1842,10 +1884,12 @@ function tracker_get_stats(&$tracker, $from = null, $to = null){
 		$stats[WAITING] = 0;
 		$stats[TESTING] = 0;
 		$stats[PUBLISHED] = 0;
+		$stats[VALIDATED] = 0;
 		$stats[RESOLVED] = 0;
 		$stats[ABANDONNED] = 0;
 		$stats[TRANSFERED] = 0;
 	}
+	
 	return $stats;
 }
 
@@ -1926,12 +1970,15 @@ function tracker_backtrack_stats_by_month(&$tracker){
 			}
 			$issuelist[$is->id] = -1;
 		}
+	
 		ksort($tracks);
+		
 		$availdates = array_keys($tracks);
 		$lowest = $availdates[0];
 		$highest = $availdates[count($availdates) - 1];
 		list($low->year, $low->month) = split('-', $lowest);
 		$dateiter = new date_iterator($low->year, $low->month);
+	
 		// scan table and snapshot issue states
 		$current = $dateiter->current();
 		while (strcmp($current, $highest) <= 0) {
@@ -1944,6 +1991,7 @@ function tracker_backtrack_stats_by_month(&$tracker){
 			$dateiter->next();
 			$current = $dateiter->current();
 		}
+		
 		// revert and summarize states	
 		foreach($monthtracks as $current => $monthtrack){
 			foreach($monthtrack as $issueid => $state){
@@ -1954,6 +2002,7 @@ function tracker_backtrack_stats_by_month(&$tracker){
 					$stats[$current]['sumunres'] = @$stats[$current]['sumunres'] + 1;
 			}
 		}
+	
 		return $stats;
 	}
 	return array();
@@ -2007,6 +2056,7 @@ class date_iterator{
 	var $initmonth;
 	var $year;
 	var $month;
+	
 	function date_iterator($year, $month){
 		$this->year = $year;
 		$this->month = $month;
@@ -2018,6 +2068,7 @@ class date_iterator{
 		$this->year = $this->inityear;
 		$this->month = $this->initmonth;
 	}
+	
 	function next(){
 		$this->month++;
 		if ($this->month > 12){
@@ -2037,6 +2088,7 @@ class date_iterator{
 	function getmonth(){
 		return $this->month;
 	}
+	
 	function getiterations($highest){
 		$year = $this->year;
 		$month = $this->month;

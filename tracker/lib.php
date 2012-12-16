@@ -157,6 +157,7 @@ function tracker_print_recent_activity($course, $isteacher, $timestart) {
         }
         return true;
     }
+    
     return false;  //  True if anything was printed, otherwise false 
 }
 
@@ -187,6 +188,13 @@ function tracker_grades($trackerid) {
 }
 
 /**
+ *
+ **/
+function tracker_scale_used_anywhere($scaleid){
+    return false;
+}
+
+/**
 * Must return an array of user records (all data) who are participants
 * for a given instance of tracker. Must include every user involved
 * in the instance, independent of his role (student, teacher, admin...)
@@ -207,6 +215,7 @@ function tracker_get_participants($trackerid) {
     if(!$commenters) $commenters = array();
     $participants = array_merge(array_keys($resolvers), array_keys($developers), array_keys($reporters), array_keys($admins));
     $participantlist = implode(',', array_unique($participants));
+    
     if (!empty($participantlist)){
         return $DB->get_records_list('user', array('id' => $participantlist));   
     }
@@ -220,6 +229,7 @@ function tracker_get_participants($trackerid) {
 * as reference.
 */
 function tracker_scale_used ($trackerid, $scaleid) {
+   
     $return = false;
 
     //$rec = get_record("tracker","id","$trackerid","scale","-$scaleid");
@@ -227,14 +237,8 @@ function tracker_scale_used ($trackerid, $scaleid) {
     //if (!empty($rec)  && !empty($scaleid)) {
     //    $return = true;
     //}
+   
     return $return;
-}
-
-/**
- *
- **/
-function tracker_scale_used_anywhere($scaleid){
-    return false;
 }
 
 /**
@@ -297,6 +301,7 @@ function tracker_install(){
         $rpcmap->rpcid = $rpcid;
         $DB->insert_record('mnet_service2rpc', $rpcmap);
     }
+    
     return $result;
 }
 
@@ -308,6 +313,7 @@ function tracker_uninstall(){
 	global $DB;
 
     $return = true;
+    
     // delete all tracker related mnet services and MNET bindings
     $service = $DB->get_record('mnet_service', array('name' => 'tracker_cascade'));
     if ($service){
@@ -316,5 +322,6 @@ function tracker_uninstall(){
         $DB->delete_records('mnet_rpc', array('parent' => 'tracker'));
         $DB->delete_records('mnet_service', array('name' => 'tracker_cascade'));
     }
+    
     return $return;
 }

@@ -20,6 +20,7 @@ $STATUSKEYS = array(POSTED => get_string('posted', 'tracker'),
                     RESOLVING => get_string('resolving', 'tracker'), 
                     WAITING => get_string('waiting', 'tracker'), 
                     TESTING => get_string('testing', 'tracker'), 
+                    VALIDATED => get_string('validated', 'tracker'), 
                     PUBLISHED => get_string('published', 'tracker'), 
                     RESOLVED => get_string('resolved', 'tracker'), 
                     ABANDONNED => get_string('abandonned', 'tracker'),
@@ -307,10 +308,15 @@ if (!empty($issues)){
         $table->add_data($dataset);     
     }
     $table->print_html();
+    echo '<br/>';
 } else {
     if (!$resolved){
+    	echo '<br/>';
+    	echo '<br/>';
         notice(get_string('noissuesreported', 'tracker'), "view.php?id=$cm->id"); 
     } else {
+    	echo '<br/>';
+    	echo '<br/>';
         notice(get_string('noissuesresolved', 'tracker'), "view.php?id=$cm->id"); 
     }
 }

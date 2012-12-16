@@ -18,31 +18,35 @@
 	// $editorfields = '';
 
 	/// Check for required parameters - Course Module Id, trackerID, 
-
+	    
 	$id = optional_param('id', 0, PARAM_INT); // Course Module ID, or
 	$a  = optional_param('a', 0, PARAM_INT);  // tracker ID
 	$issueid = optional_param('issueid', '', PARAM_INT);  // issue number
-
+	
 	// PART OF MVC Implementation
 	$action = optional_param('what', '', PARAM_ALPHA);
 	$screen = optional_param('screen', '', PARAM_ALPHA);
 	$view = optional_param('view', '', PARAM_ALPHA);
 	// !PART OF MVC Implementation
-
+	
 	if ($id) {
 	    if (! $cm = get_coursemodule_from_id('tracker', $id)) {
 	        print_error('errorcoursemodid', 'tracker');
 	    }
+		
 	    if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
 	        print_error('errorcoursemisconfigured', 'tracker');
 	    }
+		
 	    if (! $tracker = $DB->get_record('tracker', array('id' => $cm->instance))) {
 	        print_error('errormoduleincorrect', 'tracker');
 	    }
 	} else {
+		
 	    if (! $tracker = $DB->get_record('tracker', array('id' => $a))) {
 	        print_error('errormoduleincorrect', 'tracker');
 	    }
+		
 	    if (! $course = $DB->get_record('course', array('id' => $tracker->course))) {
 	        print_error('errorcoursemisconfigured', 'tracker');
 	    }
@@ -64,19 +68,19 @@
 
 	$context = context_module::instance($cm->id);
 	require_login($course->id);
-
+	
 	add_to_log($course->id, 'tracker', "$view:$screen/$action", "view.php?id=$cm->id", "$tracker->id", $cm->id);
-
+	
 	$usehtmleditor = can_use_html_editor();
 	$defaultformat = FORMAT_MOODLE;
 	tracker_loadpreferences($tracker->id, $USER->id);
-
+	
 	/// Search controller - special implementation
 	// TODO : consider incorporing this controller back into standard MVC
 	if ($action == 'searchforissues'){
 	    $search = optional_param('search', null, PARAM_CLEANHTML);
 	    $saveasreport = optional_param('saveasreport', null, PARAM_CLEANHTML);
-
+	    
 	    if (!empty($search)){       //search for issues
 	        tracker_searchforissues($tracker, $cm->id);
 	    } elseif (!empty ($saveasreport)){        //save search as a report
@@ -90,7 +94,7 @@
 	        redirect("view.php?id={$cm->id}&amp;screen={$returnview}");
 	    }
 	}
-
+	
 	$strtrackers = get_string('modulenameplural', 'tracker');
 	$strtracker  = get_string('modulename', 'tracker');
 
@@ -109,8 +113,6 @@
 	$PAGE->set_headingmenu(navmenu($course, $cm));
 	echo $OUTPUT->header();
 
-	/// integrate module specific stylesheets (calls an eventual theme override)
-	echo '<link rel="stylesheet" href="'.$CFG->wwwroot.'/theme/'.$PAGE->theme->name.'/tracker.css" type="text/css" />';
 	// PART OF MVC Implementation
 	/// memorizes current view - typical session switch
 	if (!empty($view)){
@@ -144,7 +146,7 @@
 	if (has_capability('mod/tracker:configure', $context)){
 	    $rows[0][] = new tabobject('admin', "view.php?id={$cm->id}&amp;view=admin", get_string('administration', 'tracker'));
 	}
-
+	
 	/// submenus
 	$selected = null;
 	$activated = null;
@@ -233,7 +235,7 @@
 	                include "views/viewmyassignedticketslist.php";
 	                break;
 	            case 'browse': 
-	                if (!has_capability('mod/tracker:viewallissues', $context)){
+	                if (!(has_capability('mod/tracker:viewallissues', $context) || $tracker->supportmode == 'bugtracker')){
 	                    print_error ('errornoaccessallissues', 'tracker');
 	                } else {
 	                    $resolved = 0;
@@ -272,7 +274,7 @@
 	                include "views/viewmyticketslist.php";
 	                break;
 	            case 'browse': 
-	                if (!has_capability('mod/tracker:viewallissues', $context)){
+	                if (!(has_capability('mod/tracker:viewallissues', $context) || $tracker->supportmode == 'bugtracker')){
 	                    print_error('errornoaccessallissues', 'tracker');
 	                } else {
 	                    $resolved = 1;

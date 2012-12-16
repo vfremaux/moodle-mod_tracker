@@ -1,6 +1,7 @@
 <?php
 echo $OUTPUT->heading(get_string('reports', 'tracker'), 1);
 echo $OUTPUT->heading(get_string('status', 'tracker'), 2);
+
 $STATUSKEYS = array(POSTED => get_string('posted', 'tracker'), 
                     OPEN => get_string('open', 'tracker'), 
                     RESOLVING => get_string('resolving', 'tracker'), 
@@ -9,7 +10,9 @@ $STATUSKEYS = array(POSTED => get_string('posted', 'tracker'),
                     PUBLISHED => get_string('published', 'tracker'), 
                     RESOLVED => get_string('resolved', 'tracker'), 
                     ABANDONNED => get_string('abandonned', 'tracker'),
-                    TRANSFERED => get_string('transfered', 'tracker'));
+                    TRANSFERED => get_string('transfered', 'tracker'),
+					VALIDATED => get_string('validated', 'tracker'));
+
 $STATUSCODES = array(POSTED => 'posted', 
                     OPEN => 'open', 
                     RESOLVING => 'resolving', 
@@ -18,7 +21,9 @@ $STATUSCODES = array(POSTED => 'posted',
                     PUBLISHED => 'published', 
                     RESOLVED => 'resolved', 
                     ABANDONNED => 'abandonned',
-                    TRANSFERED => 'transfered');
+                    TRANSFERED => 'transfered',
+					VALIDATED => 'validated');
+
 $tickets = tracker_get_stats($tracker);
 $statsbyassignee = tracker_get_stats_by_user($tracker, 'assignedto');
 $statsbyreporter = tracker_get_stats_by_user($tracker, 'reportedby');
@@ -60,6 +65,7 @@ $alltickets = $DB->count_records('tracker_issue', array('trackerid' => $tracker-
 			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[TESTING])/$alltickets) * 100).' %' : '0 %'; ?></td>
 		</tr>
 		</table>
+		
 		<table width="80%">
 		<tr>
 			<td width="40%" align="left" class="status_resolved"><?php echo $STATUSKEYS[RESOLVED] ?></td>
@@ -77,6 +83,7 @@ $alltickets = $DB->count_records('tracker_issue', array('trackerid' => $tracker-
 			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[TRANSFERED])/$alltickets) * 100).' %' : '0 % '; ?></td>
 		</tr>
 		</table>
+
 		</td>
 		<td width="33%">
 			<?php echo $OUTPUT->heading(get_string('countbyassignee', 'tracker', $alltickets), 3) ?>
@@ -99,6 +106,7 @@ $alltickets = $DB->count_records('tracker_issue', array('trackerid' => $tracker-
 							echo "<span class=\"status_$statcode\">$subresult</span> "; 
 						}
 						echo '</td>';
+
 						echo "</tr>";
 						$line = ($line + 1) % 2;
 					}
