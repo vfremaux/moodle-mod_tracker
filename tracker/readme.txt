@@ -24,3 +24,8 @@ It provides a complete bug tracker activity with following features :
 - Watch management
 - Notification service (parametric)
 - Full backup/restore implementation
+
+Release note : 2012101700
+===========================
+Fix backup restore inconsistancies
+Add VALIDATED status

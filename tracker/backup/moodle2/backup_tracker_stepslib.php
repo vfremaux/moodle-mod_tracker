@@ -93,7 +93,7 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
         $queries = new backup_nested_element('queries');
 
         $query = new backup_nested_element('query', array('id'), array(
-            'trackerid', 'userid', 'name', 'description', 'published', 'fiednames', 'fieldvalues'));
+            'trackerid', 'userid', 'name', 'description', 'published', 'fieldnames', 'fieldvalues'));
 
         $statechanges = new backup_nested_element('statechanges');
 
@@ -147,7 +147,7 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
             $dependancy->set_source_table('tracker_issuedependancy', array('trackerid' => backup::VAR_ACTIVITYID));
             $ownership->set_source_table('tracker_issueownership', array('trackerid' => backup::VAR_ACTIVITYID, 'issueid' => backup::PARENTID));
             $state->set_source_table('tracker_state_change', array('trackerid' => backup::VAR_ACTIVITYID, 'issueid' => backup::PARENTID));
-            $query->set_source_table('tracker_state_change', array('trackerid' => backup::VAR_ACTIVITYID));
+            $query->set_source_table('tracker_query', array('trackerid' => backup::VAR_ACTIVITYID));
             $preference->set_source_table('tracker_preferences', array('trackerid' => backup::VAR_ACTIVITYID));
         }
 

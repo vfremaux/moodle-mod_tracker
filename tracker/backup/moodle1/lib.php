@@ -20,7 +20,7 @@
  * Based off of a template @ http://docs.moodle.org/dev/Backup_1.9_conversion_for_developers
  *
  * @package    mod
- * @subpackage vodeclic
+ * @subpackage tracker
  * @copyright  2011 Valery Fremaux <valery.fremaux@club-internet.fr>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

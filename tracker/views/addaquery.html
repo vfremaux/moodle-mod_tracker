@@ -18,8 +18,9 @@ $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'bugreport');
 ?>
 <center>
 <!-- Print Query Form -->
-<form name="form" action="view.php" method="post">
+<form name="addqueryform" action="view.php" method="post">
 	<input type="hidden" name="what" value="<?php p($form->action) ?>">
+	<input type="hidden" name="view" value="profile">
 	<input type="hidden" name="screen" value="myqueries">
 	<input type="hidden" name="fields" value="<?php p($form->fields) ?>">
 	<input type="hidden" name="id" value="<?php p($cm->id) ?>">
@@ -60,10 +61,10 @@ $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'bugreport');
     <tr>
         <td colspan="2">
 		    <?php
-		    $onsubmitcall = ($usehtmleditor) ? "document.forms['form'].onsubmit();" : '' ;
+		    $onsubmitcall = ($usehtmleditor) ? "document.forms['addqueryform'].onsubmit();" : '' ;
 		    ?>
 			<input type="submit" name="save" value="<?php print_string('continue') ?>" />
-			<input type="button" name="cancel_btn" value="<?php print_string('cancel') ?>" onclick="document.forms['form'].what.value = '';document.forms['form'].screen.value = 'search';<?php p($onsubmitcall) ?>document.forms['form'].submit();" />
+			<input type="button" name="cancel_btn" value="<?php print_string('cancel') ?>" onclick="document.forms['addqueryform'].what.value = '';document.forms['addqueryform'].screen.value = 'search';<?php p($onsubmitcall) ?>document.forms['addqueryform'].submit();" />
 		</td>
 	</tr>
 </table>

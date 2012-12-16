@@ -39,6 +39,7 @@ if (!empty($fields)){
 
 $limit = 20;
 $page = optional_param('page', 1, PARAM_INT);
+$alltracks = optional_param('alltracks', false, PARAM_BOOL);
 
 if ($page <= 0){
     $page = 1;
@@ -56,7 +57,6 @@ if (isset($searchqueries)){
     $sql = $searchqueries->search;
     $numrecords = $DB->count_records_sql($searchqueries->count);
 } else {
-	$alltracks = optional_param('alltracks', false, PARAM_BOOL);
 	$singletrackerclause = (empty($alltracks)) ? " AND i.trackerid = {$tracker->id} " : '' ;
 	
     if ($resolved){
@@ -255,7 +255,8 @@ if (!empty($issues)){
         if (has_capability('mod/tracker:manage', $context)){
             $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=delete\" title=\"".get_string('delete')."\" ><img src=\"{$CFG->pixpath}/t/delete.gif\" border=\"0\" /></a>";
         }
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;screen=mywatches&amp;issueid={$issue->id}&what=register\" title=\"".get_string('register', 'tracker')."\" ><img src=\"{$CFG->wwwroot}/mod/tracker/pix/register.gif\" border=\"0\" /></a>";
+        // Ergo Report I3 2012 => self list displays owned tickets. Already registered
+        // $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;screen=mywatches&amp;issueid={$issue->id}&what=register\" title=\"".get_string('register', 'tracker')."\" ><img src=\"{$CFG->wwwroot}/mod/tracker/pix/register.gif\" border=\"0\" /></a>";
         if ($issue->resolutionpriority < $maxpriority && has_capability('mod/tracker:viewpriority', $context) && !has_capability('mod/tracker:managepriority', $context)){
             $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&amp;what=askraise\" title=\"".get_string('askraise', 'tracker')."\" ><img src=\"{$CFG->wwwroot}/mod/tracker/pix/askraise.gif\" border=\"0\" /></a>";
         }
