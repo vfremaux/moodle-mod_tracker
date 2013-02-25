@@ -78,7 +78,7 @@ if (isset($searchqueries)){
             i.resolutionpriority,
             u.firstname ".sql_as()." firstname, 
             u.lastname ".sql_as()." lastname,
-            COUNT(ic.issueid) ".sql_as()." watches
+            COUNT(ic.issueid) AS watches
         FROM 
             {$CFG->prefix}user u,
             {$CFG->prefix}tracker_issue i

@@ -348,7 +348,7 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false){
     global $CFG, $USER;
 
     $keys = array_keys($fields);
-
+    
     //Check to see if we are search using elements as a parameter.  
     //If so, we need to include the table tracker_issueattribute in the search query
     $elementssearch = false;
@@ -392,11 +392,14 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false){
                 $elementsSearchConstraint .= " AND i.summary LIKE '%{$summarytoken}%'";
             }
         }
-
-        if (is_numeric($key)){
-            foreach($fields[$key] as $value){
-                $elementsSearchConstraint .= ' AND i.id IN (SELECT issue FROM ' . $CFG->prefix . 'tracker_issueattribute WHERE elementdefinition=' . $key . ' AND elementitemid=' . $value . ')';
-            }
+        
+        $element = get_record('tracker_element', 'name', $key);
+        foreach($fields[$key] as $value){
+        	if (is_numeric($value)){
+	            $elementsSearchConstraint .= ' AND i.id IN (SELECT issueid FROM ' . $CFG->prefix . 'tracker_issueattribute WHERE elementid = ' . $element->id . ' AND elementitemid = \'' . $value . '\')';
+	        } else {
+	            $elementsSearchConstraint .= ' AND i.id IN (SELECT issueid FROM ' . $CFG->prefix . 'tracker_issueattribute WHERE elementid = ' . $element->id . ' AND elementitemid LIKE \'' . $value . '%\')';
+	        }
         }
     }
     
@@ -416,7 +419,7 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false){
                 u.firstname, 
                 u.lastname
             FROM 
-                {$CFG->prefix}user AS u, 
+                {$CFG->prefix}user u, 
                 $elementsSearchClause
                 {$CFG->prefix}tracker_issue i
             LEFT JOIN
@@ -508,8 +511,7 @@ function tracker_extractsearchparametersfrompost(){
                 error ('Only numbers (or a list of numbers seperated by a comma (",") allowed in the issue number field', 'view.php?id=' . $this->tracker_getcoursemodule() . '&what=search');
             }
         }
-    }
-    else{
+     } else {
         $checkdate = optional_param('checkdate', 0, PARAM_INT);
         if ($checkdate){
             $month = optional_param('month', '', PARAM_INT);
@@ -536,7 +538,7 @@ function tracker_extractsearchparametersfrompost(){
         if (!empty($summary)){  
             $fields['summary'][] = $summary;
         }
-                                
+        
         $keys = array_keys($_POST);                         // get the key value of all the fields submitted
         $elementkeys = preg_grep('/element./' , $keys);     // filter out only the element keys
         
@@ -547,8 +549,7 @@ function tracker_extractsearchparametersfrompost(){
                     foreach ($_POST[$elementkey] as $elementvalue){
                         $fields[$elementid[1]][] = $elementvalue;
                     }
-                }
-                else{
+                } else {
                     $fields[$elementid[1]][] = $_POST[$elementkey];
                 }
             }
@@ -567,12 +568,12 @@ function tracker_extractsearchparametersfrompost(){
 */
 function tracker_savesearchparameterstodb($query, $fields){
     global $USER;
-        
+	
     $query->userid = $USER->id;
     $query->published = 0;
     $query->fieldnames = '';
     $query->fieldvalues = '';
-    
+	
     if (!empty($fields)){
         $keys = array_keys($fields);
         if (!empty($keys)){
@@ -581,8 +582,7 @@ function tracker_savesearchparameterstodb($query, $fields){
                     if (empty($query->fieldnames)){
                         $query->fieldnames = $key;
                         $query->fieldvalues = $value;
-                    }
-                    else{
+                    } else {
                         $query->fieldnames = $query->fieldnames . ', ' . $key;
                         $query->fieldvalues = $query->fieldvalues . ', '  . $value;
                     }
@@ -590,7 +590,7 @@ function tracker_savesearchparameterstodb($query, $fields){
             }       
         }
     }
-    
+	
     if (!isset($query->id)) {           //if not given a $queryid, then insert record
         $queryid = insert_record('tracker_query', $query, true);
     }
@@ -605,6 +605,8 @@ function tracker_savesearchparameterstodb($query, $fields){
 * @param array $fields
 */
 function tracker_printsearchfields($fields){
+
+	$strs = array();
     foreach($fields as $key => $value){
         switch(trim($key)){
             case 'datereported' :
@@ -646,8 +648,10 @@ function tracker_printsearchfields($fields){
 *
 */
 function tracker_extractsearchparametersfromdb($queryid=null){
-    if (!$queryid)
+
+    if (!$queryid){
         $queryid = optional_param('queryid', '', PARAM_INT);
+	}
     $query_record = get_record('tracker_query', 'id', $queryid);
     $fields = null;
     
@@ -662,8 +666,7 @@ function tracker_extractsearchparametersfromdb($queryid=null){
                 $count++;
             }
         }
-    }
-    else{
+    } else{
         error ("Invalid query id: " . $queryid);
     }
     
@@ -693,8 +696,7 @@ function tracker_setsearchcookies($fields){
             $result = setcookie("moodle_tracker_search_" . $key, $cookie);          
             $success = $success && $result;
         }
-    }
-    else{
+    } else {
         $success = false;
     }
     return $success;    
@@ -706,9 +708,9 @@ function tracker_setsearchcookies($fields){
 * @return an array of field desriptions
 */
 function tracker_extractsearchcookies(){
+
     $keys = array_keys($_COOKIE);                                           // get the key value of all the cookies
     $cookiekeys = preg_grep('/moodle_tracker_search./' , $keys);            // filter all search cookies
-    
     $fields = null;
     foreach ($cookiekeys as $cookiekey){
         preg_match('/moodle_tracker_search_(.*)$/', $cookiekey, $fieldname);
@@ -724,6 +726,7 @@ function tracker_extractsearchcookies(){
 * @return boolean true if succeeded
 */
 function tracker_clearsearchcookies(){
+
     $success = true;
     $keys = array_keys($_COOKIE);                                           // get the key value of all the cookies
     $cookiekeys = preg_grep('/moodle_tracker_search./' , $keys);            // filter all search cookies
@@ -750,12 +753,12 @@ function tracker_searchforissues(&$tracker, $cmid){
     $success = tracker_setsearchcookies($fields);
     
     if ($success){
-        if ($tracker->supportmode == 'bugtracker')
+        if ($tracker->supportmode == 'bugtracker'){
             redirect ("view.php?id={$cmid}&amp;view=view&amp;screen=browse");
-        else 
+        } else {
             redirect ("view.php?id={$cmid}&amp;view=view&amp;screen=mytickets");
-    }
-    else{
+		}
+    } else {
         error ("Failed to set cookie: " . $cookie . "<br>");
     }
 }
@@ -887,6 +890,7 @@ function tracker_getassignees($userid){
 function tracker_submitanissue(&$tracker){
     global $CFG;
     
+    $issue = new StdClass;
     $issue->datereported = required_param('datereported', PARAM_INT);
     $issue->summary = required_param('summary', PARAM_TEXT);
     $issue->description = addslashes(required_param('description', PARAM_CLEANHTML));
@@ -946,7 +950,6 @@ function tracker_recordelements(&$issue){
     
     foreach ($keys as $key){
         preg_match('/element(.*)$/', $key, $elementid);
-        
         $elementname = $elementid[1];
         
         $sql = "
@@ -1076,7 +1079,6 @@ function tracker_clearelements($issueid){
     if (!empty($reloadedfilekeys)){
         foreach($reloadedfilekeys as $reloadedkey){
         	if (!empty($_FILES[$reloadedkey]['name'])){ // file is reloaded with another entry
-        		debug_trace('removing reloaded '.$reloadedkey);
 	            if (preg_match("/element(.*)$/", $reloadedkey, $matches)){
 	                $elementname = $matches[1];
 	                $element = get_record('tracker_element', 'name', $elementname);
@@ -1126,7 +1128,7 @@ function tracker_register_cc(&$tracker, &$issue, $userid){
         if ($userprefs = get_record('tracker_preferences', 'trackerid', $tracker->id, 'userid', $userid, 'name', 'eventmask')){
             $eventmask = $userprefs->value;
         }
-        
+        $cc = new StdClass;
         $cc->trackerid = $tracker->id;
         $cc->issueid = $issue->id;
         $cc->userid = $userid;
@@ -1148,11 +1150,11 @@ function tracker_print_user($user){
     if ($user){
         print_user_picture ($user->id, $COURSE->id, !empty($user->picture));
         if ($CFG->messaging){
-            echo "<a href=\"$CFG->wwwroot/user/view.php?id={$user->id}&amp;course={$COURSE->id}\">".fullname($user)."</a> <a href=\"\" onclick=\"this.target='message'; return openpopup('/message/discussion.php?id={$user->id}', 'message', 'menubar=0,location=0,scrollbars,status,resizable,width=400,height=500', 0);\" ><img src=\"$CFG->pixpath/t/message.gif\"></a>";
+            echo "&nbsp;<a href=\"$CFG->wwwroot/user/view.php?id={$user->id}&amp;course={$COURSE->id}\">".fullname($user)."</a> <a href=\"\" onclick=\"this.target='message'; return openpopup('/message/discussion.php?id={$user->id}', 'message', 'menubar=0,location=0,scrollbars,status,resizable,width=400,height=500', 0);\" ><img src=\"$CFG->pixpath/t/message.gif\"></a>";
         } elseif (!$user->emailstop && $user->maildisplay){
-            echo "<a href=\"$CFG->wwwroot/user/view.php?id={$user->id}&amp;course={$COURSE->id}\">".fullname($user)."</a> <a href=\"mailto:{$user->email}\"><img src=\"$CFG->pixpath/t/mail.gif\"></a>";
+            echo "&nbsp;<a href=\"$CFG->wwwroot/user/view.php?id={$user->id}&amp;course={$COURSE->id}\">".fullname($user)."</a> <a href=\"mailto:{$user->email}\"><img src=\"$CFG->pixpath/t/mail.gif\"></a>";
         } else {
-            echo fullname($user);
+            echo '&nbsp;'.fullname($user);
         }
     }
 }
@@ -1231,7 +1233,9 @@ function tracker_getpotentialdependancies($trackerid, $issueid){
 * @return a comma separated list of nodes
 */
 function tracker_get_subtree_list($trackerid, $id){
+
     $res = get_records_menu('tracker_issuedependancy', 'parentid', $id, '', 'id,childid');
+
     $ids = array();
     if (is_array($res)){
         foreach(array_values($res) as $aSub){
@@ -2074,4 +2078,5 @@ class date_iterator{
 		return $i;
 	}
 }
+
 ?>

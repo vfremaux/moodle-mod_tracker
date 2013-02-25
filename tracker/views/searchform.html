@@ -21,6 +21,7 @@
 <form name="byidform" action="view.php" method="get">
 <input type="hidden" name="what" value="searchforissues" />
 <input type="hidden" name="screen" value="browse" />
+<input type="hidden" name="view" value="view" />
 <input type="hidden" name="id" value="<?php p($cm->id) ?>" />
 
 <table border="0" cellpadding="5">
@@ -40,7 +41,7 @@
     print_simple_box_end();
     print_simple_box_start('center', '80%', '', '', 'generalbox', 'bugreport');
 ?>
-<form name="searchform" action="view.php" method="get">
+<form name="searchform" action="view.php" method="post">
 <input type="hidden" name="what" value="searchforissues" />
 <input type="hidden" name="screen" value="<?php echo ($tracker->supportmode == 'bugtracker') ? 'browse' : 'mytickets' ; ?>" />
 <input type="hidden" name="view" value="view" />

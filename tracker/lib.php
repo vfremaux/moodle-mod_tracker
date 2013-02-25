@@ -1,4 +1,4 @@
-<?PHP  // $Id: lib.php,v 1.5 2011-10-14 20:38:24 vf Exp $
+<?PHP  // $Id: lib.php,v 1.3 2010/12/17 22:12:16 vf Exp $
 
 /**
 * @package mod-tracker
@@ -293,4 +293,4 @@ function tracker_uninstall(){
     
     return $return;
 }
-?>
+

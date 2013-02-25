@@ -61,7 +61,7 @@ print_simple_box_start('center', '100%', '', '', 'generalbox', 'bugreport');
     <tr>
         <td colspan="2">
 		    <?php
-		    $onsubmitcall = ($usehtmleditor && $CFG->defaulthtmleditor != 'tinymce') ? "document.forms['addqueryform'].onsubmit();" : '' ;
+		    $onsubmitcall = ($usehtmleditor && @$CFG->defaulthtmleditor != 'tinymce') ? "document.forms['addqueryform'].onsubmit();" : '' ;
 		    ?>
 			<input type="submit" name="save" value="<?php print_string('continue') ?>" />
 			<input type="button" name="cancel_btn" value="<?php print_string('cancel') ?>" onclick="document.forms['addqueryform'].what.value = '';document.forms['addqueryform'].screen.value = 'search';<?php p($onsubmitcall) ?>document.forms['addqueryform'].submit();" />

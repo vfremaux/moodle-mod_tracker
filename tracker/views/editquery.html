@@ -37,13 +37,16 @@ var datereporteditems = ['day','month','year'];
         <td align="right" width="150"><b><?php print_string('reportedby', 'tracker') ?>:</b></td>
         <td width="150" align="left">
             <?php
-                $reporters = tracker_getreporters($tracker->id);
+                if ($reporters = tracker_getreporters($tracker->id)){
             
-                $reportersmenu = array();
-                foreach($reporters as $reporter){
-                    $reportersmenu[$reporter->id] = fullname($reporter);
-                }
-                choose_from_menu($reportersmenu, 'reportedby', implode('', $fields['reportedby']), get_string('any', 'tracker'));
+	                $reportersmenu = array();
+	                foreach($reporters as $reporter){
+	                    $reportersmenu[$reporter->id] = fullname($reporter);
+	                }
+	                choose_from_menu($reportersmenu, 'reportedby', implode('', $fields['reportedby']), get_string('any', 'tracker'));
+	            } else {
+	            	print_string('noreporters', 'tracker');
+	            }
             ?>
         </td>
         <td align="right" width="150"><b><?php print_string('datereported', 'tracker') ?>:</b></td>
@@ -70,7 +73,9 @@ var datereporteditems = ['day','month','year'];
     <!--Print Bug Category Dropdowns-->
     <tr>
         <td>
-            <?php $elements = tracker_printelements($tracker, $fields, 'query')?>
+            <?php 
+            $elements = tracker_printelements($tracker, $fields, 'query')
+            ?>
         </td>
     </tr>
     <tr valign="top">

@@ -80,7 +80,7 @@ if (isset($searchqueries)){
             t.name,
             t.ticketprefix,
             i.resolutionpriority,
-            COUNT(ic.issueid) ".sql_as()." watches
+            COUNT(ic.issueid) AS watches
         FROM 
             {$CFG->prefix}tracker_issue i
         JOIN

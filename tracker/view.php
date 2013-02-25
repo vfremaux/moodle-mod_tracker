@@ -1,4 +1,4 @@
-<?PHP  // $Id: view.php,v 1.8 2012-12-08 15:39:54 vf Exp $
+<?PHP  // $Id: view.php,v 1.7 2012-07-07 16:46:53 vf Exp $
 
 /**
 * @package mod-tracker
@@ -13,7 +13,7 @@
 	require_once("../../config.php");
 	require_once($CFG->dirroot."/mod/tracker/lib.php");
 	require_once($CFG->dirroot."/mod/tracker/locallib.php");
-	
+
 	$usehtmleditor = false;
 	$editorfields = '';
 	
@@ -28,23 +28,25 @@
 	$screen = optional_param('screen', '', PARAM_ALPHA);
 	$view = optional_param('view', '', PARAM_ALPHA);
 	// !PART OF MVC Implementation
-	        
+	
 	if ($id) {
 	    if (! $cm = get_coursemodule_from_id('tracker', $id)) {
 	        print_error('errorcoursemodid', 'tracker');
 	    }
-	
+		
 	    if (! $course = get_record('course', 'id', $cm->course)) {
 	        print_error('errorcoursemisconfigured', 'tracker');
 	    }
-	
+		
 	    if (! $tracker = get_record('tracker', 'id', $cm->instance)) {
 	        print_error('errormoduleincorrect', 'tracker');
 	    }
 	} else {
+		
 	    if (! $tracker = get_record('tracker', 'id', $a)) {
 	        print_error('errormoduleincorrect', 'tracker');
 	    }
+		
 	    if (! $course = get_record('course', 'id', $tracker->course)) {
 	        print_error('errorcoursemisconfigured', 'tracker');
 	    }
@@ -82,7 +84,7 @@
 	        redirect("view.php?id={$cm->id}&amp;screen={$returnview}");
 	    }
 	}
-	            
+	
 	$strtrackers = get_string('modulenameplural', 'tracker');
 	$strtracker  = get_string('modulename', 'tracker');
 	
@@ -98,8 +100,7 @@
 	                  update_module_button($cm->id, $course->id, $strtracker), navmenu($course, $cm));
 
 	/// integrate module specific stylesheets (calls an eventual theme override)
-	echo '<link rel="stylesheet" href="'.$CFG->themewww.'/'.current_theme().'/tracker.css" type="text/css" />';
-	
+
 	// PART OF MVC Implementation
 	/// memorizes current view - typical session switch
 	if (!empty($view)){
@@ -108,7 +109,7 @@
 	    $_SESSION['currentview'] = 'reportanissue';
 	}
 	$view = $_SESSION['currentview'];
-	
+
 	/// memorizes current screen - typical session switch
 	if (!empty($screen)){
 	    $_SESSION['currentscreen'] = $screen;
@@ -133,7 +134,7 @@
 	if (has_capability('mod/tracker:configure', $context)){
 	    $rows[0][] = new tabobject('admin', "view.php?id={$cm->id}&amp;view=admin", get_string('administration', 'tracker'));
 	}
-	        
+	
 	/// submenus
 	$selected = null;
 	$activated = null;
@@ -221,7 +222,7 @@
 	                $resolved = 0;
 	                include "views/viewmyassignedticketslist.php";
 	                break;
-	            case 'browse': 
+	            case 'browse':
 	                if (!(has_capability('mod/tracker:viewallissues', $context) || $tracker->supportmode == 'bugtracker')){
 	                    print_error ('errornoaccessallissues', 'tracker');
 	                } else {
