@@ -229,7 +229,6 @@ function tracker_get_participants($trackerid) {
 * as reference.
 */
 function tracker_scale_used ($trackerid, $scaleid) {
-   
     $return = false;
 
     //$rec = get_record("tracker","id","$trackerid","scale","-$scaleid");

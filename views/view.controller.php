@@ -271,14 +271,14 @@ elseif($action == 'usequery'){
 /******************************* unregister administratively a user *****************************/
 elseif ($action == 'unregister'){
 	$issueid = required_param('issueid', PARAM_INT);
-	$ccid = required_param('ccid', PARAM_INT);
-	if (!$DB->delete_records ('tracker_issuecc', 'trackerid', $tracker->id, 'issueid', $issueid, 'userid', $ccid)){
+	$ccid = optional_param('ccid', $USER->id, PARAM_INT);
+	if (!$DB->delete_records ('tracker_issuecc', array('trackerid' => $tracker->id, 'issueid' => $issueid, 'userid' => $ccid))){
 		print_error('errorcannotdeletecc', 'tracker');
 	}
 }
 elseif ($action == 'register'){
 	$issueid = required_param('issueid', PARAM_INT);
-	$ccid = required_param('ccid', PARAM_INT);
+	$ccid = optional_param('ccid', $USER->id, PARAM_INT);
 	$issue = $DB->get_record('tracker_issue', array('id' => $issueid));
 	tracker_register_cc($tracker, $issue, $ccid);
 }

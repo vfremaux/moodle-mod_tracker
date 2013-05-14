@@ -141,12 +141,12 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
 
         if ($userinfo) {
             $issue->set_source_table('tracker_issue', array('trackerid' => backup::VAR_PARENTID));
-            $attrib->set_source_table('tracker_issueattribute', array('trackerid' => backup::VAR_ACTIVITYID, 'issueid' => backup::PARENTID));
-            $cc->set_source_table('tracker_issuecc', array('trackerid' => backup::VAR_ACTIVITYID, 'issueid' => backup::PARENTID));
-            $comment->set_source_table('tracker_issuecomment', array('trackerid' => backup::VAR_ACTIVITYID, 'issueid' => backup::PARENTID));
+            $attrib->set_source_table('tracker_issueattribute', array('trackerid' => backup::VAR_ACTIVITYID, 'issueid' => backup::VAR_PARENTID));
+            $cc->set_source_table('tracker_issuecc', array('trackerid' => backup::VAR_ACTIVITYID, 'issueid' => backup::VAR_PARENTID));
+            $comment->set_source_table('tracker_issuecomment', array('trackerid' => backup::VAR_ACTIVITYID, 'issueid' => backup::VAR_PARENTID));
             $dependancy->set_source_table('tracker_issuedependancy', array('trackerid' => backup::VAR_ACTIVITYID));
-            $ownership->set_source_table('tracker_issueownership', array('trackerid' => backup::VAR_ACTIVITYID, 'issueid' => backup::PARENTID));
-            $state->set_source_table('tracker_state_change', array('trackerid' => backup::VAR_ACTIVITYID, 'issueid' => backup::PARENTID));
+            $ownership->set_source_table('tracker_issueownership', array('trackerid' => backup::VAR_ACTIVITYID, 'issueid' => backup::VAR_PARENTID));
+            $state->set_source_table('tracker_state_change', array('trackerid' => backup::VAR_ACTIVITYID, 'issueid' => backup::VAR_PARENTID));
             $query->set_source_table('tracker_query', array('trackerid' => backup::VAR_ACTIVITYID));
             $preference->set_source_table('tracker_preferences', array('trackerid' => backup::VAR_ACTIVITYID));
         }
