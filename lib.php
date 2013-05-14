@@ -1,4 +1,4 @@
-<?PHP  // $Id: lib.php,v 1.5 2011-10-14 20:38:24 vf Exp $
+<?PHP  // $Id: lib.php,v 1.1.1.1 2012-08-01 10:16:31 vf Exp $
 
 /**
 * @package mod-tracker
@@ -229,7 +229,6 @@ function tracker_get_participants($trackerid) {
 * as reference.
 */
 function tracker_scale_used ($trackerid, $scaleid) {
-   
     $return = false;
 
     //$rec = get_record("tracker","id","$trackerid","scale","-$scaleid");

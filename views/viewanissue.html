@@ -120,6 +120,7 @@ if (has_capability('mod/tracker:resolve', $context)){
         $issue->status = OPEN;
         $DB->set_field('tracker_issue', 'status', OPEN, array('id' => $issueid));
 	    // log state change
+	    $stc = new StdClass;
 	    $stc->userid = $USER->id;
 	    $stc->issueid = $issue->id;
 	    $stc->trackerid = $tracker->id;

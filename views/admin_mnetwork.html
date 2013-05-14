@@ -189,7 +189,7 @@ function submitform(formname){
 			if (empty($localtrackersmenu)){
 			    print_string('nolocalcandidate', 'tracker');
 			} else {
-			    html_writer::select($localtrackersmenu, 'localtracker', '', array('' => 'choose'), array('onchange' => "submitform('bindlocalparent')"));
+			    echo html_writer::select($localtrackersmenu, 'localtracker', '', array('' => 'choose'), array('onchange' => "submitform('bindlocalparent')"));
 			}
 			?>
 		</td>

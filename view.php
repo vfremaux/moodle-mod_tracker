@@ -1,4 +1,4 @@
-<?PHP  // $Id: view.php,v 1.2 2012-06-01 18:53:07 vf Exp $
+<?PHP  // $Id: view.php,v 1.1.1.1 2012-08-01 10:16:32 vf Exp $
 
 /**
 * @package mod-tracker
@@ -18,17 +18,17 @@
 	// $editorfields = '';
 
 	/// Check for required parameters - Course Module Id, trackerID, 
-	    
+
 	$id = optional_param('id', 0, PARAM_INT); // Course Module ID, or
 	$a  = optional_param('a', 0, PARAM_INT);  // tracker ID
 	$issueid = optional_param('issueid', '', PARAM_INT);  // issue number
-	
+
 	// PART OF MVC Implementation
 	$action = optional_param('what', '', PARAM_ALPHA);
 	$screen = optional_param('screen', '', PARAM_ALPHA);
 	$view = optional_param('view', '', PARAM_ALPHA);
 	// !PART OF MVC Implementation
-	
+
 	if ($id) {
 	    if (! $cm = get_coursemodule_from_id('tracker', $id)) {
 	        print_error('errorcoursemodid', 'tracker');
@@ -217,7 +217,7 @@
 	    if (has_capability('mod/tracker:report', $context)){
 	        include "views/issuereportform.html";
 	    } else {
-	        notice(get_string('youneedanaccount','tracker'), $CFG->wwwroot."/course/view.php?id={$course->id}");
+	        echo $OUTPUT->notification(get_string('youneedanaccount','tracker'), $CFG->wwwroot."/course/view.php?id={$course->id}");
 	    }
 	} elseif ($view == 'view'){
 	    $result = 0 ;
@@ -235,7 +235,7 @@
 	                include "views/viewmyassignedticketslist.php";
 	                break;
 	            case 'browse': 
-	                if (!(has_capability('mod/tracker:viewallissues', $context) || $tracker->supportmode == 'bugtracker')){
+	                if (!has_capability('mod/tracker:viewallissues', $context)){
 	                    print_error ('errornoaccessallissues', 'tracker');
 	                } else {
 	                    $resolved = 0;
@@ -274,7 +274,7 @@
 	                include "views/viewmyticketslist.php";
 	                break;
 	            case 'browse': 
-	                if (!(has_capability('mod/tracker:viewallissues', $context) || $tracker->supportmode == 'bugtracker')){
+	                if (!has_capability('mod/tracker:viewallissues', $context)){
 	                    print_error('errornoaccessallissues', 'tracker');
 	                } else {
 	                    $resolved = 1;

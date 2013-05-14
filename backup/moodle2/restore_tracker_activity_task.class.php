@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/tracker/backup/moodle2/restore_tracker_stepslib.php'); // Because it exists (must)
 
 /**
- * label restore task that provides all the settings and steps to perform one
+ * tracker restore task that provides all the settings and steps to perform one
  * complete restore of the activity
  */
 class restore_tracker_activity_task extends restore_activity_task {

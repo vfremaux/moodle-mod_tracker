@@ -33,6 +33,15 @@
 
 $capabilities = array(
 
+    'mod/tracker:addinstance' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+
     'mod/tracker:seeissues' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,

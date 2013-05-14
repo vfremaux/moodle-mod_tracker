@@ -52,6 +52,7 @@ elseif ($action == 'doaddelement'){
 	$form->shared = optional_param('shared', 0, PARAM_INT);
 	$errors = array();
 	if (empty($form->name)){
+		$error = new StdClass;
 	    $error->message = get_string('namecannotbeblank', 'tracker');
 	    $error->on = 'name';
 	    $errors[] = $error;
@@ -71,6 +72,9 @@ elseif ($action == 'doaddelement'){
         if ($elementobj->hasoptions()){  // Bounces to the option editor
             $form->name = '';
             $form->description = '';
+            
+            // prepare use case bounce to further code (later in controller).
+            $bounce_elementid = $form->elementid;
             $action = 'viewelementoptions';
     	}
 	} else {
@@ -113,12 +117,14 @@ if ($action == 'doupdateelement'){
 
 	$errors = array();
 	if (empty($form->name)){
+		$error = new StdClass;
 	    $error->message = get_string('namecannotbeblank', 'tracker');
 	    $error->on = 'name';
 	    $errors[] = $error;
 	}
 
     if(!count($errors)){
+    	$element = new StdClass;
     	$element->id = $form->elementid;
     	$element->name = $form->name;
     	$element->type = $form->type;
@@ -156,6 +162,7 @@ if ($action == 'submitelementoption'){
 	// check validity
 	$errors = array();
 	if ($DB->count_records('tracker_elementitem', array('elementid' => $form->elementid, 'name' => $form->name))){
+		$error = new StdClass;
 	    $error->message = get_string('optionisused', 'tracker');
 	    $error->on = 'name';
 	    $errors[] = $error;
@@ -163,6 +170,7 @@ if ($action == 'submitelementoption'){
 
 	if ($form->name == ''){
 	    unset($error);
+		$error = new StdClass;
 	    $error->message = get_string('optionnamecannotbeblank', 'tracker');
 	    $error->on = 'name';
 	    $errors[] = $error;
@@ -170,11 +178,13 @@ if ($action == 'submitelementoption'){
 
 	if ($form->description == ''){
 	    unset($error);
+		$error = new StdClass;
 	    $error->message = get_string('descriptionisempty', 'tracker');
 	    $error->on = 'description';
 	    $errors[] = $error;
 	}
 	if (!count($errors)){
+		$option = new StdClass;
     	$option->name = strtolower($form->name);
     	$option->description = addslashes($form->description);
     	$option->elementid = $form->elementid;
@@ -204,7 +214,7 @@ if ($action == 'submitelementoption'){
 /************************************* edit an element option *****************************/
 if ($action == 'viewelementoptions'){
 	$form = new StdClass;
-	$form->elementid = optional_param('elementid', @$form->elementid, PARAM_INT);
+	$form->elementid = optional_param('elementid', @$bounce_elementid, PARAM_INT);
 	if ($form->elementid != null){
 		$element = tracker_getelement($tracker, $form->elementid);
 		$form->type = $element->type;
@@ -280,6 +290,7 @@ if ($action == 'updateelementoption'){
 	// check validity
 	$errors = array();
 	if ($DB->count_records_select('tracker_elementitem', "elementid = $form->elementid AND name = '$form->name' AND id != $form->optionid ")){
+		$error = new StdClass;
 	    $error->message = get_string('optionisused', 'tracker');
 	    $error->on = 'name';
 	    $errors[] = $error;
@@ -287,6 +298,7 @@ if ($action == 'updateelementoption'){
 
 	if ($form->name == ''){
 	    unset($error);
+		$error = new StdClass;
 	    $error->message = get_string('optionnamecannotbeblank', 'tracker');
 	    $error->on = 'name';
 	    $errors[] = $error;
@@ -294,12 +306,14 @@ if ($action == 'updateelementoption'){
 
 	if ($form->description == ''){
 	    unset($error);
+		$error = new StdClass;
 	    $error->message = get_string('descriptionisempty', 'tracker');
 	    $error->on = 'description';
 	    $errors[] = $error;
 	}
 
     if (!count($errors)){
+    	$update = new StdClass;
     	$update->id = $form->optionid;
     	$update->name = $form->name;
     	$update->description = addslashes($form->description);

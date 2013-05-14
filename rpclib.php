@@ -1,4 +1,4 @@
-<?PHP  // $Id: rpclib.php,v 1.4 2012-07-14 19:25:28 vf Exp $
+<?PHP  // $Id: rpclib.php,v 1.2 2012-08-12 21:43:55 vf Exp $
 
 /**
 * @package mod-tracker
@@ -34,6 +34,7 @@ if (!defined('RPC_SUCCESS')) {
 *
 */
 function tracker_rpc_check($username, $remotehostroot, &$localuser){
+	global $DB;
 
     // get local identity for user
 
@@ -59,7 +60,7 @@ function tracker_rpc_check($username, $remotehostroot, &$localuser){
 * @return string a JSON encoded information structure.
 */
 function tracker_rpc_get_infos($trackerid, $nojson = false){
-    global $CFG;
+    global $CFG, $DB;
 
     $tracker = $DB->get_record('tracker', array('id' => "$trackerid"));
     $query = "
@@ -93,7 +94,8 @@ function tracker_rpc_get_infos($trackerid, $nojson = false){
 * @return a stub of instance descriptions
 */
 function tracker_rpc_get_instances($username, $remotehostroot){
-    global $CFG;
+    global $CFG, $DB;
+
     if ($failedcheck = tracker_rpc_check($username, $remotehostroot, $localuser)) return $failedcheck;
     $response->status = RPC_SUCCESS;
     $trackers = $DB->get_records('tracker', null, 'name', 'id,name');
@@ -121,6 +123,7 @@ function tracker_rpc_get_instances($username, $remotehostroot){
 * @return the local issue record id
 */
 function tracker_rpc_post_issue($username, $remoteuserhostroot, $trackerid, $remote_issue){
+	global $DB;
 
     if ($failedcheck = tracker_rpc_check($username, $remoteuserhostroot, $localuser)) return $failedcheck;
 

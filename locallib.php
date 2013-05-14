@@ -529,8 +529,7 @@ function tracker_extractsearchparametersfrompost(){
         foreach ($issuenumberarray as $issueid){
             if (is_numeric($issueid)){
                 $fields['id'][] = $issueid;
-            }
-            else{
+            } else {
                 print_error('errorbadlistformat', 'tracker', 'view.php?id=' . $this->tracker_getcoursemodule() . '&what=search');
             }
         }
@@ -689,7 +688,7 @@ function tracker_extractsearchparametersfromdb($queryid=null){
                 $count++;
             }
         }
-    } else{
+    } else {
         error ("Invalid query id: " . $queryid);
     }
     
@@ -951,7 +950,7 @@ function tracker_getownedissuesforresolve($trackerid, $userid = null){
     if (empty($userid)){
         $userid = $USER->id;
     }
-    return $DB->get_records_select('tracker_issue', "trackerid = {$trackerid} AND assignedto = {$userid} ");
+    return $DB->get_records_select('tracker_issue', " trackerid = ? AND assignedto = ? ", array($trackerid, $userid));
 }
 
 /**
@@ -1738,7 +1737,7 @@ function tracker_notifyccs_comment($issueid, $comment, $tracker = null){
 function tracker_loadpreferences($trackerid, $userid = 0){
     global $USER, $DB;
     if ($userid == 0) $userid = $USER->id;
-    $preferences = $DB->get_records_select('tracker_preferences', "trackerid = $trackerid AND userid = $userid");
+    $preferences = $DB->get_records_select('tracker_preferences', "trackerid = ? AND userid = ? ", array($trackerid, $userid));
     if ($preferences){
         foreach($preferences as $preference){
             $USER->trackerprefs->{$preference->name} = $preference->value;
@@ -1849,7 +1848,7 @@ function tracker_update_priority_stack(&$tracker){
     $DB->execute($sql);
 
     /// fetch prioritarized by order
-    $issues = $DB->get_records_select('tracker_issue', "trackerid = {$tracker->id} AND resolutionpriority != 0 ", 'resolutionpriority', 'id, resolutionpriority');
+    $issues = $DB->get_records_select('tracker_issue', "trackerid = ? AND resolutionpriority != 0 ", array($tracker->id), 'resolutionpriority', 'id, resolutionpriority');
     $i = 1;
     if (!empty($issues)){
         foreach ($issues as $issue){
