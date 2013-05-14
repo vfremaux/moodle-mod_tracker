@@ -273,7 +273,9 @@ if (!empty($issues)){
         if (has_capability('mod/tracker:manage', $context)){
             $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=delete\" title=\"".get_string('delete')."\" ><img src=\"".$OUTPUT->pix_url('t/delete', 'core')."\" border=\"0\" /></a>";
         }
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;screen=mywatches&amp;issueid={$issue->id}&what=register\" title=\"".get_string('register', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('register', 'mod_tracker')."\" border=\"0\" /></a>";
+        if (!$DB->get_record('tracker_issuecc', array('userid' => $USER->id, 'issueid' => $issue->id))){
+	        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;screen={$screen}&amp;issueid={$issue->id}&what=register\" title=\"".get_string('register', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('register', 'mod_tracker')."\" border=\"0\" /></a>";
+	    }
         if (preg_match('/^resolutionpriority/', $sort) && has_capability('mod/tracker:managepriority', $context)){
             if ($issue->resolutionpriority < $maxpriority){
                 $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=raisetotop\" title=\"".get_string('raisetotop', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('totop', 'mod_tracker')."\" border=\"0\" /></a>";

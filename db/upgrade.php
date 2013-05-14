@@ -15,7 +15,7 @@ function xmldb_tracker_upgrade($oldversion=0) {
     /// Define field parent to be added to tracker
         $table = new xmldb_table('tracker');
         $field = new xmldb_field('parent');
-        $field->set_attributes(XMLDB_TYPE_CHAR, '80', null, null, null, null, null, null, 'timemodified');
+        $field->set_attributes(XMLDB_TYPE_CHAR, '80', null, null, null, null, 'timemodified');
 
     /// Launch add field parent
         $dbman->add_field($table, $field);
@@ -91,7 +91,7 @@ function xmldb_tracker_upgrade($oldversion=0) {
     /// Define field supportmode to be added to tracker
         $table = new xmldb_table('tracker');
         $field = new xmldb_field('supportmode');
-        $field->set_attributes(XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null, null, 'bugtracker', 'parent');
+        $field->set_attributes(XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'bugtracker', 'parent');
 
     /// Launch add field supportmode
         $dbman->add_field($table, $field);
@@ -105,7 +105,7 @@ function xmldb_tracker_upgrade($oldversion=0) {
     /// Define field supportmode to be added to tracker
         $table = new xmldb_table('tracker_issue');
         $field = new xmldb_field('resolutionpriority');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null, 0, 'resolutionformat');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 'resolutionformat');
 
     /// Launch add field supportmode
         $dbman->add_field($table, $field);
@@ -155,7 +155,7 @@ function xmldb_tracker_upgrade($oldversion=0) {
     /// Changing precision of field parent on table tracker to (80)
         $table = new xmldb_table('tracker');
         $field = new xmldb_field('parent');
-        $field->set_attributes(XMLDB_TYPE_CHAR, '80', null, null, null, null, null, null, 'timemodified');
+        $field->set_attributes(XMLDB_TYPE_CHAR, '80', null, null, null, null, 'timemodified');
 
     /// Launch change of precision for field parent
         $dbman->change_field_precision($table, $field);
@@ -169,7 +169,7 @@ function xmldb_tracker_upgrade($oldversion=0) {
     /// Define field defaultassignee to be added to tracker
         $table = new xmldb_table('tracker');
         $field = new xmldb_field('defaultassignee');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'supportmode');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'supportmode');
 
     /// Launch add field defaultassignee
         $dbman->add_field($table, $field);
@@ -183,7 +183,7 @@ function xmldb_tracker_upgrade($oldversion=0) {
     /// Define field subtrackers to be added to tracker
         $table = new xmldb_table('tracker');
         $field = new xmldb_field('subtrackers');
-        $field->set_attributes(XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null, null, '0', 'defaultassignee');
+        $field->set_attributes(XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, '0', 'defaultassignee');
 
     /// Launch add field subtrackers
         $dbman->add_field($table, $field);

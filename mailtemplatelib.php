@@ -4,7 +4,7 @@
 * This library is a third-party proposal for standardizing mail
 * message constitution for third party modules. It is actually used
 * by all ethnoinformatique.fr module. It relies on mail and message content
-* templates tha should reside in a mail/{$lang} directory within the 
+* templates that should reside in a mail/{$lang} directory within the 
 * module space.
 *
 * @package extralibs

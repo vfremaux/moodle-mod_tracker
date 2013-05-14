@@ -284,7 +284,7 @@ if ($tracker->subtrackers && $issue->status != TRANSFERED && (has_capability('mo
     </tr>
 <?php
 if ($tracker->enablecomments){
-	if ($commentscount){
+	if (!empty($commentscount)){
 ?>
     <tr>
         <td colspan="4">
