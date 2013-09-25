@@ -66,7 +66,7 @@ function tracker_update_instance($tracker, $mform) {
     $tracker->timemodified = time();
     $tracker->id = $tracker->instance;
 
-	if (is_array($tracker->subtrackers)){
+	if (is_array(@$tracker->subtrackers)){
 		$tracker->subtrackers = implode(',', $tracker->subtrackers);
 	}
 
@@ -85,6 +85,12 @@ function tracker_delete_instance($id) {
         return false;
     }
 
+    if (!$cm = get_coursemodule_from_instance('tracker', $tracker->id)) {
+        return false;
+    }
+
+    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+
     $result = true;
 
     /// Delete any dependent records here 
@@ -96,6 +102,10 @@ function tracker_delete_instance($id) {
     $DB->delete_records('tracker_issueattribute', array('trackerid' => "$tracker->id"));
     $DB->delete_records('tracker_issuecc', array('trackerid' => "$tracker->id"));
     $DB->delete_records('tracker_issuecomment', array('trackerid' => "$tracker->id"));
+
+	// delete all files attached to this context
+    $fs = get_file_storage();
+    $fs->delete_area_files($context->id);
 
     return $result;
 }
@@ -323,4 +333,35 @@ function tracker_uninstall(){
     }
     
     return $return;
+}
+
+function tracker_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload) {
+    global $CFG, $DB;
+	
+    if ($context->contextlevel != CONTEXT_MODULE) {
+        return false;
+    }
+	
+    require_course_login($course, true, $cm);
+    
+    $fileareas = array('issuedescription', 'issueresolution', 'issueattribute', 'issuecomment');
+    if (!in_array($filearea, $fileareas)) {
+        return false;
+    }
+
+    $itemid = (int)array_shift($args);
+
+    if (!$tracker = $DB->get_record('tracker', array('id' => $cm->instance))) {
+        return false;
+    }
+
+    $fs = get_file_storage();
+    $relativepath = implode('/', $args);
+    $fullpath = "/$context->id/mod_tracker/$filearea/$itemid/$relativepath";
+    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
+        return false;
+    }
+
+    // finally send the file
+    send_stored_file($file, 0, 0, false); // download MUST be forced - security!
 }

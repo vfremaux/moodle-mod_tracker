@@ -88,10 +88,6 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
     	
         // Add tracker related files, no need to match by itemname (just internally handled context)
         $this->add_related_files('mod_tracker', 'intro', null);
-        $this->add_related_files('mod_tracker', 'comment', null);
-        $this->add_related_files('mod_tracker', 'description', null);
-        $this->add_related_files('mod_tracker', 'resolution', null);
-        $this->add_related_files('mod_tracker', 'attachment', 'tracker_issue');
     }
 
     protected function process_tracker_element($data) {
@@ -151,6 +147,10 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         // The data is actually inserted into the database later in inform_new_usage_id.
         $newitemid = $DB->insert_record('tracker_issue', $data);
         $this->set_mapping('tracker_issue', $oldid, $newitemid, false); // Has no related files
+
+        $this->add_related_files('mod_tracker', 'issuecomment', 'tracker_issue', null, $oldid);
+        $this->add_related_files('mod_tracker', 'issuedescription', 'tracker_issue', null, $oldid);
+        $this->add_related_files('mod_tracker', 'issueresolution', 'tracker_issue', null, $oldid);
     }
 
     protected function process_tracker_issueattribute($data) {
@@ -167,15 +167,19 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         $data->timemodified = $this->apply_date_offset($data->timemodified);
 
         // The data is actually inserted into the database later in inform_new_usage_id.
-        $newitemid = $DB->insert_record('tracker_issueattibute', $data);
+        $newitemid = $DB->insert_record('tracker_issueattribute', $data);
         // needs no mapping as terminal record
-        // $this->set_mapping('tracker_issueattibute', $oldid, $newitemid, false); // Has no related files
+        $this->set_mapping('tracker_issueattribute', $oldid, $newitemid, false); // Has no related files
+
+        $this->add_related_files('mod_tracker', 'issueattribute', 'tracker_issueattribute', null, $oldid);
     }
 
     protected function process_tracker_issuecc($data) {
     	global $DB;
     	
         $data = (object)$data;
+
+        $oldid = $data->id;
 
         $data->trackerid = $this->get_mappingid('tracker', $data->trackerid);
         $data->userid = $this->get_mappingid('user', $data->userid);
@@ -192,6 +196,8 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
     	
         $data = (object)$data;
 
+        $oldid = $data->id;
+
         $data->trackerid = $this->get_mappingid('tracker', $data->trackerid);
         $data->userid = $this->get_mappingid('user', $data->userid);
         $data->issueid = $this->get_new_parentid('issue');
@@ -199,7 +205,9 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         // The data is actually inserted into the database later in inform_new_usage_id.
         $newitemid = $DB->insert_record('tracker_issuecomment', $data);
         // needs no mapping as terminal record
-        // $this->set_mapping('tracker_issuecomment', $oldid, $newitemid, false); // Has no related files
+        $this->set_mapping('tracker_issuecomment', $oldid, $newitemid, false); // Has no related files
+
+        $this->add_related_files('mod_tracker', 'issuecomment', 'tracker_issuecomment', null, $oldid);
     }
 
     protected function process_tracker_issuedependancy($data) {

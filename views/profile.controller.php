@@ -52,7 +52,7 @@ elseif ($action == 'dosaveasquery'){
 	$fields = unserialize(stripslashes(required_param('fields', PARAM_RAW)));
 	$query->trackerid = $tracker->id;
 	if (! tracker_savesearchparameterstodb($query, $fields)){
-		print_error('errorunabletosavequery', 'traker', '', "view.php?a={$tracker->id}&amp;what=search");
+		print_error('errorunabletosavequery', 'tracker',  $url.'&amp;view=profile');
 	}
 }
 /******************************** ask for viewing a personal search query **************************/
@@ -80,14 +80,14 @@ elseif ($action == 'updatequery'){
 	$fields = tracker_extractsearchparametersfrompost();
 	$query->trackerid = $tracker->id;
 	if(! tracker_savesearchparameterstodb($query, $fields)){
-		print_error('errorunabletosavequeryid', 'tracker', $query->id, 'view.php?a={$tracker->id}&amp;page=myqueries');
+		print_error('errorunabletosavequeryid', 'tracker',  $url.'&amp;view=profile', $query->id);
 	}
 }
 /******************************** deletes a personal search query **************************/
 elseif ($action == 'deletequery'){
 	$queryid = optional_param('queryid', '', PARAM_INT);
 	if (! $DB->delete_records ('tracker_query', 'id', $queryid, 'trackerid', $tracker->id, 'userid', $USER->id)){
-		print_error('errorcannotdeletequeryid', 'tracker', $queryid);
+		print_error('errorcannotdeletequeryid', 'tracker',  $url.'&amp;view=profile', $queryid);
 	}
 }
 /******************************** register to an issue **************************/
@@ -132,6 +132,7 @@ elseif ($action == 'editwatch'){
 }
 /********************************* update a watchers config for an issue **************************/
 elseif ($action == 'updatewatch'){
+	$cc = new StdClass();
 	$cc->id = required_param('ccid', PARAM_INT);
 	$open = optional_param('open', '', PARAM_INT);
 	$resolving = optional_param('resolving', '', PARAM_INT);
@@ -160,7 +161,7 @@ elseif ($action == 'updatewatch'){
         $cc->events = ($oncomment === 1) ? $cc->events | ON_COMMENT : $cc->events & ~ON_COMMENT ;
 
     if (!$DB->update_record('tracker_issuecc', $cc)){
-        print_error('errorcannotupdatewatcher', 'tracker');
+        print_error('errorcannotupdatewatcher', 'tracker', $url.'&amp;view=profile');
     }
 }
 /********************************* saves the user's preferences **************************/
@@ -173,18 +174,19 @@ elseif ($action == 'saveprefs'){
     $resolved = optional_param('resolved', 1, PARAM_INT);
     $abandonned = optional_param('abandonned', 1, PARAM_INT);
     $oncomment = optional_param('oncomment', 1, PARAM_INT);
+    $pref = new StdClass();
     $pref->trackerid = $tracker->id;
     $pref->userid = $USER->id;
     $pref->name = 'eventmask';
     $pref->value = $open * EVENT_OPEN + $resolving * EVENT_RESOLVING + $waiting * EVENT_WAITING + $resolved * EVENT_RESOLVED + $abandonned * EVENT_ABANDONNED + $oncomment * ON_COMMENT + $testing * EVENT_TESTING + $published * EVENT_PUBLISHED;
     if (!$oldpref = $DB->get_record('tracker_preferences', array('trackerid' => $tracker->id, 'userid' => $USER->id, 'name' => 'eventmask'))){
         if (!$DB->insert_record('tracker_preferences', $pref)){
-            print_error('errorcannotsaveprefs', 'tracker');
+            print_error('errorcannotsaveprefs', 'tracker', $url.'&amp;view=profile');
         }
     } else {
         $pref->id = $oldpref->id;
         if (!$DB->update_record('tracker_preferences', $pref)){
-            print_error('errorcannotupdateprefs', 'tracker');
+            print_error('errorcannotupdateprefs', 'tracker', $url.'&amp;view=profile');
         }
     }
 }

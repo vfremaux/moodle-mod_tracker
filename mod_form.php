@@ -37,11 +37,19 @@ class mod_tracker_mod_form extends moodleform_mod {
       	$modeoptions['ticketting'] = get_string('mode_ticketting', 'tracker');
 	  	$mform->addElement('select', 'supportmode', get_string('supportmode', 'tracker'), $modeoptions);
 	  	$mform->addHelpButton('supportmode', 'supportmode', 'tracker');
+
 	  	$mform->addElement('text', 'ticketprefix', get_string('ticketprefix', 'tracker'), array('size' => 5));
+	  	$mform->setType('ticketprefix', PARAM_TEXT);
+
+      	$mform->addElement('textarea', 'thanksmessage', get_string('thanksmessage', 'tracker'), array('cols' => 60, 'rows' => 10));
+      	$mform->setType('thanksmessage', PARAM_TEXT);
+
 	  	$mform->addElement('checkbox', 'enablecomments', get_string('enablecomments', 'tracker'));
 	  	$mform->addHelpButton('enablecomments', 'enablecomments', 'tracker');
+
 	  	$mform->addElement('checkbox', 'allownotifications', get_string('notifications', 'tracker'));
 	  	$mform->addHelpButton('allownotifications', 'notifications', 'tracker');
+
       	if (isset($this->_cm->id) && $assignableusers = get_users_by_capability(context_module::instance($this->_cm->id), 'mod/tracker:resolve', 'u.id, firstname,lastname', 'lastname,firstname')){
       	    $useropts[0] = get_string('none');
       	    foreach($assignableusers as $assignable){
@@ -52,6 +60,8 @@ class mod_tracker_mod_form extends moodleform_mod {
       	} else {
     		$mform->addElement('hidden', 'defaultassignee', 0);
       	}
+	    $mform->setType('defaultassignee', PARAM_INT);
+
 	  	if ($subtrackers = $DB->get_records_select('tracker', " id != 0 " )){
 			$trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
 	  		$subtrackersopts = array();
@@ -66,6 +76,7 @@ class mod_tracker_mod_form extends moodleform_mod {
 	  		}
 			if (!empty($subtrackersopts)){
 		      	$select = &$mform->addElement('select', 'subtrackers', get_string('subtrackers', 'tracker'), $subtrackersopts);
+		      	$mform->setType('subtrackers', PARAM_INT);
 		      	$select->setMultiple(true);
 		    }
 	  	}
@@ -77,10 +88,10 @@ class mod_tracker_mod_form extends moodleform_mod {
 	  	$this->add_action_buttons();
 	}
 
-    	/*
 	function definition_after_data(){
 	  $mform    =& $this->_form;
-	  }*/
+	}
+
 	function validation($data, $files = null) {
 	    $errors = array();
 	    return $errors;

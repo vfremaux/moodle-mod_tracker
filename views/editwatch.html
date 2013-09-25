@@ -33,6 +33,7 @@ $notabandonned = ($form->events & EVENT_ABANDONNED) ? '' : 'checked="checked"';
 <form name="editqueryform" action="view.php" method="post">
 <input type="hidden" name="id" value="<?php p($cm->id) ?>" />
 <input type="hidden" name="what" value="updatewatch" />
+<input type="hidden" name="view" value="profile" />
 <input type="hidden" name="ccid" value="<?php p($form->id) ?>" />
 <input type="hidden" name="screen" value="mywatches" />
 

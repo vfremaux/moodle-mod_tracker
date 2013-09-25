@@ -15,19 +15,20 @@ if (!defined('MOODLE_INTERNAL')) {
 
 echo "<br/>";
 echo $OUTPUT->heading(get_string('me', 'tracker')); 
+
+$OUTPUT->box_start('center', '90%', '', '', 'generalbox', 'bugreport'); 
+
 ?>
-<center>
-<?php $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'bugreport'); ?>
-<table border="1" cellpadding="3" width="800">
-	<tr>
-		<td align="right" valign="top"><b><?php print_string('name') ?>:</b></td>
-		<td align="left" valign="top">
+<table border="1" cellpadding="3" width="100%">
+	<tr valign="top">
+		<td align="right" width="33%"><b><?php print_string('name') ?>:</b></td>
+		<td align="left">
 			<?php echo fullname($USER) ?>
 		</td>
 	</tr>
-	<tr>
-		<td align="right" valign="top"><b><?php print_string('tracker-levelaccess', 'tracker') ?>:</b></td>
-		<td align="left" valign="top">
+	<tr valign="top">
+		<td align="right" width="33%"><b><?php print_string('tracker-levelaccess', 'tracker') ?>:</b></td>
+		<td align="left">
 			<?php 
 			    echo ($reporter = has_capability('mod/tracker:report', $context)) ? '<span class="green">'.get_string('icanreport', 'tracker').'</span>' : '<span class="red">'.get_string('icannotreport', 'tracker').'</span>' ;
 			    echo '<br/>';
@@ -45,9 +46,9 @@ if ($manager){
     <tr>
         <td colspan="2"><?php echo $OUTPUT->heading(get_string('manager', 'tracker')); ?></td>
     </tr>
-    <tr>
-        <td align="right" valign="top"><b><?php print_string('myassignees', 'tracker') ?>:</b></td>
-        <td align="left" valign="top">
+    <tr valign="top">
+        <td align="right"><b><?php print_string('myassignees', 'tracker') ?>:</b></td>
+        <td align="left">
             <?php
                 $assignees = tracker_getassignees($USER->id);
                 if ($assignees){
@@ -68,9 +69,9 @@ if ($resolver){
     <tr>
         <td colspan="2"><?php echo $OUTPUT->heading(get_string('resolver', 'tracker')); ?></td>
     </tr>
-    <tr>
-        <td align="right" valign="top"><b><?php print_string('myissues', 'tracker') ?>:</b></td>
-        <td align="left" valign="top">
+    <tr valign="top">
+        <td align="right" width="33%"><b><?php print_string('myissues', 'tracker') ?>:</b></td>
+        <td align="left">
             <?php
                 $issues = tracker_getownedissuesforresolve($tracker->id, $USER->id);
                 if ($issues){
@@ -79,8 +80,7 @@ if ($resolver){
                         echo "&nbsp;<span class=\"status_{$STATUSCODES[$issue->status]}\">".$STATUSKEYS[$issue->status].'</span>';
                         echo '<br />';
                     }
-                }
-                else{
+                } else {
                     print_string('noresolvingissue', 'tracker');
                 }
             ?>
@@ -92,7 +92,5 @@ if ($resolver){
 </table>
 <?php 
 $OUTPUT->box_end(); 
-$nohtmleditorneeded = true;
-?>
 
-</center>
+?>

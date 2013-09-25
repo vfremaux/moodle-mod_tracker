@@ -31,6 +31,7 @@ $STATUSKEYS = array(POSTED => get_string('posted', 'tracker'),
 if (!isset($fields)){
     $fields = tracker_extractsearchcookies();
 }
+
 if (!empty($fields)){
     $searchqueries = tracker_constructsearchqueries($tracker->id, $fields);
 }
@@ -130,7 +131,7 @@ if (isset($searchqueries)){
             <?php print_string('searchresults', 'tracker') ?>: <?php echo $numrecords ?> <br/>
         </td>
         <td colspan="2" align="right">
-                <a href="view.php?id=<?php p($cm->id) ?>&amp;what=clearsearch"><?php print_string('clearsearch', 'tracker') ?></a>
+                <a href="view.php?id=<?php p($cm->id) ?>&amp;view=view&amp;screen=browse&amp;what=clearsearch"><?php print_string('clearsearch', 'tracker') ?></a>
         </td>
     </tr>
 <?php
@@ -141,6 +142,8 @@ if (isset($searchqueries)){
 <form name="manageform" action="view.php" method="post">
 <input type="hidden" name="id" value="<?php p($cm->id) ?>" />
 <input type="hidden" name="what" value="updatelist" />
+<input type="hidden" name="view" value="view" />
+<input type="hidden" name="screen" value="browse" />
 <?php       
 
 /// define table object
@@ -237,7 +240,7 @@ $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)',
 if (!empty($issues)){
     /// product data for table
     foreach ($issues as $issue){
-        $issuenumber = "<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}\">{$tracker->ticketprefix}{$issue->id}</a>";
+        $issuenumber = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;issueid={$issue->id}\">{$tracker->ticketprefix}{$issue->id}</a>";
         $summary = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}\">".format_string($issue->summary).'</a>';
         $datereported = date('Y/m/d h:i', $issue->datereported);
         $user = $DB->get_record('user', array('id' => $issue->reportedby));
@@ -265,10 +268,10 @@ if (!empty($issues)){
         }
         $status = '<div class="status_'.$STATUSCODES[$issue->status].'" style="width: 110%; height: 105%; text-align:center">'.$status.'</div>';
         $hassolution = $issue->status == RESOLVED && !empty($issue->resolution);
-        $solution = ($hassolution) ? "<img src=\"{$CFG->wwwroot}/mod/tracker/pix/solution.gif\" height=\"15\" alt=\"".get_string('hassolution','tracker')."\" />" : '' ;
+        $solution = ($hassolution) ? "<img src=\"".$OUTPUT->pix_url('solution', 'tracker').'" height="15" alt="'.get_string('hassolution','tracker')."\" />" : '' ;
         $actions = '';
         if (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context)){
-            $actions = "<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&screen=editanissue\" title=\"".get_string('update')."\" ><img src=\"".$OUTPUT->pix_url('t/edit', 'core')."\" border=\"0\" /></a>";
+            $actions = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;issueid={$issue->id}&screen=editanissue\" title=\"".get_string('update')."\" ><img src=\"".$OUTPUT->pix_url('t/edit', 'core')."\" border=\"0\" /></a>";
         }
         if (has_capability('mod/tracker:manage', $context)){
             $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=delete\" title=\"".get_string('delete')."\" ><img src=\"".$OUTPUT->pix_url('t/delete', 'core')."\" border=\"0\" /></a>";

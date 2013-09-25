@@ -28,6 +28,16 @@ define('TESTING', 7);
 define('PUBLISHED', 8);
 define('VALIDATED', 9);
 
+// statusses
+define('ENABLED_OPEN', 1);
+define('ENABLED_RESOLVING', 2);
+define('ENABLED_WAITING', 4);
+define('ENABLED_RESOLVED', 8);
+define('ENABLED_ABANDONNED', 16);
+define('ENABLED_TESTING', 64);
+define('ENABLED_PUBLISHED', 128);
+define('ENABLED_VALIDATED', 256);
+
 // states && eventmasks
 define('EVENT_POSTED', 0);
 define('EVENT_OPEN', 1);
@@ -92,65 +102,16 @@ function tracker_loadelements(&$tracker, &$elementsobj){
     /// make a set of element objet with records
     if (!empty($elements)){
         foreach ($elements as $element){
-            if ($element->type == ''){
-                $elementsobj[$element->id] = new trackerelement($tracker, $element->id);
-                $elementsobj[$element->id]->setoptionsfromdb();
-            }
-            else{
-                // this get the options by the constructor
-                include_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/'.$element->type.'/'.$element->type.'.class.php');
-                $constructorfunction = "{$element->type}element";
-                $elementsobj[$element->id] = new $constructorfunction($tracker, $element->id);
-            }
+            // this get the options by the constructor
+            include_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/'.$element->type.'/'.$element->type.'.class.php');
+            $constructorfunction = "{$element->type}element";
+            $elementsobj[$element->id] = new $constructorfunction($tracker, $element->id);
             $elementsobj[$element->id]->name = $element->name;
             $elementsobj[$element->id]->description = $element->description;
             $elementsobj[$element->id]->type = $element->type;
             $elementsobj[$element->id]->course = $element->course;
         }
     }
-}
-
-/**
-* this implements an element factory
-* makes a single element from a record if given an id, or a new element of a desired type
-* @uses $CFG
-* @param int $elementid
-* @param string $type the type for creating a new element
-* @return object
-*/
-function tracker_getelement(&$tracker, $elementid=null, $type=null){
-    global $CFG, $DB;
-    if ($elementid){
-        $element = $DB->get_record('tracker_element', array('id' => $elementid));
-        $elementtype = ($element) ? $element->type : $type ;
-
-        if (!empty($element)){
-            if ($element->type == ''){
-                $elementobj = new trackerelement($tracker, $element->id);
-                $elementobj->setoptionsfromdb();
-            } else {
-                include_once('classes/trackercategorytype/' . $element->type . '/'.$element->type.'.class.php');
-                $constructorfunction = "{$elementtype}element";
-                $elementobj = new $constructorfunction($tracker, $element->id);
-            }
-            $elementobj->name = $element->name;
-            $elementobj->description = $element->description;
-            $elementobj->type = $element->type;
-            $elementobj->course = $element->course;
-        }
-    }
-    else{
-        if ($type == ''){
-            $elementobj = new trackerelement($tracker);
-            $elementobj->setoptionsfromdb();
-        }
-        else{
-            include_once('classes/trackercategorytype/' . $type . '/'.$type.'.class.php');
-            $constructorfunction = "{$type}element";
-            $elementobj = new $constructorfunction($tracker);
-        }
-    }   
-    return $elementobj;
 }
 
 /**
@@ -194,49 +155,29 @@ function tracker_requiresfile($trackerid){
 }
 
 /**
-* loads elements in a reference
+* loads elements as objects array in a reference
 * @param int $trackerid the current tracker
-* @param reference a reference to an array of used elements
+* @param reference $used a reference to an array of used elements
 */
 function tracker_loadelementsused(&$tracker, &$used){
     global $CFG, $DB;
+    
+    $cm = get_coursemodule_from_instance('tracker', $tracker->id);
+    $context = context_module::instance($cm->id);
 
-    $sql = "
-        SELECT 
-            e.*,
-            eu.id AS usedid,
-            eu.sortorder, 
-            eu.trackerid, 
-            eu.canbemodifiedby, 
-            eu.active
-        FROM 
-            {tracker_element} e,
-            {tracker_elementused} eu
-        WHERE 
-            eu.elementid = e.id AND 
-            eu.trackerid = {$tracker->id} 
-        ORDER BY 
-            eu.sortorder ASC
-    ";
-    $elements = $DB->get_records_sql($sql);
+    $usedelements = $DB->get_records('tracker_elementused', array('trackerid' => $tracker->id), 'sortorder', 'id,elementid,sortorder');
     $used = array();
-    if (!empty($elements)){
-        foreach ($elements as $element){
-            if ($element->type == ''){
-                $used[$element->id] = new trackerelement($tracker, $element->id);
-                $used[$element->id]->setoptionsfromdb();
-            } else {
-                include_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/' . $element->type . '/'.$element->type.'.class.php');
-                $constructorfunction = "{$element->type}element";
-                $used[$element->id] = new $constructorfunction($tracker, $element->id);
-            }
-            $used[$element->id]->usedid = $element->usedid;
-            $used[$element->id]->name = $element->name;
-            $used[$element->id]->description = $element->description;
-            $used[$element->id]->type = $element->type;
-            $used[$element->id]->course = $element->course;
-            $used[$element->id]->sortorder = $element->sortorder;                       
-            $used[$element->id]->active = $element->active;                       
+    $sortorder = 1;
+    if (!empty($usedelements)){
+        foreach ($usedelements as $ueid => $ue){
+        	// normalize sortorder indexes
+        	if ($ue->sortorder != $sortorder){
+        		$ue->sortorder = $sortorder;
+        		$DB->update_record('tracker_elementused', $ue);
+        	}
+        	$used[$ue->elementid] = trackerelement::find_instance_by_usedid($tracker, $ueid);
+        	$used[$ue->elementid]->setcontext($context);
+        	$sortorder++;
         }
     }
 }   
@@ -315,12 +256,12 @@ function tracker_printelements(&$tracker, $fields=null, $dest=false){
             echo '</td>';
             echo '<td align="left" colspan="3">';
             if ($dest == 'search'){
+            	if ($element->type == 'file') continue;
                 $element->viewsearch();
-            }
-            elseif ($dest == 'query'){
+            } elseif ($dest == 'query'){
+            	if ($element->type == 'file') continue;
                 $element->viewquery();
-            }
-            else{
+            } else {
                 $element->view(true);
             }
             echo '</td>';
@@ -416,6 +357,10 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false){
             $elementsSearchConstraint .= ' AND i.reportedby = ' . $fields[$key][0];
         }
 
+        if ($key == 'assignedto'){
+            $elementsSearchConstraint .= ' AND i.assignedto = ' . $fields[$key][0];
+        }
+
         if ($key == 'summary'){
             $summarytokens = explode(' ', $fields[$key][0]);
             foreach ($summarytokens as $summarytoken){
@@ -430,6 +375,7 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false){
         }
     }
     if ($own == false){
+    	$sql = new StdClass();
         $sql->search = "
             SELECT DISTINCT 
                 i.id, 
@@ -556,6 +502,11 @@ function tracker_extractsearchparametersfrompost(){
             $fields['reportedby'][] = $reportedby;
         }
         
+        $assignedto = optional_param('assignedto', '', PARAM_INT);
+        if (!empty($assignedto)){   
+            $fields['assignedto'][] = $assignedto;
+        }
+        
         $summary = optional_param('summary', '', PARAM_TEXT);
         if (!empty($summary)){  
             $fields['summary'][] = $summary;
@@ -615,8 +566,7 @@ function tracker_savesearchparameterstodb($query, $fields){
 	
     if (!isset($query->id)) {           //if not given a $queryid, then insert record
         $queryid = $DB->insert_record('tracker_query', $query);
-    }
-    else {                      //otherwise, update record
+    } else {                      //otherwise, update record
         $queryid = $DB->update_record('tracker_query', $query, true);
     }   
     return $queryid;        
@@ -657,6 +607,17 @@ function tracker_printsearchfields($fields){
                 }
                 $reporterlist = implode ("', '", $reporters);
                 $strs[] = get_string('reportedby', 'tracker').' '.get_string('IN', 'tracker')." ('".$reporterlist."')";
+                break;
+            case 'assignedto' :
+                $users = $DB->get_records_list('user', array('id' => implode(',',$value)), 'lastname', 'id,firstname,lastname');
+                $assignees = array();
+                if($users){
+                    foreach($users as $user){
+                        $assignees[] = fullname($user);
+                    }
+                }
+                $assigneelist = implode ("', '", $assignees);
+                $strs[] = get_string('assignedto', 'tracker').' '.get_string('IN', 'tracker')." ('".$assigneelist."')";
                 break;
             default : 
                 $strs[] = get_string($key, 'tracker') . ' '.get_string('IN', 'tracker')." ('".implode("','", $value) . "')";
@@ -851,7 +812,8 @@ function tracker_getreporters($trackerid){
         SELECT
             DISTINCT(reportedby) AS id,
             u.firstname,
-            u.lastname
+            u.lastname,
+            u.imagealt
         FROM
             {tracker_issue} i,
             {user} u
@@ -886,6 +848,7 @@ function tracker_getassignees($userid){
             u.email, 
             u.emailstop, 
             u.maildisplay,
+            u.imagealt,
             COUNT(i.id) as issues
         FROM
             {tracker_issue} i,
@@ -900,7 +863,8 @@ function tracker_getassignees($userid){
             u.picture, 
             u.email, 
             u.emailstop, 
-            u.maildisplay
+            u.maildisplay,
+            u.imagealt
     ";
     return $DB->get_records_sql($sql, array($userid));
 }
@@ -910,33 +874,33 @@ function tracker_getassignees($userid){
 * @uses $CFG
 * @param int $trackerid the current tracker
 */
-function tracker_submitanissue(&$tracker){
-    global $CFG, $DB;
-    
-    $issue = new StdClass;
-    $issue->datereported = required_param('datereported', PARAM_INT);
-    $issue->summary = required_param('summary', PARAM_TEXT);
-    $issue->description = addslashes(required_param('description', PARAM_CLEANHTML));
-    $issue->format = addslashes(required_param('format', PARAM_CLEANHTML));
-    $issue->assignedto = $tracker->defaultassignee;
-    $issue->bywhomid = 0;
-    $issue->trackerid = $tracker->id;
-    $issue->status = POSTED;
-    $issue->reportedby = required_param('reportedby', PARAM_INT);
+function tracker_submitanissue(&$tracker, &$data){
+	global $CFG, $DB, $USER;
+	
+	$issue = new StdClass();
+	$issue->datereported = time();
+	$issue->summary = $data->summary;
+	$issue->description = $data->description_editor['text'];
+	$issue->descriptionformat = $data->description_editor['format'];
+	$issue->assignedto = $tracker->defaultassignee;
+	$issue->bywhomid = 0;
+	$issue->trackerid = $tracker->id;
+	$issue->status = POSTED;
+	$issue->reportedby = $USER->id;
 
-    // fetch max actual priority
-    $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', " trackerid = {$tracker->id} GROUP BY trackerid ");
-    $issue->resolutionpriority = $maxpriority + 1;
+	// fetch max actual priority
+	$maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', " trackerid = ? GROUP BY trackerid ", array($tracker->id));
+	$issue->resolutionpriority = $maxpriority + 1;
 
-    $issue->id = $DB->insert_record('tracker_issue', $issue);
-    if ($issue->id){
-        tracker_recordelements($issue);
-        // if not CCed, the assignee should be
-        tracker_register_cc($tracker, $issue, $issue->reportedby);
-        return $issue;
-    } else {
-         print_error('errorrecordissue', 'tracker');
-    }
+	if ($issue->id = $DB->insert_record('tracker_issue', $issue)){
+		$data->issueid = $issue->id;
+		tracker_recordelements($issue, $data);
+		// if not CCed, the assignee should be
+		tracker_register_cc($tracker, $issue, $issue->reportedby);
+		return $issue;
+	} else {
+		print_error('errorrecordissue', 'tracker');
+	}
 }
 
 /**
@@ -957,185 +921,47 @@ function tracker_getownedissuesforresolve($trackerid, $userid = null){
 * stores in database the element values
 * @uses $CFG
 * @param object $issue
+* @param object $data full form return
 */
-function tracker_recordelements(&$issue){
-    global $CFG, $COURSE, $DB;
-    
-    $keys = array_keys($_POST);                 // get the key value of all the fields submitted
-    $keys = preg_grep('/element./' , $keys);    // filter out only the element keys
+function tracker_recordelements(&$issue, &$data){
+	global $CFG, $COURSE, $DB , $PAGE;
 
-    $filekeys = array_keys($_FILES);                 // get the key value of all the fields submitted
-    $filekeys = preg_grep('/element./' , $filekeys);    // filter out only the element keys    
-
-    $keys = array_merge($keys, $filekeys);
-    
-    foreach ($keys as $key){
-        preg_match('/element(.*)$/', $key, $elementid);
-        $elementname = $elementid[1];
-        
-        $sql = "
-            SELECT 
-              e.id as elementid,
-              e.type as type
-            FROM
-                {tracker_elementused} eu,
-                {tracker_element} e
-            WHERE
-                eu.elementid = e.id AND
-                e.name = ? AND
-                eu.trackerid = ? 
-        ";
-        $attribute = $DB->get_record_sql($sql, array($elementname, $issue->trackerid));
-        $attribute->timemodified = $issue->datereported;
-        if (is_array(@$_POST[$key])){
-	        $values = optional_param_array($key, '', PARAM_TEXT);
-	    } else {
-	        $values = optional_param($key, '', PARAM_TEXT);
-	    }
-        $attribute->issueid = $issue->id;
-        $attribute->trackerid = $issue->trackerid;
-        
-        /// For those elements where more than one option can be selected
-        if (is_array($values)){
-            foreach ($values as $value){
-                $attribute->elementitemid = $value;
-                $attributeid = $DB->insert_record('tracker_issueattribute', $attribute);
-                if (!$attributeid){
-                    print_error('erroraddissueattribute', 'tracker', '', 1);
-                }
-            }
-        } else {  //For the rest of the elements that can only support one answer
-            if ($attribute->type != 'file'){
-                $attribute->elementitemid = str_replace("'", "''", $values);
-                $attributeid = $DB->insert_record('tracker_issueattribute', $attribute);    
-	            if (empty($attributeid)){
-	                print_error('erroraddissueattribute', 'tracker', '', 2);
-	            }
-            } else {
-				$fs = get_file_storage();
-				if (!empty($_FILES[$key]['name'])){
-				 
-					// Prepare file record object
-					$context = context_module::instance($issue->trackerid);
-					$fileinfo = array(
-					    'contextid' => $context->id, // ID of context
-					    'component' => 'mod_tracker',     // usually = table name
-					    'filearea' => 'attachment',     // usually = table name
-					    'itemid' => $issue->id,               // usually = ID of row in table
-					    'filepath' => '/',           // any path beginning and ending in /
-					    'filename' => $_FILES[$key]['name']); // any filename
-					    
-					// Get previous file and delete it
-					if ($file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], 
-					        $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename'])){
-					    $file->delete();
-					}
-					    				 
-					$fs->create_file_from_pathname($fileinfo, $_FILES[$key]['tmp_name']);
-					$attribute->elementitemid = $_FILES[$key]['name'];
-	                $attributeid = $DB->insert_record('tracker_issueattribute', $attribute);
-	            }
-            }
-
-        }   
-    }           
+	$tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
+	$usedelements = $DB->get_records('tracker_elementused', array('trackerid' => $issue->trackerid), 'id', 'id,elementid');
+	foreach($usedelements as $ueid => $ue){
+		$ueinstance = trackerelement::find_instance_by_usedid($tracker, $ueid);
+		$ueinstance->setcontext($PAGE->context);
+		$ueinstance->formprocess($data);
+	}
 }
 
 /**
 * clears element recordings for an issue
-* @TODO check if it is really used
+* @see view.controller.php / updateissue
 * @param int $issueid the issue
+* @param int $withfiles if true, the attached files will be deleted too (full deletion)
 */
-function tracker_clearelements($issueid){
+function tracker_clearelements($issueid, $withfiles = false){
     global $CFG, $COURSE, $DB;
 
     if (!$issue = $DB->get_record('tracker_issue', array('id' => "$issueid"))){
         return;
     }
-
-    // find all files elements to protect
     
-   $sql = "
-            SELECT
-                e.id,
-                e.type
-            FROM
-                {tracker_element} e,
-                {tracker_elementused} eu
-            WHERE
-                e.id = eu.elementid AND
-                e.type = 'file' AND
-                eu.trackerid = {$issue->trackerid}
-    ";
+	$attributeids = $DB->get_records('tracker_issueattribute', array('issueid' => $issueid), 'id', 'id,id');
 
-    $nofileclause = '';
-    if($fileelements = $DB->get_records_sql($sql)){
-        $fileelementlist = implode("','", array_keys($fileelements));
-        $nofileclause = " AND elementid NOT IN ('$fileelementlist') ";
-    }
-    if (!$DB->delete_records_select('tracker_issueattribute', "issueid = $issueid $nofileclause")){
+    if (!$DB->delete_records_select('tracker_issueattribute', array('issueid' => $issueid))){
         print_error('errorcannotlearelementsforissue', 'tracker', $issueid);
     }
-
-    $storebase = "{$COURSE->id}/moddata/tracker/{$issue->trackerid}/{$issue->id}";
-
-    // remove all deleted file attachements
-    $keys = array_keys($_POST);
-    $deletefilekeys = preg_grep('/deleteelement./' , $keys);    // filter out only the deleteelement keys    
-
-    if (!empty($deletefilekeys)){
-        foreach($deletefilekeys as $deletedkey){
-            if (preg_match("/deleteelement(.*)$/", $deletedkey, $matches)){
-                $elementname = $matches[1];
-                $element = $DB->get_record('tracker_element', array('name' => $elementname));
-                if ($elementitem = $DB->get_record('tracker_issueattribute', array('elementid' => $element->id, 'issueid' => $issueid))){
-                    if (!empty($elementitem->elementitemid)){                    	
-						$fs = get_file_storage();
-						$context = context_module::instance($issue->trackerid);
-						// Prepare file record object
-						$fileinfo = array(
-						    'component' => 'mod_tracker',
-						    'filearea' => 'attachment',     // usually = table name
-						    'itemid' => $issue->id,               // usually = ID of row in table
-						    'contextid' => $context->id, // ID of context
-						    'filepath' => '/',           // any path beginning and ending in /
-						    'filename' => $elementitem->value); // any filename
-						 
-						// Get file
-						$file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], 
-						        $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename']);
-						 
-						// Delete it if it exists
-						if ($file) {
-						    $file->delete();
-						}
-					}
-                    $DB->delete_records('tracker_issueattribute', array('id' => $elementitem->id));
-                }
-            }
-        }
-    }
-
-    // remove all reloaded files
-    $keys = array_keys($_FILES);
-    $reloadedfilekeys = preg_grep('/element./' , $keys);    // filter out only the reloaded element keys    
     
-    if (!empty($reloadedfilekeys)){
-        foreach($reloadedfilekeys as $reloadedkey){
-        	if (!empty($_FILES[$reloadedkey]['name'])){ // file is reloaded with another entry
-	            if (preg_match("/element(.*)$/", $reloadedkey, $matches)){
-	                $elementname = $matches[1];
-	                $element = $DB->get_record('tracker_element', array('name' => $elementname));
-	                if ($elementitem = $DB->get_record('tracker_issueattribute', array('elementid' => $element->id, 'issueid' => $issueid))){
-	                    if (!empty($elementitem->elementitemid)){
-	                        filesystem_delete_file($storebase.'/'.$elementitem->elementitemid);
-	                    }
-	                    $DB->delete_records('tracker_issueattribute', array('id' => $elementitem->id));
-	                }
-	            }
-	        }
-        }
-    }
+    // delete issue attribute fields
+    if ($withfiles && !empty($attributeids)){
+	    $fs = get_file_storage();
+	    foreach($attributeids as $attid => $void){
+		    $fs->delete_area_files($context->id, 'mod_tracker', 'issueattribute', $attid);
+		}
+	}
+    
 }
 
 /**
@@ -1736,10 +1562,12 @@ function tracker_notifyccs_comment($issueid, $comment, $tracker = null){
 */
 function tracker_loadpreferences($trackerid, $userid = 0){
     global $USER, $DB;
+
     if ($userid == 0) $userid = $USER->id;
     $preferences = $DB->get_records_select('tracker_preferences', "trackerid = ? AND userid = ? ", array($trackerid, $userid));
     if ($preferences){
         foreach($preferences as $preference){
+        	$USER->trackerprefs = new Stdclass();
             $USER->trackerprefs->{$preference->name} = $preference->value;
         }
     }
@@ -1975,7 +1803,8 @@ function tracker_backtrack_stats_by_month(&$tracker){
 		$availdates = array_keys($tracks);
 		$lowest = $availdates[0];
 		$highest = $availdates[count($availdates) - 1];
-		list($low->year, $low->month) = split('-', $lowest);
+		$low = new StdClass();
+		list($low->year, $low->month) = explode('-', $lowest);
 		$dateiter = new date_iterator($low->year, $low->month);
 	
 		// scan table and snapshot issue states
@@ -2028,14 +1857,15 @@ function tracker_get_stats_by_user(&$tracker, $userclass, $from = null, $to = nu
 		ON
 			i.{$userclass} = u.id
 		WHERE
-			trackerid = {$tracker->id}
+			trackerid = ?
 		GROUP BY
-			i.{$userclass},status
+			CONCAT(u.id, '-', i.status)
 		ORDER BY
 			u.lastname, u.firstname
 	";
-	if ($results = $DB->get_records_sql($sql)){
+	if ($results = $DB->get_records_sql($sql, array($tracker->id))){
 		foreach($results as $r){
+			$stats[$r->id] = new StdClass();
 			$stats[$r->id]->name = fullname($r);
 			$stats[$r->id]->status[$r->status] = $r->value;
 			$stats[$r->id]->sum = @$stats[$r->id]->sum + $r->value;
@@ -2106,4 +1936,156 @@ class date_iterator{
 	}
 }
 
+/**
+* Initializes a full featured moodle text editor outside a moodle form context.
+* This allow making custom forms with free HMTL layout.
+*/
+function tracker_print_direct_editor($attributes, $values, $options){
+    global $CFG, $PAGE;
+
+	require_once($CFG->dirroot.'/repository/lib.php');
+
+    $ctx = $options['context'];
+
+    $id           = $attributes['id'];
+    $elname       = $attributes['name'];
+
+    $subdirs      = @$options['subdirs'];
+    $maxbytes     = @$options['maxbytes'];
+    $areamaxbytes = @$options['areamaxbytes'];
+    $maxfiles     = @$options['maxfiles'];
+    $changeformat = @$options['changeformat']; // TO DO: implement as ajax calls
+
+    $text         = $values['text'];
+    $format       = $values['format'];
+    $draftitemid  = $values['itemid'];
+
+    // security - never ever allow guest/not logged in user to upload anything
+    if (isguestuser() or !isloggedin()) {
+        $maxfiles = 0;
+    }
+
+    // $str = $this->_getTabs();
+    $str = '';
+    $str .= '<div>';
+
+    $editor = editors_get_preferred_editor($format);
+    $strformats = format_text_menu();
+    $formats =  $editor->get_supported_formats();
+    foreach ($formats as $fid) {
+        $formats[$fid] = $strformats[$fid];
+    }
+
+    // get filepicker info
+    //
+    $fpoptions = array();
+    if ($maxfiles != 0 ) {
+        if (empty($draftitemid)) {
+            // no existing area info provided - let's use fresh new draft area
+            require_once("$CFG->libdir/filelib.php");
+            $draftitemid = file_get_unused_draft_itemid();
+            echo " Generating fresh filearea $draftitemid "; 
+        }
+
+        $args = new stdClass();
+        // need these three to filter repositories list
+        $args->accepted_types = array('web_image');
+        $args->return_types = @$options['return_types'];
+        $args->context = $ctx;
+        $args->env = 'filepicker';
+        // advimage plugin
+        $image_options = initialise_filepicker($args);
+        $image_options->context = $ctx;
+        $image_options->client_id = uniqid();
+        $image_options->maxbytes = @$options['maxbytes'];
+        $image_options->areamaxbytes = @$options['areamaxbytes'];
+        $image_options->env = 'editor';
+        $image_options->itemid = $draftitemid;
+
+        // moodlemedia plugin
+        $args->accepted_types = array('video', 'audio');
+        $media_options = initialise_filepicker($args);
+        $media_options->context = $ctx;
+        $media_options->client_id = uniqid();
+        $media_options->maxbytes  = @$options['maxbytes'];
+        $media_options->areamaxbytes  = @$options['areamaxbytes'];
+        $media_options->env = 'editor';
+        $media_options->itemid = $draftitemid;
+
+        // advlink plugin
+        $args->accepted_types = '*';
+        $link_options = initialise_filepicker($args);
+        $link_options->context = $ctx;
+        $link_options->client_id = uniqid();
+        $link_options->maxbytes  = @$options['maxbytes'];
+        $link_options->areamaxbytes  = @$options['areamaxbytes'];
+        $link_options->env = 'editor';
+        $link_options->itemid = $draftitemid;
+
+        $fpoptions['image'] = $image_options;
+        $fpoptions['media'] = $media_options;
+        $fpoptions['link'] = $link_options;
+    }
+
+    //If editor is required and tinymce, then set required_tinymce option to initalize tinymce validation.
+    if (($editor instanceof tinymce_texteditor)  && !empty($attributes['onchange'])) {
+        $options['required'] = true;
+    }
+
+    // print text area - TODO: add on-the-fly switching, size configuration, etc.
+    $editor->use_editor($id, $options, $fpoptions);
+
+    $rows = empty($attributes['rows']) ? 15 : $attributes['rows'];
+    $cols = empty($attributes['cols']) ? 80 : $attributes['cols'];
+
+    //Apply editor validation if required field
+    $editorrules = '';
+    if (!empty($attributes['onblur']) && !empty($attributes['onchange'])) {
+        $editorrules = ' onblur="'.htmlspecialchars($attributes['onblur']).'" onchange="'.htmlspecialchars($attributes['onchange']).'"';
+    }
+    $str .= '<div><textarea id="'.$id.'" name="'.$elname.'[text]" rows="'.$rows.'" cols="'.$cols.'"'.$editorrules.'>';
+    $str .= s($text);
+    $str .= '</textarea></div>';
+
+    $str .= '<div>';
+    if (count($formats)>1) {
+        $str .= html_writer::label(get_string('format'), 'menu'. $elname. 'format', false, array('class' => 'accesshide'));
+        $str .= html_writer::select($formats, $elname.'[format]', $format, false, array('id' => 'menu'. $elname. 'format'));
+    } else {
+        $keys = array_keys($formats);
+        $str .= html_writer::empty_tag('input',
+                array('name' => $elname.'[format]', 'type' => 'hidden', 'value' => array_pop($keys)));
+    }
+    $str .= '</div>';
+
+    // during moodle installation, user area doesn't exist
+    // so we need to disable filepicker here.
+    if (!during_initial_install() && empty($CFG->adminsetuppending)) {
+        // 0 means no files, -1 unlimited
+        if ($maxfiles != 0 ) {
+            $str .= '<input type="hidden" name="'.$elname.'[itemid]" value="'.$draftitemid.'" />';
+
+            // used by non js editor only
+            $editorurl = new moodle_url("$CFG->wwwroot/repository/draftfiles_manager.php", array(
+                'action' => 'browse',
+                'env' => 'editor',
+                'itemid' => $draftitemid,
+                'subdirs' => $subdirs,
+                'maxbytes' => $maxbytes,
+                'areamaxbytes' => $areamaxbytes,
+                'maxfiles' => $maxfiles,
+                'ctx_id' => $ctx->id,
+                'course' => $PAGE->course->id,
+                'sesskey' => sesskey(),
+                ));
+            $str .= '<noscript>';
+            $str .= "<div><object type='text/html' data='$editorurl' height='160' width='600' style='border:1px solid #000'></object></div>";
+            $str .= '</noscript>';
+        }
+    }
+
+    $str .= '</div>';
+
+    return $str;
+}
 ?>
