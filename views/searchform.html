@@ -19,12 +19,13 @@
 <center>
 
 <!-- Print Bug Form -->
-<form name="byidform" action="view.php" method="get">
+<form name="byidform" action="view.php" method="get" class="mform">
 <input type="hidden" name="what" value="searchforissues" />
 <input type="hidden" name="screen" value="browse" />
 <input type="hidden" name="view" value="view" />
 <input type="hidden" name="id" value="<?php p($cm->id) ?>" />
-
+<fieldset>
+	<legend class="ftoggler"><?php echo get_string('searchbyid', 'tracker') ?></legend>
 <table border="0" cellpadding="5">
     <tr>
         <td align="right" width="150"><b><?php print_string('issuenumber', 'tracker') ?>:</b></td>
@@ -37,12 +38,14 @@
         </td>
     </tr>
 </table>
+</fieldset>
 </form>
+
 <?php
     $OUTPUT->box_end();
     $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'bugreport');
 ?>
-<form name="searchform" action="view.php" method="get">
+<form name="searchform" action="view.php" method="get" class="mform">
 <input type="hidden" name="what" value="searchforissues" />
 <input type="hidden" name="screen" value="<?php echo ($tracker->supportmode == 'bugtracker') ? 'browse' : 'mytickets' ; ?>" />
 <input type="hidden" name="view" value="view" />
@@ -51,6 +54,8 @@
 var datereporteditems = ['day','month','year'];
 </script>
 
+<fieldset>
+	<legend class="ftoggler"><?php echo get_string('searchcriteria', 'tracker') ?></legend>
 <table border="0" cellpadding="5" width="800">
     <tr>
         <td align="right" width="130" valign="top"><b><?php print_string('reportedby', 'tracker') ?>:</b><br /></td>
@@ -64,8 +69,7 @@ var datereporteditems = ['day','month','year'];
             $reportersmenu[$reporter->id] = fullname($reporter);
         }
         echo html_writer::select($reportersmenu, 'reportedby', '', array('' => get_string('any', 'tracker')));
-    }
-    else{
+    } else {
         print_string('noreporters', 'tracker');
     }
 ?>
@@ -78,6 +82,28 @@ var datereporteditems = ['day','month','year'];
             echo html_writer::select_time('months', 'month'); 
             echo html_writer::select_time('years', 'year'); 
             ?>
+        </td>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <td align="right" width="130" valign="top"><b><?php print_string('assignedto', 'tracker') ?>:</b><br /></td>
+        <td width="180" valign="top" align="left">
+<?php
+    $assignees = tracker_getassignees($tracker->id);
+
+    $assigneesmenu = array();
+    if ($assignees){
+        foreach($assignees as $assignee){
+            $assigneesmenu[$assignee->id] = fullname($assignee);
+        }
+        echo html_writer::select($assigneesmenu, 'assignedto', '', array('' => get_string('any', 'tracker')));
+    } else {
+        print_string('noassignees', 'tracker');
+    }
+?>
+        </td>
+        <td align="right" width="200"></td>
+        <td width="280" valign="top" align="left">
         </td>
         <td>&nbsp;</td>
     </tr>
@@ -110,6 +136,7 @@ var datereporteditems = ['day','month','year'];
         </td>
     </tr>
 </table>
+</fieldset>
 </form>
 <?php
 $OUTPUT->box_end();

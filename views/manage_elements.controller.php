@@ -78,7 +78,7 @@ elseif ($action == 'editelement'){
 	    $element = tracker_getelement($form->elementid);
 		$form->type = $element->type;
 		$form->name = $element->name;
-		$form->description = str_replace("'", "''", $element->description);
+		$form->description = $element->description;
 		$form->format = $element->format;
 		$form->shared = ($element->course == 0) ;
 		$form->action = 'doupdateelement';
@@ -112,7 +112,7 @@ if ($action == 'doupdateelement'){
     	$element->id = $form->elementid;
     	$element->name = $form->name;
     	$element->type = $form->type;
-    	$element->description = str_replace("'", "''", $form->description);
+    	$element->description = $form->description;
     	$element->format = $form->format;
     	$element->course = ($form->shared) ? 0 : $COURSE->id ;
     	if (!$DB->update_record('tracker_element', $element)){
@@ -286,7 +286,7 @@ if ($action == 'updateelementoption'){
     if (!count($errors)){
     	$update->id = $form->optionid;
     	$update->name = $form->name;
-    	$update->description = str_replace("'", "''", $form->description);
+    	$update->description = $form->description;
     	$update->format = $form->format;
     	if ($DB->update_record('tracker_elementitem', $update)){
             echo $OUTPUT->heading(get_string('editoptions', 'tracker'));

@@ -149,24 +149,7 @@ $string['mode_bugtracker'] = 'Traqueur de défauts ';
 $string['mode_ticketting'] = 'Service support utilisateur ';
 $string['modulename'] = 'Gestionnaire de tickets';
 $string['modulenameplural'] = 'Gestionnaires de tickets';
-$string['modulename_help'] = 'Le gestionnaire de tickets permet la gestion de tickets d\'aide, de rapport de défaut, ou de toute activité ou tâche qui nécessite un suivi d\'état dans un cours.
-
-L\'activité permet de constituer un formulaire de dépôt en choisissant des attributs à partir d\'une liste d\'éléments configurable. Certains éléments peuvent même être partagés
-au niveau site pour être réutilisés dans d\'autres instances.
-
-Le ticket, (ou tâche représentée) peut être attribuée à un utilisateur.
-
-Le ticket prend un certain nombre d\'états et leur changement émettra des notifications à certains utilisateurs qui les ont autorisées. Chaque utilisateur peut choisir librement les
-différentes notificaitons qu\'il peut recevoir.
-
-Les tickets peuvent être liés par dépendance, permettant de remonter une chaine causale.
-
-Les changements d\'état sont historisés pour chaque ticket.
-
-Les gestionnaires peuvent être cascadés localement ou via MNET vers un gestionnaire collecteur de plus haut niveau.
-
-Les gestionnaires peuvent être associés à des sous-gestionnaires, facilitant et organisant le déplacement de tickets entre plusieurs gestionnaires. 
-';
+$string['nofileloaded'] = 'Pas de fichier chargé.';
 $string['month'] = 'Mois';
 $string['myassignees'] = 'Les résolveurs que j\'ai nommés ';
 $string['myissues'] = 'Les tickets que je gère ';
@@ -179,7 +162,7 @@ $string['mywork'] = 'Mon travail';
 $string['name'] = 'Nom';
 $string['namecannotbeblank'] = 'Le nom ne peut pas être laissé vide.';
 $string['newissue'] = 'Nouveau ticket';
-$string['noassignees'] = 'Pas de développeur attribué';
+$string['noassignees'] = 'Pas de responsable attribué';
 $string['nocomments'] = 'Pas de commentaires ';
 $string['nodata'] = 'Aucune donnée à traiter.';
 $string['nodevelopers'] = 'Pas de développeurs';
@@ -245,6 +228,8 @@ $string['runninginmonth'] = 'En cours dans le mois';
 $string['saveasquery'] = 'Sauvegarder une requête ';
 $string['savequery'] = 'Sauvegarder la requête';
 $string['search'] = 'Recherche';
+$string['searchbyid'] = 'Recherche par ID';
+$string['searchcriteria'] = 'Critères de recherche';
 $string['searchresults'] = 'Résultats de recherche';
 $string['searchwiththat'] = 'Relancer cette recherche';
 $string['selectparent'] = 'Choix de la cible';
@@ -281,7 +266,8 @@ $string['supportmode'] = 'Mode de support ';
 $string['testing'] = 'En test';
 $string['text'] = 'Champ de texte'; // @DYNA
 $string['textarea'] = 'Zone de texte'; // @DYNA
-$string['thanks'] = 'Merci de votre contribution à l\'amélioration continue du service.';
+$string['thanksdefault'] = 'Merci de votre contribution à l\'amélioration continue du service.';
+$string['thanksmessage'] = 'Message de remerciement';
 $string['ticketprefix'] = 'Préfixe du ticket';
 $string['tickets'] = 'Tickets';
 $string['tracker-levelaccess'] = 'Mes possibilités dans ce traqueur ';
@@ -325,6 +311,24 @@ $string['youneedanaccount'] = 'Vous devez posséder un compte dans cet espace po
 
 // help strings
 
+$string['modulename_help'] = 'Le gestionnaire de tickets permet la gestion de tickets d\'aide, de rapport de défaut, ou de toute activité ou tâche qui nécessite un suivi d\'état dans un cours.
+
+L\'activité permet de constituer un formulaire de dépôt en choisissant des attributs à partir d\'une liste d\'éléments configurable. Certains éléments peuvent même être partagés
+au niveau site pour être réutilisés dans d\'autres instances.
+
+Le ticket, (ou tâche représentée) peut être attribuée à un utilisateur.
+
+Le ticket prend un certain nombre d\'états et leur changement émettra des notifications à certains utilisateurs qui les ont autorisées. Chaque utilisateur peut choisir librement les
+différentes notificaitons qu\'il peut recevoir.
+
+Les tickets peuvent être liés par dépendance, permettant de remonter une chaine causale.
+
+Les changements d\'état sont historisés pour chaque ticket.
+
+Les gestionnaires peuvent être cascadés localement ou via MNET vers un gestionnaire collecteur de plus haut niveau.
+
+Les gestionnaires peuvent être associés à des sous-gestionnaires, facilitant et organisant le déplacement de tickets entre plusieurs gestionnaires. 
+';
 $string['elements_help'] = '<p>
 On peut constituer le formulaire de récolte des défauts à l\'aide d\'éléments. Un formulaire contient au moins les 
 champs "résumé", "description", et "rapporté par", mais il est possible d\'ajouter tout type de qualificateur au défaut.

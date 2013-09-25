@@ -18,16 +18,16 @@ $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
 $issue->reporter = $DB->get_record('user', array('id' => $issue->reportedby));
 tracker_loadelementsused($tracker, $elementsused);
 
-$enctype = '';
-if (tracker_requiresfile($tracker->id)){
-    $enctype = ' enctype="multipart/form-data" ';
-}
+$editoroptions = array('trusttext' => true, 'subdirs' => true, 'maxfiles' => 99, 'maxbytes' => $COURSE->maxbytes, 'context' => $context);
+$issue = file_prepare_standard_editor($issue, 'description', $editoroptions, $context, 'mod_tracker', 'issuedescription', $issue->id);
+$issue = file_prepare_standard_editor($issue, 'resolution', $editoroptions, $context, 'mod_tracker', 'issueresolution', $issue->id);
+
 ?>
 <center>
 
 <!-- Print Bug Form -->
 
-<table border="1" cellpadding="5" class="tracker-issue">
+<table border="1" cellpadding="5" class="tracker-issue-editor">
 <?php
 if (has_capability('mod/tracker:resolve', $context)){
     /// Opens the issue if I have capability to resolve
@@ -38,7 +38,7 @@ if (has_capability('mod/tracker:resolve', $context)){
 ?>
     <tr>
         <td colspan="4" align="right">
-            <form method="POST" action="view.php?id=<?php p($cm->id) ?>&amp;screen=viewanissue&amp;issueid=<?php echo $issue->id ?>">
+            <form method="POST" action="view.php?id=<?php p($cm->id) ?>&amp;view=view&amp;screen=viewanissue&amp;issueid=<?php echo $issue->id ?>">
                 <input type="submit" name="go_btn" value="<?php print_string('turneditingoff', 'tracker') ?>" />
             </form>
         </td>
@@ -46,9 +46,10 @@ if (has_capability('mod/tracker:resolve', $context)){
 <?php
 }
 ?>  
-    <form action="view.php" name="editissue" method="post" <?php echo $enctype ?> >
+    <form action="view.php" name="editissue" method="post">
     <input type="hidden" name="id" value="<?php p($cm->id) ?>" />
     <input type="hidden" name="issueid" value="<?php p($issueid) ?>" />
+    <input type="hidden" name="view" value="view" />
     <input type="hidden" name="screen" value="viewanissue" />
     <input type="hidden" name="what" value="updateanissue" />
     <tr>
@@ -115,21 +116,12 @@ if (has_capability('mod/tracker:resolve', $context)){
         <td align="right" height="200" class="tracker-issue-param"><b><?php print_string('description') ?>:</b></td>
         <td align="left" colspan="3" width="600">
 <?php
-            print_textarea($usehtmleditor, 20, 60, 680, 400, 'description', $issue->description);
-            if ($usehtmleditor) {
-                echo '<input type="hidden" name="format" value="'.FORMAT_HTML.'" />';
-            } 
-            else {
-                echo '<p align="right">';
-                $OUTPUT->help_icon('textformat', 'moodle');
-                print_string('formattexttype');
-                echo ':&nbsp;';
-                if (empty($form->format)) {
-                    $form->format = FORMAT_MOODLE;
-                }
-                echo html_writer::select(format_text_menu(), 'format', $form->format); 
-                echo '</p>';
-            }
+            // print_textarea($usehtmleditor, 20, 60, 680, 400, 'description_editor', $issue->description, 0, false, 'id_description');
+
+			$attributes = array('id' => 'id_description', 'name' => 'description_editor');
+			$values = array('text' => $issue->description_editor['text'], 'format' => $issue->description_editor['format'], 'itemid' => $issue->description_editor['itemid']);
+			$options = array('maxfiles' => 99, 'maxbytes' => $COURSE->maxbytes, 'context' => $context);
+			echo tracker_print_direct_editor($attributes, $values, $options);
 ?>
         </td>
     </tr>
@@ -148,7 +140,7 @@ if (is_array($elementsused)){
             echo ":</b><br />";
             echo "</td>";   
             echo "<td colspan=\"3\" align=\"left\">";           
-                echo $elementsused[$key]->view(true, $issue->id);
+                echo $elementsused[$key]->edit($issue->id);
             echo "</td>";
             echo "</tr>";
         }
@@ -159,20 +151,10 @@ if (is_array($elementsused)){
         <td align="right" height="200" class="tracker-issue-param"><b><?php print_string('resolution', 'tracker') ?>:</b></td>
         <td align="left" colspan="3">
 <?php
-            print_textarea($usehtmleditor, 20, 60, 680, 400, 'resolution', $issue->resolution);
-            if ($usehtmleditor) {
-                echo '<input type="hidden" name="resolutionformat" value="'.FORMAT_HTML.'" />';
-            } else {
-                echo '<p align="right">';
-                $OUTPUT->help_icon('textformat', 'moodle');
-                print_string('formattexttype');
-                echo ':&nbsp;';
-                if (empty($form->format)) {
-                    $form->format = "MOODLE";
-                }
-                echo html_writer::select(format_text_menu(), 'resolutionformat', $form->resolutionformat); 
-                echo '</p>';
-            }
+			$attributes = array('id' => 'id_resolution', 'name' => 'resolution_editor');
+			$values = array('text' => $issue->resolution_editor['text'], 'format' => $issue->resolution_editor['format'], 'itemid' => $issue->resolution_editor['itemid']);
+			$options = array('maxfiles' => 99, 'maxbytes' => $COURSE->maxbytes, 'context' => $context);
+			echo tracker_print_direct_editor($attributes, $values, $options);
 ?>
         </td>
     </tr>

@@ -8,7 +8,7 @@
 *
 * Controller for all "view" related views
 * 
-* @usecase submitanissue
+* // @usecase submitanissue // gone away 
 * @usecase updateanissue
 * @usecase delete
 * @usecase updatelist
@@ -31,45 +31,27 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
 }
 
-/************************************* Submit an issue *****************************/
-if ($action == 'submitanissue'){
-	if (!$issue = tracker_submitanissue($tracker)){
-	   print_error('errorcannotsubmitticket', 'tracker');
-    }
-    // log state change
-    $stc = new StdClass;
-    $stc->userid = $USER->id;
-    $stc->issueid = $issue->id;
-    $stc->trackerid = $tracker->id;
-    $stc->timechange = time();
-    $stc->statusfrom = POSTED;
-    $stc->statusto = POSTED;    
-    $DB->insert_record('tracker_state_change', $stc);
-    echo $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'bugreport');
-    print_string('thanks', 'tracker');
-    echo $OUTPUT->box_end();
-    echo $OUTPUT->continue_button("view.php?id={$cm->id}view=view&amp;screen=browse");
-    // notify all admins
-    if ($tracker->allownotifications){
-        tracker_notify_submission($issue, $cm, $tracker);
-        if ($issue->assignedto){
-            tracker_notifyccs_changeownership($issue->id, $tracker);
-        }
-    }
-    return -1;
-}
 /************************************* update an issue *****************************/
 elseif ($action == 'updateanissue'){
 	$issue = new StdClass;
+
     $issue->id = required_param('issueid', PARAM_INT);
+    $issue->issueid = $issue->id;
     $issue->status = required_param('status', PARAM_INT);
     $issue->assignedto = required_param('assignedto', PARAM_INT);
     $issue->summary = required_param('summary', PARAM_TEXT);
-    $issue->description = str_replace("'", "''", required_param('description', PARAM_CLEANHTML));
-    $issue->format = required_param('format', PARAM_INT);
+    $issue->description_editor = required_param_array('description_editor', PARAM_CLEANHTML);
+    $issue->descriptionformat = $issue->description_editor['format'];
+    $editoroptions = array('maxfiles' => 99, 'maxbytes' => $COURSE->maxbytes, 'context' => $context);
+
+    $issue->resolution_editor = required_param_array('resolution_editor', PARAM_CLEANHTML);
+    $issue->resolutionformat = $issue->resolution_editor['format'];
+    
+	$issue->description = file_save_draft_area_files($issue->description_editor['itemid'], $context->id, 'mod_tracker', 'issuedescription', $issue->id, $editoroptions, $issue->description_editor['text']);
+	$issue->resolution = file_save_draft_area_files($issue->resolution_editor['itemid'], $context->id, 'mod_tracker', 'issueresolution', $issue->id, $editoroptions, $issue->resolution_editor['text']);
+
     $issue->datereported = required_param('datereported', PARAM_INT);
-    $issue->resolution = required_param('resolution', PARAM_CLEANHTML);
-    $issue->resolutionformat = required_param('resolutionformat', PARAM_INT);
+
     $issue->trackerid = $tracker->id;
 
     // if ownership has changed, prepare logging
@@ -112,7 +94,7 @@ elseif ($action == 'updateanissue'){
     }
 
     tracker_clearelements($issue->id);    
-    tracker_recordelements($issue);
+    tracker_recordelements($issue, $issue);
     // TODO : process dependancies
     $dependancies = optional_param('dependancies', null, PARAM_INT);
     if (is_array($dependancies)){
@@ -142,7 +124,9 @@ elseif ($action == 'delete'){
     $DB->delete_records('tracker_issue', array('id' => $issueid));
     $DB->delete_records('tracker_issuedependancy', array('childid' => $issueid));
     $DB->delete_records('tracker_issuedependancy', array('parentid' => $issueid));
+    $attributeids = $DB->get_records('tracker_issueattribute', array('issueid' => $issueid), 'id', 'id,id');
     $DB->delete_records('tracker_issueattribute', array('issueid' => $issueid));
+    $commentids = $DB->get_records('tracker_issuecomment', array('issueid' => $issueid), 'id', 'id,id');
     $DB->delete_records('tracker_issuecomment', array('issueid' => $issueid));
     $DB->delete_records('tracker_issueownership', array('issueid' => $issueid));
     $DB->delete_records('tracker_state_change', array('issueid' => $issueid));
@@ -163,6 +147,24 @@ elseif ($action == 'delete'){
     // todo : send notification to all cced
 
     $DB->delete_records('tracker_issuecc', array('issueid' => $issueid));
+    
+    // clear all associated fileareas
+    
+    $fs = get_file_storage();
+    $fs->delete_area_files($context->id, 'mod_tracker', 'issuedescription', $issue->id);
+    $fs->delete_area_files($context->id, 'mod_tracker', 'issueresolution', $issue->id);
+    
+    if ($attributeids){
+    	foreach($attributeids as $attributeid => $void){
+    		$fs->delete_area_files($context->id, 'mod_tracker', 'issueattribute', $issue->id);
+    	}
+    }
+
+    if ($commentids){
+    	foreach($commentids as $commentid => $void){
+    		$fs->delete_area_files($context->id, 'mod_tracker', 'issuecomment', $commentid);
+    	}
+    }
 }
 /************************************* updating list and status *****************************/
 elseif ($action == 'updatelist'){
@@ -238,16 +240,22 @@ elseif ($action == 'updatelist'){
 	tracker_update_priority_stack($tracker);
 }
 /********************************* requires the add a comment form **************************/
+// gone away
+/*
 elseif ($action == 'addacomment'){
+	$form = new StdClass();
     $form->issueid = required_param('issueid', PARAM_INT);
     include "views/addacomment.html";
     return -1;
 }
+*/
 /***************************************** add a comment ***********************************/
+// gone away
+/*
 elseif ($action == 'doaddcomment'){
     $issueid = required_param('issueid', PARAM_INT);
     $comment = new StdClass;
-    $comment->comment = str_replace("'", "''", required_param('comment', PARAM_CLEANHTML));
+    $comment->comment = required_param('comment', PARAM_CLEANHTML);
     $comment->commentformat = required_param('commentformat', PARAM_INT);
     $comment->userid = $USER->id;
     $comment->trackerid = $tracker->id;
@@ -263,6 +271,7 @@ elseif ($action == 'doaddcomment'){
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
 	tracker_register_cc($tracker, $issue, $USER->id);
 }
+*/
 /************************************ reactivates a stored search *****************************/
 elseif($action == 'usequery'){
     $queryid = required_param('queryid', PARAM_INT);
@@ -537,5 +546,4 @@ elseif ($action == 'doaskraise'){
 
      tracker_notify_raiserequest($issue, $cm, $reason, $urgent, $tracker);
 }
-
 ?>

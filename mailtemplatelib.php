@@ -26,6 +26,7 @@ if (!function_exists('compile_mail_template')){
         global $USER;
         
         if (empty($lang)) $lang = $USER->lang; 
+        $lang = substr($lang, 0, 2); // be sure we are in moodle 2
         
         $notification = implode('', tracker_get_mail_template($template, $module, $lang));
         foreach($infomap as $aKey => $aValue){

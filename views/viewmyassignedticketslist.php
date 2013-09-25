@@ -228,13 +228,13 @@ if (!empty($issues)){
         $summary = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}\">".format_string($issue->summary).'</a>';
         $datereported = date('Y/m/d h:i', $issue->datereported);
         if (has_capability('mod/tracker:manage', $context)){ // managers can assign bugs
-            $status = choose_from_menu($STATUSKEYS, "status{$issue->id}", $issue->status, '', "document.forms['manageform'].schanged{$issue->id}.value = 1;", '', true). "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
+            $status = html_writer::select($STATUSKEYS, "status{$issue->id}", $issue->status, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")). "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
             $developers = get_users_by_capability($context, 'mod/tracker:develop', 'u.id,lastname,firstname', 'lastname');
             foreach($developers as $developer){
                 $developersmenu[$developer->id] = fullname($developer);
             }
         } elseif (has_capability('mod/tracker:resolve', $context)){ // resolvers can give a bug back to managers
-            $status = html_writer::select($STATUSKEYS, "status{$issue->id}", $issue->status, '', "document.forms['manageform'].schanged{$issue->id}.value = 1;", '', true) . "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
+            $status = html_writer::select($STATUSKEYS, "status{$issue->id}", $issue->status, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
             $managers = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,lastname,firstname', 'lastname');
             foreach($managers as $manager){
                 $managersmenu[$manager->id] = fullname($manager);
@@ -250,15 +250,15 @@ if (!empty($issues)){
         $solution = ($hassolution) ? "<img src=\"{$CFG->wwwroot}/mod/tracker/pix/solution.gif\" height=\"15\" alt=\"".get_string('hassolution','tracker')."\" />" : '' ;
         $actions = '';
         if (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context)){
-            $actions = "<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&screen=editanissue\" title=\"".get_string('update')."\" ><img src=\"{$CFG->pixpath}/t/edit.gif\" border=\"0\" /></a>";
+            $actions = "<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&screen=editanissue\" title=\"".get_string('update')."\" ><img src=\"".$OUTPUT->pix_url('/t/edit')."\" border=\"0\" /></a>";
         }
         if (has_capability('mod/tracker:manage', $context)){
-            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=delete\" title=\"".get_string('delete')."\" ><img src=\"{$CFG->pixpath}/t/delete.gif\" border=\"0\" /></a>";
+            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&what=delete\" title=\"".get_string('delete')."\" ><img src=\"".$OUTPUT->pix_url('/t/delete')."\" border=\"0\" /></a>";
         }
         // Ergo Report I3 2012 => self list displays owned tickets. Already registered
-        // $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;screen=mywatches&amp;issueid={$issue->id}&what=register\" title=\"".get_string('register', 'tracker')."\" ><img src=\"{$CFG->wwwroot}/mod/tracker/pix/register.gif\" border=\"0\" /></a>";
+        // $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;screen=mywatches&amp;issueid={$issue->id}&what=register\" title=\"".get_string('register', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('register', 'tracker')."\" border=\"0\" /></a>";
         if ($issue->resolutionpriority < $maxpriority && has_capability('mod/tracker:viewpriority', $context) && !has_capability('mod/tracker:managepriority', $context)){
-            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&amp;what=askraise\" title=\"".get_string('askraise', 'tracker')."\" ><img src=\"{$CFG->wwwroot}/mod/tracker/pix/askraise.gif\" border=\"0\" /></a>";
+            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}&amp;what=askraise\" title=\"".get_string('askraise', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('askraise', 'tracker')."\" border=\"0\" /></a>";
         }
         if (!empty($tracker->parent)){
             $transfer = ($issue->status == TRANSFERED) ? tracker_print_transfer_link($tracker, $issue) : '' ;
@@ -273,7 +273,7 @@ if (!empty($issues)){
 	echo '<br/>';
 	echo '<br/>';
 	echo '<br/>';
-    notice(get_string('notickets', 'tracker'), "view.php?id=$cm->id"); 
+    echo $OUTPUT->notification(get_string('notickets', 'tracker'), "view.php?id=$cm->id"); 
 }
 
 if (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context)){

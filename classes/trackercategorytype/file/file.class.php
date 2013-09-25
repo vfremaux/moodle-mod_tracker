@@ -13,67 +13,153 @@ include_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelem
 require_once $CFG->libdir.'/uploadlib.php';
 
 class fileelement extends trackerelement{
-	function fileelement($tracker, $id=null){
-	    $this->trackerelement($tracker, $id, null);
+
+	var $filemanageroptions;
+	
+	function __construct($tracker, $id = null, $used = false){
+		global $COURSE;
+
+	    parent::__construct($tracker, $id, $used);
+	    $this->filemanageroptions = array('subdirs' => 0, 'maxfiles' => 1, 'maxbytes' => $COURSE->maxbytes, 'accepted_types' => array('*'));
 	}
 
-	function view($editable, $issueid=0){
+	// no care of real value of element. 
+	// there is some file stored into the file area or not.
+	function view($issueid = 0){
 	    global $CFG, $COURSE, $DB;
-        $this->getvalue($issueid);
-	    if ($editable){
-	        echo "<input type=\"file\" name=\"element{$this->name}\" />";
-	        if (!empty($this->value)){
-        	    $issue = $DB->get_record('tracker_issue', array('id' => "$issueid"));
-        	    $unstampedvalue = preg_replace("/[^_]+_/", '', $this->value); // strip off the md5 stamp
+	    
+	    $elmname = 'element'.$this->name;
+	    
+	    $issue = $DB->get_record('tracker_issue', array('id' => "$issueid"));
+	    $attribute = $DB->get_record('tracker_issueattribute', array('issueid' => $issueid, 'elementid' => $this->id));
+	    
+	    if ($attribute){
+			$fs = get_file_storage();
+			
+			$imagefiles = $fs->get_area_files($this->context->id, 'mod_tracker', 'issueattribute', $attribute->id);
 
-                if ($CFG->slasharguments){
-        		    $filepath = "{$CFG->wwwroot}/file.php/{$COURSE->id}/moddata/tracker/{$issue->trackerid}/{$issue->id}/{$this->value}";
-        		} else {
-        		    $filepath = "{$CFG->wwwroot}/file.php?file=/{$COURSE->id}/moddata/tracker/{$issue->trackerid}/{$issue->id}/{$this->value}";
-        		}
-        	    if (preg_match("/\.(jpg|gif|png|jpeg)$/i", $unstampedvalue)){
-        		    echo "<img src=\"{$filepath}\" class=\"tracker_image_attachment\" />";
-        	    } else {
-        		    echo "<a href=\"{$filepath}\">{$unstampedvalue}</a>";
-        	    }
-    	        echo "<br/><input type=\"checkbox\" name=\"deleteelement{$this->name}\" value=\"1\" /> ";
-    	        print_string('deleteattachedfile', 'tracker');
+			if(empty($imagefiles)){
+				$html = html_writer::start_tag('span', array('class' => 'tracker-file-item-notice'));
+			    $html .= get_string('nofileloaded', 'tracker');
+			    $html .= html_writer::end_tag('span');
+			    return $html;
+			}
+
+			$imagefile = array_pop($imagefiles);
+		    $filename = $imagefile->get_filename();
+		    $filearea = $imagefile->get_filearea();
+		    $itemid = $imagefile->get_itemid();
+
+		    $fileurl = $CFG->wwwroot."/pluginfile.php/{$this->context->id}/mod_tracker/{$filearea}/{$itemid}/{$filename}";
+		
+    	    if (preg_match("/\.(jpg|gif|png|jpeg)$/i", $filename)){
+    		    return "<img style=\"max-width:600px\" src=\"{$fileurl}\" class=\"tracker_image_attachment\" />";
+    	    } else {
+		    	return html_writer::link($fileurl, $filename);
     	    }
+        } else {
+			$html = html_writer::start_tag('span', array('class' => 'tracker-file-item-notice'));
+		    $html .= get_string('nofileloaded', 'tracker');
+		    $html .= html_writer::end_tag('span');
+		    return $html;
+        }
+	}
+
+	function edit($issueid = 0){
+		global $COURSE, $OUTPUT, $DB, $PAGE;
+		
+		if ($attribute = $DB->get_record('tracker_issueattribute', array('elementid' => $this->id, 'issueid' => $issueid))){
+			$itemid = $attribute->id;
 		} else {
-    	    $issue = $DB->get_record('tracker_issue', array('id' => "$issueid"));
-    	    if ($issue){
-    		    if (!empty($this->value)){
-					$fs = get_file_storage();
-					
-					$context = context_module::instance($issue->trackerid);
+			$itemid = 0;
+		}
 
-					// Prepare file record object
-					$fileinfo = array(
-					    'component' => 'mod_tracker',     // usually = table name
-					    'filearea' => 'attachment',     // usually = table name
-					    'itemid' => $issue->id,               // usually = ID of row in table
-					    'contextid' => $context->id, // ID of context
-					    'filepath' => '/',           // any path beginning and ending in /
-					    'filename' => $this->value); // any filename
-					 
-					// Get file
-					$file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'],
-					                      $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename']);
+		$draftitemid = 0; // drafitemid will be filled when preparing new area.
+	    file_prepare_draft_area($draftitemid, $this->context->id, 'mod_tracker', 'issueattribute', $itemid, $this->filemanageroptions);
+		
+		$options = new StdClass();
+		$options->accepted_types = $this->filemanageroptions['accepted_types'];
+        $options->itemid = $draftitemid;
+        $options->maxbytes = $this->filemanageroptions['maxbytes'];
+        $options->maxfiles = $this->filemanageroptions['maxfiles'];
+        $options->elementname = 'element'.$this->name;
 
-					$url = "{$CFG->wwwroot}/pluginfile.php/{$file->get_contextid()}/mod_tracker/attachment}";
-				    $filename = $file->get_filename();
-				    $fileurl = $url.$file->get_filepath().$file->get_itemid().'/'.$filename;
+		$fp = new file_picker($options);
+		
+		$html = $OUTPUT->render($fp);
+        $html .= '<input type="hidden" name="element'.$this->name.'" id="id_'.$this->name.'" value="'.$draftitemid.'" class="filepickerhidden"/>';
 
-            	    if (preg_match("/\.(jpg|gif|png|jpeg)$/i", $this->value)){
-            		    echo "<img src=\"{$fileurl}\" class=\"tracker_image_attachment\" />";
-            	    } else {
-				    	echo html_writer::link($fileurl, $filename);
-            	    }
-            	} else {
-            	    print_string('nofile', 'tracker');
-            	}
-            }
-	    }   
+        $module = array('name'=>'form_filepicker', 'fullpath'=>'/lib/form/filepicker.js', 'requires' => array('core_filepicker', 'node', 'node-event-simulate', 'core_dndupload'));
+        $PAGE->requires->js_init_call('M.form_filepicker.init', array($fp->options), true, $module);
+
+        $nonjsfilepicker = new moodle_url('/repository/draftfiles_manager.php', array(
+            'env' => 'filepicker',
+            'action' => 'browse',
+            'itemid' => $draftitemid,
+            'subdirs' => 0,
+            'maxbytes' => $this->filemanageroptions->maxbytes,
+            'maxfiles' => 1,
+            'ctx_id' => $this->context->id,
+            'course' => $PAGE->course->id,
+            'sesskey' => sesskey(),
+            ));
+
+        // non js file picker
+        $html .= '<noscript>';
+        $html .= "<div><object type='text/html' data='$nonjsfilepicker' height='160' width='600' style='border:1px solid #000'></object></div>";
+        $html .= '</noscript>';
+        
+        echo $html;
+	}
+	
+	function add_form_element(&$form){
+		global $COURSE;
+		
+		$form->addElement('header', "head{$this->name}", $this->description);
+		$form->addElement('filepicker', 'element'.$this->name, '', null, $this->options);
+	}
+	
+	function set_data($defaults){
+		global $COURSE;
+		
+		$elmname = 'element'.$this->name;
+		$draftitemid = file_get_submitted_draft_itemid($elmname);
+		$maxbytes = $COURSE->maxbytes;
+		file_prepare_draft_area($draftitemid, $this->context->id, 'mod_tracker', 'issueattribute', $this->id, $this->filemanageroptions);
+		$defaults->$elmname = $draftitemid;
+	}
+
+	/**
+	* used for post processing form values, or attached files management
+	*/
+	function formprocess(&$data){
+		global $COURSE, $USER, $DB;
+		
+		if (!$attribute = $DB->get_record('tracker_issueattribute', array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid))){
+			$attribute = new StdClass();
+			$attribute->trackerid = $data->trackerid;
+			$attribute->issueid = $data->issueid;
+			$attribute->elementid = $this->id;
+		}
+				
+		$attribute->elementitemid = ''; // value is meaning less. we jsut need the attribute record as storage itemid
+		$attribute->timemodified = time();
+
+		if (!isset($attribute->id)){
+			$attribute->id = $DB->insert_record('tracker_issueattribute', $attribute);
+			if (empty($attribute->id)){
+				print_error('erroraddissueattribute', 'tracker', '', 2);
+			}
+		} else {
+			$DB->update_record('tracker_issueattribute', $attribute);
+		}
+		
+		$elmname = 'element'.$this->name;
+		$data->$elmname = optional_param($elmname, 0, PARAM_INT);
+
+		if ($data->$elmname){
+			file_save_draft_area_files($data->$elmname, $this->context->id, 'mod_tracker', 'issueattribute', 0 + $attribute->id, $this->filemanageroptions);
+		}
 	}
 }
 ?>

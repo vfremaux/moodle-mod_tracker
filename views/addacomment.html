@@ -22,6 +22,7 @@ $issue = $DB->get_record('tracker_issue', array('id' => $form->issueid));
 <!-- Print Comment Form -->
 <form name="commentform" action="view.php" method="post">
 	<input type="hidden" name="what" value="doaddcomment">
+	<input type="hidden" name="view" value="view">
 	<input type="hidden" name="screen" value="viewanissue">
 	<input type="hidden" name="issueid" value="<?php p($form->issueid) ?>">
 	<input type="hidden" name="id" value="<?php p($cm->id) ?>">

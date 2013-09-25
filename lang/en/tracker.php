@@ -191,27 +191,11 @@ $string['me'] = 'My profile';
 $string['mode_bugtracker'] = 'Team bug tracker';
 $string['mode_ticketting'] = 'User support ticketting';
 $string['modulename'] = 'User support - Tracker';
+$string['nofileloaded'] = 'No file loaded here.';
 $string['options'] = 'Options';
 $string['print'] = 'Print';
 $string['reports'] = 'Reports';
 $string['resolvedplural'] = 'Resolved';
-$string['modulename_help'] = 'The Tracker activity allows tracking tickets for help, bug report, or also trackable activities in a course.
-
-The activity allows creating the tracking form with attributes elements from a list of configurable elements. Some elements can be shared at site
-level to be reused in other trackers.
-
-the ticket (or task) can be assigned for work to another user.
-
-The tracked ticket is a statefull ticket that sends state change notifications to any follower that has enabled notifications. A user can choose which state changes he tracks usually.
-
-Tickets can be chained in dependancy, so it may be easy to follow a cause/consequence ticket sequence.
-
-History of changes are tracked for each ticket.
-
-Ticket tracker can be cascaded locally or through MNET allowing a ticket manager to send a ticket to a remote (higher level) ticket collector.
-
-Trackers can now be chained so that ticket can be moved between trackers. 
-';
 $string['modulenameplural'] = 'User support - trackers';
 $string['month'] = 'Month';
 $string['myassignees'] = 'Resolver I assigned';
@@ -290,6 +274,8 @@ $string['saveasquery'] = 'Save a query';
 $string['savequery'] = 'Save the query';
 $string['search'] = 'Search';
 $string['searchresults'] = 'Search results';
+$string['searchbyid'] = 'Search by ID';
+$string['searchcriteria'] = 'Search criteria';
 $string['searchwiththat'] = 'Launch this query again';
 $string['selectparent'] = 'Parent selection';
 $string['sendrequest'] = 'Send request';
@@ -312,7 +298,7 @@ $string['solution'] = 'Solution';
 $string['sortorder'] = 'Order';
 $string['standalone'] = 'Standalone tracker (top level support).';
 $string['status'] = 'Status';
-$string['submission'] = 'A new ticket is reported in tracker [{$a]}';
+$string['submission'] = 'A new ticket is reported in tracker [{$a}]';
 $string['submitbug'] = 'Submit the ticket';
 $string['subtrackers'] = 'Subtrackers';
 $string['sum_opened'] = 'Opened';
@@ -325,7 +311,8 @@ $string['supportmode_help'] = 'Support mode has effect on who have access to whi
 $string['testing'] = 'Being tested';
 $string['text'] = 'Textfield'; // @DYNA
 $string['textarea'] = 'Textarea'; // @DYNA
-$string['thanks'] = 'Thanks to contributing to the constant enhancement of this service.';
+$string['thanksdefault'] = 'Thanks to contributing to the constant enhancement of this service.';
+$string['thanksmessage'] = 'Thanks message.';
 $string['ticketprefix'] = 'Ticket prefix';
 $string['tickets'] = 'Tickets';
 $string['tracker-levelaccess'] = 'My capabilities in this tracker';
@@ -369,6 +356,24 @@ $string['youneedanaccount'] = 'You need an authorized account here to report a t
 $string['statehistory'] = 'States';
 
 // help strings
+
+$string['modulename_help'] = 'The Tracker activity allows tracking tickets for help, bug report, or also trackable activities in a course.
+
+The activity allows creating the tracking form with attributes elements from a list of configurable elements. Some elements can be shared at site
+level to be reused in other trackers.
+
+the ticket (or task) can be assigned for work to another user.
+
+The tracked ticket is a statefull ticket that sends state change notifications to any follower that has enabled notifications. A user can choose which state changes he tracks usually.
+
+Tickets can be chained in dependancy, so it may be easy to follow a cause/consequence ticket sequence.
+
+History of changes are tracked for each ticket.
+
+Ticket tracker can be cascaded locally or through MNET allowing a ticket manager to send a ticket to a remote (higher level) ticket collector.
+
+Trackers can now be chained so that ticket can be moved between trackers. 
+';
 
 $string['elements_help'] = '<p>
 Issue submission form can be customized by adding form elements. The "summary", "description", et "reportedby" fields are as default, but any additional qualifier can be added to the issue description.

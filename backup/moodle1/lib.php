@@ -61,6 +61,10 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
                         'description' => 'intro',
                         'format' => 'introformat',
                     ),
+                    'newfields' => array(
+                        'enabledstates' => 511,
+                        'thanksmessage' => '',
+                    ),
                 )
             ),
             new convert_path(

@@ -15,7 +15,9 @@ if (!defined('MOODLE_INTERNAL')) {
 
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID, or
 $a  = optional_param('a', 0, PARAM_INT);  // course ID	
+
 $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'description');
+
 ?>
 <form name="addelement" method="post" action="view.php">
 <table border="0" width="100%">
@@ -25,6 +27,7 @@ $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'description');
 		</td>
 		<td valign="top">
 				<?php
+					echo "<input type=\"hidden\" name=\"view\" value=\"admin\" />";
 					echo "<input type=\"hidden\" name=\"id\" value=\"{$cm->id}\" />";
 					echo "<input type=\"hidden\" name=\"what\" value=\"createelement\" />";
 		            $types = tracker_getelementtypes();
@@ -42,7 +45,9 @@ $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'description');
 <?php
 $OUTPUT->box_end(); 
 $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'description');
+
 tracker_loadelements($tracker, $elements);	
+
 echo $OUTPUT->heading(get_string('elements', 'tracker'));
 
 $localstr = get_string('local', 'tracker');
@@ -75,10 +80,10 @@ if (!empty($elements)){
 		if ($element->hasoptions() && empty($element->options)){
 		    $name .= ' <span class="error">('.get_string('nooptions', 'tracker').')</span>';
 		}
-		$actions = "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=addelement&amp;elementid={$element->id}\" title=\"".get_string('addtothetracker', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('t/moveleft', 'core') ."\" /></a>";
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=viewelementoptions&amp;elementid={$element->id}\" title=\"".get_string('editoptions', 'tracker')."\"><img src=\"".$OUTPUT->pix_url('editoptions', 'mod_tracker')."\" /></a>";
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=editelement&amp;elementid={$element->id}\" title=\"".get_string('editproperties', 'tracker')."\"><img src=\"".$OUTPUT->pix_url('t/edit', 'core') ."\" /></a>";
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;what=deleteelement&amp;elementid={$element->id}\" title=\"".get_string('delete')."\"><img src=\"".$OUTPUT->pix_url('t/delete', 'core') ."\" /></a>";
+		$actions = "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=addelement&amp;elementid={$element->id}\" title=\"".get_string('addtothetracker', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('t/moveleft', 'core') ."\" /></a>";
+        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=viewelementoptions&amp;elementid={$element->id}\" title=\"".get_string('editoptions', 'tracker')."\"><img src=\"".$OUTPUT->pix_url('editoptions', 'mod_tracker')."\" /></a>";
+        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=editelement&amp;elementid={$element->id}\" title=\"".get_string('editproperties', 'tracker')."\"><img src=\"".$OUTPUT->pix_url('t/edit', 'core') ."\" /></a>";
+        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=deleteelement&amp;elementid={$element->id}\" title=\"".get_string('delete')."\"><img src=\"".$OUTPUT->pix_url('t/delete', 'core') ."\" /></a>";
 
         $local = '';
         if ($element->course == $COURSE->id){

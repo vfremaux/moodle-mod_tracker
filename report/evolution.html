@@ -24,6 +24,7 @@ if (!empty($ticketsbymonth)){
 		$lowest = $availdates[0];
 		
 		$highest = $availdates[count($availdates) - 1];
+		$low = new StdClass();
 		list($low->year, $low->month) = split('-', $lowest);
 	}
 	

@@ -171,7 +171,7 @@
     width: 5%;
 }
 
-.tracker_image_attachment{
+.tracker-image-attachment{
      max-width:570px;
 }
 
@@ -210,7 +210,11 @@
 	border:1px #808080 solid
 }
 
-.tracker-issue td{
+.tracker-issue-editor {
+	width:100%;
+}
+
+.tracker-issue-editor td{
 	border:1px solid #D0D0D0;
 }
 
@@ -219,8 +223,26 @@
 	border:1px solid #F0F0F0;
 }
 
+.tracker-issue-summary{
+	background-color:#fcfcfc;
+	border:1px solid #f0f0f0;
+	font-size:1.9em;
+	padding:5px;
+}
+
 .tracker-issue-description{
 	background-color:#F0F0F0;
 	border:1px solid #D0D0D0;
 	padding:5px;
+}
+
+.tracker-file-item-notice{
+	font-style:italic;
+}
+
+#tracker-acknowledge{
+	margin:50px;
+	border:1px #c0c0c0 solid;
+	padding:30px;
+	font-size:1.2em;
 }

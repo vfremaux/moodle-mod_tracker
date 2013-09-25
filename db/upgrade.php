@@ -193,34 +193,71 @@ function xmldb_tracker_upgrade($oldversion=0) {
     }
 
 	// Moodle 2.x break line : All new changes to Moodle 1.9 version should remain under this timestamp.     
-
-	if ($oldversion < 2012101700){
-
-        // Rename description field to intro, and define field introformat to be added to tracker
-        $table = new xmldb_table('tracker');
-        $introfield = new xmldb_field('description', XMLDB_TYPE_TEXT, 'small', null, XMLDB_NOTNULL, null, null, 'name');
-        if ($dbman->field_exists($table, $introfield)){
-	        $dbman->rename_field($table, $introfield, 'intro', false);
-	        
-	        $formatfield = new xmldb_field('format', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'intro');
-	        $dbman->rename_field($table, $introfield, 'introformat', false);
-	    }
 	
-        // conditionally migrate to html format in intro
-        if ($CFG->texteditors !== 'textarea') {
-            $rs = $DB->get_recordset('tracker', array('introformat' => FORMAT_MOODLE),'', 'id, intro, introformat');
-            foreach ($rs as $q) {
-                $q->intro       = text_to_html($q->intro, false, false, true);
-                $q->introformat = FORMAT_HTML;
-                $DB->update_record('tracker', $q);
-                upgrade_set_timeout();
-            }
-            $rs->close();
-        }
-        upgrade_mod_savepoint(true, 2012101700, 'tracker');
+	// Unconditionnally perform Moodle 1.9 => Moodle 2 if necessary for every upgrade.
+
+    // Rename description field to intro, and define field introformat to be added to tracker
+    $table = new xmldb_table('tracker');
+    $introfield = new xmldb_field('description', XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'name');
+    if ($dbman->field_exists($table, $introfield)){
+        $dbman->rename_field($table, $introfield, 'intro', false);
+        
+        $formatfield = new xmldb_field('format', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'intro');
+        $dbman->rename_field($table, $formatfield, 'introformat', false);
     }
+	
+    // conditionally migrate to html format in intro
+    /*
+    // weird column text compare error....
+    if ($CFG->texteditors !== 'textarea') {
+        if ($trackers = $DB->get_records('tracker', array('introformat' => FORMAT_MOODLE),'', 'id, intro, introformat')){
+	        foreach ($trackers as $t) {
+	            $t->intro       = text_to_html($t->intro, false, false, true);
+	            $t->introformat = FORMAT_HTML;
+	            $DB->update_record('tracker', $t);
+	            upgrade_set_timeout();
+	        }
+	    }
+    }
+    */
 
 	// Moodle 2.x      
+
+	if ($result && $oldversion < 2013092200) {
+
+    /// Define field subtrackers to be added to tracker
+		$table = new xmldb_table('tracker_issue');
+		$field = new xmldb_field('format', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'description');
+		if ($dbman->field_exists($table, $field)){
+			$dbman->rename_field($table, $field, 'descriptionformat', false);
+		}
+        /// tracker savepoint reached
+        upgrade_mod_savepoint(true, 2013092200, 'tracker');
+	}
+
+	if ($result && $oldversion < 2013092300) {
+
+    /// Define field subtrackers to be added to tracker
+		$table = new xmldb_table('tracker');
+		$field = new xmldb_field('enabledstates', XMLDB_TYPE_INTEGER, '6', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '511', 'subtrackers');
+		if (!$dbman->field_exists($table, $field)){
+			$dbman->add_field($table, $field);
+		}
+        /// tracker savepoint reached
+        upgrade_mod_savepoint(true, 2013092300, 'tracker');
+	}
+
+	if ($result && $oldversion < 2013092400) {
+
+    /// Define field subtrackers to be added to tracker
+		$table = new xmldb_table('tracker');
+		$field = new xmldb_field('thanksmessage', XMLDB_TYPE_TEXT, 'small', null, null, null, null, 'enabledstates');
+		if (!$dbman->field_exists($table, $field)){
+			$dbman->add_field($table, $field);
+		}
+        /// tracker savepoint reached
+        upgrade_mod_savepoint(true, 2013092400, 'tracker');
+	}
     
     return $result;
 }
