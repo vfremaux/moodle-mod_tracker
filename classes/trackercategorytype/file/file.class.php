@@ -97,7 +97,7 @@ class fileelement extends trackerelement{
             'action' => 'browse',
             'itemid' => $draftitemid,
             'subdirs' => 0,
-            'maxbytes' => $this->filemanageroptions->maxbytes,
+            'maxbytes' => $this->filemanageroptions['maxbytes'],
             'maxfiles' => 1,
             'ctx_id' => $this->context->id,
             'course' => $PAGE->course->id,

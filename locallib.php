@@ -950,7 +950,7 @@ function tracker_clearelements($issueid, $withfiles = false){
     
 	$attributeids = $DB->get_records('tracker_issueattribute', array('issueid' => $issueid), 'id', 'id,id');
 
-    if (!$DB->delete_records_select('tracker_issueattribute', array('issueid' => $issueid))){
+    if (!$DB->delete_records('tracker_issueattribute', array('issueid' => $issueid))){
         print_error('errorcannotlearelementsforissue', 'tracker', $issueid);
     }
     

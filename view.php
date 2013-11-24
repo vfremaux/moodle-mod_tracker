@@ -52,6 +52,7 @@
 	}
 
 	$url = $CFG->wwwroot.'/mod/tracker/view.php?id='.$cm->id;
+	$self = $url.'&amp;view='.$view.'&amp;screen='.$screen;
 	
 	// redirect (before outputting) traps
 	if ($view == "view" && (empty($screen) || $screen == 'viewanissue' || $screen == 'editanissue') && empty($issueid)){

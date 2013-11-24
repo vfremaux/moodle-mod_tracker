@@ -57,6 +57,7 @@ class radioelement extends trackerelement{
 			$form->addElement('header', "head{$this->name}", $this->description);
 			foreach ($this->options as $option){
 				$form->addElement('radio', 'element'.$this->name, $option->description, '', $option->name);
+				$form->setType('element'.$this->name, PARAM_TEXT);
 			}
 		}
 	}

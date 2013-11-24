@@ -59,6 +59,7 @@ class radiohorizelement extends trackerelement{
 			$form->addElement('header', "head{$this->name}", $this->description);
 			foreach ($this->options as $option){
 				$group[] = &$form->createElement('radio', 'element'.$this->name, '', $option->description, $option->name);
+				$form->setType('element'.$this->name, PARAM_TEXT);
 			}
 			
 			$form->addGroup($group, 'element' . $this->name.'_set', '', false);
