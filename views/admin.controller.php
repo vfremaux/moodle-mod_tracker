@@ -279,6 +279,7 @@ if ($action == 'editelementoption'){
 }
 /************************************* edit an element option *****************************/
 if ($action == 'updateelementoption'){
+	$form = new Stdclass();
 	$form->elementid = required_param('elementid', PARAM_INT);
 	$form->optionid = required_param('optionid', PARAM_INT);
 	$form->name = required_param('name', PARAM_ALPHANUM);

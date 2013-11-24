@@ -55,7 +55,8 @@ class checkboxhorizelement extends trackerelement{
 			$group = array();
 			$form->addElement('header', "head{$this->name}", $this->description);
 			foreach ($this->options as $option){
-				$group[] = &$form->createElement('checkbox', 'element' . $this->name . '[]', '', $option->description);
+				$group[] = &$form->createElement('checkbox', "element{$this->name}{$option->id}", '', $option->description);
+				$form->setType("element{$this->name}{$option->id}", PARAM_TEXT);
 			}
 			
 			$form->addGroup($group, 'element' . $this->name.'_set');

@@ -28,9 +28,11 @@ class TrackerIssueForm extends moodleform{
 		$mform = $this->_form;
 
 		$mform->addElement('hidden', 'id', $this->_customdata['cmid']);
+		$mform->setType('id', PARAM_INT);
 		$mform->addElement('hidden', 'trackerid', $trackerid);
+		$mform->setType('trackerid', PARAM_INT);
 		
-		$mform->addElement('text', 'summary', get_string('summary', 'tracker'));
+		$mform->addElement('text', 'summary', get_string('summary', 'tracker'), array('size' => 80));
 		$mform->setType('summary', PARAM_TEXT);
 	  	$mform->addRule('summary', null, 'required', null, 'client');
 		

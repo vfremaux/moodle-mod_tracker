@@ -10,6 +10,7 @@
 */
 
 include_once('classes/trackercategorytype/trackerelement.class.php');
+require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 
 /**
  * List of features supported in tracker module
@@ -169,6 +170,90 @@ function tracker_print_recent_activity($course, $isteacher, $timestart) {
     }
     
     return false;  //  True if anything was printed, otherwise false 
+}
+
+/**
+ * Print an overview of all trackers
+ * for the courses.
+ *
+ * @param mixed $courses The list of courses to print the overview for
+ * @param array $htmlarray The array of html to return
+ */
+function tracker_print_overview($courses, &$htmlarray) {
+    global $USER, $CFG, $DB;
+    
+    if (empty($courses) || !is_array($courses) || count($courses) == 0) {
+        return array();
+    }
+
+    if (!$trackers = get_all_instances_in_courses('tracker', $courses)) {
+        return;
+    }
+
+    $strtracker = get_string('modulename', 'tracker');
+
+	foreach($trackers as $tracker){
+
+        $context = context_module::instance($tracker->coursemodule);
+
+		$yours = null;
+        if (has_capability('mod/tracker:develop', $context)) {
+
+            // count how many assigned
+            $sql = "
+            	SELECT DISTINCT
+            		i.id, i.id
+            	FROM
+            		{tracker_issue} i
+            	LEFT JOIN
+            		{tracker_issueownership} io
+            	ON
+            		io.issueid = i.id
+            	WHERE
+            		i.trackerid = ? AND
+            		assignedto = ? AND
+            		(status = ".POSTED." OR
+            		status = ".OPEN." OR
+            		status = ".RESOLVING.") AND
+            		io.id IS NULL
+            ";
+            $yours = $DB->get_records_sql($sql, array($tracker->id, $USER->id));
+		}
+
+		$unassigned = null;
+        if (has_capability('mod/tracker:manage', $context)) {
+
+            // count how many unassigned
+            $unassigned = $DB->get_records('tracker_issue', array('trackerid' => $tracker->id, 'assignedto' => 0, 'status' => POSTED));
+		}
+		
+		if (!$yours && !$unassigned) continue;
+
+        $str = '<div class="tracker overview">';
+        $str .= '<div class="name">'.$strtracker. ': '.
+               '<a '.($tracker->visible ? '':' class="dimmed"').
+               'title="'.$strtracker.'" href="'.$CFG->wwwroot.
+               '/mod/tracker/view.php?id='.$tracker->coursemodule.'">'.
+               format_string($tracker->name).'</a></div>';
+
+        if ($yours) {
+            $link = new moodle_url('/mod/tracker/view.php', array('id' => $tracker->coursemodule, 'view' => 'view', 'screen' => 'mywork'));
+            $str .= '<div class="details"><a href="'.$link.'">'.get_string('issuestowatch', 'tracker', count($yours)).'</a></div>';
+        }
+
+        if ($unassigned) {
+            $link = new moodle_url('/mod/tracker/view.php', array('id' => $tracker->coursemodule, 'view' => 'view', 'screen' => 'mywork'));
+            $str .= '<div class="details"><a href="'.$link.'">'.get_string('issuestoassign', 'tracker', count($unassigned)).'</a></div>';
+        }
+
+    	$str .= '</div>';
+
+	    if (empty($htmlarray[$tracker->course]['tracker'])) {
+	        $htmlarray[$tracker->course]['tracker'] = $str;
+	    } else {
+	        $htmlarray[$tracker->course]['tracker'] .= $str;
+	    }
+	}
 }
 
 /**

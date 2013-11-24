@@ -19,8 +19,8 @@
         <FIELD NAME="parent" TYPE="char" LENGTH="80" NOTNULL="false" SEQUENCE="false" PREVIOUS="timemodified" NEXT="supportmode"/>
         <FIELD NAME="supportmode" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="bugtracker" SEQUENCE="false" PREVIOUS="parent" NEXT="defaultassignee"/>
         <FIELD NAME="defaultassignee" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="supportmode" NEXT="subtrackers" />
-        <FIELD NAME="subtrackers" TYPE="char" LENGTH="100" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="defaultassignee" />
-        <FIELD NAME="enabledstates" TYPE="int" LENGTH="6" NOTNULL="true" DEFAULT="511" SEQUENCE="false" PREVIOUS="thanksmessage" />
+        <FIELD NAME="subtrackers" TYPE="char" LENGTH="100" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="defaultassignee" NEXT="enabledstates" />
+        <FIELD NAME="enabledstates" TYPE="int" LENGTH="6" NOTNULL="true" DEFAULT="511" SEQUENCE="false" PREVIOUS="subtrackers" NEXT="thanksmessage" />
         <FIELD NAME="thanksmessage" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="enabledstates" />
       </FIELDS>
       <KEYS>
@@ -75,7 +75,7 @@
         <FIELD NAME="datereported" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="descriptionformat" NEXT="reportedby"/>
         <FIELD NAME="reportedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="datereported" NEXT="status"/>
         <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="reportedby" NEXT="assignedto"/>
-        <FIELD NAME="assignedto" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="status" NEXT="bywhomid"/>
+        <FIELD NAME="assignedto" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" DEFAULT="0" PREVIOUS="status" NEXT="bywhomid"/>
         <FIELD NAME="bywhomid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="assignedto" NEXT="timeassigned"/>
         <FIELD NAME="timeassigned" TYPE="int" LENGTH="11" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="bywhomid" NEXT="resolution"/>
         <FIELD NAME="resolution" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="timeassigned" NEXT="resolutionformat"/>
