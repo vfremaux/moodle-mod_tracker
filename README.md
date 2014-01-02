@@ -40,3 +40,20 @@ It provides a complete ticket tracking activity with following features :
 - Notification service (parametric)
 - Full backup/restore implementation
 - Tracking activity reports
+
+Release note : 2012101700
+===========================
+Fix backup restore inconsistancies
+Add VALIDATED status
+
+Release note : 2014010100
+===========================
+Adds a full preset system to choose major tracker usecase that setup state list, thanks message and role overrides for the module :
+- Bug tracker
+- User support
+- Task Distribution
+- Fully customizable states and thanks message
+
+Adds a strict workflow control for internal roles
+
+Cleans mod_form with advanced params.
