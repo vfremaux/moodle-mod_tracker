@@ -42,18 +42,26 @@ define('ENABLED_VALIDATED', 512);
 define('ENABLED_ALL', 1023);
 
 // major roles against status keys
-if ($tracker->supportmode == 'bugtracker'){
-	define('ROLE_REPORT', ENABLED_POSTED | ENABLED_VALIDATED);
-} else {
-	define('ROLE_REPORT', ENABLED_POSTED | ENABLED_RESOLVED| ENABLED_VALIDATED);
+function shop_get_role_definition(&$tracker, $role){
+	if ($role == 'report'){
+		if ($tracker->supportmode == 'bugtracker'){
+			return ENABLED_POSTED | ENABLED_VALIDATED;
+		} else {
+			return ENABLED_POSTED | ENABLED_RESOLVED| ENABLED_VALIDATED;
+		}
+	} elseif ($role == 'develop') {
+		if ($tracker->supportmode == 'bugtracker'){
+			return ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED | ENABLED_VALIDATED;
+		} else {
+			return ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED;
+		}
+	} elseif ($role == 'resolve'){	
+		return ENABLED_RESOLVED | ENABLED_VALIDATED | ENABLED_ABANDONNED | ENABLED_TRANSFERED;
+	} elseif ($role == 'manage'){	
+		return ENABLED_POSTED | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED | ENABLED_VALIDATED;
+	}
+	return 0;
 }
-if ($tracker->supportmode == 'bugtracker'){
-	define('ROLE_DEVELOP', ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED | ENABLED_VALIDATED);
-} else {
-	define('ROLE_DEVELOP', ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED);
-}
-define('ROLE_RESOLVE', ENABLED_RESOLVED | ENABLED_VALIDATED | ENABLED_ABANDONNED | ENABLED_TRANSFERED);
-define('ROLE_MANAGE', ENABLED_POSTED | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED | ENABLED_VALIDATED);
 
 // states && eventmasks
 define('EVENT_POSTED', 1);
@@ -2153,39 +2161,43 @@ function tracker_get_statuskeys($tracker, $cm = null){
 			$STATUSKEYS = array();
 
 			if (has_capability('mod/tracker:report', $context)){
+				$roledef = shop_get_role_definition($tracker, 'report');
 				foreach($FULLSTATUSKEYS as $key => $label){
 					$eventkey = pow(2,$key);
-					if ($eventkey & ROLE_REPORT){
+					if ($eventkey & $roledef){
 						$STATUSKEYS[$key] = $label;
 					}
 				}
 			}
 			if (has_capability('mod/tracker:develop', $context)){
+				$roledef = shop_get_role_definition($tracker, 'develop');
 				foreach($FULLSTATUSKEYS as $key => $label){
 					$eventkey = pow(2,$key);
-					if ($eventkey & ROLE_DEVELOP){
+					if ($eventkey & $roledef){
 						$STATUSKEYS[$key] = $label;
 					}
 				}
 			}
 			if (has_capability('mod/tracker:resolve', $context)){
+				$roledef = shop_get_role_definition($tracker, 'resolve');
 				foreach($FULLSTATUSKEYS as $key => $label){
 					$eventkey = pow(2,$key);
-					if ($eventkey & ROLE_RESOLVE){
+					if ($eventkey & $roledef){
 						$STATUSKEYS[$key] = $label;
 					}
 				}
 			}
 			if (has_capability('mod/tracker:manage', $context)){
+				$roledef = shop_get_role_definition($tracker, 'manage');
 				foreach($FULLSTATUSKEYS as $key => $label){
 					$eventkey = pow(2,$key);
-					if ($eventkey & ROLE_MANAGE){
+					if ($eventkey & $roledef){
 						$STATUSKEYS[$key] = $label;
 					}
 				}
 			}
 		} else {
-			echo "using cache";
+			// echo "using cache";
 		}
 		return $STATUSKEYS;
 	}

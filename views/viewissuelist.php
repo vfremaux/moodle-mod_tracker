@@ -252,7 +252,7 @@ if (!empty($issues)){
                 $managersmenu[$manager->id] = fullname($manager);
             }
             $managersmenu[$USER->id] = fullname($USER);
-            $assignedto = html_writer($developersmenu, "assignedto{$issue->id}", $issue->assignedto, array('' => get_string('unassigned', 'tracker')), array('onchange' => "document.forms['manageform'].changed{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"changed{$issue->id}\" value=\"0\" />";
+            $assignedto = html_writer::select($developersmenu, "assignedto{$issue->id}", $issue->assignedto, array('' => get_string('unassigned', 'tracker')), array('onchange' => "document.forms['manageform'].changed{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"changed{$issue->id}\" value=\"0\" />";
         } else {
             $status = $FULLSTATUSKEYS[0 + $issue->status]; 
             $assignedto = fullname($user);
