@@ -239,7 +239,7 @@ function xmldb_tracker_upgrade($oldversion=0) {
 
     /// Define field subtrackers to be added to tracker
 		$table = new xmldb_table('tracker');
-		$field = new xmldb_field('enabledstates', XMLDB_TYPE_INTEGER, '6', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '511', 'subtrackers');
+		$field = new xmldb_field('enabledstates', XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '511', 'subtrackers');
 		if (!$dbman->field_exists($table, $field)){
 			$dbman->add_field($table, $field);
 		}
@@ -257,6 +257,25 @@ function xmldb_tracker_upgrade($oldversion=0) {
 		}
         /// tracker savepoint reached
         upgrade_mod_savepoint(true, 2013092400, 'tracker');
+	}
+    
+	if ($result && $oldversion < 2014010100) {
+
+    /// Define field strictworkflow to be added to tracker
+		$table = new xmldb_table('tracker');
+		$field = new xmldb_field('strictworkflow', XMLDB_TYPE_INTEGER, 1, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'thanksmessage');
+		if (!$dbman->field_exists($table, $field)){
+			$dbman->add_field($table, $field);
+		}
+
+		// We shifted mask values one factor above.        
+        $sql = "
+        	UPDATE {tracker_preferences} SET value = value * 2 WHERE name = 'eventmask'
+        ";
+        $DB->execute($sql);
+
+        /// tracker savepoint reached
+        upgrade_mod_savepoint(true, 2014010100, 'tracker');
 	}
     
     return $result;

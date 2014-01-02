@@ -1,23 +1,38 @@
 <?php
 
-	if ($tracker->supportmode == 'bugtracker'){
-		$totalissues = $DB->count_records_select('tracker_issue', "trackerid = ? AND status <> ".RESOLVED." AND status <> ".ABANDONNED, array($tracker->id));
-		$totalresolvedissues = $DB->count_records_select('tracker_issue', "trackerid = ? AND (status = ".RESOLVED." OR status = ".ABANDONNED.")", array($tracker->id));
-	} else {
+	if ($screen == 'mytickets'){
 		$totalissues = $DB->count_records_select('tracker_issue', "trackerid = ? AND status <> ".RESOLVED." AND status <> ".ABANDONNED." AND reportedby = ? ", array($tracker->id, $USER->id));
 		$totalresolvedissues = $DB->count_records_select('tracker_issue', "trackerid = ? AND (status = ".RESOLVED." OR status = ".ABANDONNED.") AND reportedby = ? ", array($tracker->id, $USER->id));
+	} elseif ($screen == 'mywork'){
+		$totalissues = $DB->count_records_select('tracker_issue', "trackerid = ? AND status <> ".RESOLVED." AND status <> ".ABANDONNED." AND assignedto = ? ", array($tracker->id, $USER->id));
+		$totalresolvedissues = $DB->count_records_select('tracker_issue', "trackerid = ? AND (status = ".RESOLVED." OR status = ".ABANDONNED.") AND assignedto = ? ", array($tracker->id, $USER->id));
+	} else {
+		$totalissues = $DB->count_records_select('tracker_issue', "trackerid = ? AND status <> ".RESOLVED." AND status <> ".ABANDONNED, array($tracker->id));
+		$totalresolvedissues = $DB->count_records_select('tracker_issue', "trackerid = ? AND (status = ".RESOLVED." OR status = ".ABANDONNED.")", array($tracker->id));
 	}
+
 	/// Print tabs with options for user
-	$rows[0][] = new tabobject('reportanissue', "reportissue.php?id={$cm->id}", get_string('newissue', 'tracker'));
+	if (has_capability('mod/tracker:report', $context)){
+		$rows[0][] = new tabobject('reportanissue', "reportissue.php?id={$cm->id}", get_string('newissue', 'tracker'));
+	}
+
 	$rows[0][] = new tabobject('view', "view.php?id={$cm->id}&amp;view=view", get_string('view', 'tracker').' ('.$totalissues.' '.get_string('issues','tracker').')');
+
 	$rows[0][] = new tabobject('resolved', "view.php?id={$cm->id}&amp;view=resolved", get_string('resolvedplural', 'tracker').' ('.$totalresolvedissues.' '.get_string('issues','tracker').')');
+
 	$rows[0][] = new tabobject('profile', "view.php?id={$cm->id}&amp;view=profile", get_string('profile', 'tracker'));
+
 	if (has_capability('mod/tracker:viewreports', $context)){
 		$rows[0][] = new tabobject('reports', "view.php?id={$cm->id}&amp;view=reports", get_string('reports', 'tracker'));
 	}
+
 	if (has_capability('mod/tracker:configure', $context)){
 	    $rows[0][] = new tabobject('admin', "view.php?id={$cm->id}&amp;view=admin", get_string('administration', 'tracker'));
 	}
+	
+	/// 
+	$myticketsstr = ($tracker->supportmode != 'taskspread') ? get_string('mytickets', 'tracker') : get_string('mytasks', 'tracker');
+		
 	
 	/// submenus
 	$selected = null;
@@ -25,19 +40,27 @@
 	switch ($view){
 	    case 'view' :
 	        if (!preg_match("/mytickets|mywork|browse|search|viewanissue|editanissue/", $screen)) $screen = 'mytickets';
-	        $rows[1][] = new tabobject('mytickets', "view.php?id={$cm->id}&amp;view=view&amp;screen=mytickets", get_string('mytickets', 'tracker'));
-			if (has_capability('mod/tracker:resolve', $context)){
+			if (has_capability('mod/tracker:report', $context)){
+		        $rows[1][] = new tabobject('mytickets', "view.php?id={$cm->id}&amp;view=view&amp;screen=mytickets", $myticketsstr);
+		    }
+			if (tracker_has_assigned($tracker, false)){
 		        $rows[1][] = new tabobject('mywork', "view.php?id={$cm->id}&amp;view=view&amp;screen=mywork", get_string('mywork', 'tracker'));
 		    }
 	        if (has_capability('mod/tracker:viewallissues', $context) || $tracker->supportmode == 'bugtracker'){
 	            $rows[1][] = new tabobject('browse', "view.php?id={$cm->id}&amp;view=view&amp;screen=browse", get_string('browse', 'tracker'));
 	        }
-	        $rows[1][] = new tabobject('search', "view.php?id={$cm->id}&amp;view=view&amp;screen=search", get_string('search', 'tracker'));
+	        if ($tracker->supportmode == 'bugtracker'){
+		        $rows[1][] = new tabobject('search', "view.php?id={$cm->id}&amp;view=view&amp;screen=search", get_string('search', 'tracker'));
+		    }
 	        break;
 	    case 'resolved' :
-	        if (!preg_match("/mytickets|browse/", $screen)) $screen = 'mytickets';
-	        $rows[1][] = new tabobject('mytickets', "view.php?id={$cm->id}&amp;view=resolved&amp;screen=mytickets", get_string('mytickets', 'tracker'));
-	        $rows[1][] = new tabobject('mywork', "view.php?id={$cm->id}&amp;view=view&amp;screen=mywork", get_string('mywork', 'tracker'));
+	        if (!preg_match("/mytickets|browse|mywork/", $screen)) $screen = 'mytickets';
+			if (has_capability('mod/tracker:report', $context)){
+		        $rows[1][] = new tabobject('mytickets', "view.php?id={$cm->id}&amp;view=resolved&amp;screen=mytickets", $myticketsstr);
+		    }
+			if (tracker_has_assigned($tracker, true)){
+		        $rows[1][] = new tabobject('mywork', "view.php?id={$cm->id}&amp;view=view&amp;screen=mywork", get_string('mywork', 'tracker'));
+		    }
 	        if (has_capability('mod/tracker:viewallissues', $context) || $tracker->supportmode == 'bugtracker'){
 	            $rows[1][] = new tabobject('browse', "view.php?id={$cm->id}&amp;view=resolved&amp;screen=browse", get_string('browse', 'tracker'));
 	        }
@@ -47,7 +70,9 @@
 	        $rows[1][] = new tabobject('myprofile', "view.php?id={$cm->id}&amp;view=profile&amp;screen=myprofile", get_string('myprofile', 'tracker'));
 	        $rows[1][] = new tabobject('mypreferences', "view.php?id={$cm->id}&amp;view=profile&amp;screen=mypreferences", get_string('mypreferences', 'tracker'));
 	        $rows[1][] = new tabobject('mywatches', "view.php?id={$cm->id}&amp;view=profile&amp;screen=mywatches", get_string('mywatches', 'tracker'));
-	        $rows[1][] = new tabobject('myqueries', "view.php?id={$cm->id}&amp;view=profile&amp;screen=myqueries", get_string('myqueries', 'tracker'));
+	        if ($tracker->supportmode == 'bugtracker'){
+		        $rows[1][] = new tabobject('myqueries', "view.php?id={$cm->id}&amp;view=profile&amp;screen=myqueries", get_string('myqueries', 'tracker'));
+		    }
 	    break;
 	    case 'reports':
 	        if (!preg_match("/status|evolution|print/", $screen)) $screen = 'status';

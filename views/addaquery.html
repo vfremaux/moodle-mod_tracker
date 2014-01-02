@@ -9,14 +9,15 @@
 * From for adding a stored query
 */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
-}
+	if (!defined('MOODLE_INTERNAL')) {
+	    die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
+	}
+	
+	echo $OUTPUT->heading(get_string('addaquerytomemo', 'tracker'));
+	$OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'bugreport');
 
-echo $OUTPUT->heading(get_string('addaquerytomemo', 'tracker'));
-$OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'bugreport');
-?>
-<center>
+	echo '<center>';
+?>	
 <!-- Print Query Form -->
 <form name="addqueryform" action="view.php" method="post">
 	<input type="hidden" name="what" value="<?php p($form->action) ?>">
@@ -70,6 +71,6 @@ $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'bugreport');
 </table>
 </form>
 <?php
-$OUTPUT->box_end();
-?>
-</center>
+
+	echo $OUTPUT->box_end();
+	echo '</center>';

@@ -29,29 +29,46 @@ define('PUBLISHED', 8);
 define('VALIDATED', 9);
 
 // statusses
-define('ENABLED_OPEN', 1);
-define('ENABLED_RESOLVING', 2);
-define('ENABLED_WAITING', 4);
-define('ENABLED_RESOLVED', 8);
-define('ENABLED_ABANDONNED', 16);
-define('ENABLED_TESTING', 64);
-define('ENABLED_PUBLISHED', 128);
-define('ENABLED_VALIDATED', 256);
+define('ENABLED_POSTED', 1);
+define('ENABLED_OPEN', 2);
+define('ENABLED_RESOLVING', 4);
+define('ENABLED_WAITING', 8);
+define('ENABLED_RESOLVED', 16);
+define('ENABLED_ABANDONNED', 32);
+define('ENABLED_TRANSFERED', 64);
+define('ENABLED_TESTING', 128);
+define('ENABLED_PUBLISHED', 256);
+define('ENABLED_VALIDATED', 512);
+define('ENABLED_ALL', 1023);
+
+// major roles against status keys
+if ($tracker->supportmode == 'bugtracker'){
+	define('ROLE_REPORT', ENABLED_POSTED | ENABLED_VALIDATED);
+} else {
+	define('ROLE_REPORT', ENABLED_POSTED | ENABLED_RESOLVED| ENABLED_VALIDATED);
+}
+if ($tracker->supportmode == 'bugtracker'){
+	define('ROLE_DEVELOP', ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED | ENABLED_VALIDATED);
+} else {
+	define('ROLE_DEVELOP', ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED);
+}
+define('ROLE_RESOLVE', ENABLED_RESOLVED | ENABLED_VALIDATED | ENABLED_ABANDONNED | ENABLED_TRANSFERED);
+define('ROLE_MANAGE', ENABLED_POSTED | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED | ENABLED_VALIDATED);
 
 // states && eventmasks
-define('EVENT_POSTED', 0);
-define('EVENT_OPEN', 1);
-define('EVENT_RESOLVING', 2);
-define('EVENT_WAITING', 4);
-define('EVENT_RESOLVED', 8);
-define('EVENT_ABANDONNED', 16);
-define('EVENT_TRANSFERED', 32);
-define('ON_COMMENT', 64);
+define('EVENT_POSTED', 1);
+define('EVENT_OPEN', 2);
+define('EVENT_RESOLVING', 4);
+define('EVENT_WAITING', 8);
+define('EVENT_RESOLVED', 16);
+define('EVENT_ABANDONNED', 32);
+define('EVENT_TRANSFERED', 64);
 define('EVENT_TESTING', 128);
 define('EVENT_PUBLISHED', 256);
 define('EVENT_VALIDATED', 512);
+define('ON_COMMENT', 1024);
 
-define('ALL_EVENTS', 1023);
+define('ALL_EVENTS', 2047);
 
 global $STATUSCODES;
 global $STATUSKEYS;
@@ -65,18 +82,6 @@ $STATUSCODES = array(POSTED => 'posted',
                     TESTING => 'testing',
                     PUBLISHED => 'published',
                     VALIDATED => 'validated',
-                    );
-
-$STATUSKEYS = array(POSTED => get_string('posted', 'tracker'), 
-                    OPEN => get_string('open', 'tracker'), 
-                    RESOLVING => get_string('resolving', 'tracker'), 
-                    WAITING => get_string('waiting', 'tracker'), 
-                    RESOLVED => get_string('resolved', 'tracker'), 
-                    ABANDONNED => get_string('abandonned', 'tracker'),
-                    TRANSFERED => get_string('transfered', 'tracker'),
-                    TESTING => get_string('testing', 'tracker'),
-                    PUBLISHED => get_string('published', 'tracker'),
-                    VALIDATED => get_string('validated', 'tracker'),
                     );
 
 /**
@@ -2088,4 +2093,239 @@ function tracker_print_direct_editor($attributes, $values, $options){
 
     return $str;
 }
-?>
+
+/**
+* get all active keys for ticket states? As this may be required for all tickets in a print list, we cache it
+* @param object $tracker the tracker instance
+* @param object $cm the course module. If given, only role accessible keys will be output
+*/
+function tracker_get_statuskeys($tracker, $cm = null){
+	static $FULLSTATUSKEYS;
+	static $STATUSKEYS;
+
+	if (!isset($FULLSTATUSKEYS)){
+		$FULLSTATUSKEYS = array(
+			POSTED => get_string('posted', 'tracker'), 
+	        OPEN => get_string('open', 'tracker'), 
+	        RESOLVING => get_string('resolving', 'tracker'), 
+	        WAITING => get_string('waiting', 'tracker'), 
+	        TESTING => get_string('testing', 'tracker'), 
+	        VALIDATED => get_string('validated', 'tracker'), 
+	        PUBLISHED => get_string('published', 'tracker'), 
+	        RESOLVED => get_string('resolved', 'tracker'), 
+	        ABANDONNED => get_string('abandonned', 'tracker'),
+	        TRANSFERED => get_string('transfered', 'tracker')
+	    );
+	
+		if (!($tracker->enabledstates & ENABLED_OPEN)){
+			unset($FULLSTATUSKEYS[OPEN]);
+		}
+		if (!($tracker->enabledstates & ENABLED_RESOLVING)){
+			unset($FULLSTATUSKEYS[RESOLVING]);
+		}
+		if (!($tracker->enabledstates & ENABLED_WAITING)){
+			unset($FULLSTATUSKEYS[WAITING]);
+		}
+		if (!($tracker->enabledstates & ENABLED_TESTING)){
+			unset($FULLSTATUSKEYS[TESTING]);
+		}
+		if (!($tracker->enabledstates & ENABLED_VALIDATED)){
+			unset($FULLSTATUSKEYS[VALIDATED]);
+		}
+		if (!($tracker->enabledstates & ENABLED_PUBLISHED)){
+			unset($FULLSTATUSKEYS[PUBLISHED]);
+		}
+		if (!($tracker->enabledstates & ENABLED_RESOLVED)){
+			unset($FULLSTATUSKEYS[RESOLVED]);
+		}
+		if (!($tracker->enabledstates & ENABLED_ABANDONNED)){
+			unset($FULLSTATUSKEYS[ABANDONNED]);
+		}
+		if (empty($tracker->parent)){
+			unset($FULLSTATUSKEYS[TRANSFERED]);
+		}
+	}
+	
+	if (!empty($tracker->strictworkflow) && $cm){
+		if (!isset($STATUSKEYS)){
+			$context = context_module::instance($cm->id);
+
+			$STATUSKEYS = array();
+
+			if (has_capability('mod/tracker:report', $context)){
+				foreach($FULLSTATUSKEYS as $key => $label){
+					$eventkey = pow(2,$key);
+					if ($eventkey & ROLE_REPORT){
+						$STATUSKEYS[$key] = $label;
+					}
+				}
+			}
+			if (has_capability('mod/tracker:develop', $context)){
+				foreach($FULLSTATUSKEYS as $key => $label){
+					$eventkey = pow(2,$key);
+					if ($eventkey & ROLE_DEVELOP){
+						$STATUSKEYS[$key] = $label;
+					}
+				}
+			}
+			if (has_capability('mod/tracker:resolve', $context)){
+				foreach($FULLSTATUSKEYS as $key => $label){
+					$eventkey = pow(2,$key);
+					if ($eventkey & ROLE_RESOLVE){
+						$STATUSKEYS[$key] = $label;
+					}
+				}
+			}
+			if (has_capability('mod/tracker:manage', $context)){
+				foreach($FULLSTATUSKEYS as $key => $label){
+					$eventkey = pow(2,$key);
+					if ($eventkey & ROLE_MANAGE){
+						$STATUSKEYS[$key] = $label;
+					}
+				}
+			}
+		} else {
+			echo "using cache";
+		}
+		return $STATUSKEYS;
+	}
+	
+	return $FULLSTATUSKEYS;
+}
+
+// allows array reduction for state profiles
+function tracker_ror($v, $w){
+    $v |= $w;
+    return $v;
+}
+
+/**
+*
+*
+*/
+function tracker_resolve_view(&$tracker, &$cm){
+	global $SESSION;
+	
+	$context = context_module::instance($cm->id);
+	
+	$view = optional_param('view', @$SESSION->tracker_current_view, PARAM_ALPHA);
+	if (empty($view)){
+		$defaultview = 'view';
+		$view = $defaultview;
+	}
+	
+	$SESSION->tracker_current_view = $view;
+	return $view;
+}
+
+/**
+*
+*
+*/
+function tracker_resolve_screen(&$tracker, &$cm){
+	global $SESSION;
+	
+	$context = context_module::instance($cm->id);
+	
+	$screen = optional_param('screen', @$SESSION->tracker_current_screen, PARAM_ALPHA);
+	if (empty($screen)){
+		if (has_capability('mod/tracker:develop', $context)){
+			$defaultscreen = 'mywork';
+		} elseif (has_capability('mod/tracker:report', $context)) {
+			$defaultscreen = 'mytickets';
+		} else {
+			$defaultscreen = 'browse'; // report
+		}
+		$screen = $defaultscreen;
+	}
+
+	// some forced modes	
+	if ($tracker->supportmode == 'taskspread' && $SESSION->tracker_current_view == 'view'){
+		if (has_capability('mod/tracker:develop', $context) && ($screen != 'viewanissue')){
+			$screen = 'mywork';
+		}
+	}
+	// some forced modes	
+	if ($tracker->supportmode == 'taskspread' && $SESSION->tracker_current_view == 'resolved'){
+		if (has_capability('mod/tracker:develop', $context) && ($screen != 'viewanissue')){
+			$screen = 'mywork';
+		}
+	}
+	
+	$SESSION->tracker_current_screen = $screen;
+	return $screen;
+}
+
+/**
+* Conditions for people having access to ticket full edition
+*
+*/
+function tracker_can_edit(&$tracker, &$context, &$issue){
+	global $USER;
+	
+	if (has_capability('mod/tracker:manage', $context)) return true;
+	
+	if ($issue->reportedby == $USER->id) return true;
+
+	if ($issue->assignedto == $USER->id && has_capability('mod/tracker:resolve', $context)) return true;
+
+	return false;	
+}
+
+/**
+* Conditions for people authorized to work on : ticket editor (but non owner)
+* this is used for opening tickets when viweing 
+* @see views/viewanissue.php
+*/
+function tracker_can_workon(&$tracker, &$context, $issue = null){
+	global $USER;
+	
+	if (has_capability('mod/tracker:develop', $context)) return true;
+
+	if ($issue){
+		if ($issue->assignedto == $USER->id && has_capability('mod/tracker:resolve', $context)) return true;
+	} else {
+		if (has_capability('mod/tracker:resolve', $context)) return true;
+	}
+
+	return false;	
+}
+
+function tracker_has_assigned($tracker, $resolved = false){
+	global $DB, $USER;
+	
+	$select = '
+		trackerid = ? AND
+		assignedto = ? 
+	';
+	
+	if ($resolved){
+		$select .= '
+			AND
+			status IN ('.RESOLVED.','.ABANDONNED.','.VALIDATED.')
+		';
+	} else {
+		$select .= '
+			AND
+			status NOT IN ('.RESOLVED.','.ABANDONNED.','.VALIDATED.')
+		';
+	}
+		
+	return $DB->count_records_select('tracker_issue', $select, array($tracker->id, $USER->id));
+}
+
+function tracker_check_jquery(){
+	global $PAGE, $OUTPUT;
+
+	$current = '1.8.2';
+	
+	if (empty($OUTPUT->jqueryversion)){
+		$OUTPUT->jqueryversion = '1.8.2';
+		$PAGE->requires->js('/mod/tracker/js/jquery-'.$current.'.min.js', true);
+	} else {
+		if ($OUTPUT->jqueryversion < $current){
+			debugging('the previously loaded version of jquery is lower than required. This may cause issues to tracker reports. Programmers might consider upgrading JQuery version in the component that preloads JQuery library.', DEBUG_DEVELOPER, array('notrace'));
+		}
+	}
+	
+}

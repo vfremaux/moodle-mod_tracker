@@ -16,17 +16,6 @@ if (!defined('MOODLE_INTERNAL')) {
 
 include_once $CFG->libdir.'/tablelib.php';
 
-$STATUSKEYS = array(POSTED => get_string('posted', 'tracker'), 
-                    OPEN => get_string('open', 'tracker'), 
-                    RESOLVING => get_string('resolving', 'tracker'), 
-                    WAITING => get_string('waiting', 'tracker'), 
-                    TESTING => get_string('testing', 'tracker'), 
-                    VALIDATED => get_string('validated', 'tracker'), 
-                    PUBLISHED => get_string('published', 'tracker'), 
-                    RESOLVED => get_string('resolved', 'tracker'), 
-                    ABANDONNED => get_string('abandonned', 'tracker'),
-                    TRANSFERED => get_string('transfered', 'tracker'));
-
 /// get search engine related information
 // fields can come from a stored query,or from the current query in the user's client environement cookie
 if (!isset($fields)){
@@ -131,8 +120,7 @@ if (isset($searchqueries)){
 <form name="manageform" action="view.php" method="post">
 <input type="hidden" name="id" value="<?php p($cm->id) ?>" />
 <input type="hidden" name="what" value="updatelist" />
-<input type="hidden" name="view" value="view" />
-<input type="hidden" name="screen" value="mytickets" />
+<input type="hidden" name="view" value="resolved" />
 <?php       
 
 /// define table object
@@ -221,6 +209,10 @@ if (!empty($sort)){
 $issues = $DB->get_records_sql($sql, null, $table->get_page_start(), $table->get_page_size());
 $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', " trackerid = $tracker->id GROUP BY trackerid ");
 
+$FULLSTATUSKEYS = tracker_get_statuskeys($tracker);
+$STATUSKEYS = tracker_get_statuskeys($tracker, $cm);
+$STATUSKEYS[0] = get_string('nochange', 'tracker');
+
 if (!empty($issues)){
     /// product data for table
     $developersmenu = array();
@@ -230,14 +222,14 @@ if (!empty($issues)){
         $datereported = date('Y/m/d h:i', $issue->datereported);
         $user = $DB->get_record('user', array('id' => $issue->assignedto));
         if (has_capability('mod/tracker:manage', $context)){ // managers can assign bugs
-        	$status = html_writer::select($STATUSKEYS, "status{$issue->id}", $issue->status, array('' => 'choose'), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;"));
+        	$status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;"));
             $developers = get_users_by_capability($context, 'mod/tracker:develop', 'u.id,lastname,firstname', 'lastname');
             foreach($developers as $developer){
                 $developersmenu[$developer->id] = fullname($developer);
             }
             $assignedto = html_writer::select($developersmenu, "assignedto{$issue->id}", $issue->assignedto, array('' => get_string('unassigned', 'tracker')), array('onchange' => "document.forms['manageform'].changed{$issue->id}.value = 1;"));
         } elseif (has_capability('mod/tracker:resolve', $context)){ // resolvers can give a bug back to managers
-        	$status = html_writer::select($STATUSKEYS, "status{$issue->id}", $issue->status, array('' => 'choose'), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;"));
+        	$status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;"));
             $managers = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,lastname,firstname', 'lastname');
             foreach($managers as $manager){
                 $managersmenu[$manager->id] = fullname($manager);
@@ -245,7 +237,7 @@ if (!empty($issues)){
             $managersmenu[$USER->id] = fullname($USER);
             $assignedto = html_writer::select($developersmenu, "assignedto{$issue->id}", $issue->assignedto, array('' => get_string('unassigned', 'tracker')), array('onchange' => "document.forms['manageform'].changed{$issue->id}.value = 1;"));
         } else {
-            $status = $STATUSKEYS[0 + $issue->status]; 
+            $status = $FULLSTATUSKEYS[0 + $issue->status]; 
             $assignedto = fullname($user);
         }
         $status = '<div class="status_'.$STATUSCODES[$issue->status].'" style="width: 110%; height: 105%; text-align:center">'.$status.'</div>';
@@ -253,15 +245,15 @@ if (!empty($issues)){
         $solution = ($hassolution) ? "<img src=\"{$CFG->wwwroot}/mod/tracker/pix/solution.gif\" height=\"15\" alt=\"".get_string('hassolution','tracker')."\" />" : '' ;
         $actions = '';
         if (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context)){
-            $actions = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;issueid={$issue->id}&screen=editanissue\" title=\"".get_string('update')."\" ><img src=\"".$OUTPUT->pix_url('t/edit', 'core')."\" border=\"0\" /></a>";
+            $actions = "<a href=\"view.php?id={$cm->id}&amp;view=resolved&amp;issueid={$issue->id}&screen=editanissue\" title=\"".get_string('update')."\" ><img src=\"".$OUTPUT->pix_url('t/edit', 'core')."\" border=\"0\" /></a>";
         }
         if (has_capability('mod/tracker:manage', $context)){
-            $actions .= "&nbsp;<a href=\"{$self}&amp;issueid={$issue->id}&what=delete\" title=\"".get_string('delete')."\" ><img src=\"".$OUTPUT->pix_url('t/delete', 'core')."\" border=\"0\" /></a>";
+            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=resolved&amp;issueid={$issue->id}&what=delete\" title=\"".get_string('delete')."\" ><img src=\"".$OUTPUT->pix_url('t/delete', 'core')."\" border=\"0\" /></a>";
         }
         // Ergo Report I3 2012 => self list displays owned tickets. Already registered
         // $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;screen=mywatches&amp;issueid={$issue->id}&what=register\" title=\"".get_string('register', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('register', 'mod_tracker')."\" border=\"0\" /></a>";
         if ($issue->resolutionpriority < $maxpriority && has_capability('mod/tracker:viewpriority', $context) && !has_capability('mod/tracker:managepriority', $context)){
-            $actions .= "&nbsp;<a href=\"{$self}&amp;issueid={$issue->id}&amp;what=askraise\" title=\"".get_string('askraise', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('askraise', 'mod_tracker')."\" border=\"0\" /></a>";
+            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=resolved&amp;issueid={$issue->id}&amp;what=askraise\" title=\"".get_string('askraise', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('askraise', 'mod_tracker')."\" border=\"0\" /></a>";
         }
         if (!empty($tracker->parent)){
             $transfer = ($issue->status == TRANSFERED) ? tracker_print_transfer_link($tracker, $issue) : '' ;
@@ -282,20 +274,14 @@ if (!empty($issues)){
         $table->add_data($dataset);     
     }
     $table->print_html();
+
+	echo '<center>';
+	echo '<p><input type="submit" name="go_btn" value="'.get_string('savechanges').'" /></p>';
+	echo '</center>';
 } else {
 	echo '<br/>';
 	echo '<br/>';
-    notice(get_string('notickets', 'tracker'), "view.php?id=$cm->id"); 
+    echo $OUTPUT->notification(get_string('notickets', 'tracker'), 'box generalbox', 'notice'); 
 }
 
-if (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context)){
-?>
-<center>
-    <p><input type="submit" name="go_btn" value="<?php print_string('savechanges') ?>" /></p>
-</center>
-</form>
-<?php
-
-$nohtmleditorneeded = true;
-}
-?>
+echo '</form>';

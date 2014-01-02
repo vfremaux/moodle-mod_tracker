@@ -50,6 +50,10 @@
 	$issue->description = file_rewrite_pluginfile_urls($issue->description, 'pluginfile.php', $context->id, 'mod_tracker', 'issuedescription', $issue->id);
 	$issue->resolution = file_rewrite_pluginfile_urls($issue->resolution, 'pluginfile.php', $context->id, 'mod_tracker', 'issueresolution', $issue->id);
 
+// get STATUSKEYS labels
+
+	$STATUSKEYS = tracker_get_statuskeys($tracker);
+
 // start ptinting
 
 	echo $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'bugreport');
@@ -119,7 +123,7 @@
 </script>
 <?php
 
-if (has_capability('mod/tracker:resolve', $context)){
+if (tracker_can_workon($tracker, $context, $issue)){
     // If I can resolve and I have seen, the bug is open
     if ($issue->status < OPEN){
     	$oldstatus = $issue->status;
@@ -135,6 +139,9 @@ if (has_capability('mod/tracker:resolve', $context)){
 	    $stc->statusto = $issue->status;
 	    $DB->insert_record('tracker_state_change', $stc);
     }
+}
+
+if (tracker_can_edit($tracker, $context, $issue)){
 ?>
     <tr>
         <td colspan="4" align="right" width="800">

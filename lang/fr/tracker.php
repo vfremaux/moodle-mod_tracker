@@ -52,7 +52,7 @@ $string['checkboxhoriz'] = 'Cases à cocher horizontal'; // @DYNA
 $string['chooselocal'] = 'Choisir une instance locale ';
 $string['chooseremote'] = 'Choisir un hôte distant ';
 $string['chooseremoteparent'] = 'Choisir une instance distante ';
-$string['choosetarget'] = 'Choisir un sous-gestionaire';
+$string['choosetarget'] = 'Choisir un sous-gestionnaire';
 $string['clearsearch'] = 'Effacer les critères de recherche';
 $string['comment'] = 'Commentaire';
 $string['comments'] = 'Commentaires';
@@ -101,7 +101,7 @@ $string['elementsused'] = 'Critères utilisés';
 $string['elucidationratio'] = 'Taux d\'élucidation';
 $string['emailoptions'] = 'Options de courriel';
 $string['emergency'] = 'Avis d\'urgence';
-$string['emptydefinition'] = 'La définition du traqueur cible est vide.';
+$string['emptydefinition'] = 'La définition du gestionnaire cible est vide.';
 $string['enablecomments'] = 'Autoriser les commentaires';
 $string['errorcoursemisconfigured'] = 'Ce cours est mal configuré';
 $string['errorcoursemodid'] = 'L\'ID de module de cours est incrorrect';
@@ -121,8 +121,8 @@ $string['hidecomments'] = 'Cacher les commentaires';
 $string['hidedependancies'] = 'Cacher les dépendances';
 $string['hidehistory'] = 'Cacher l\'historique';
 $string['history'] = 'Assignés';
-$string['iamadeveloper'] = 'Je suis un développeur';
-$string['iamnotadeveloper'] = 'Je ne développe pas';
+$string['iamadeveloper'] = 'Je peux travailler sur des tickets';
+$string['iamnotadeveloper'] = 'Je ne peux pas tavailler sur des tickets';
 $string['icanmanage'] = 'Je peux gérer les tickets';
 $string['icannotmanage'] = 'Je ne gère pas les tickets';
 $string['icannotreport'] = 'Je ne peux pas créer des tickets';
@@ -147,24 +147,33 @@ $string['manageelements'] = 'Gérer les rubriques';
 $string['managenetwork'] = 'Fonctions cascade et réseau';
 $string['manager'] = 'Mes ressources ';
 $string['me'] = 'Mon profil';
+$string['message_bugtracker'] = 'Merci pour votre contribution à l\'amélioration générale du service.';
+$string['message_ticketting'] = 'Nous avons bien enregistré votre demande. Elle a été assignée à {$a}.';
+$string['message_ticketting_preassigned'] = 'Nous avons bien enregistré votre demande. Elle sera traitée très prochainement.';
+$string['message_taskspread'] = 'Vous venez de définir une tâche. Pour finaliser votre action, n\'oubliez pas de l\'assigner à un destinataire.';
 $string['mode_bugtracker'] = 'Traqueur de défauts ';
 $string['mode_ticketting'] = 'Service support utilisateur ';
+$string['mode_taskspread'] = 'Distribution de tâches individuelles';
+$string['mode_customized'] = 'Gestionnaire customisé';
 $string['modulename'] = 'Gestionnaire de tickets';
 $string['modulenameplural'] = 'Gestionnaires de tickets';
 $string['nofileloaded'] = 'Pas de fichier chargé.';
 $string['month'] = 'Mois';
-$string['myassignees'] = 'Les résolveurs que j\'ai nommés ';
+$string['myassignees'] = 'Les personnes que j\'ai assignées';
 $string['myissues'] = 'Les tickets que je gère ';
 $string['mypreferences'] = 'Mes préférences';
 $string['myprofile'] = 'Mon profil';
 $string['myqueries'] = 'Mes recherches';
 $string['mytickets'] = 'Mon support ';
+$string['mytasks'] = 'Mes demandes';
 $string['mywatches'] = 'Mes abonnements';
 $string['mywork'] = 'Mon travail';
 $string['name'] = 'Nom';
 $string['namecannotbeblank'] = 'Le nom ne peut pas être laissé vide.';
 $string['newissue'] = 'Nouveau ticket';
+$string['noassignedtickets'] = 'Aucun travail en cours';
 $string['noassignees'] = 'Pas de responsable attribué';
+$string['nochange'] = 'Ne pas changer';
 $string['nocomments'] = 'Pas de commentaires ';
 $string['nodata'] = 'Aucune donnée à traiter.';
 $string['nodevelopers'] = 'Pas de développeurs';
@@ -180,7 +189,7 @@ $string['noqueryssaved'] = 'Aucune recherche actuellement mémorisée';
 $string['noremotehosts'] = 'Aucun hôte réseau disponible';
 $string['noremotetrackers'] = 'Aucun tracker distant disponible';
 $string['noreporters'] = 'Pas de rapporteurs, il n\'y a probablement pas de ticket dans ce gestionnaire.';
-$string['noresolvers'] = 'Pas de développeurs';
+$string['noresolvers'] = 'Pas de responsables';
 $string['noresolvingissue'] = 'Pas de ticket attribué';
 $string['notickets'] = 'Aucun ticket personnel';
 $string['noticketsorassignation'] = 'Pas de tickets ou d\'assignations';
@@ -195,7 +204,7 @@ $string['optionisused'] = 'Ce nom d\'option est déjà utilisé pour cet éléme
 $string['order'] = 'Ordre';
 $string['pages'] = 'Pages';
 $string['posted'] = 'Posté';
-$string['potentialresolvers'] = 'Développeurs potentiels';
+$string['potentialresolvers'] = 'Responsables potentiels';
 $string['preferences'] = 'Préférences';
 $string['prefsnote'] = 'Les préférences déterminent quelles sont les notifications que vous validez lorsque vous créez une nouvelle entrée de défaut ou lorsque que vous vous abonnez à un défaut existant';
 $string['print'] = 'Impression';
@@ -255,7 +264,9 @@ $string['solution'] = 'Solution';
 $string['sortorder'] = 'Ordre';
 $string['standalone'] = 'Traqueur autonome.';
 $string['statehistory'] = 'Etats';
+$string['stateprofile'] = 'Etats de tickets';
 $string['status'] = 'Etat';
+$string['strictworkflow'] = 'Cycle de vie strict';
 $string['submission'] = 'Un nouveau ticket a été ouvert dans le tracker [{$a}]';
 $string['submitbug'] = 'Soumettre le ticket';
 $string['subtrackers'] = 'Sous-gestionnaires ';
@@ -269,7 +280,7 @@ $string['testing'] = 'En test';
 $string['text'] = 'Champ de texte'; // @DYNA
 $string['textarea'] = 'Zone de texte'; // @DYNA
 $string['thanksdefault'] = 'Merci de votre contribution à l\'amélioration continue du service.';
-$string['thanksmessage'] = 'Message de remerciement';
+$string['thanksmessage'] = 'Feedback après dépôt';
 $string['ticketprefix'] = 'Préfixe du ticket';
 $string['tickets'] = 'Tickets';
 $string['tracker-levelaccess'] = 'Mes possibilités dans ce traqueur ';
@@ -291,7 +302,7 @@ $string['turneditingon'] = 'Activer l\'édition';
 $string['type'] = 'Type';
 $string['unassigned'] = 'Non affecté' ;
 $string['unbind'] = 'Supprimer la cascade';
-$string['unmatchingelements'] = 'La définition des deux trackeurs ne correspond pas. Ceci peut poser des problèmes pendant la cascade des tickets de support.';
+$string['unmatchingelements'] = 'La définition des deux gestionnaires ne correspond pas. Ceci peut poser des problèmes pendant la cascade des tickets entre eux.';
 $string['unregisterall'] = 'Me désabonner de tous les tickets' ;
 $string['unsetoncomment'] = 'Les commentaires déposés me sont envoyés';
 $string['unsetwhenopens'] = 'L\'avis à l\'ouverture m\'est envoyé';
@@ -331,95 +342,106 @@ Les gestionnaires peuvent être cascadés localement ou via MNET vers un gestion
 
 Les gestionnaires peuvent être associés à des sous-gestionnaires, facilitant et organisant le déplacement de tickets entre plusieurs gestionnaires. 
 ';
-$string['elements_help'] = '<p>
+
+$string['supportmode_help'] = 'Le mode de support applique des réglages prédéfinis au gestionnaire pour lui donner un comportement spécifique. 
+
+* Traqueur de défauts: Les rapporteurs ont accès à toute la liste de tickets pour un examen collaboratif des demandes déposées. Tous les états sont activés, y compris
+les états participant aux phases de test sur des versions de préproduction.
+
+* Support utilisateur/Ticketting: Les rapporteurs n\'ont accès qu\'aux tickets qu\'ils ont émis. Les développeurs peuvent voir toute la liste de tickets
+assignés ou non et peuvent s\'assigner sur les tickets. Certains états propre à un processus de gestion "technique" ont été désactivés.
+
+* Task distribution: Les rapporteurs peuvent voir tous les tickets postés par les autres rapporteurs. Les développeurs (destinataires) ne peuvent voir
+que la liste de tickets qui leurs sont assignés à travers la vue "Mon travail". Des états sont désactivés pour une gestion très simplifiée des tickets.
+
+* Gestionnaire Customisé : Aucune prédéfinition des roles, surcharges ni états de tickets n\'est imposée. Ce mode est le plus souple, mais demande une bonne connaissance
+des réglage de Moodle et une réflexion sur le schéma d\'usage.
+
+';
+
+$string['elements_help'] = '
 On peut constituer le formulaire de récolte des défauts à l\'aide d\'éléments. Un formulaire contient au moins les 
 champs "résumé", "description", et "rapporté par", mais il est possible d\'ajouter tout type de qualificateur au défaut.
-</p>
-<p>
+
 Les éléments sont des "éléments de formulaire" courants qui permettent de collecter des critères, tels que boutons radio, cases à cocher, listes déroulantes, champ de texte libre
 ou même une zone de texte.
-</p>
-<p>Les éléments sont définis par les propriétés suivantes :
-</p>
-<h3>Le nom</h3>
-<p>Le nom sert à identifier l\'élément au niveau technique. Il doit être constitué sans caractères spéciaux, sans accents ni espaces. Le nom n\'apparait à aucun moment sur l\'interface du tracker.</p>
-<h3>La description</h3>
-<p>La description est un texte qui est utilisé lorsqu\'il faut faire mention de l\'élément sur l\'interface.</p>
-<h3>Options</h3>
-<p>Certains éléments comme les cases à cocher les listes ou les boutons radio permettent de saisir une valeur "contrainte" à un ensemble de valeur fini. Les options permettent de déterminer cet ensemble de valeurs possibles.
-</p>
-<p>Les options sont éditées une fois l\'élément créé.</p>
-<p>Les champs et zones de texte n\'admettent pas d\'options</p>';
 
-$string['options_help'] = '<p>
+Les éléments sont définis par les propriétés suivantes :
+
+### Le nom
+
+Le nom sert à identifier l\'élément au niveau technique. Il doit être constitué sans caractères spéciaux, sans accents ni espaces. Le nom n\'apparait à aucun moment sur l\'interface du tracker.
+
+### La description</h3>
+
+La description est un texte qui est utilisé lorsqu\'il faut faire mention de l\'élément sur l\'interface.
+
+### Options
+
+Certains éléments comme les cases à cocher les listes ou les boutons radio permettent de saisir une valeur "contrainte" à un ensemble de valeur fini. Les options permettent de déterminer cet ensemble de valeurs possibles.
+
+Les options sont éditées une fois l\'élément créé.
+
+Les champs et zones de texte n\'admettent pas d\'options
+';
+
+$string['options_help'] = '
 Les options sont les différentes valeurs de critères de qualification.
-</p>
-<p>Les options sont définis par les propriétés suivantes :
-</p>
-<h3>Un nom</h3>
-<p>Le nom sert à identifier l\'option. Il doit être constitué sans caractères spéciaux, sans accents ni espaces. Le nom n\'apparait à aucun moment sur l\'interface du tracker. On peut le considérer aussi comme le "code" technique pour cette valeur du critère.</p>
-<h3>La description</h3>
-<p>La description est un texte qui est utilisé lorsqu\'il faut faire mention de l\'option sur l\'interface.</p>
 
-<h3>Ordre des options</h3>
+Les options sont définis par les propriétés suivantes :
 
-<p>Vous pouvez définir l\'ordonnancement des options. Cet ordre détermine comment les listes ou les différents choix sont présentés aux utilisateurs.</p>
+### Un nom
 
-<p>Les champs et zones de texte n\'admettent pas d\'options</p> ';
+Le nom sert à identifier l\'option. Il doit être constitué sans caractères spéciaux, sans accents ni espaces. Le nom n\'apparait à aucun moment sur l\'interface du tracker. On peut le considérer aussi comme le "code" technique pour cette valeur du critère.
+
+### La description
+
+La description est un texte qui est utilisé lorsqu\'il faut faire mention de l\'option sur l\'interface.
+
+### Ordre des options
+
+Vous pouvez définir l\'ordonnancement des options. Cet ordre détermine comment les listes ou les différents choix sont présentés aux utilisateurs.
+
+Les champs et zones de texte n\'admettent pas d\'options
+';
 
 
-$string['ticketprefix_help'] = '## Gestionnaire de tickets / support utilisateur
-
-### Préfixe du ticket
-
-<p>Ce paramètre permet de préfixer une chaîne constante devant les identifiants numériques des défauts. Ceci permet
+$string['ticketprefix_help'] = '
+Ce paramètre permet de préfixer une chaîne constante devant les identifiants numériques des défauts. Ceci permet
 une meilleure identification et communication pendant la résolution de défauts.
-</p>';
+';
 
-$string['urgentquery_help'] = '## Gestionnaire de tickets / support utilisateur
+$string['urgentquery_help'] = '
+Cocher cette case peut donner un signal auw développeurs ou aux gestionnaires du support pour prendre en compte votre demande plus rapidement.
 
-### Demande urgente
-
-<p>Cocher cette case peut donner un signal auw développeurs ou aux gestionnaires du support pour prendre en compte votre demande plus rapidement.</p>
-<p>Attention cependant, il n\'existe aucune procédure automatisée qui considère ce paramètre. La prise en compte de ce degré d\'urgence reste
-à la discretion des personnes chargées d\'évaluer ces demandes.</p>
+Attention cependant, il n\'existe aucune procédure automatisée qui considère ce paramètre. La prise en compte de ce degré d\'urgence reste
+à la discretion des personnes chargées d\'évaluer ces demandes.
 ';
 
 $string['mods_help'] = '
-<ul>
-<p>Ce module permet à un administrateur ou un opérateur technique de récolter localement les défauts et 
+Ce module permet à un administrateur ou un opérateur technique de récolter localement les défauts et 
 dysfonctionnements de la plate-forme. Il peut être utilisé dans le cadre de l\'exploitation de Moodle, mais également
 comme outil de résolution de défaut dans le cas général. Il peut être instancié plusieurs fois dans le même cours
 comme un module d\'activité.
-</p>
-<p>
+
 La fiche de description de défaut est paramétrable. Il est possible de définir les rubriques que l\'on souhaite
 faire détailler par les utilisateurs. Le moteur de recherche intégré tient compte de ce paramétrage. 
-</p>
-</ul>';
-
-$string['enablecomments_help'] = '## Gestionnaire de tickets / support utilisateur
-
-### Activation des commentaires
-
-<p>Si cette option est active, les enregistrements de défaut peuvent être commentés par le public autorisé à lire les fiches.
-</p>';
-
-$string['enablecomments_help'] = '## Gestionnaire de tickets / support utilisateur
-
-### Notifications
-
-<p>Ce paramètre permet d\'activer ou inhiber les notifications par courrier. Si elles sont activées, certains événements
-dans le traqueur de défauts peuvent conduire à l\'émission d\'un courriel vers les utilisateurs concernés.
-</p>
 ';
 
-$string['defaultassignee_help'] = '## Gestionnaire de tickets / support utilisateur
+$string['enablecomments_help'] = '
+Si cette option est active, les enregistrements de défaut peuvent être commentés par le public autorisé à lire les fiches.
+';
 
-### Assigné par défaut
+$string['allownotifications_help'] = '
+Ce paramètre permet d\'activer ou inhiber les notifications par courrier. Si elles sont activées, certains événements
+dans le traqueur de défauts peuvent conduire à l\'émission d\'un courriel vers les utilisateurs concernés.
+';
 
-<p>
+$string['defaultassignee_help'] = '
 Vous pouvez demander à ce que les tickets entrants soient assignés par défaut à un des résolveurs. Ceci n\'empêche pas 
 la notification aux gestionnaires de tickets.
-</p>
+';
+
+$string['strictworkflow_help'] = '
+Lorsqu\'activé, chaque rôle (interne au regard du gestionnaire, rapporteur, développeur, résolveur ou responsable) n\'aura accès qu\'aux états correspondant à ce rôle.
 ';

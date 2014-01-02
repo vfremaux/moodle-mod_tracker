@@ -33,6 +33,9 @@
 	        print_error('errorcoursemodid', 'tracker');
 	    }
 	}
+
+	$screen = tracker_resolve_screen($tracker, $cm);
+	$view = tracker_resolve_view($tracker, $cm);
 	
 	$context = context_module::instance($cm->id);
 

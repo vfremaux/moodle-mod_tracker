@@ -64,6 +64,7 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
                     'newfields' => array(
                         'enabledstates' => 511,
                         'thanksmessage' => '',
+                        'strictworkflow' => 0,
                     ),
                 )
             ),

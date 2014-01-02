@@ -163,14 +163,14 @@ $string['hidecomments'] = 'Hide comments';
 $string['hidedependancies'] = 'Hide dependancies';
 $string['hidehistory'] = 'Hide history';
 $string['history'] = 'Assignees';
-$string['iamadeveloper'] = 'I\'m a developer';
-$string['iamnotadeveloper'] = 'I\'m not a developer';
-$string['icanmanage'] = 'I can manage issue entries';
-$string['icannotmanage'] = 'I cannot manage';
+$string['iamadeveloper'] = 'I can work on tickets';
+$string['iamnotadeveloper'] = 'I cannot work on tickets';
+$string['icanmanage'] = 'I can manage ticket content';
+$string['icannotmanage'] = 'I cannot manage ticket content';
 $string['icannotreport'] = 'I cannot report';
-$string['icannotresolve'] = 'I\'m not a resolver';
+$string['icannotresolve'] = 'I cannot assign nor close tickets';
 $string['icanreport'] = 'I can report';
-$string['icanresolve'] = 'I am assigned on some tickets';
+$string['icanresolve'] = 'I can assign and close tickets';
 $string['id'] = 'Identifier';
 $string['intest'] = 'Testing';
 $string['intro'] = 'Description';
@@ -192,12 +192,18 @@ $string['manager'] = 'Manager';
 $string['me'] = 'My profile';
 $string['mode_bugtracker'] = 'Team bug tracker';
 $string['mode_ticketting'] = 'User support ticketting';
+$string['mode_taskspread'] = 'Task distributor';
+$string['mode_customized'] = 'Customized tracker';
 $string['modulename'] = 'User support - Tracker';
 $string['nofileloaded'] = 'No file loaded here.';
 $string['options'] = 'Options';
 $string['print'] = 'Print';
 $string['reports'] = 'Reports';
 $string['resolvedplural'] = 'Resolved';
+$string['message_bugtracker'] = 'Thanks for your contribution and helping making this service more reliable.';
+$string['message_ticketting'] = 'We have registered your query. I has been assigned to {$a}.';
+$string['message_ticketting_preassigned'] = 'We have registered your query. It will be assigned and handled as soon as possible.';
+$string['message_taskspread'] = 'You just defined a task. Don\'t foget assigning it to some recepient in the nxt screns to distribute it.';
 $string['modulenameplural'] = 'User support - trackers';
 $string['month'] = 'Month';
 $string['myassignees'] = 'Resolver I assigned';
@@ -206,13 +212,16 @@ $string['mypreferences'] = 'My preferences';
 $string['myprofile'] = 'My profile';
 $string['myqueries'] = 'My queries';
 $string['mytickets'] = 'My tickets';
+$string['mytasks'] = 'My tickets';
 $string['mywatches'] = 'My watches';
 $string['mywork'] = 'My work';
 $string['name'] = 'Name';
 $string['namecannotbeblank'] = 'Name cannot be empty';
 $string['newissue'] = 'New ticket';
+$string['noassignedtickets'] = 'No assigned tickets';
 $string['noassignees'] = 'No assignee';
 $string['nocomments'] = 'No comments';
+$string['nochange'] = 'Leave unchanged';
 $string['nodevelopers'] = 'No developpers';
 $string['nodata'] = 'No data to show.';
 $string['noelements'] = 'No element';
@@ -299,7 +308,9 @@ $string['site'] = 'Site';
 $string['solution'] = 'Solution';
 $string['sortorder'] = 'Order';
 $string['standalone'] = 'Standalone tracker (top level support).';
+$string['stateprofile'] = 'Ticket states';
 $string['status'] = 'Status';
+$string['strictworkflow'] = 'Strict workflow';
 $string['submission'] = 'A new ticket is reported in tracker [{$a}]';
 $string['submitbug'] = 'Submit the ticket';
 $string['subtrackers'] = 'Subtrackers';
@@ -309,7 +320,6 @@ $string['sum_reported'] = 'Reported';
 $string['sum_resolved'] = 'Solved';
 $string['summary'] = 'Summary';
 $string['supportmode'] = 'Support mode';
-$string['supportmode_help'] = 'Support mode has effect on who have access to which ticket scope';
 $string['testing'] = 'Being tested';
 $string['text'] = 'Textfield'; // @DYNA
 $string['textarea'] = 'Textarea'; // @DYNA
@@ -325,7 +335,7 @@ $string['tracker_description'] = '<p>When publishing this service, you allow tra
 $string['tracker_name'] = 'Tracker module services';
 $string['tracker_service_name'] = 'Tracker module services';
 $string['trackerelements'] = 'Tracker\'s definition';
-$string['trackereventchanged'] = 'Issue state change in tracker [{$a}]';
+$string['trackereventchanged'] = 'Issue state change in tracker [{$a]}';
 $string['trackerhost'] = 'Parent host for tracker';
 $string['trackername'] = 'Tracker name';
 $string['transfer'] = 'Transfered';
@@ -359,6 +369,21 @@ $string['statehistory'] = 'States';
 
 // help strings
 
+$string['supportmode_help'] = 'Support mode applies some predefined settings and role overides on the tracker to achieved a preset behaviour. 
+
+* Bug report: Reporters have access to the whole ticket list for reading the issues in a collaborative way. All states are enabled for a complete
+tecnhical operation workflow, including operations on preprod test systems.
+
+* User support/Ticketting: Reporters usually have only access to the tickets they have posted and cannot access to the ticket browsing mode. Some states
+have been disabled, that are more commonly used for technical operations.
+
+* Task distribution: Reporters can have or not access to the whole distributed ticket list. Workers can only have access to the tickets they are asigned to
+through the "My work" screen. They will NOT have access to the browse function. some intermediate states have beed disabled for a simpler marking of task states.
+
+* Customized: When customized, the activity editor can choose states and overrides to apply to the tracker. This is the most flexible setting, but needs a correct knowledge of Moodle roles and setting management.
+
+';
+
 $string['modulename_help'] = 'The Tracker activity allows tracking tickets for help, bug report, or also trackable activities in a course.
 
 The activity allows creating the tracking form with attributes elements from a list of configurable elements. Some elements can be shared at site
@@ -377,57 +402,72 @@ Ticket tracker can be cascaded locally or through MNET allowing a ticket manager
 Trackers can now be chained so that ticket can be moved between trackers. 
 ';
 
-$string['elements_help'] = '<p>
+$string['elements_help'] = '
 Issue submission form can be customized by adding form elements. The "summary", "description", et "reportedby" fields are as default, but any additional qualifier can be added to the issue description.
-</p>
-<p>
+
 Elements that can be added are "form elements" i.e. standard form widgets that can represent any qualifier or open description, such as radio buttons, checkboxes, dropdown, textfields or textareas.
-</p>
-<p>Elements are set using the following properties:
-</p>
-<h3>A name</h3>
-<p>This name is the element identifier, technically speaking. It must be a token using alphanumeric chars and the _ character, without spaces or non printable chars. The name will not appear on the user interface.</p>
-<h3>Description</h3>
-<p>The description is used when the element has to be identified on the user interface.</p>
-<h3>Options</h3>
-<p>Some elements have a finite list of option values.
-</p>
-<p>Options are added after the element is created.</p>
-<p>Fieldtexts and textareas do not have any options.</p> ';
 
-$string['options_help'] = '<h3>A name</h3>
-<p>The name identifies the option value. It should be a token using alphanumeric chars and _ without spaces or non printable chars.</p>
-<h3>Description</h3>
-<p>The description is the viewable counterpart of the option code.</p>
+Elements are set using the following properties:
 
-<h3>Option ordering</h3>
+### A name
 
-<p>You may define the order in which the options appear in the lists.</p>
+This name is the element identifier, technically speaking. It must be a token using alphanumeric chars and the _ character, without spaces or non printable chars. The name will not appear on the user interface.
 
-<p>Textfield and textarea elements do not have any options.</p> ';
+### Description
 
+The description is used when the element has to be identified on the user interface.
 
-$string['ticketprefix_help'] = '## Task Tracking / User support
+### Options
 
-### Ticket Prefix
+Some elements have a finite list of option values.
 
-This parameter allows defining a fixed prefix thatt will be prepended to the issue numerical identifier. This should allow better identification of a issue entry in documents, forum posts...';
+Options are added after the element is created.
 
-$string['urgentquery_help'] = '## Task Tracking / User support
+Fieldtexts and textareas do not have any options.
+';
 
-### Urgent query
+$string['options_help'] = '
+### A name
+The name identifies the option value. It should be a token using alphanumeric chars and _ without spaces or non printable chars.
 
+### Description
+
+The description is the viewable counterpart of the option code.
+
+### Option ordering
+
+You may define the order in which the options appear in the lists.
+
+Textfield and textarea elements do not have any options.';
+
+$string['ticketprefix_help'] = '
+This parameter allows defining a fixed prefix thatt will be prepended to the issue numerical identifier. This should allow better identification of a issue entry in documents, forum posts...
+';
+
+$string['urgentquery_help'] = '
 Checking this checkbox will send a signal to developpers or tickets managers so your issue can be considered more quickly.
 
 Please consider although that there is no automated process using directly this variable. The acceptation of the emergency will be depending on how urgent support administrators have considered your demand.';
 
 $string['mods_help'] = '
-This module provides an amdinistrator or techical operator a way to collect locally issues on a Moodle implementation. It may be used mainly as an overall system tool for Moodle administration and support to end users, but also can be used as any other module for student projects. It can be instanciated several times within a course space. 
+This module provides an amdinistrator or technical operator a way to collect locally issues on a Moodle implementation. It may be used mainly as an overall system tool for Moodle administration and support to end users, but also can be used as any other module for student projects. It can be instanciated several times within a course space. 
 The issue description form is fully customisable. The tracker administrator can add as many description he needs by adding form elements. The integrated search engine do ajust itself to this customization.';
 
 $string['defaultassignee_help'] = '
+You might require incoming tickets are preassigned to one of the available resolvers.
+';
 
-You might require incoming tickets are preassigned to one of the available resolvers.';
+$string['enablecomemnts_help'] = '
+When enabled some roles will be able to comment issues.
+';
+
+$string['allownotifications_help'] = '
+When enabled some state changes may result in sending notifications to users when user is watching an issue. Users can configure which event will notify them.
+';
+
+$string['strictworkflow_help'] = '
+When enabled, each specific internal role in tracker (reporter, developer, resolvers, manager) will only have access to his accessible states against his role.
+';
 
 
 

@@ -40,7 +40,7 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
         $tracker = new backup_nested_element('tracker', array('id'), array(
 			'name', 'intro', 'introformat', 'requirelogin', 'allownotifications', 'enablecomments', 'ticketprefix', 
 			'timemodified', 'parent', 'supportmode', 'defaultassignee', 'subtrackers', 'enablestates',
-			'thanksmessage'));
+			'thanksmessage', 'strictworkflow'));
 
         $elements = new backup_nested_element('elements');
 

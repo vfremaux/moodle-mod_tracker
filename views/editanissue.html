@@ -29,7 +29,7 @@ $issue = file_prepare_standard_editor($issue, 'resolution', $editoroptions, $con
 
 <table border="1" cellpadding="5" class="tracker-issue-editor">
 <?php
-if (has_capability('mod/tracker:resolve', $context)){
+if (tracker_can_edit($tracker, $context, $issue)){
     /// Opens the issue if I have capability to resolve
     if ($issue->status < OPEN){
         $issue->status = OPEN;
@@ -103,7 +103,7 @@ if (has_capability('mod/tracker:resolve', $context)){
         </td>
         <td align="right" width="150" class="tracker-issue-param"><b><?php print_string('status', 'tracker') ?>:</b></td>
         <td width="250" class="<?php echo 'status_'.$STATUSCODES[$issue->status] ?>">
-            <?php echo html_writer::select($STATUSKEYS, 'status', $issue->status); ?>
+            <?php echo html_writer::select(tracker_get_statuskeys($tracker), 'status', $issue->status); ?>
         </td>
     </tr>
     <tr>

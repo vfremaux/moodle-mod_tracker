@@ -9,12 +9,13 @@
 * A form for updating a stored query
 */
 
-echo $OUTPUT->heading(get_string('editquery', 'tracker'));
-$OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'bugreport');
-$checkdate = ($form->checkdate) ? "checked=\"checked\"" : '' ;
-?>
-<center>
+	echo $OUTPUT->heading(get_string('editquery', 'tracker'));
+	$OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'bugreport');
+	$checkdate = ($form->checkdate) ? "checked=\"checked\"" : '' ;
+	
+	echo '<center>';
 
+?>
 <!-- Print Query Description -->
 
 <form name="editqueryform" action="view.php" method="post">
@@ -82,10 +83,11 @@ var datereporteditems = ['day','month','year'];
 </table>
 </form>
 <?php
-$OUTPUT->box_end();
-$nohtmleditorneeded = true;
-?>
-</center>
-<script type="text/javascript">
-lockoptions('editqueryform','checkdate', datereporteditems);
-</script>
+
+	echo $OUTPUT->box_end();
+
+	$nohtmleditorneeded = true;
+	echo '</center>';
+	echo '<script type="text/javascript">';
+	echo 'lockoptions(\'editqueryform\',\'checkdate\', datereporteditems);';
+	echo '</script>';

@@ -2,17 +2,6 @@
 echo $OUTPUT->heading(get_string('reports', 'tracker'), 1);
 echo $OUTPUT->heading(get_string('status', 'tracker'), 2);
 
-$STATUSKEYS = array(POSTED => get_string('posted', 'tracker'), 
-                    OPEN => get_string('open', 'tracker'), 
-                    RESOLVING => get_string('resolving', 'tracker'), 
-                    WAITING => get_string('waiting', 'tracker'), 
-                    TESTING => get_string('testing', 'tracker'), 
-                    PUBLISHED => get_string('published', 'tracker'), 
-                    RESOLVED => get_string('resolved', 'tracker'), 
-                    ABANDONNED => get_string('abandonned', 'tracker'),
-                    TRANSFERED => get_string('transfered', 'tracker'),
-					VALIDATED => get_string('validated', 'tracker'));
-
 $STATUSCODES = array(POSTED => 'posted', 
                     OPEN => 'open', 
                     RESOLVING => 'resolving', 
@@ -28,6 +17,8 @@ $tickets = tracker_get_stats($tracker);
 $statsbyassignee = tracker_get_stats_by_user($tracker, 'assignedto');
 $statsbyreporter = tracker_get_stats_by_user($tracker, 'reportedby');
 $alltickets = $DB->count_records('tracker_issue', array('trackerid' => $tracker->id));
+
+$STATUSKEYS = tracker_get_statuskeys($tracker);
 ?>
 <table width="100%" cellpadding="20">
 	<tr valign="top">
@@ -39,49 +30,29 @@ $alltickets = $DB->count_records('tracker_issue', array('trackerid' => $tracker-
 			<td width="30%" align="right"><?php print_string('count', 'tracker') ?></td>
 			<td width="30%" align="right"></td>
 		</tr>
+		<?php 
+		foreach(array_keys($STATUSKEYS) as $key){
+			if ($key == ABANDONNED && $key == RESOLVED && $key == VALIDATED && $key == TRANSFERED) continue;
+		?>
 		<tr>
-			<td width="40%" align="left" class="status_posted"><?php echo $STATUSKEYS[POSTED] ?></td>
-			<td width="30%" align="right"><?php echo 0 + @$tickets[POSTED] ?></td>
-			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[POSTED])/$alltickets) * 100) .' %' : '0 %' ; ?></td>
+			<td width="40%" align="left" class="status_<?php echo $STATUSCODES[$key] ?>"><?php echo $STATUSKEYS[$key] ?></td>
+			<td width="30%" align="right"><?php echo 0 + @$tickets[$key] ?></td>
+			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[$key])/$alltickets) * 100) .' %' : '0 %' ; ?></td>
 		</tr>
-		<tr>
-			<td width="40%" align="left" class="status_open"><?php echo $STATUSKEYS[OPEN] ?></td>
-			<td width="30%" align="right"><?php echo 0 + @$tickets[OPEN] ?></td>
-			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[OPEN])/$alltickets) * 100).' %' : '0 %' ; ?></td>
-		</tr>
-		<tr>
-			<td width="40%" align="left" class="status_resolving"><?php echo $STATUSKEYS[RESOLVING] ?></td>
-			<td width="30%" align="right"><?php echo 0 + @$tickets[RESOLVING] ?></td>
-			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[RESOLVING])/$alltickets) * 100).' %': '0 %'; ?></td>
-		</tr>
-		<tr>
-			<td width="40%" align="left" class="status_waiting"><?php echo $STATUSKEYS[WAITING] ?></td>
-			<td width="30%" align="right"><?php echo 0 + @$tickets[WAITING] ?></td>
-			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[WAITING])/$alltickets) * 100).' %': '0 %'; ?></td>
-		</tr>
-		<tr>
-			<td width="40%" align="left" class="status_testing"><?php echo $STATUSKEYS[TESTING] ?></td>
-			<td width="30%" align="right"><?php echo 0 + @$tickets[TESTING] ?></td>
-			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[TESTING])/$alltickets) * 100).' %' : '0 %'; ?></td>
-		</tr>
+		<?php } ?>
 		</table>
 		
 		<table width="80%">
+		<?php 
+		foreach(array_keys($STATUSKEYS) as $key){
+			if (!($key == ABANDONNED && $key == RESOLVED && $key == VALIDATED && $key == TRANSFERED)) continue;
+		?>
 		<tr>
-			<td width="40%" align="left" class="status_resolved"><?php echo $STATUSKEYS[RESOLVED] ?></td>
-			<td width="30%" align="right"><?php echo 0 + @$tickets[RESOLVED] ?></td>
-			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[RESOLVED])/$alltickets) * 100).' %': '0 % '; ?></td>
+			<td width="40%" align="left" class="status_<?php echo $STATUSCODES[$key] ?>"><?php echo $STATUSKEYS[$key] ?></td>
+			<td width="30%" align="right"><?php echo 0 + @$tickets[$key] ?></td>
+			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[$key])/$alltickets) * 100).' %': '0 % '; ?></td>
 		</tr>
-		<tr>
-			<td width="40%" align="left" class="status_abandonned"><?php echo $STATUSKEYS[ABANDONNED] ?></td>
-			<td width="30%" align="right"><?php echo 0 + @$tickets[ABANDONNED] ?></td>
-			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[ABANDONNED])/$alltickets) * 100).' %': '0 % '; ?></td>
-		</tr>
-		<tr>
-			<td width="40%" align="left" class="status_transfered"><?php echo $STATUSKEYS[TRANSFERED] ?></td>
-			<td width="30%" align="right"><?php echo 0 + @$tickets[TRANSFERED] ?></td>
-			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[TRANSFERED])/$alltickets) * 100).' %' : '0 % '; ?></td>
-		</tr>
+		<?php } ?>
 		</table>
 
 		</td>

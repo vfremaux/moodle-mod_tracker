@@ -25,8 +25,6 @@
 
 	// PART OF MVC Implementation
 	$action = optional_param('what', '', PARAM_ALPHA);
-	$screen = optional_param('screen', '', PARAM_ALPHA);
-	$view = optional_param('view', '', PARAM_ALPHA);
 	// !PART OF MVC Implementation
 
 	if ($id) {
@@ -51,14 +49,16 @@
 	    }
 	}
 
+	$screen = tracker_resolve_screen($tracker, $cm);
+	$view = tracker_resolve_view($tracker, $cm);
+	
 	$url = $CFG->wwwroot.'/mod/tracker/view.php?id='.$cm->id;
-	$self = $url.'&amp;view='.$view.'&amp;screen='.$screen;
 	
 	// redirect (before outputting) traps
 	if ($view == "view" && (empty($screen) || $screen == 'viewanissue' || $screen == 'editanissue') && empty($issueid)){
         redirect("view.php?id={$cm->id}&amp;view=view&amp;screen=browse");
 	}
-	if (empty($view) || $view == 'reportanissue'){
+	if ($view == 'reportanissue'){
 		redirect($CFG->wwwroot.'/mod/tracker/reportissue.php?id='.$id);
 	}
 
@@ -112,25 +112,12 @@
 	$PAGE->set_url($url);
     $PAGE->set_button($OUTPUT->update_module_button($cm->id, 'tracker'));
     $PAGE->set_headingmenu(navmenu($course, $cm));
+    
+    if ($screen == 'print'){
+    	$PAGE->set_pagelayout('embedded');
+    }
+
 	echo $OUTPUT->header();
-
-	// PART OF MVC Implementation
-	/// memorizes current view - typical session switch
-	if (!empty($view)){
-	    $_SESSION['currentview'] = $view;
-	} elseif (empty($_SESSION['currentview'])) {
-	    $_SESSION['currentview'] = 'reportanissue';
-	}
-	$view = $_SESSION['currentview'];
-
-	/// memorizes current screen - typical session switch
-	if (!empty($screen)){
-	    $_SESSION['currentscreen'] = $screen;
-	} elseif (empty($_SESSION['currentscreen'])) {
-	    $_SESSION['currentscreen'] = '';
-	}
-	$screen = $_SESSION['currentscreen'];
-	// !PART OF MVC Implementation
 
 	echo $OUTPUT->box_start('', 'tracker-view');
 
@@ -171,7 +158,7 @@
 	                break;
 	            case 'viewanissue' :
 	                ///If user it trying to view an issue, check to see if user has privileges to view this issue
-                    if (!has_capability('mod/tracker:seeissues', $context)){
+                    if (!has_any_capability(array('mod/tracker:seeissues','mod/tracker:resolve','mod/tracker:develop','mod/tracker:manage'), $context)){
                         print_error('errornoaccessissue', 'tracker');
                     } else {
                         include "views/viewanissue.html";
@@ -196,6 +183,10 @@
 	            case 'mytickets': 
 	                $resolved = 1;
 	                include "views/viewmyticketslist.php";
+	                break;
+	            case 'mywork': 
+	                $resolved = 1;
+	                include "views/viewmyassignedticketslist.php";
 	                break;
 	            case 'browse': 
 	                if (!has_capability('mod/tracker:viewallissues', $context)){

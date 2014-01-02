@@ -20,8 +20,9 @@
         <FIELD NAME="supportmode" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="bugtracker" SEQUENCE="false" PREVIOUS="parent" NEXT="defaultassignee"/>
         <FIELD NAME="defaultassignee" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="supportmode" NEXT="subtrackers" />
         <FIELD NAME="subtrackers" TYPE="char" LENGTH="100" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="defaultassignee" NEXT="enabledstates" />
-        <FIELD NAME="enabledstates" TYPE="int" LENGTH="6" NOTNULL="true" DEFAULT="511" SEQUENCE="false" PREVIOUS="subtrackers" NEXT="thanksmessage" />
-        <FIELD NAME="thanksmessage" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="enabledstates" />
+        <FIELD NAME="enabledstates" TYPE="int" LENGTH="11" NOTNULL="true" DEFAULT="511" SEQUENCE="false" PREVIOUS="subtrackers" NEXT="thanksmessage" />
+        <FIELD NAME="thanksmessage" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="enabledstates" NEXT="strictworkflow" />
+        <FIELD NAME="strictworkflow" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" DEFAULT="0" PREVIOUS="thanksmessage" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker"/>
