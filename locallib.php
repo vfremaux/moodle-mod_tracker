@@ -802,7 +802,8 @@ function tracker_getnumissuesreported($trackerid, $status='*', $reporterid = '*'
 * @param object $context
 */
 function tracker_getadministrators($context){
-    return get_users_by_capability($context, 'mod/tracker:manage', 'u.id,firstname,lastname,picture,email', 'lastname', '', '', '', '', false);
+	$allnames = get_all_user_name_fields(true, 'u');
+    return get_users_by_capability($context, 'mod/tracker:manage', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
 }
 
 /**
@@ -810,7 +811,8 @@ function tracker_getadministrators($context){
 * @param object $context
 */
 function tracker_getresolvers($context){
-    return get_users_by_capability($context, 'mod/tracker:resolve', 'u.id,firstname,lastname,picture,email', 'lastname', '', '', '', '', false);
+	$allnames = get_all_user_name_fields(true, 'u');
+    return get_users_by_capability($context, 'mod/tracker:resolve', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
 }
 
 /**
@@ -820,12 +822,13 @@ function tracker_getresolvers($context){
 */
 function tracker_getreporters($trackerid){
     global $CFG, $DB;
+
+	$allnames = get_all_user_name_fields(true, 'u');
     
     $sql = "
         SELECT
             DISTINCT(reportedby) AS id,
-            u.firstname,
-            u.lastname,
+			{$allnames},
             u.imagealt
         FROM
             {tracker_issue} i,
@@ -842,7 +845,8 @@ function tracker_getreporters($trackerid){
 *
 */
 function tracker_getdevelopers($context){
-    return get_users_by_capability($context, 'mod/tracker:develop', 'u.id,firstname,lastname,picture,email', 'lastname', '', '', '', '', false);
+	$allnames = get_all_user_name_fields(true, 'u');
+    return get_users_by_capability($context, 'mod/tracker:develop', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
 }
 
 /**
@@ -852,11 +856,12 @@ function tracker_getdevelopers($context){
 function tracker_getassignees($userid){
     global $CFG, $DB;
     
+	$allnames = get_all_user_name_fields(true, 'u');
+
     $sql = "
         SELECT DISTINCT 
             u.id, 
-            u.firstname, 
-            u.lastname, 
+            {$allnames},
             u.picture, 
             u.email, 
             u.emailstop, 
