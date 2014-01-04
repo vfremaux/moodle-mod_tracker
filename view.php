@@ -72,8 +72,6 @@
 	
 	add_to_log($course->id, 'tracker', "$view:$screen/$action", "view.php?id=$cm->id", "$tracker->id", $cm->id);
 	
-	$usehtmleditor = can_use_html_editor();
-	$defaultformat = FORMAT_MOODLE;
 	tracker_loadpreferences($tracker->id, $USER->id);
 	
 	/// Search controller - special implementation
@@ -111,7 +109,6 @@
 	$PAGE->set_heading(format_string($tracker->name));
 	$PAGE->set_url($url);
     $PAGE->set_button($OUTPUT->update_module_button($cm->id, 'tracker'));
-    $PAGE->set_headingmenu(navmenu($course, $cm));
     
     if ($screen == 'print'){
     	$PAGE->set_pagelayout('embedded');
