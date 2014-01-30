@@ -54,14 +54,14 @@ class dropdownelement extends trackerelement{
 		}
 	}
 	
-	function add_form_element(&$form){
+	function add_form_element(&$mform){
 
 		if (isset($this->options)){
 			foreach ($this->options as $option){
 				$optionsmenu[$option->id] = format_string($option->description);
 			}
 			
-			$mform->addElement('select', "element$this->name", format_string($this->description));
+			$mform->addElement('select', "element$this->name", format_string($this->description), $optionsmenu);
 		}
 	}
 
@@ -94,7 +94,7 @@ class dropdownelement extends trackerelement{
 	function formprocess(&$data){
 		global $DB;
 		
-		if (!$attribute = $DB->get_record('tracker_issueattribute', array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid));
+		if (!$attribute = $DB->get_record('tracker_issueattribute', array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid))){
 			$attribute = new StdClass();
 			$attribute->trackerid = $data->trackerid;
 			$attribute->issueid = $data->issueid;

@@ -72,7 +72,6 @@ $string['defaultassignee'] = 'Assigné par défaut';
 $string['deleteattachedfile'] = 'Supprimer l\'attachement';
 $string['dependancies'] = 'Dépendances';
 $string['dependson'] = 'Dépends de ';
-$string['evolution'] = 'Tendances';
 $string['descriptionisempty'] = 'La description ne peut pas être laissée vide.';
 $string['distribute'] = 'Déplacer le ticket';
 $string['doaddelementcheckbox'] = 'Ajouter des cases à cocher'; // @DYNA
@@ -111,6 +110,7 @@ $string['errornoaccessallissues'] = 'Vous n\'avez pas l\'autorisation de voir to
 $string['errornoaccessissue'] = 'Vous n\'avez pas l\'autorisation de voir ce ticket.';
 $string['errornoeditissue'] = 'Vous n\'avez pas l\'autorisaton de modifier ce ticket.';
 $string['errorremote'] = 'Erreur distante: {$a}';
+$string['evolution'] = 'Tendances';
 $string['evolutionbymonth'] = 'Evolution par mois';
 $string['file'] = 'Fichier attaché';
 $string['follow'] = 'Suivre';
@@ -148,24 +148,23 @@ $string['managenetwork'] = 'Fonctions cascade et réseau';
 $string['manager'] = 'Mes ressources ';
 $string['me'] = 'Mon profil';
 $string['message_bugtracker'] = 'Merci pour votre contribution à l\'amélioration générale du service.';
+$string['message_taskspread'] = 'Vous venez de définir une tâche. Pour finaliser votre action, n\'oubliez pas de l\'assigner à un destinataire.';
 $string['message_ticketting'] = 'Nous avons bien enregistré votre demande. Elle a été assignée à {$a}.';
 $string['message_ticketting_preassigned'] = 'Nous avons bien enregistré votre demande. Elle sera traitée très prochainement.';
-$string['message_taskspread'] = 'Vous venez de définir une tâche. Pour finaliser votre action, n\'oubliez pas de l\'assigner à un destinataire.';
 $string['mode_bugtracker'] = 'Traqueur de défauts ';
-$string['mode_ticketting'] = 'Service support utilisateur ';
-$string['mode_taskspread'] = 'Distribution de tâches individuelles';
 $string['mode_customized'] = 'Gestionnaire customisé';
+$string['mode_taskspread'] = 'Distribution de tâches individuelles';
+$string['mode_ticketting'] = 'Service support utilisateur ';
 $string['modulename'] = 'Gestionnaire de tickets';
 $string['modulenameplural'] = 'Gestionnaires de tickets';
-$string['nofileloaded'] = 'Pas de fichier chargé.';
 $string['month'] = 'Mois';
 $string['myassignees'] = 'Les personnes que j\'ai assignées';
 $string['myissues'] = 'Les tickets que je gère ';
 $string['mypreferences'] = 'Mes préférences';
 $string['myprofile'] = 'Mon profil';
 $string['myqueries'] = 'Mes recherches';
-$string['mytickets'] = 'Mon support ';
 $string['mytasks'] = 'Mes demandes';
+$string['mytickets'] = 'Mon support ';
 $string['mywatches'] = 'Mes abonnements';
 $string['mywork'] = 'Mon travail';
 $string['name'] = 'Nom';
@@ -180,6 +179,7 @@ $string['nodevelopers'] = 'Pas de développeurs';
 $string['noelements'] = 'Aucun élément';
 $string['noelementscreated'] = 'Aucun élément créé';
 $string['nofile'] = 'Pas de fichier attaché';
+$string['nofileloaded'] = 'Pas de fichier chargé.';
 $string['noissuesreported'] = 'Aucun ticket relevé';
 $string['noissuesresolved'] = 'Aucun ticket résolu';
 $string['nolocalcandidate'] = 'Aucun tracker local disponible';
@@ -284,10 +284,6 @@ $string['thanksmessage'] = 'Feedback après dépôt';
 $string['ticketprefix'] = 'Préfixe du ticket';
 $string['tickets'] = 'Tickets';
 $string['tracker-levelaccess'] = 'Mes possibilités dans ce traqueur ';
-$string['tracker_description'] = '<p>La publication de ce service permet à des trackers du site {$a} de cascader leur collecte vers l\'un de vos trackeurs.</p>
-<ul><li><i>Dépendance</i> : Vous devez abonner le serveur {$a} à ce service.</li></ul>
-<p>L\'abonement à ce service permet à des trackeurs de cascader des tickets de support vers les trackeurs du site {$a}.</p>
-<ul><li><i>Dépendance</i> : Le site {$a} doit publier le service de cascade de trackeurs.</li></ul>';
 $string['tracker_name'] = 'Services du gestionnaire de tickets';
 $string['tracker_service_name'] = 'Services du gestionnaire de tickets';
 $string['trackerelements'] = 'Définition du trackeur ';
@@ -314,15 +310,20 @@ $string['unsetwhenwaits'] = 'Les avis de mise en sommeil me sont envoyés';
 $string['unsetwhenworks'] = 'Les avis de prise en charge me sont envoyés';
 $string['urgentraiserequestcaption'] = 'Un utilisateur demande une priorité d\'urgence';
 $string['urgentsignal'] = 'DEMANDE URGENTE';
+$string['validated'] = 'Validé';
 $string['view'] = 'Tickets';
 $string['vieworiginal'] = 'Voir l\'orginal';
-$string['validated'] = 'Validé';
 $string['voter'] = 'Votes';
 $string['waiting'] = 'Bloqué';
 $string['watches'] = 'Obs.';
 $string['youneedanaccount'] = 'Vous devez posséder un compte dans cet espace pour pouvoir poster';
 
 // help strings
+
+$string['tracker_description'] = '<p>La publication de ce service permet à des trackers du site {$a} de cascader leur collecte vers l\'un de vos trackeurs.</p>
+<ul><li><i>Dépendance</i> : Vous devez abonner le serveur {$a} à ce service.</li></ul>
+<p>L\'abonement à ce service permet à des trackeurs de cascader des tickets de support vers les trackeurs du site {$a}.</p>
+<ul><li><i>Dépendance</i> : Le site {$a} doit publier le service de cascade de trackeurs.</li></ul>';
 
 $string['modulename_help'] = 'Le gestionnaire de tickets permet la gestion de tickets d\'aide, de rapport de défaut, ou de toute activité ou tâche qui nécessite un suivi d\'état dans un cours.
 
