@@ -1,19 +1,16 @@
 <?php
 
 /**
-* @package mod-tracker
-* @category mod
-* @author Clifford Tham, Valery Fremaux > 1.8
-* @date 02/12/2007
-*
-* Library of internal functions and constants for module tracker
-*/
+ * @package mod-tracker
+ * @category mod
+ * @author Clifford Tham, Valery Fremaux > 1.8
+ * @date 02/12/2007
+ *
+ * Library of internal functions and constants for module tracker
+ */
 
-/**
-* includes and requires
-*/
-require_once $CFG->dirroot.'/mod/tracker/filesystemlib.php';
-require_once $CFG->dirroot.'/lib/uploadlib.php';
+require_once($CFG->dirroot.'/mod/tracker/filesystemlib.php');
+require_once($CFG->dirroot.'/lib/uploadlib.php');
 require_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
 
 // statusses
@@ -42,25 +39,25 @@ define('ENABLED_VALIDATED', 512);
 define('ENABLED_ALL', 1023);
 
 // major roles against status keys
-function shop_get_role_definition(&$tracker, $role){
-	if ($role == 'report'){
-		if ($tracker->supportmode == 'bugtracker'){
-			return ENABLED_POSTED | ENABLED_VALIDATED;
-		} else {
-			return ENABLED_POSTED | ENABLED_RESOLVED| ENABLED_VALIDATED;
-		}
-	} elseif ($role == 'develop') {
-		if ($tracker->supportmode == 'bugtracker'){
-			return ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED | ENABLED_VALIDATED;
-		} else {
-			return ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED;
-		}
-	} elseif ($role == 'resolve'){	
-		return ENABLED_RESOLVED | ENABLED_VALIDATED | ENABLED_ABANDONNED | ENABLED_TRANSFERED;
-	} elseif ($role == 'manage'){	
-		return ENABLED_POSTED | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED | ENABLED_VALIDATED;
-	}
-	return 0;
+function shop_get_role_definition(&$tracker, $role) {
+    if ($role == 'report') {
+        if ($tracker->supportmode == 'bugtracker') {
+            return ENABLED_POSTED | ENABLED_VALIDATED;
+        } else {
+            return ENABLED_POSTED | ENABLED_RESOLVED| ENABLED_VALIDATED;
+        }
+    } elseif ($role == 'develop') {
+        if ($tracker->supportmode == 'bugtracker') {
+            return ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED | ENABLED_VALIDATED;
+        } else {
+            return ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED;
+        }
+    } elseif ($role == 'resolve') {
+        return ENABLED_RESOLVED | ENABLED_VALIDATED | ENABLED_ABANDONNED | ENABLED_TRANSFERED;
+    } elseif ($role == 'manage') {
+        return ENABLED_POSTED | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED | ENABLED_VALIDATED;
+    }
+    return 0;
 }
 
 // states && eventmasks
@@ -93,28 +90,30 @@ $STATUSCODES = array(POSTED => 'posted',
                     );
 
 /**
-* loads all elements in memory
-* @uses $CFG
-* @uses $COURSE
-* @param reference $tracker the tracker object
-* @param reference $elementsobj
-*/
-function tracker_loadelements(&$tracker, &$elementsobj){
+ * loads all elements in memory
+ * @uses $CFG
+ * @uses $COURSE
+ * @param reference $tracker the tracker object
+ * @param reference $elementsobj
+ */
+function tracker_loadelements(&$tracker, &$elementsobj) {
     global $COURSE, $CFG, $DB;
 
     /// first get shared elements
     $elements = $DB->get_records('tracker_element', array('course' => 0));
-    if (!$elements) $elements = array();
+    if (!$elements) {
+        $elements = array();
+    }
 
-    /// get course scope elements
+    // Get course scope elements.
     $courseelements = $DB->get_records('tracker_element', array('course' => $COURSE->id));
-    if ($courseelements){
+    if ($courseelements) {
         $elements = array_merge($elements, $courseelements);
     }
 
-    /// make a set of element objet with records
-    if (!empty($elements)){
-        foreach ($elements as $element){
+    // Make a set of element objet with records.
+    if (!empty($elements)) {
+        foreach ($elements as $element) {
             // this get the options by the constructor
             include_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/'.$element->type.'/'.$element->type.'.class.php');
             $constructorfunction = "{$element->type}element";
@@ -128,10 +127,10 @@ function tracker_loadelements(&$tracker, &$elementsobj){
 }
 
 /**
-* get all available types which are plugins in classes/trackercategorytype
-* @uses $CFG
-* @return an array of known element types
-*/
+ * get all available types which are plugins in classes/trackercategorytype
+ * @uses $CFG
+ * @return an array of known element types
+ */
 function tracker_getelementtypes(){
     global $CFG;
     $typedir = "{$CFG->dirroot}/mod/tracker/classes/trackercategorytype";
@@ -146,9 +145,9 @@ function tracker_getelementtypes(){
 }
 
 /**
-* tells if at least one used element is a file element
-* @param int $trackerid the current tracker
-*/
+ * tells if at least one used element is a file element
+ * @param int $trackerid the current tracker
+ */
 function tracker_requiresfile($trackerid){
     global $CFG, $DB;
 
@@ -168,10 +167,10 @@ function tracker_requiresfile($trackerid){
 }
 
 /**
-* loads elements as objects array in a reference
-* @param int $trackerid the current tracker
-* @param reference $used a reference to an array of used elements
-*/
+ * loads elements as objects array in a reference
+ * @param int $trackerid the current tracker
+ * @param reference $used a reference to an array of used elements
+ */
 function tracker_loadelementsused(&$tracker, &$used){
     global $CFG, $DB;
     
@@ -182,26 +181,26 @@ function tracker_loadelementsused(&$tracker, &$used){
     $used = array();
     $sortorder = 1;
     if (!empty($usedelements)){
-        foreach ($usedelements as $ueid => $ue){
-        	// normalize sortorder indexes
-        	if ($ue->sortorder != $sortorder){
-        		$ue->sortorder = $sortorder;
-        		$DB->update_record('tracker_elementused', $ue);
-        	}
-        	$used[$ue->elementid] = trackerelement::find_instance_by_usedid($tracker, $ueid);
-        	$used[$ue->elementid]->setcontext($context);
-        	$sortorder++;
+        foreach ($usedelements as $ueid => $ue) {
+            // normalize sortorder indexes
+            if ($ue->sortorder != $sortorder) {
+                $ue->sortorder = $sortorder;
+                $DB->update_record('tracker_elementused', $ue);
+            }
+            $used[$ue->elementid] = trackerelement::find_instance_by_usedid($tracker, $ueid);
+            $used[$ue->elementid]->setcontext($context);
+            $sortorder++;
         }
     }
 }   
 
 /**
-* quite the same as above, but not loading objects, and
-* mapping hash keys by "name"
-* @param int $trackerid
-*
-*/
-function tracker_getelementsused_by_name(&$tracker){
+ * quite the same as above, but not loading objects, and
+ * mapping hash keys by "name"
+ * @param int $trackerid
+ *
+ */
+function tracker_getelementsused_by_name(&$tracker) {
     global $CFG, $DB;
 
     $sql = "
@@ -235,9 +234,9 @@ function tracker_getelementsused_by_name(&$tracker){
 * @param int $elementid the element
 * @return boolean
 */
-function tracker_iselementused($trackerid, $elementid){
-	global $DB;
-	
+function tracker_iselementused($trackerid, $elementid) {
+    global $DB;
+    
     $inusedelements = $DB->count_records_select('tracker_elementused', 'elementid = ' . $elementid . ' AND trackerid = ' . $trackerid);  
     return $inusedelements;
 }
@@ -247,32 +246,32 @@ function tracker_iselementused($trackerid, $elementid){
 * @param int $trackerid the current tracker
 * @param array $fields the array of fields to be printed
 */
-function tracker_printelements(&$tracker, $fields=null, $dest=false){
+function tracker_printelements(&$tracker, $fields=null, $dest=false) {
     tracker_loadelementsused($tracker, $used);
-    if (!empty($used)){
-        if (!empty($fields)){
-            foreach ($used as $element){
-                if (isset($fields[$element->id])){
-                    foreach($fields[$element->id] as $value){
+    if (!empty($used)) {
+        if (!empty($fields)) {
+            foreach ($used as $element) {
+                if (isset($fields[$element->id])) {
+                    foreach($fields[$element->id] as $value) {
                         $element->value = $value;
                     }
                 }
             }
         }
-        foreach ($used as $element){
+        foreach ($used as $element) {
 
-        	if (!$element->active) continue;
+            if (!$element->active) continue;
 
             echo '<tr>';
             echo '<td align="right" valign="top">';
             echo '<b>' . format_string($element->description) . ':</b>';
             echo '</td>';
             echo '<td align="left" colspan="3">';
-            if ($dest == 'search'){
-            	if ($element->type == 'file') continue;
+            if ($dest == 'search') {
+                if ($element->type == 'file') continue;
                 $element->viewsearch();
             } elseif ($dest == 'query'){
-            	if ($element->type == 'file') continue;
+                if ($element->type == 'file') continue;
                 $element->viewquery();
             } else {
                 $element->view(true);
@@ -303,15 +302,15 @@ function tracker_printelements(&$mform, &$tracker, $fields=null, $dest=false){
         }
         foreach ($used as $element){
 
-        	if (!$element->active) continue;
-        	
+            if (!$element->active) continue;
+            
             if ($dest == 'search'){
                 $element->viewsearch($mform);
             }
             elseif ($dest == 'query'){
                 $element->viewquery($mform);
             } else {
-            	$element->view($mform);
+                $element->view($mform);
             } 
         }
     }
@@ -388,7 +387,7 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false){
         }
     }
     if ($own == false){
-    	$sql = new StdClass();
+        $sql = new StdClass();
         $sql->search = "
             SELECT DISTINCT 
                 i.id, 
@@ -554,12 +553,12 @@ function tracker_extractsearchparametersfrompost(){
 */
 function tracker_savesearchparameterstodb($query, $fields){
     global $USER, $DB;
-	
+    
     $query->userid = $USER->id;
     $query->published = 0;
     $query->fieldnames = '';
     $query->fieldvalues = '';
-	
+    
     if (!empty($fields)){
         $keys = array_keys($fields);
         if (!empty($keys)){
@@ -576,7 +575,7 @@ function tracker_savesearchparameterstodb($query, $fields){
             }       
         }
     }
-	
+    
     if (!isset($query->id)) {           //if not given a $queryid, then insert record
         $queryid = $DB->insert_record('tracker_query', $query);
     } else {                      //otherwise, update record
@@ -590,8 +589,8 @@ function tracker_savesearchparameterstodb($query, $fields){
 * @param array $fields
 */
 function tracker_printsearchfields($fields){
-	global $DB;
-	
+    global $DB;
+    
     foreach($fields as $key => $value){
         switch(trim($key)){
             case 'datereported' :
@@ -644,11 +643,11 @@ function tracker_printsearchfields($fields){
 *
 */
 function tracker_extractsearchparametersfromdb($queryid=null){
-	global $DB;
-	
+    global $DB;
+    
     if (!$queryid){
         $queryid = optional_param('queryid', '', PARAM_INT);
-	}
+    }
     $query_record = $DB->get_record('tracker_query', array('id' => $queryid));
     $fields = null;
     
@@ -754,7 +753,7 @@ function tracker_searchforissues(&$tracker, $cmid){
             redirect ("view.php?id={$cmid}&amp;view=view&amp;screen=browse");
         } else {
             redirect("view.php?id={$cmid}&amp;view=view&amp;screen=mytickets");
-		}
+        }
     } else {
         print_error('errorcookie', 'tracker', '', $cookie);
     }
@@ -802,7 +801,7 @@ function tracker_getnumissuesreported($trackerid, $status='*', $reporterid = '*'
 * @param object $context
 */
 function tracker_getadministrators($context){
-	$allnames = get_all_user_name_fields(true, 'u');
+    $allnames = get_all_user_name_fields(true, 'u');
     return get_users_by_capability($context, 'mod/tracker:manage', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
 }
 
@@ -811,7 +810,7 @@ function tracker_getadministrators($context){
 * @param object $context
 */
 function tracker_getresolvers($context){
-	$allnames = get_all_user_name_fields(true, 'u');
+    $allnames = get_all_user_name_fields(true, 'u');
     return get_users_by_capability($context, 'mod/tracker:resolve', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
 }
 
@@ -823,12 +822,12 @@ function tracker_getresolvers($context){
 function tracker_getreporters($trackerid){
     global $CFG, $DB;
 
-	$allnames = get_all_user_name_fields(true, 'u');
+    $allnames = get_all_user_name_fields(true, 'u');
     
     $sql = "
         SELECT
             DISTINCT(reportedby) AS id,
-			{$allnames},
+            {$allnames},
             u.imagealt
         FROM
             {tracker_issue} i,
@@ -845,7 +844,7 @@ function tracker_getreporters($trackerid){
 *
 */
 function tracker_getdevelopers($context){
-	$allnames = get_all_user_name_fields(true, 'u');
+    $allnames = get_all_user_name_fields(true, 'u');
     return get_users_by_capability($context, 'mod/tracker:develop', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
 }
 
@@ -856,7 +855,7 @@ function tracker_getdevelopers($context){
 function tracker_getassignees($userid){
     global $CFG, $DB;
     
-	$allnames = get_all_user_name_fields(true, 'u');
+    $allnames = get_all_user_name_fields(true, 'u');
 
     $sql = "
         SELECT DISTINCT 
@@ -893,32 +892,32 @@ function tracker_getassignees($userid){
 * @param int $trackerid the current tracker
 */
 function tracker_submitanissue(&$tracker, &$data){
-	global $CFG, $DB, $USER;
-	
-	$issue = new StdClass();
-	$issue->datereported = time();
-	$issue->summary = $data->summary;
-	$issue->description = $data->description_editor['text'];
-	$issue->descriptionformat = $data->description_editor['format'];
-	$issue->assignedto = $tracker->defaultassignee;
-	$issue->bywhomid = 0;
-	$issue->trackerid = $tracker->id;
-	$issue->status = POSTED;
-	$issue->reportedby = $USER->id;
+    global $CFG, $DB, $USER;
+    
+    $issue = new StdClass();
+    $issue->datereported = time();
+    $issue->summary = $data->summary;
+    $issue->description = $data->description_editor['text'];
+    $issue->descriptionformat = $data->description_editor['format'];
+    $issue->assignedto = $tracker->defaultassignee;
+    $issue->bywhomid = 0;
+    $issue->trackerid = $tracker->id;
+    $issue->status = POSTED;
+    $issue->reportedby = $USER->id;
 
-	// fetch max actual priority
-	$maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', " trackerid = ? GROUP BY trackerid ", array($tracker->id));
-	$issue->resolutionpriority = $maxpriority + 1;
+    // fetch max actual priority
+    $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', " trackerid = ? GROUP BY trackerid ", array($tracker->id));
+    $issue->resolutionpriority = $maxpriority + 1;
 
-	if ($issue->id = $DB->insert_record('tracker_issue', $issue)){
-		$data->issueid = $issue->id;
-		tracker_recordelements($issue, $data);
-		// if not CCed, the assignee should be
-		tracker_register_cc($tracker, $issue, $issue->reportedby);
-		return $issue;
-	} else {
-		print_error('errorrecordissue', 'tracker');
-	}
+    if ($issue->id = $DB->insert_record('tracker_issue', $issue)){
+        $data->issueid = $issue->id;
+        tracker_recordelements($issue, $data);
+        // if not CCed, the assignee should be
+        tracker_register_cc($tracker, $issue, $issue->reportedby);
+        return $issue;
+    } else {
+        print_error('errorrecordissue', 'tracker');
+    }
 }
 
 /**
@@ -942,15 +941,15 @@ function tracker_getownedissuesforresolve($trackerid, $userid = null){
 * @param object $data full form return
 */
 function tracker_recordelements(&$issue, &$data){
-	global $CFG, $COURSE, $DB , $PAGE;
+    global $CFG, $COURSE, $DB , $PAGE;
 
-	$tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
-	$usedelements = $DB->get_records('tracker_elementused', array('trackerid' => $issue->trackerid), 'id', 'id,elementid');
-	foreach($usedelements as $ueid => $ue){
-		$ueinstance = trackerelement::find_instance_by_usedid($tracker, $ueid);
-		$ueinstance->setcontext($PAGE->context);
-		$ueinstance->formprocess($data);
-	}
+    $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
+    $usedelements = $DB->get_records('tracker_elementused', array('trackerid' => $issue->trackerid), 'id', 'id,elementid');
+    foreach($usedelements as $ueid => $ue){
+        $ueinstance = trackerelement::find_instance_by_usedid($tracker, $ueid);
+        $ueinstance->setcontext($PAGE->context);
+        $ueinstance->formprocess($data);
+    }
 }
 
 /**
@@ -966,7 +965,7 @@ function tracker_clearelements($issueid, $withfiles = false){
         return;
     }
     
-	$attributeids = $DB->get_records('tracker_issueattribute', array('issueid' => $issueid), 'id', 'id,id');
+    $attributeids = $DB->get_records('tracker_issueattribute', array('issueid' => $issueid), 'id', 'id,id');
 
     if (!$DB->delete_records('tracker_issueattribute', array('issueid' => $issueid))){
         print_error('errorcannotlearelementsforissue', 'tracker', $issueid);
@@ -974,11 +973,11 @@ function tracker_clearelements($issueid, $withfiles = false){
     
     // delete issue attribute fields
     if ($withfiles && !empty($attributeids)){
-	    $fs = get_file_storage();
-	    foreach($attributeids as $attid => $void){
-		    $fs->delete_area_files($context->id, 'mod_tracker', 'issueattribute', $attid);
-		}
-	}
+        $fs = get_file_storage();
+        foreach($attributeids as $attid => $void){
+            $fs->delete_area_files($context->id, 'mod_tracker', 'issueattribute', $attid);
+        }
+    }
     
 }
 
@@ -1008,8 +1007,8 @@ if (!function_exists('print_error_class')){
 * @param int $userid the cced user's ID
 */
 function tracker_register_cc(&$tracker, &$issue, $userid){
-	global $DB;
-	
+    global $DB;
+    
     if ($userid && !$DB->get_record('tracker_issuecc', array('trackerid' => $tracker->id, 'issueid' => $issue->id, 'userid' => $userid))){
         // Add new the assignee as new CC !!
         // we do not discard the old one as he may be still concerned
@@ -1121,8 +1120,8 @@ function tracker_getpotentialdependancies($trackerid, $issueid){
 * @return a comma separated list of nodes
 */
 function tracker_get_subtree_list($trackerid, $id){
-	global $DB;
-	
+    global $DB;
+    
     $res = $DB->get_records_menu('tracker_issuedependancy', array('parentid' => $id), '', 'id,childid');
     $ids = array();
     if (is_array($res)){
@@ -1585,7 +1584,7 @@ function tracker_loadpreferences($trackerid, $userid = 0){
     $preferences = $DB->get_records_select('tracker_preferences', "trackerid = ? AND userid = ? ", array($trackerid, $userid));
     if ($preferences){
         foreach($preferences as $preference){
-        	$USER->trackerprefs = new Stdclass();
+            $USER->trackerprefs = new Stdclass();
             $USER->trackerprefs->{$preference->name} = $preference->value;
         }
     }
@@ -1706,36 +1705,36 @@ function tracker_update_priority_stack(&$tracker){
 }
 
 function tracker_get_stats(&$tracker, $from = null, $to = null){
-	global $CFG, $DB;
-	$sql = "
-		SELECT
-			status,
-			count(*) as value
-		FROM
-			{tracker_issue}
-		WHERE
-			trackerid = {$tracker->id}
-		GROUP BY
-			status
-	";
-	if ($results = $DB->get_records_sql($sql)){
-		foreach($results as $r){
-			$stats[$r->status] = $r->value;
-		}
-	} else {
-		$stats[POSTED] = 0;
-		$stats[OPEN] = 0;
-		$stats[RESOLVING] = 0;
-		$stats[WAITING] = 0;
-		$stats[TESTING] = 0;
-		$stats[PUBLISHED] = 0;
-		$stats[VALIDATED] = 0;
-		$stats[RESOLVED] = 0;
-		$stats[ABANDONNED] = 0;
-		$stats[TRANSFERED] = 0;
-	}
-	
-	return $stats;
+    global $CFG, $DB;
+    $sql = "
+        SELECT
+            status,
+            count(*) as value
+        FROM
+            {tracker_issue}
+        WHERE
+            trackerid = {$tracker->id}
+        GROUP BY
+            status
+    ";
+    if ($results = $DB->get_records_sql($sql)){
+        foreach($results as $r){
+            $stats[$r->status] = $r->value;
+        }
+    } else {
+        $stats[POSTED] = 0;
+        $stats[OPEN] = 0;
+        $stats[RESOLVING] = 0;
+        $stats[WAITING] = 0;
+        $stats[TESTING] = 0;
+        $stats[PUBLISHED] = 0;
+        $stats[VALIDATED] = 0;
+        $stats[RESOLVED] = 0;
+        $stats[ABANDONNED] = 0;
+        $stats[TRANSFERED] = 0;
+    }
+    
+    return $stats;
 }
 
 /**
@@ -1743,32 +1742,32 @@ function tracker_get_stats(&$tracker, $from = null, $to = null){
 *
 */
 function tracker_get_stats_by_month(&$tracker, $from = null, $to = null){
-	global $CFG, $DB;
-	$sql = "
-		SELECT
-			CONCAT(YEAR(FROM_UNIXTIME(datereported)), '-', DATE_FORMAT(FROM_UNIXTIME(datereported), '%m'), '-', status) as resultid,
-			CONCAT(YEAR(FROM_UNIXTIME(datereported)), '-', DATE_FORMAT(FROM_UNIXTIME(datereported), '%m')) as period,
-			status,
-			count(*) as value
-		FROM
-			{tracker_issue}
-		WHERE
-			trackerid = {$tracker->id}
-		GROUP BY
-			status, CONCAT(YEAR(FROM_UNIXTIME(datereported)), '-', DATE_FORMAT(FROM_UNIXTIME(datereported), '%m'))
-		ORDER BY period
-	";
-	if ($results = $DB->get_records_sql($sql)){
-		foreach($results as $r){
-			$stats[$r->period][$r->status] = $r->value;
-			$stats[$r->period]['sum'] = @$stats[$r->period]['sum'] + $r->value;
-			$stats['sum'] = @$stats['sum'] + $r->value;
-		}
-	} else {
-		$stats = array();
-	}
+    global $CFG, $DB;
+    $sql = "
+        SELECT
+            CONCAT(YEAR(FROM_UNIXTIME(datereported)), '-', DATE_FORMAT(FROM_UNIXTIME(datereported), '%m'), '-', status) as resultid,
+            CONCAT(YEAR(FROM_UNIXTIME(datereported)), '-', DATE_FORMAT(FROM_UNIXTIME(datereported), '%m')) as period,
+            status,
+            count(*) as value
+        FROM
+            {tracker_issue}
+        WHERE
+            trackerid = {$tracker->id}
+        GROUP BY
+            status, CONCAT(YEAR(FROM_UNIXTIME(datereported)), '-', DATE_FORMAT(FROM_UNIXTIME(datereported), '%m'))
+        ORDER BY period
+    ";
+    if ($results = $DB->get_records_sql($sql)){
+        foreach($results as $r){
+            $stats[$r->period][$r->status] = $r->value;
+            $stats[$r->period]['sum'] = @$stats[$r->period]['sum'] + $r->value;
+            $stats['sum'] = @$stats['sum'] + $r->value;
+        }
+    } else {
+        $stats = array();
+    }
 
-	return $stats;
+    return $stats;
 }
 
 /**
@@ -1776,82 +1775,82 @@ function tracker_get_stats_by_month(&$tracker, $from = null, $to = null){
 *
 */
 function tracker_backtrack_stats_by_month(&$tracker){
-	global $CFG, $DB;
+    global $CFG, $DB;
 
-	$sql = "
-		SELECT
-			id,
-			CONCAT(YEAR(FROM_UNIXTIME(datereported)), '-', DATE_FORMAT(FROM_UNIXTIME(datereported), '%m')) as period,
-			status
-		FROM
-			{tracker_issue}
-		WHERE
-			trackerid = {$tracker->id}
-		ORDER BY period
-	";
-	if ($issues = $DB->get_records_sql($sql)){
+    $sql = "
+        SELECT
+            id,
+            CONCAT(YEAR(FROM_UNIXTIME(datereported)), '-', DATE_FORMAT(FROM_UNIXTIME(datereported), '%m')) as period,
+            status
+        FROM
+            {tracker_issue}
+        WHERE
+            trackerid = {$tracker->id}
+        ORDER BY period
+    ";
+    if ($issues = $DB->get_records_sql($sql)){
 
-		// dispatch issue generating events and follow change tracks
-		foreach($issues as $is){
-			$tracks[$is->period][$is->id] = $is->status;
-			$sql = "
-				SELECT
-					id,
-					issueid,
-					timechange,
-					CONCAT(YEAR(FROM_UNIXTIME(timechange)), '-', DATE_FORMAT(FROM_UNIXTIME(timechange), '%m')) as period,
-					statusto
-				FROM
-					{tracker_state_change}
-				WHERE
-					issueid = {$is->id}
-				ORDER BY 
-					timechange
-			";
-			if ($changes = $DB->get_records_sql($sql)){
-				foreach($changes as $c){
-					$tracks[$c->period][$c->issueid] = $c->statusto;
-				}
-			}
-			$issuelist[$is->id] = -1;
-		}
-	
-		ksort($tracks);
-		
-		$availdates = array_keys($tracks);
-		$lowest = $availdates[0];
-		$highest = $availdates[count($availdates) - 1];
-		$low = new StdClass();
-		list($low->year, $low->month) = explode('-', $lowest);
-		$dateiter = new date_iterator($low->year, $low->month);
-	
-		// scan table and snapshot issue states
-		$current = $dateiter->current();
-		while (strcmp($current, $highest) <= 0) {
-			if (array_key_exists($current, $tracks)){
-				foreach($tracks[$current] as $trackedid => $trackedstate){
-					$issuelist[$trackedid] = $trackedstate;
-				}
-			}
-			$monthtracks[$current] = $issuelist;
-			$dateiter->next();
-			$current = $dateiter->current();
-		}
-		
-		// revert and summarize states	
-		foreach($monthtracks as $current => $monthtrack){
-			foreach($monthtrack as $issueid => $state){
-				if ($state == -1) continue;
-				$stats[$current][$state] = @$stats[$current][$state] + 1;
-				$stats[$current]['sum'] = @$stats[$current]['sum'] + 1;
-				if ($state != RESOLVED && $state != ABANDONNED && $state != TRANSFERED)
-					$stats[$current]['sumunres'] = @$stats[$current]['sumunres'] + 1;
-			}
-		}
-	
-		return $stats;
-	}
-	return array();
+        // dispatch issue generating events and follow change tracks
+        foreach($issues as $is){
+            $tracks[$is->period][$is->id] = $is->status;
+            $sql = "
+                SELECT
+                    id,
+                    issueid,
+                    timechange,
+                    CONCAT(YEAR(FROM_UNIXTIME(timechange)), '-', DATE_FORMAT(FROM_UNIXTIME(timechange), '%m')) as period,
+                    statusto
+                FROM
+                    {tracker_state_change}
+                WHERE
+                    issueid = {$is->id}
+                ORDER BY 
+                    timechange
+            ";
+            if ($changes = $DB->get_records_sql($sql)){
+                foreach($changes as $c){
+                    $tracks[$c->period][$c->issueid] = $c->statusto;
+                }
+            }
+            $issuelist[$is->id] = -1;
+        }
+    
+        ksort($tracks);
+        
+        $availdates = array_keys($tracks);
+        $lowest = $availdates[0];
+        $highest = $availdates[count($availdates) - 1];
+        $low = new StdClass();
+        list($low->year, $low->month) = explode('-', $lowest);
+        $dateiter = new date_iterator($low->year, $low->month);
+    
+        // scan table and snapshot issue states
+        $current = $dateiter->current();
+        while (strcmp($current, $highest) <= 0) {
+            if (array_key_exists($current, $tracks)){
+                foreach($tracks[$current] as $trackedid => $trackedstate){
+                    $issuelist[$trackedid] = $trackedstate;
+                }
+            }
+            $monthtracks[$current] = $issuelist;
+            $dateiter->next();
+            $current = $dateiter->current();
+        }
+        
+        // revert and summarize states    
+        foreach($monthtracks as $current => $monthtrack){
+            foreach($monthtrack as $issueid => $state){
+                if ($state == -1) continue;
+                $stats[$current][$state] = @$stats[$current][$state] + 1;
+                $stats[$current]['sum'] = @$stats[$current]['sum'] + 1;
+                if ($state != RESOLVED && $state != ABANDONNED && $state != TRANSFERED)
+                    $stats[$current]['sumunres'] = @$stats[$current]['sumunres'] + 1;
+            }
+        }
+    
+        return $stats;
+    }
+    return array();
 }
 
 /**
@@ -1859,39 +1858,38 @@ function tracker_backtrack_stats_by_month(&$tracker){
 *
 */
 function tracker_get_stats_by_user(&$tracker, $userclass, $from = null, $to = null){
-	global $CFG, $DB;
-	$sql = "
-		SELECT
-			CONCAT(u.id, '-', i.status) as resultdid,
-			u.id,
-			u.firstname,
-			u.lastname,
-			count(*) as value,
-			i.status
-		FROM
-			{tracker_issue} i
-		LEFT JOIN
-			{user} u			
-		ON
-			i.{$userclass} = u.id
-		WHERE
-			trackerid = ?
-		GROUP BY
-			CONCAT(u.id, '-', i.status)
-		ORDER BY
-			u.lastname, u.firstname
-	";
-	if ($results = $DB->get_records_sql($sql, array($tracker->id))){
-		foreach($results as $r){
-			$stats[$r->id] = new StdClass();
-			$stats[$r->id]->name = fullname($r);
-			$stats[$r->id]->status[$r->status] = $r->value;
-			$stats[$r->id]->sum = @$stats[$r->id]->sum + $r->value;
-		}
-	} else {
-		$stats = array();
-	}
-	return $stats;
+    global $CFG, $DB;
+    $sql = "
+        SELECT
+            CONCAT(u.id, '-', i.status) as resultdid,
+            u.id,
+            ".get_all_user_name_fields(true, 'u').",
+            count(*) as value,
+            i.status
+        FROM
+            {tracker_issue} i
+        LEFT JOIN
+            {user} u
+        ON
+            i.{$userclass} = u.id
+        WHERE
+            trackerid = ?
+        GROUP BY
+            CONCAT(u.id, '-', i.status)
+        ORDER BY
+            u.lastname, u.firstname
+    ";
+    if ($results = $DB->get_records_sql($sql, array($tracker->id))){
+        foreach($results as $r){
+            $stats[$r->id] = new StdClass();
+            $stats[$r->id]->name = fullname($r);
+            $stats[$r->id]->status[$r->status] = $r->value;
+            $stats[$r->id]->sum = @$stats[$r->id]->sum + $r->value;
+        }
+    } else {
+        $stats = array();
+    }
+    return $stats;
 }
 
 /**
@@ -1899,59 +1897,59 @@ function tracker_get_stats_by_user(&$tracker, $userclass, $from = null, $to = nu
 *
 */
 class date_iterator{
-	var $inityear;
-	var $initmonth;
-	var $year;
-	var $month;
-	
-	function date_iterator($year, $month){
-		$this->year = $year;
-		$this->month = $month;
-		$this->inityear = $year;
-		$this->initmonth = $month;
-	}	
+    var $inityear;
+    var $initmonth;
+    var $year;
+    var $month;
+    
+    function date_iterator($year, $month){
+        $this->year = $year;
+        $this->month = $month;
+        $this->inityear = $year;
+        $this->initmonth = $month;
+    }    
 
-	function reset(){
-		$this->year = $this->inityear;
-		$this->month = $this->initmonth;
-	}
-	
-	function next(){
-		$this->month++;
-		if ($this->month > 12){
-			$this->month = 1;
-			$this->year++;
-		}
-	}
+    function reset(){
+        $this->year = $this->inityear;
+        $this->month = $this->initmonth;
+    }
+    
+    function next(){
+        $this->month++;
+        if ($this->month > 12){
+            $this->month = 1;
+            $this->year++;
+        }
+    }
 
-	function current(){
-		return $this->year.'-'.sprintf('%02d', $this->month);
-	}
+    function current(){
+        return $this->year.'-'.sprintf('%02d', $this->month);
+    }
 
-	function getyear(){
-		return $this->year;
-	}
+    function getyear(){
+        return $this->year;
+    }
 
-	function getmonth(){
-		return $this->month;
-	}
-	
-	function getiterations($highest){
-		$year = $this->year;
-		$month = $this->month;
-		$current = $year.'-'.sprintf('%02d', $month);
-		$i = 0;
-		while (strcmp($current, $highest) <= 0){
-			$i++;
-			$month++;
-			if ($month > 12){
-				$month = 1;
-				$year++;
-			}			
-			$current = $year.'-'.sprintf('%02d', $month);
-		}
-		return $i;
-	}
+    function getmonth(){
+        return $this->month;
+    }
+    
+    function getiterations($highest){
+        $year = $this->year;
+        $month = $this->month;
+        $current = $year.'-'.sprintf('%02d', $month);
+        $i = 0;
+        while (strcmp($current, $highest) <= 0){
+            $i++;
+            $month++;
+            if ($month > 12){
+                $month = 1;
+                $year++;
+            }            
+            $current = $year.'-'.sprintf('%02d', $month);
+        }
+        return $i;
+    }
 }
 
 /**
@@ -1961,7 +1959,7 @@ class date_iterator{
 function tracker_print_direct_editor($attributes, $values, $options){
     global $CFG, $PAGE;
 
-	require_once($CFG->dirroot.'/repository/lib.php');
+    require_once($CFG->dirroot.'/repository/lib.php');
 
     $ctx = $options['context'];
 
@@ -2113,101 +2111,101 @@ function tracker_print_direct_editor($attributes, $values, $options){
 * @param object $cm the course module. If given, only role accessible keys will be output
 */
 function tracker_get_statuskeys($tracker, $cm = null){
-	static $FULLSTATUSKEYS;
-	static $STATUSKEYS;
+    static $FULLSTATUSKEYS;
+    static $STATUSKEYS;
 
-	if (!isset($FULLSTATUSKEYS)){
-		$FULLSTATUSKEYS = array(
-			POSTED => get_string('posted', 'tracker'), 
-	        OPEN => get_string('open', 'tracker'), 
-	        RESOLVING => get_string('resolving', 'tracker'), 
-	        WAITING => get_string('waiting', 'tracker'), 
-	        TESTING => get_string('testing', 'tracker'), 
-	        VALIDATED => get_string('validated', 'tracker'), 
-	        PUBLISHED => get_string('published', 'tracker'), 
-	        RESOLVED => get_string('resolved', 'tracker'), 
-	        ABANDONNED => get_string('abandonned', 'tracker'),
-	        TRANSFERED => get_string('transfered', 'tracker')
-	    );
-	
-		if (!($tracker->enabledstates & ENABLED_OPEN)){
-			unset($FULLSTATUSKEYS[OPEN]);
-		}
-		if (!($tracker->enabledstates & ENABLED_RESOLVING)){
-			unset($FULLSTATUSKEYS[RESOLVING]);
-		}
-		if (!($tracker->enabledstates & ENABLED_WAITING)){
-			unset($FULLSTATUSKEYS[WAITING]);
-		}
-		if (!($tracker->enabledstates & ENABLED_TESTING)){
-			unset($FULLSTATUSKEYS[TESTING]);
-		}
-		if (!($tracker->enabledstates & ENABLED_VALIDATED)){
-			unset($FULLSTATUSKEYS[VALIDATED]);
-		}
-		if (!($tracker->enabledstates & ENABLED_PUBLISHED)){
-			unset($FULLSTATUSKEYS[PUBLISHED]);
-		}
-		if (!($tracker->enabledstates & ENABLED_RESOLVED)){
-			unset($FULLSTATUSKEYS[RESOLVED]);
-		}
-		if (!($tracker->enabledstates & ENABLED_ABANDONNED)){
-			unset($FULLSTATUSKEYS[ABANDONNED]);
-		}
-		if (empty($tracker->parent)){
-			unset($FULLSTATUSKEYS[TRANSFERED]);
-		}
-	}
-	
-	if (!empty($tracker->strictworkflow) && $cm){
-		if (!isset($STATUSKEYS)){
-			$context = context_module::instance($cm->id);
+    if (!isset($FULLSTATUSKEYS)){
+        $FULLSTATUSKEYS = array(
+            POSTED => get_string('posted', 'tracker'), 
+            OPEN => get_string('open', 'tracker'), 
+            RESOLVING => get_string('resolving', 'tracker'), 
+            WAITING => get_string('waiting', 'tracker'), 
+            TESTING => get_string('testing', 'tracker'), 
+            VALIDATED => get_string('validated', 'tracker'), 
+            PUBLISHED => get_string('published', 'tracker'), 
+            RESOLVED => get_string('resolved', 'tracker'), 
+            ABANDONNED => get_string('abandonned', 'tracker'),
+            TRANSFERED => get_string('transfered', 'tracker')
+        );
+    
+        if (!($tracker->enabledstates & ENABLED_OPEN)){
+            unset($FULLSTATUSKEYS[OPEN]);
+        }
+        if (!($tracker->enabledstates & ENABLED_RESOLVING)){
+            unset($FULLSTATUSKEYS[RESOLVING]);
+        }
+        if (!($tracker->enabledstates & ENABLED_WAITING)){
+            unset($FULLSTATUSKEYS[WAITING]);
+        }
+        if (!($tracker->enabledstates & ENABLED_TESTING)){
+            unset($FULLSTATUSKEYS[TESTING]);
+        }
+        if (!($tracker->enabledstates & ENABLED_VALIDATED)){
+            unset($FULLSTATUSKEYS[VALIDATED]);
+        }
+        if (!($tracker->enabledstates & ENABLED_PUBLISHED)){
+            unset($FULLSTATUSKEYS[PUBLISHED]);
+        }
+        if (!($tracker->enabledstates & ENABLED_RESOLVED)){
+            unset($FULLSTATUSKEYS[RESOLVED]);
+        }
+        if (!($tracker->enabledstates & ENABLED_ABANDONNED)){
+            unset($FULLSTATUSKEYS[ABANDONNED]);
+        }
+        if (empty($tracker->parent)){
+            unset($FULLSTATUSKEYS[TRANSFERED]);
+        }
+    }
+    
+    if (!empty($tracker->strictworkflow) && $cm){
+        if (!isset($STATUSKEYS)){
+            $context = context_module::instance($cm->id);
 
-			$STATUSKEYS = array();
+            $STATUSKEYS = array();
 
-			if (has_capability('mod/tracker:report', $context)){
-				$roledef = shop_get_role_definition($tracker, 'report');
-				foreach($FULLSTATUSKEYS as $key => $label){
-					$eventkey = pow(2,$key);
-					if ($eventkey & $roledef){
-						$STATUSKEYS[$key] = $label;
-					}
-				}
-			}
-			if (has_capability('mod/tracker:develop', $context)){
-				$roledef = shop_get_role_definition($tracker, 'develop');
-				foreach($FULLSTATUSKEYS as $key => $label){
-					$eventkey = pow(2,$key);
-					if ($eventkey & $roledef){
-						$STATUSKEYS[$key] = $label;
-					}
-				}
-			}
-			if (has_capability('mod/tracker:resolve', $context)){
-				$roledef = shop_get_role_definition($tracker, 'resolve');
-				foreach($FULLSTATUSKEYS as $key => $label){
-					$eventkey = pow(2,$key);
-					if ($eventkey & $roledef){
-						$STATUSKEYS[$key] = $label;
-					}
-				}
-			}
-			if (has_capability('mod/tracker:manage', $context)){
-				$roledef = shop_get_role_definition($tracker, 'manage');
-				foreach($FULLSTATUSKEYS as $key => $label){
-					$eventkey = pow(2,$key);
-					if ($eventkey & $roledef){
-						$STATUSKEYS[$key] = $label;
-					}
-				}
-			}
-		} else {
-			// echo "using cache";
-		}
-		return $STATUSKEYS;
-	}
-	
-	return $FULLSTATUSKEYS;
+            if (has_capability('mod/tracker:report', $context)){
+                $roledef = shop_get_role_definition($tracker, 'report');
+                foreach($FULLSTATUSKEYS as $key => $label){
+                    $eventkey = pow(2,$key);
+                    if ($eventkey & $roledef){
+                        $STATUSKEYS[$key] = $label;
+                    }
+                }
+            }
+            if (has_capability('mod/tracker:develop', $context)){
+                $roledef = shop_get_role_definition($tracker, 'develop');
+                foreach($FULLSTATUSKEYS as $key => $label){
+                    $eventkey = pow(2,$key);
+                    if ($eventkey & $roledef){
+                        $STATUSKEYS[$key] = $label;
+                    }
+                }
+            }
+            if (has_capability('mod/tracker:resolve', $context)){
+                $roledef = shop_get_role_definition($tracker, 'resolve');
+                foreach($FULLSTATUSKEYS as $key => $label){
+                    $eventkey = pow(2,$key);
+                    if ($eventkey & $roledef){
+                        $STATUSKEYS[$key] = $label;
+                    }
+                }
+            }
+            if (has_capability('mod/tracker:manage', $context)){
+                $roledef = shop_get_role_definition($tracker, 'manage');
+                foreach($FULLSTATUSKEYS as $key => $label){
+                    $eventkey = pow(2,$key);
+                    if ($eventkey & $roledef){
+                        $STATUSKEYS[$key] = $label;
+                    }
+                }
+            }
+        } else {
+            // echo "using cache";
+        }
+        return $STATUSKEYS;
+    }
+    
+    return $FULLSTATUSKEYS;
 }
 
 // allows array reduction for state profiles
@@ -2217,132 +2215,144 @@ function tracker_ror($v, $w){
 }
 
 /**
-*
-*
-*/
-function tracker_resolve_view(&$tracker, &$cm){
-	global $SESSION;
-	
-	$context = context_module::instance($cm->id);
-	
-	$view = optional_param('view', @$SESSION->tracker_current_view, PARAM_ALPHA);
-	if (empty($view)){
-		$defaultview = 'view';
-		$view = $defaultview;
-	}
-	
-	$SESSION->tracker_current_view = $view;
-	return $view;
+ *
+ *
+ */
+function tracker_resolve_view(&$tracker, &$cm) {
+    global $SESSION;
+
+    $context = context_module::instance($cm->id);
+
+    $view = optional_param('view', @$SESSION->tracker_current_view, PARAM_ALPHA);
+    if (empty($view)) {
+        $defaultview = 'view';
+        $view = $defaultview;
+    }
+
+    $SESSION->tracker_current_view = $view;
+    return $view;
 }
 
 /**
-*
-*
-*/
-function tracker_resolve_screen(&$tracker, &$cm){
-	global $SESSION;
-	
-	$context = context_module::instance($cm->id);
-	
-	$screen = optional_param('screen', @$SESSION->tracker_current_screen, PARAM_ALPHA);
-	if (empty($screen)){
-		if (has_capability('mod/tracker:develop', $context)){
-			$defaultscreen = 'mywork';
-		} elseif (has_capability('mod/tracker:report', $context)) {
-			$defaultscreen = 'mytickets';
-		} else {
-			$defaultscreen = 'browse'; // report
-		}
-		$screen = $defaultscreen;
-	}
+ *
+ *
+ */
+function tracker_resolve_screen(&$tracker, &$cm) {
+    global $SESSION;
 
-	// some forced modes	
-	if ($tracker->supportmode == 'taskspread' && $SESSION->tracker_current_view == 'view'){
-		if (has_capability('mod/tracker:develop', $context) && ($screen != 'viewanissue')){
-			$screen = 'mywork';
-		}
-	}
-	// some forced modes	
-	if ($tracker->supportmode == 'taskspread' && $SESSION->tracker_current_view == 'resolved'){
-		if (has_capability('mod/tracker:develop', $context) && ($screen != 'viewanissue')){
-			$screen = 'mywork';
-		}
-	}
-	
-	$SESSION->tracker_current_screen = $screen;
-	return $screen;
+    $context = context_module::instance($cm->id);
+
+    $screen = optional_param('screen', @$SESSION->tracker_current_screen, PARAM_ALPHA);
+    if (empty($screen)) {
+        if (has_capability('mod/tracker:develop', $context)) {
+            $defaultscreen = 'mywork';
+        } elseif (has_capability('mod/tracker:report', $context)) {
+            $defaultscreen = 'mytickets';
+        } else {
+            $defaultscreen = 'browse'; // report
+        }
+        $screen = $defaultscreen;
+    }
+
+    // Some forced modes
+    if ($tracker->supportmode == 'taskspread' && $SESSION->tracker_current_view == 'view') {
+        if (has_capability('mod/tracker:develop', $context) && ($screen != 'viewanissue')) {
+            $screen = 'mywork';
+        }
+    }
+
+    // Some forced modes
+    if ($tracker->supportmode == 'taskspread' && $SESSION->tracker_current_view == 'resolved') {
+        if (has_capability('mod/tracker:develop', $context) && ($screen != 'viewanissue')) {
+            $screen = 'mywork';
+        }
+    }
+
+    $SESSION->tracker_current_screen = $screen;
+    return $screen;
 }
 
 /**
-* Conditions for people having access to ticket full edition
-*
-*/
-function tracker_can_edit(&$tracker, &$context, &$issue){
-	global $USER;
-	
-	if (has_capability('mod/tracker:manage', $context)) return true;
-	
-	if ($issue->reportedby == $USER->id) return true;
+ * Conditions for people having access to ticket full edition
+ *
+ */
+function tracker_can_edit(&$tracker, &$context, &$issue) {
+    global $USER;
 
-	if ($issue->assignedto == $USER->id && has_capability('mod/tracker:resolve', $context)) return true;
+    if (has_capability('mod/tracker:manage', $context)) {
+        return true;
+    }
 
-	return false;	
+    if ($issue->reportedby == $USER->id) {
+        return true;
+    }
+
+    if ($issue->assignedto == $USER->id && has_capability('mod/tracker:resolve', $context)) {
+        return true;
+    }
+
+    return false;
 }
 
 /**
-* Conditions for people authorized to work on : ticket editor (but non owner)
-* this is used for opening tickets when viweing 
-* @see views/viewanissue.php
-*/
-function tracker_can_workon(&$tracker, &$context, $issue = null){
-	global $USER;
-	
-	if (has_capability('mod/tracker:develop', $context)) return true;
+ * Conditions for people authorized to work on : ticket editor (but non owner)
+ * this is used for opening tickets when viweing 
+ * @see views/viewanissue.php
+ */
+function tracker_can_workon(&$tracker, &$context, $issue = null) {
+    global $USER;
 
-	if ($issue){
-		if ($issue->assignedto == $USER->id && has_capability('mod/tracker:resolve', $context)) return true;
-	} else {
-		if (has_capability('mod/tracker:resolve', $context)) return true;
-	}
+    if (has_capability('mod/tracker:develop', $context)) {
+        return true;
+    }
 
-	return false;	
+    if ($issue) {
+        if ($issue->assignedto == $USER->id && has_capability('mod/tracker:resolve', $context)) {
+            return true;
+        }
+    } else {
+        if (has_capability('mod/tracker:resolve', $context)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
-function tracker_has_assigned($tracker, $resolved = false){
-	global $DB, $USER;
-	
-	$select = '
-		trackerid = ? AND
-		assignedto = ? 
-	';
-	
-	if ($resolved){
-		$select .= '
-			AND
-			status IN ('.RESOLVED.','.ABANDONNED.','.VALIDATED.')
-		';
-	} else {
-		$select .= '
-			AND
-			status NOT IN ('.RESOLVED.','.ABANDONNED.','.VALIDATED.')
-		';
-	}
-		
-	return $DB->count_records_select('tracker_issue', $select, array($tracker->id, $USER->id));
+function tracker_has_assigned($tracker, $resolved = false) {
+    global $DB, $USER;
+
+    $select = '
+        trackerid = ? AND
+        assignedto = ? 
+    ';
+
+    if ($resolved) {
+        $select .= '
+            AND
+            status IN ('.RESOLVED.','.ABANDONNED.','.VALIDATED.')
+        ';
+    } else {
+        $select .= '
+            AND
+            status NOT IN ('.RESOLVED.','.ABANDONNED.','.VALIDATED.')
+        ';
+    }
+
+    return $DB->count_records_select('tracker_issue', $select, array($tracker->id, $USER->id));
 }
 
-function tracker_check_jquery(){
-	global $PAGE, $OUTPUT;
+function tracker_check_jquery() {
+    global $PAGE, $JQUERYVERSION;
 
-	$current = '1.8.2';
-	
-	if (empty($OUTPUT->jqueryversion)){
-		$OUTPUT->jqueryversion = '1.8.2';
-		$PAGE->requires->js('/mod/tracker/js/jquery-'.$current.'.min.js', true);
-	} else {
-		if ($OUTPUT->jqueryversion < $current){
-			debugging('the previously loaded version of jquery is lower than required. This may cause issues to tracker reports. Programmers might consider upgrading JQuery version in the component that preloads JQuery library.', DEBUG_DEVELOPER, array('notrace'));
-		}
-	}
-	
+    $current = '1.8.2';
+
+    if (empty($JQUERYVERSION)) {
+        $JQUERYVERSION = '1.8.2';
+        $PAGE->requires->js('/mod/tracker/js/jquery-'.$current.'.min.js', true);
+    } else {
+        if ($JQUERYVERSION < $current) {
+            debugging('the previously loaded version of jquery is lower than required. This may cause issues to tracker reports. Programmers might consider upgrading JQuery version in the component that preloads JQuery library.', DEBUG_DEVELOPER, array('notrace'));
+        }
+    }
 }
