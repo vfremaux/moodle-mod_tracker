@@ -1,4 +1,4 @@
-<?php // $Id: tracker.php,v 1.2 2012-08-12 21:43:55 vf Exp $ 
+<?php // $Id: tracker.php,v 1.2 2012-08-12 21:43:55 vf Exp $
       // tracker.php - created with Moodle 1.2 development (2003111400)
 
 // Capabilities
@@ -340,10 +340,10 @@ Les changements d\'état sont historisés pour chaque ticket.
 
 Les gestionnaires peuvent être cascadés localement ou via MNET vers un gestionnaire collecteur de plus haut niveau.
 
-Les gestionnaires peuvent être associés à des sous-gestionnaires, facilitant et organisant le déplacement de tickets entre plusieurs gestionnaires. 
+Les gestionnaires peuvent être associés à des sous-gestionnaires, facilitant et organisant le déplacement de tickets entre plusieurs gestionnaires.
 ';
 
-$string['supportmode_help'] = 'Le mode de support applique des réglages prédéfinis au gestionnaire pour lui donner un comportement spécifique. 
+$string['supportmode_help'] = 'Le mode de support applique des réglages prédéfinis au gestionnaire pour lui donner un comportement spécifique.
 
 * Traqueur de défauts: Les rapporteurs ont accès à toute la liste de tickets pour un examen collaboratif des demandes déposées. Tous les états sont activés, y compris
 les états participant aux phases de test sur des versions de préproduction.
@@ -360,7 +360,7 @@ des réglage de Moodle et une réflexion sur le schéma d\'usage.
 ';
 
 $string['elements_help'] = '
-On peut constituer le formulaire de récolte des défauts à l\'aide d\'éléments. Un formulaire contient au moins les 
+On peut constituer le formulaire de récolte des défauts à l\'aide d\'éléments. Un formulaire contient au moins les
 champs "résumé", "description", et "rapporté par", mais il est possible d\'ajouter tout type de qualificateur au défaut.
 
 Les éléments sont des "éléments de formulaire" courants qui permettent de collecter des critères, tels que boutons radio, cases à cocher, listes déroulantes, champ de texte libre
@@ -405,7 +405,6 @@ Vous pouvez définir l\'ordonnancement des options. Cet ordre détermine comment
 Les champs et zones de texte n\'admettent pas d\'options
 ';
 
-
 $string['ticketprefix_help'] = '
 Ce paramètre permet de préfixer une chaîne constante devant les identifiants numériques des défauts. Ceci permet
 une meilleure identification et communication pendant la résolution de défauts.
@@ -419,13 +418,13 @@ Attention cependant, il n\'existe aucune procédure automatisée qui considère 
 ';
 
 $string['mods_help'] = '
-Ce module permet à un administrateur ou un opérateur technique de récolter localement les défauts et 
+Ce module permet à un administrateur ou un opérateur technique de récolter localement les défauts et
 dysfonctionnements de la plate-forme. Il peut être utilisé dans le cadre de l\'exploitation de Moodle, mais également
 comme outil de résolution de défaut dans le cas général. Il peut être instancié plusieurs fois dans le même cours
 comme un module d\'activité.
 
 La fiche de description de défaut est paramétrable. Il est possible de définir les rubriques que l\'on souhaite
-faire détailler par les utilisateurs. Le moteur de recherche intégré tient compte de ce paramétrage. 
+faire détailler par les utilisateurs. Le moteur de recherche intégré tient compte de ce paramétrage.
 ';
 
 $string['enablecomments_help'] = '
@@ -438,7 +437,7 @@ dans le traqueur de défauts peuvent conduire à l\'émission d\'un courriel ver
 ';
 
 $string['defaultassignee_help'] = '
-Vous pouvez demander à ce que les tickets entrants soient assignés par défaut à un des résolveurs. Ceci n\'empêche pas 
+Vous pouvez demander à ce que les tickets entrants soient assignés par défaut à un des résolveurs. Ceci n\'empêche pas
 la notification aux gestionnaires de tickets.
 ';
 

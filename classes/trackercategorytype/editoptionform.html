@@ -20,27 +20,27 @@ $straction = get_string('action');
 <input type="hidden" name="elementid" value="<?php p($form->elementid) ?>" />
 <input type="hidden" name="optionid" value="<?php p($form->optionid) ?>" />
 <table width="90%">
-	<tr>
-		<td width="100">&nbsp;</td>
-		<td width="110" align="center">
-		    <b><?php echo $strname ?></b>
-		</td>
-		<td width="240" align="center">
-		    <b><?php echo $strdescription ?></b></td>
-		<td width="75" align="center"><b><?php echo $straction ?></b></td>
-	</tr>
-	<tr>
-		<td>&nbsp;</td>
-		<td align="center" <?php print_error_class(@$errors, 'name') ?> >
-		    <input type="text" name="name" value="<?php echo @$form->name ?>" size="32" maxlength="32" />
-		</td>
-		<td align="center" <?php print_error_class(@$errors, 'description') ?> >
-    		<input type="text" name="description" value="<?php echo htmlspecialchars(stripslashes(@$form->description)) ?>" size="80" maxlength="255" />
+    <tr>
+        <td width="100">&nbsp;</td>
+        <td width="110" align="center">
+            <b><?php echo $strname ?></b>
         </td>
-		<td align="center">
-		    <input type="submit" name="add_btn" value="<?php print_string('add') ?>" />
-		</td>
-	</tr>
+        <td width="240" align="center">
+            <b><?php echo $strdescription ?></b></td>
+        <td width="75" align="center"><b><?php echo $straction ?></b></td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td align="center" <?php print_error_class(@$errors, 'name') ?> >
+            <input type="text" name="name" value="<?php echo @$form->name ?>" size="20" maxlength="32" />
+        </td>
+        <td align="center" <?php print_error_class(@$errors, 'description') ?> >
+            <input type="text" name="description" value="<?php echo htmlspecialchars(stripslashes(@$form->description)) ?>" size="60" maxlength="255" />
+        </td>
+        <td align="center">
+            <input type="submit" name="add_btn" value="<?php print_string('add') ?>" />
+        </td>
+    </tr>
 </table>
 
 <br/>

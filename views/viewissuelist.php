@@ -10,7 +10,7 @@
 */
 
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
+    die('Direct access to this script is forbidden.');    // It must be included from view.php in mod/tracker
 }
 
 require_once($CFG->libdir.'/tablelib.php');
@@ -19,25 +19,25 @@ $FULLSTATUSKEYS = tracker_get_statuskeys($tracker);
 $STATUSKEYS = tracker_get_statuskeys($tracker, $cm);
 $STATUSKEYS[0] = get_string('nochange', 'tracker');
 
-/// get search engine related information
+// get search engine related information
 // fields can come from a stored query,or from the current query in the user's client environement cookie
-if (!isset($fields)){
+if (!isset($fields)) {
     $fields = tracker_extractsearchcookies();
 }
 
-if (!empty($fields)){
+if (!empty($fields)) {
     $searchqueries = tracker_constructsearchqueries($tracker->id, $fields);
 }
 
 $limit = 20;
 $page = optional_param('page', 1, PARAM_INT);
 
-if ($page <= 0){
+if ($page <= 0) {
     $page = 1;
 }
 
 if (isset($searchqueries)) {
-    /* SEARCH DEBUG 
+    /* SEARCH DEBUG
     $strsql = str_replace("\n", "<br/>", $searchqueries->count);
     $strsql = str_replace("\t", "&nbsp;&nbsp;&nbsp;", $strsql);
     echo "<div align=\"left\"> <b>count using :</b> ".$strsql." <br/>";
@@ -49,7 +49,7 @@ if (isset($searchqueries)) {
     $numrecords = $DB->count_records_sql($searchqueries->count);
 } else {
     // check we display only resolved tickets or working
-    if ($resolved){
+    if ($resolved) {
         $resolvedclause = " AND
            (status = ".RESOLVED." OR
            status = ".ABANDONNED.")
@@ -62,60 +62,60 @@ if (isset($searchqueries)) {
     }
 
     $sql = "
-        SELECT 
-            i.id, 
-            i.summary, 
-            i.datereported, 
-            i.reportedby, 
-            i.assignedto, 
+        SELECT
+            i.id,
+            i.summary,
+            i.datereported,
+            i.reportedby,
+            i.assignedto,
             i.status,
             i.resolutionpriority,
-            u.firstname firstname, 
+            u.firstname firstname,
             u.lastname lastname,
             COUNT(ic.issueid) watches
-        FROM 
+        FROM
             {user} u,
             {tracker_issue} i
         LEFT JOIN
-            {tracker_issuecc} ic 
+            {tracker_issuecc} ic
         ON
             ic.issueid = i.id
-        WHERE 
-            i.reportedby = u.id AND 
+        WHERE
+            i.reportedby = u.id AND
             i.trackerid = {$tracker->id}
             $resolvedclause
-        GROUP BY 
-            i.id, 
-            i.summary, 
-            i.datereported, 
-            i.reportedby, 
-            i.assignedto, 
+        GROUP BY
+            i.id,
+            i.summary,
+            i.datereported,
+            i.reportedby,
+            i.assignedto,
             i.status,
             i.resolutionpriority,
-            u.firstname, 
+            u.firstname,
             u.lastname
     ";
 
     $sqlcount = "
-        SELECT 
+        SELECT
             COUNT(*)
-        FROM 
-            {tracker_issue} i, 
+        FROM
+            {tracker_issue} i,
             {user} u
-        WHERE 
-            i.reportedby = u.id AND 
+        WHERE
+            i.reportedby = u.id AND
             i.trackerid = {$tracker->id}
             $resolvedclause
     ";
     $numrecords = $DB->count_records_sql($sqlcount);
 }
 
-/// display list of issues
+// display list of issues
 ?>
 <center>
 <table border="1" width="100%">
 <?php
-if (isset($searchqueries)){
+if (isset($searchqueries)) {
 ?>
     <tr>
         <td colspan="2">
@@ -127,7 +127,7 @@ if (isset($searchqueries)){
     </tr>
 <?php
 }
-?>      
+?>
 </table>
 </center>
 <form name="manageform" action="view.php" method="post">
@@ -135,9 +135,9 @@ if (isset($searchqueries)){
 <input type="hidden" name="what" value="updatelist" />
 <input type="hidden" name="view" value="view" />
 <input type="hidden" name="screen" value="browse" />
-<?php       
+<?php
 
-/// define table object
+// define table object
 $prioritystr = get_string('priority', 'tracker');
 $issuenumberstr = get_string('issuenumber', 'tracker');
 $summarystr = get_string('summary', 'tracker');
@@ -147,8 +147,8 @@ $assignedtostr = get_string('assignedto', 'tracker');
 $statusstr = get_string('status', 'tracker');
 $watchesstr = get_string('watches', 'tracker');
 $actionstr = '';
-if ($resolved){
-    if(!empty($tracker->parent)){
+if ($resolved) {
+    if (!empty($tracker->parent)) {
         $transferstr = get_string('transfer', 'tracker');
         $tablecolumns = array('id', 'summary', 'datereported', 'reportedby', 'assignedto', 'status', 'watches', 'transfered', 'action');
         $tableheaders = array("<b>$issuenumberstr</b>", "<b>$summarystr</b>", "<b>$datereportedstr</b>", "<b>$reportedbystr</b>", "<b>$assignedtostr</b>", "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$transferstr</b>", "<b>$actionstr</b>");
@@ -157,7 +157,7 @@ if ($resolved){
         $tableheaders = array("<b>$issuenumberstr</b>", "<b>$summarystr</b>", "<b>$datereportedstr</b>", "<b>$reportedbystr</b>", "<b>$assignedtostr</b>", "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$actionstr</b>");
     }
 } else {
-    if(!empty($tracker->parent)){
+    if (!empty($tracker->parent)) {
         $transferstr = get_string('transfer', 'tracker');
         $tablecolumns = array('resolutionpriority', 'id', 'summary', 'datereported', 'reportedby', 'assignedto', 'status', 'watches', 'transfered', 'action');
         $tableheaders = array("<b>$prioritystr</b>", "<b>$issuenumberstr</b>", "<b>$summarystr</b>", "<b>$datereportedstr</b>", "<b>$reportedbystr</b>", "<b>$assignedtostr</b>", "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$transferstr</b>", "<b>$actionstr</b>");
@@ -195,70 +195,67 @@ $table->column_class('assignedto', 'list_assignedto');
 $table->column_class('watches', 'list_watches');
 $table->column_class('status', 'list_status');
 $table->column_class('action', 'list_action');
-if (!empty($tracker->parent)){
+if (!empty($tracker->parent)) {
     $table->column_class('transfered', 'list_transfered');
 }
 
 $table->setup();
 
-
-/// get extra query parameters from flexible_table behaviour
+// get extra query parameters from flexible_table behaviour
 $where = $table->get_sql_where();
 $sort = $table->get_sql_sort();
 $table->pagesize($limit, $numrecords);
 
-if (!empty($sort)){
+if (!empty($sort)) {
     $sql .= " ORDER BY $sort";
 } else {
     $sql .= " ORDER BY resolutionpriority ASC";
 }
 
-/// set list length limits
+// set list length limits
 /*
-if ($limit > $numrecords){
+if ($limit > $numrecords) {
     $offset = 0;
 } else {
     $offset = $limit * ($page - 1);
 }
 $sql = $sql . ' LIMIT ' . $limit . ',' . $offset;
 */
-//
-
-$issues = $DB->get_records_sql($sql, null, $table->get_page_start(), $table->get_page_size());
+// $issues = $DB->get_records_sql($sql, null, $table->get_page_start(), $table->get_page_size());
 
 $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', " trackerid = $tracker->id GROUP BY trackerid ");
 
-if (!empty($issues)){
-    /// product data for table
-    foreach ($issues as $issue){
+if (!empty($issues)) {
+    // product data for table
+    foreach ($issues as $issue) {
         $issuenumber = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;issueid={$issue->id}\">{$tracker->ticketprefix}{$issue->id}</a>";
         $summary = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}\">".format_string($issue->summary).'</a>';
         $datereported = date('Y/m/d h:i', $issue->datereported);
         $user = $DB->get_record('user', array('id' => $issue->reportedby));
         $reportedby = fullname($user);
         $user = $DB->get_record('user', array('id' => $issue->assignedto));
-        if (has_capability('mod/tracker:manage', $context)){ // managers can assign bugs
+        if (has_capability('mod/tracker:manage', $context)) { // managers can assign bugs
             $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array('' => 'choose'), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")). "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
             $developers = tracker_getdevelopers($context);
             if (!empty($developers)) {
                 $developersmenu = array();
-                foreach($developers as $developer){
+                foreach ($developers as $developer) {
                     $developersmenu[$developer->id] = fullname($developer);
                 }
                 $assignedto = html_writer::select($developersmenu, "assignedto{$issue->id}", $issue->assignedto, array('' => get_string('unassigned', 'tracker')), array('onchange' => "document.forms['manageform'].changed{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"changed{$issue->id}\" value=\"0\" />";
             }
-        } elseif (has_capability('mod/tracker:resolve', $context)){ // resolvers can give a bug back to managers
+        } elseif (has_capability('mod/tracker:resolve', $context)) { // resolvers can give a bug back to managers
             $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array('' => 'choose'), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
             $managers = tracker_getadministrators($context);
             if (!empty($managers)) {
-                foreach($managers as $manager){
+                foreach ($managers as $manager) {
                     $managersmenu[$manager->id] = fullname($manager);
                 }
                 $managersmenu[$USER->id] = fullname($USER);
                 $assignedto = html_writer::select($managersmenu, "assignedto{$issue->id}", $issue->assignedto, array('' => get_string('unassigned', 'tracker')), array('onchange' => "document.forms['manageform'].changed{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"changed{$issue->id}\" value=\"0\" />";
             }
         } else {
-            $status = $FULLSTATUSKEYS[0 + $issue->status]; 
+            $status = $FULLSTATUSKEYS[0 + $issue->status];
             $assignedto = fullname($user);
         }
 
@@ -313,7 +310,7 @@ if (!empty($issues)){
                 $dataset = array($maxpriority - $issue->resolutionpriority + 1, $issuenumber, $summary.' '.$solution, $datereported, $reportedby, $assignedto, $status, 0 + $issue->watches, $actions);
             }
         }
-        $table->add_data($dataset);     
+        $table->add_data($dataset);
     }
     $table->print_html();
     echo '<br/>';
@@ -326,11 +323,11 @@ if (!empty($issues)){
     if (!$resolved) {
         echo '<br/>';
         echo '<br/>';
-        echo $OUTPUT->notification(get_string('noissuesreported', 'tracker'), 'box generalbox', 'notice'); 
+        echo $OUTPUT->notification(get_string('noissuesreported', 'tracker'), 'box generalbox', 'notice');
     } else {
         echo '<br/>';
         echo '<br/>';
-        echo $OUTPUT->notification(get_string('noissuesresolved', 'tracker'), 'box generalbox', 'notice'); 
+        echo $OUTPUT->notification(get_string('noissuesresolved', 'tracker'), 'box generalbox', 'notice');
     }
 }
 
