@@ -1,4 +1,4 @@
-<?php // $Id: tracker.php,v 1.2 2012-08-12 21:43:55 vf Exp $ 
+<?php // $Id: tracker.php,v 1.2 2012-08-12 21:43:55 vf Exp $
       // tracker.php - created with Moodle 2.2
 
 $string['pluginname'] = 'Ticket Tracker/User support';
@@ -145,7 +145,7 @@ $string['errormoduleincorrect'] = 'Course module is incorrect';
 $string['errornoaccessallissues'] = 'You do not have access to view all issues.';
 $string['errornoaccessissue'] = 'You do not have access to view this issue.';
 $string['errornoeditissue'] = 'You do not have access to edit this issue.';
-$string['errorrecordissue'] = 'Could not submit issue'; 
+$string['errorrecordissue'] = 'Could not submit issue';
 $string['errorremote'] = 'Error on remote side<br/> {$a} ';
 $string['errorremote'] = 'Remote error: {$a}';
 $string['errorremotesendingcascade'] = 'Error on sending cascade :<br/> {$a}';
@@ -369,7 +369,7 @@ $string['statehistory'] = 'States';
 
 // help strings
 
-$string['supportmode_help'] = 'Support mode applies some predefined settings and role overides on the tracker to achieved a preset behaviour. 
+$string['supportmode_help'] = 'Support mode applies some predefined settings and role overides on the tracker to achieved a preset behaviour.
 
 * Bug report: Reporters have access to the whole ticket list for reading the issues in a collaborative way. All states are enabled for a complete
 tecnhical operation workflow, including operations on preprod test systems.
@@ -399,7 +399,7 @@ History of changes are tracked for each ticket.
 
 Ticket tracker can be cascaded locally or through MNET allowing a ticket manager to send a ticket to a remote (higher level) ticket collector.
 
-Trackers can now be chained so that ticket can be moved between trackers. 
+Trackers can now be chained so that ticket can be moved between trackers.
 ';
 
 $string['elements_help'] = '
@@ -450,7 +450,7 @@ Checking this checkbox will send a signal to developpers or tickets managers so 
 Please consider although that there is no automated process using directly this variable. The acceptation of the emergency will be depending on how urgent support administrators have considered your demand.';
 
 $string['mods_help'] = '
-This module provides an amdinistrator or technical operator a way to collect locally issues on a Moodle implementation. It may be used mainly as an overall system tool for Moodle administration and support to end users, but also can be used as any other module for student projects. It can be instanciated several times within a course space. 
+This module provides an amdinistrator or technical operator a way to collect locally issues on a Moodle implementation. It may be used mainly as an overall system tool for Moodle administration and support to end users, but also can be used as any other module for student projects. It can be instanciated several times within a course space.
 The issue description form is fully customisable. The tracker administrator can add as many description he needs by adding form elements. The integrated search engine do ajust itself to this customization.';
 
 $string['defaultassignee_help'] = '
@@ -468,7 +468,4 @@ When enabled some state changes may result in sending notifications to users whe
 $string['strictworkflow_help'] = '
 When enabled, each specific internal role in tracker (reporter, developer, resolvers, manager) will only have access to his accessible states against his role.
 ';
-
-
-
 

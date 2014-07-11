@@ -1,17 +1,14 @@
 <?php
 // This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
+// // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
+// // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
+// // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
@@ -138,35 +135,35 @@ include($CFG->dirroot.'/mod/tracker/menus.php');
  *
  * routing to appropriate view against situation
  */
- 
+
 if ($view == 'view') {
     $result = 0 ;
     if ($action != '') {
         $result = include($CFG->dirroot.'/mod/tracker/views/view.controller.php');
     }
     if ($result != -1) {
-        switch($screen) {
-            case 'mytickets': 
+        switch ($screen) {
+            case 'mytickets':
                 $resolved = 0;
                 include "views/viewmyticketslist.php";
                 break;
-            case 'mywork': 
+            case 'mywork':
                 $resolved = 0;
                 include($CFG->dirroot.'/mod/tracker/views/viewmyassignedticketslist.php');
                 break;
-            case 'browse': 
+            case 'browse':
                 if (!has_capability('mod/tracker:viewallissues', $context)) {
                     print_error ('errornoaccessallissues', 'tracker');
                 } else {
                     $resolved = 0;
                     include "views/viewissuelist.php";
-                } 
+                }
                 break;
             case 'search':
                 include($CFG->dirroot.'/mod/tracker/views/searchform.html');
                 break;
             case 'viewanissue' :
-                ///If user it trying to view an issue, check to see if user has privileges to view this issue
+                // If user it trying to view an issue, check to see if user has privileges to view this issue
                 if (!has_any_capability(array('mod/tracker:seeissues','mod/tracker:resolve','mod/tracker:develop','mod/tracker:manage'), $context)) {
                     print_error('errornoaccessissue', 'tracker');
                 } else {
@@ -174,10 +171,10 @@ if ($view == 'view') {
                 }
                 break;
             case 'editanissue' :
-                if (!has_capability('mod/tracker:manage', $context)){
+                if (!has_capability('mod/tracker:manage', $context)) {
                     print_error('errornoaccessissue', 'tracker');
                 } else {
-                    include "views/editanissue.html";   
+                    include "views/editanissue.html";
                 }
                 break;
         }
@@ -188,7 +185,7 @@ if ($view == 'view') {
         $result = include "views/view.controller.php";
     }
     if ($result != -1) {
-        switch($screen) {
+        switch ($screen) {
             case 'mytickets':
                 $resolved = 1;
                 include "views/viewmyticketslist.php";
@@ -210,32 +207,32 @@ if ($view == 'view') {
 } elseif ($view == 'reports') {
     $result = 0;
     if ($result != -1) {
-        switch($screen) {
+        switch ($screen) {
             case 'status':
                 include "report/status.html";
                 break;
-            case 'evolution': 
+            case 'evolution':
                 include "report/evolution.html";
                 break;
-            case 'print': 
+            case 'print':
                 include "report/print.html";
                 break;
         }
     }
 } elseif ($view == 'admin') {
     $result = 0;
-    if ($action != ''){
+    if ($action != '') {
         $result = include "views/admin.controller.php";
     }
-    if ($result != -1){
-        switch($screen){
-            case 'summary': 
-                include "views/admin_summary.html"; 
+    if ($result != -1) {
+        switch ($screen) {
+            case 'summary':
+                include "views/admin_summary.html";
                 break;
-            case 'manageelements': 
+            case 'manageelements':
                 include "views/admin_manageelements.html";
                 break;
-            case 'managenetwork': 
+            case 'managenetwork':
                 include "views/admin_mnetwork.html";
                 break;
         }

@@ -34,17 +34,17 @@ function require_jqplot_libs() {
 * prints any JQplot graph type given a php descriptor and dataset
 *
 */
-function jqplot_print_graph($htmlid, $graph, &$data, $width, $height, $addstyle = '', $return = false, $ticks = null){
+function jqplot_print_graph($htmlid, $graph, &$data, $width, $height, $addstyle = '', $return = false, $ticks = null) {
     global $PLOTID;
     static $instance = 0;
-    
+
     $htmlid = $htmlid.'_'.$instance;
     $instance++;
 
     $str = "<center><div id=\"$htmlid\" style=\"{$addstyle} width:{$width}px; height:{$height}px;\"></div></center>";
     $str .= "<script type=\"text/javascript\">\n";
-    
-    if (!is_null($ticks)){
+
+    if (!is_null($ticks)) {
         $ticksvalues = implode("','", $ticks);
         $str .= "var ticks = ['$ticksvalues']; \n";
     }
@@ -53,21 +53,21 @@ function jqplot_print_graph($htmlid, $graph, &$data, $width, $height, $addstyle 
     $varsetlist = preg_replace('/"(\d+)\"/', "$1", $varsetlist);
     $jsongraph = json_encode($graph);
     $jsongraph = preg_replace('/"\$\$\.(.*?)\"/', "$1", $jsongraph);
-    $jsongraph = preg_replace('/"(\$\.jqplot.*?)\"/', "$1", $jsongraph);        
+    $jsongraph = preg_replace('/"(\$\.jqplot.*?)\"/', "$1", $jsongraph);
 
     $str .= "
     $.jqplot.config.enablePlugins = true;
 
     plot{$PLOTID} = $.jqplot(
-        '{$htmlid}', 
-        $varsetlist, 
+        '{$htmlid}',
+        $varsetlist,
         {$jsongraph}
     );
      ";
     $str .= "</script>";
-     
+
      $PLOTID++;
-     
+
      if ($return) return $str;
      echo $str;
 }
@@ -76,10 +76,10 @@ function jqplot_print_graph($htmlid, $graph, &$data, $width, $height, $addstyle 
 * TODO : unfinished
 *
 */
-function jqplot_print_vert_bar_graph(&$data, $title, $htmlid){
+function jqplot_print_vert_bar_graph(&$data, $title, $htmlid) {
     global $PLOTID;
     static $instance = 0;
-    
+
     $htmlid = $htmlid.'_'.$instance;
     $instance++;
 
@@ -88,7 +88,7 @@ function jqplot_print_vert_bar_graph(&$data, $title, $htmlid){
     echo "
         $.jqplot.config.enablePlugins = true;
     ";
-    
+
     $title = addslashes($title);
 
     $answeredarr = array($data->answered, $data->aanswered, $data->canswered);
@@ -100,19 +100,19 @@ function jqplot_print_vert_bar_graph(&$data, $title, $htmlid){
     print_jqplot_barline('hitratio', $hitratioarr);
     echo "
         plot{$PLOTID} = $.jqplot(
-            '$htmlid', 
-            [$listattempts], 
+            '$htmlid',
+            [$listattempts],
             { legend:{show:true, location:'ne'},
-            title:'$title', 
-            seriesDefaults:{ 
+            title:'$title',
+            seriesDefaults:{
                 renderer:$.jqplot.BarRenderer,
-                  rendererOptions:{barDirection:'vertical', barPadding: 6, barMargin:15}, 
+                  rendererOptions:{barDirection:'vertical', barPadding: 6, barMargin:15},
                   shadowAngle:135
-            }, 
+            },
             series:[
-            ],   
-            axesDefaults:{useSeriesColor: true},   
-            axes:{ yaxis:{label:'Questions', min:0}, 
+            ],
+            axesDefaults:{useSeriesColor: true},
+            axes:{ yaxis:{label:'Questions', min:0},
                    y2axis:{label:'Hit Ratio', min:0, max:100, tickOptions:{formatString:'%d\%'}}
             }
         });
@@ -124,13 +124,13 @@ function jqplot_print_vert_bar_graph(&$data, $title, $htmlid){
 }
 
 /**
-* 
+*
 *
 */
-function jqplot_print_labelled_graph(&$data, $title, $htmlid, $xlabel = '', $ylabel = ''){
+function jqplot_print_labelled_graph(&$data, $title, $htmlid, $xlabel = '', $ylabel = '') {
     global $PLOTID;
     static $instance = 0;
-    
+
     $htmlid = $htmlid.'_'.$instance;
     $instance++;
 
@@ -139,26 +139,26 @@ function jqplot_print_labelled_graph(&$data, $title, $htmlid, $xlabel = '', $yla
     echo "
         $.jqplot.config.enablePlugins = true;
     ";
-    
+
     $title = addslashes($title);
-    
+
     print_jqplot_labelled_rawline($data, 'data_'.$htmlid);
 
     echo "
         plot{$PLOTID} = $.jqplot(
-            '$htmlid', 
-            [data_$htmlid], 
-            { 
-            title:'$title', 
-            seriesDefaults:{ 
+            '$htmlid',
+            [data_$htmlid],
+            {
+            title:'$title',
+            seriesDefaults:{
                 renderer:$.jqplot.LineRenderer,
                   showLine:false,
-                  showMarker:true, 
+                  showMarker:true,
                   shadowAngle:135,
                   markerOptions:{size:15, style:'circle'},
                   shadowDepth:2
-            }, 
-            axes:{ xaxis:{label:'{$xlabel}', min:0, max:100, numberTicks:11, tickOptions:{formatString:'%d\%'}}, 
+            },
+            axes:{ xaxis:{label:'{$xlabel}', min:0, max:100, numberTicks:11, tickOptions:{formatString:'%d\%'}},
                    yaxis:{label:'{$ylabel}', min:0, max:100, numberTicks:11, tickOptions:{formatString:'%d\%'}}
             },
             cursor:{zoom:true, showTooltip:false}
@@ -171,13 +171,13 @@ function jqplot_print_labelled_graph(&$data, $title, $htmlid, $xlabel = '', $yla
 }
 
 /**
-* 
+*
 *
 */
-function jqplot_print_simple_bargraph(&$data, $title, $htmlid){
+function jqplot_print_simple_bargraph(&$data, $title, $htmlid) {
     global $PLOTID;
     static $instance = 0;
-    
+
     $htmlid = $htmlid.'_'.$instance;
     $instance++;
 
@@ -186,28 +186,28 @@ function jqplot_print_simple_bargraph(&$data, $title, $htmlid){
     echo "
         $.jqplot.config.enablePlugins = true;
     ";
-    
+
     $title = addslashes($title);
-    
+
     print_jqplot_simplebarline('data_'.$htmlid, $data);
 
     echo "
-    
+
         xticks = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 80, 85, 90, 95, 100];
-    
+
         plot{$PLOTID} = $.jqplot(
-            '$htmlid', 
-            [data_$htmlid], 
-            { 
-            title:'$title', 
-            seriesDefaults:{ 
+            '$htmlid',
+            [data_$htmlid],
+            {
+            title:'$title',
+            seriesDefaults:{
                 renderer:$.jqplot.BarRenderer,
                 rendererOptions:{barPadding: 6, barMargin:4}
-            }, 
+            },
             series:[
                 {color:'#FF0000'}
             ],
-            axes:{ xaxis:{renderer:$.jqplot.CategoryAxisRenderer, label:'{$xlabel} (%)', ticks:xticks}, 
+            axes:{ xaxis:{renderer:$.jqplot.CategoryAxisRenderer, label:'{$xlabel} (%)', ticks:xticks},
                    yaxis:{label:'{$ylabel}', autoscale:true}
             },
         });

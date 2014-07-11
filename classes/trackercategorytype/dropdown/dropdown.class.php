@@ -15,7 +15,7 @@ class dropdownelement extends trackerelement {
 
     var $options;
     var $multiple;
-    
+
     function dropdownelement(&$tracker, $id = null, $used) {
         parent::__construct($tracker, $id, $used);
         $this->setoptionsfromdb();
@@ -26,7 +26,7 @@ class dropdownelement extends trackerelement {
         if (isset($this->options)) {
             $optionstrs = array();
             foreach ($this->options as $option) {
-                if ($this->value != null){
+                if ($this->value != null) {
                     if ($this->value == $option->id) {
                         $optionstrs[] = format_string($option->description);
                     }
@@ -53,28 +53,28 @@ class dropdownelement extends trackerelement {
             }
         }
     }
-    
+
     function add_form_element(&$form) {
 
-        if (isset($this->options)){
+        if (isset($this->options)) {
             foreach ($this->options as $option) {
                 $optionsmenu[$option->id] = format_string($option->description);
             }
-            
+
             $mform->addElement('select', "element$this->name", format_string($this->description));
         }
     }
 
     function set_data(&$defaults, $issueid = 0) {
-        if ($issueid){
+        if ($issueid) {
 
             $elementname = "element{$this->name}";
 
             if (!empty($this->options)) {
                 $values = $this->getvalue($issueid);
                 if ($multiple && is_array($values)) {
-                    foreach($values as $v) {
-                        if (array_key_exists($v, $this->options)){ // check option still exists
+                    foreach ($values as $v) {
+                        if (array_key_exists($v, $this->options)) { // check option still exists
                             $choice[] = $v;
                         }
                         if (!empty($choice)) {
@@ -83,14 +83,14 @@ class dropdownelement extends trackerelement {
                     }
                 } else {
                     $v = $values; // single value
-                    if (array_key_exists($v, $this->options)){ // check option still exists
+                    if (array_key_exists($v, $this->options)) { // check option still exists
                         $defaults->$elementname = $v;
                     }
                 }
             }
         }
     }
-    
+
     function formprocess(&$data) {
         global $DB;
 
@@ -101,7 +101,7 @@ class dropdownelement extends trackerelement {
             $attribute->issueid = $data->issueid;
             $attribute->elementid = $this->id;
         }
-        
+
         $elmname = 'element'.$this->name;
 
         if (!$this->multiple) {
