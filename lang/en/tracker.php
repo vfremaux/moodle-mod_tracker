@@ -1,5 +1,6 @@
-<?php // $Id: tracker.php,v 1.2 2012-08-12 21:43:55 vf Exp $
-      // tracker.php - created with Moodle 2.2
+<?php
+
+// tracker.php - created with Moodle 2.2
 
 $string['pluginname'] = 'Ticket Tracker/User support';
 $string['pluginadministration'] = 'Tracker administration';
@@ -199,6 +200,7 @@ $string['mode_taskspread'] = 'Task distributor';
 $string['mode_customized'] = 'Customized tracker';
 $string['modulename'] = 'User support - Tracker';
 $string['nofileloaded'] = 'No file loaded here.';
+$string['notrackers'] = 'No trackers in this course.';
 $string['options'] = 'Options';
 $string['print'] = 'Print';
 $string['reports'] = 'Reports';
@@ -453,7 +455,7 @@ Checking this checkbox will send a signal to developpers or tickets managers so 
 Please consider although that there is no automated process using directly this variable. The acceptation of the emergency will be depending on how urgent support administrators have considered your demand.';
 
 $string['mods_help'] = '
-This module provides an amdinistrator or technical operator a way to collect locally issues on a Moodle implementation. It may be used mainly as an overall system tool for Moodle administration and support to end users, but also can be used as any other module for student projects. It can be instanciated several times within a course space.
+This module provides an administrator or technical operator a way to collect locally issues on a Moodle implementation. It may be used mainly as an overall system tool for Moodle administration and support to end users, but also can be used as any other module for student projects. It can be instanciated several times within a course space.
 The issue description form is fully customisable. The tracker administrator can add as many description he needs by adding form elements. The integrated search engine do ajust itself to this customization.';
 
 $string['defaultassignee_help'] = '

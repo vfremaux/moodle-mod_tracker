@@ -1,5 +1,5 @@
-<?php // $Id: tracker.php,v 1.2 2012-08-12 21:43:55 vf Exp $
-      // tracker.php - created with Moodle 1.2 development (2003111400)
+<?php
+// tracker.php - created with Moodle 1.2 development (2003111400)
 
 // Capabilities
 
@@ -197,6 +197,7 @@ $string['noresolvingissue'] = 'Pas de ticket attribué';
 $string['notickets'] = 'Aucun ticket personnel';
 $string['noticketsorassignation'] = 'Pas de tickets ou d\'assignations';
 $string['notifications'] = 'Notifications';
+$string['notrackers'] = 'Pas de gestionnaire dans ce cours.';
 $string['notrackeradmins'] = 'Pas d\'administrateurs';
 $string['nowatches'] = 'Pas d\'abonnements';
 $string['numberofissues'] = 'Nombre de tickets';

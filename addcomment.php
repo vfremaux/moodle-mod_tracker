@@ -1,14 +1,17 @@
 <?php
 // This file is part of Moodle - http://moodle.org/
-// // Moodle is free software: you can redistribute it and/or modify
+// 
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// // Moodle is distributed in the hope that it will be useful,
+// 
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// // You should have received a copy of the GNU General Public License
+// 
+// You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 require('../../config.php');
@@ -57,7 +60,7 @@ if (!$issue = $DB->get_record('tracker_issue', array('id' => $issueid))) {
 
 // Setting page.
 
-$url = $CFG->wwwroot.'/mod/tracker/addcomment.php?id='.$id.'&amp;issueid='.$issueid;
+$url = new moodle_url('/mod/tracker/addcomment.php', array('id' => $id, 'issueid' => $issueid));
 $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_title(format_string($tracker->name));
@@ -65,9 +68,11 @@ $PAGE->set_heading(format_string($tracker->name));
 $PAGE->set_button($OUTPUT->update_module_button($cm->id, 'tracker'));
 $PAGE->set_headingmenu(navmenu($course, $cm));
 
-add_to_log($course->id, 'tracker', "reportissue", "view.php?id={$cm->id}", "$tracker->id", $cm->id);
+// add_to_log($course->id, 'tracker', "commentissue", "view.php?id={$cm->id}", "$tracker->id", $cm->id);
+$event = \mod_tracker\event\course_module_commented::create_from_issue($tracker, $issueid);
+$event->trigger();
 
-$form = new AddCommentForm($CFG->wwwroot.'/mod/tracker/addcomment.php', array('issueid' => $issueid, 'cmid' => $id));
+$form = new AddCommentForm(new moodle_url('/mod/tracker/addcomment.php'), array('issueid' => $issueid, 'cmid' => $id));
 
 if (!$form->is_cancelled()) {
     if ($data = $form->get_data()) {
@@ -93,10 +98,10 @@ if (!$form->is_cancelled()) {
 
         // Update back reencoded field text content.
         $DB->set_field('tracker_issuecomment', 'comment', $data->comment, array('id' => $comment->id));
-        redirect($CFG->wwwroot.'/mod/tracker/view.php?id='.$id.'&amp;view=view&amp;screen=viewanissue&amp;issueid='.$issueid);
+        redirect(new moodle_url('/mod/tracker/view.php', array('id' => $id, 'view' = 'view', 'screen' = 'viewanissue', 'issueid' => $issueid));
     }
 } else {
-    redirect($CFG->wwwroot.'/mod/tracker/view.php?id='.$id.'&amp;view=view&amp;screen=viewanissue&amp;issueid='.$issueid);
+    redirect(new moodle_url('/mod/tracker/view.php', array('id' => $id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issueid)));
 }
 
 echo $OUTPUT->header();

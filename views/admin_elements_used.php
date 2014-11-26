@@ -1,13 +1,13 @@
 <?php
 
 /**
-* @package mod-tracker
-* @category mod
-* @author Clifford Tham, Valery Fremaux > 1.8
-* @date 02/12/2007
-*
-* From for showing used element list
-*/
+ * @package mod-tracker
+ * @category mod
+ * @author Clifford Tham, Valery Fremaux > 1.8
+ * @date 02/12/2007
+ *
+ * From for showing used element list
+ */
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    // It must be included from view.php in mod/tracker

@@ -1,14 +1,17 @@
 <?php
 // This file is part of Moodle - http://moodle.org/
-// // Moodle is free software: you can redistribute it and/or modify
+//
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// // Moodle is distributed in the hope that it will be useful,
+//
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// // You should have received a copy of the GNU General Public License
+//
+// You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
@@ -58,21 +61,23 @@ if ($id) {
 $screen = tracker_resolve_screen($tracker, $cm);
 $view = tracker_resolve_view($tracker, $cm);
 
-$url = $CFG->wwwroot.'/mod/tracker/view.php?id='.$cm->id;
+$url = new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => $view, 'screen' => $screen));
 
 // Redirect (before outputting) traps.
 if ($view == "view" && (empty($screen) || $screen == 'viewanissue' || $screen == 'editanissue') && empty($issueid)) {
-    redirect("view.php?id={$cm->id}&amp;view=view&amp;screen=browse");
+    redirect(new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => 'view', 'screen' => 'browse')));
 }
 if ($view == 'reportanissue') {
-    redirect($CFG->wwwroot.'/mod/tracker/reportissue.php?id='.$id);
+    redirect(new moodle_url('/mod/tracker/reportissue.php', array('id'=> $id)));
 }
 
 // Implicit routing.
 
 if ($issueid) {
     $view = 'view';
-    if (empty($screen)) $screen = 'viewanissue';
+    if (empty($screen)) {
+        $screen = 'viewanissue';
+    }
 }
 
 // Security.
@@ -87,10 +92,8 @@ $eventparams = array(
     'context' => $context,
 );
 
-require_once($CFG->dirroot.'/mod/tracker/classes/event/course_module_viewed.php');
+// require_once($CFG->dirroot.'/mod/tracker/classes/event/course_module_viewed.php');
 $event = \mod_tracker\event\course_module_viewed::create($eventparams);
-$event->add_record_snapshot('course_modules', $cm);
-$event->add_record_snapshot('course', $course);
 $event->add_record_snapshot('tracker', $tracker);
 $event->trigger();
 
@@ -195,24 +198,26 @@ if ($view == 'view') {
 } elseif ($view == 'resolved') {
     $result = 0 ;
     if ($action != '') {
-        $result = include "views/view.controller.php";
+        $result = include 'views/view.controller.php';
     }
     if ($result != -1) {
         switch ($screen) {
             case 'mytickets':
                 $resolved = 1;
-                include "views/viewmyticketslist.php";
+                include 'views/viewmyticketslist.php';
                 break;
+
             case 'mywork':
                 $resolved = 1;
-                include "views/viewmyassignedticketslist.php";
+                include 'views/viewmyassignedticketslist.php';
                 break;
+
             case 'browse':
                 if (!has_capability('mod/tracker:viewallissues', $context)) {
                     print_error('errornoaccessallissues', 'tracker');
                 } else {
                     $resolved = 1;
-                    include "views/viewissuelist.php";
+                    include 'views/viewissuelist.php';
                 }
                 break;
         }
@@ -254,22 +259,22 @@ if ($view == 'view') {
     $result = 0;
 
     if ($action != '') {
-        $result = include "views/profile.controller.php";
+        $result = include 'views/profile.controller.php';
     }
 
     if ($result != -1) {
         switch ($screen) {
             case 'myprofile' :
-                include "views/profile.html";
+                include 'views/profile.html';
                 break;
             case 'mypreferences' :
-                include "views/mypreferences.html";
+                include 'views/mypreferences.html';
                 break;
             case 'mywatches' :
-                include "views/mywatches.html";
+                include 'views/mywatches.html';
                 break;
             case 'myqueries':
-                include "views/myqueries.html";
+                include 'views/myqueries.html';
                 break;
         }
     }

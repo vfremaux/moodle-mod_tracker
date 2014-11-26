@@ -1,14 +1,17 @@
 <?php
 // This file is part of Moodle - http://moodle.org/
-// // Moodle is free software: you can redistribute it and/or modify
+//
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// // Moodle is distributed in the hope that it will be useful,
+//
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// // You should have received a copy of the GNU General Public License
+//
+// You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once('../../config.php');
@@ -54,16 +57,14 @@ require_course_login($course->id, false, $cm);
 require_capability('mod/tracker:report', $context);
 
 // setting page
-$url = $CFG->wwwroot.'/mod/tracker/reportissue.php?id='.$id;
+$url = new moodle_url('/mod/tracker/reportissue.php', array('id' => $id));
 $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_title(format_string($tracker->name));
 $PAGE->set_heading(format_string($tracker->name));
 $PAGE->set_button($OUTPUT->update_module_button($cm->id, 'tracker'));
 
-add_to_log($course->id, 'tracker', "reportissue", "view.php?id={$cm->id}", "$tracker->id", $cm->id);
-
-$form = new TrackerIssueForm($CFG->wwwroot.'/mod/tracker/reportissue.php', array('trackerid' => $tracker->id, 'cmid' => $id));
+$form = new TrackerIssueForm(new moodle_url('/mod/tracker/reportissue.php'), array('trackerid' => $tracker->id, 'cmid' => $id));
 
 if (!$form->is_cancelled()) {
     if ($data = $form->get_data()) {
@@ -71,6 +72,10 @@ if (!$form->is_cancelled()) {
         if (!$issue = tracker_submitanissue($tracker, $data)) {
             print_error('errorcannotsubmitticket', 'tracker');
         }
+
+        // add_to_log($course->id, 'tracker', "reportissue", "view.php?id={$cm->id}", "$tracker->id", $cm->id);
+        $event = \mod_tracker\event\tracker_issuereported::create_from_issue($tracker, $issue->id);
+        $event->trigger();
 
         // stores files
         $data = file_postupdate_standard_editor($data, 'description', $form->editoroptions, $context, 'mod_tracker', 'issuedescription', $data->issueid);
@@ -90,7 +95,7 @@ if (!$form->is_cancelled()) {
         echo $OUTPUT->box_start('generalbox', 'tracker-acknowledge');
         echo (empty($tracker->thanksmessage)) ? get_string('thanksdefault', 'tracker') : format_string($tracker->thanksmessage) ;
         echo $OUTPUT->box_end();
-        echo $OUTPUT->continue_button($CFG->wwwroot."/mod/tracker/view.php?id={$cm->id}view=view&amp;screen=browse");
+        echo $OUTPUT->continue_button(new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => 'view', 'screen' => 'browse')));
         echo $OUTPUT->footer();
         die;
         // notify all admins

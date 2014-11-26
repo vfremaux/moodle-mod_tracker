@@ -1,23 +1,23 @@
 <?PHP
 
 /**
-* A view of owned issues
-* @package mod-tracker
-* @category mod
-* @author Valery Fremaux
-* @date 02/12/2007
-* @version Moodle 2.0
-*
-* Print Bug List
-*/
+ * A view of owned issues
+ * @package mod-tracker
+ * @category mod
+ * @author Valery Fremaux
+ * @date 02/12/2007
+ * @version Moodle 2.0
+ *
+ * Print Bug List
+ */
 
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    // It must be included from view.php in mod/tracker
+    die('Direct access to this script is forbidden.');
 }
 
 include_once $CFG->libdir.'/tablelib.php';
 
-// get search engine related information
+// Get search engine related information
 // fields can come from a stored query,or from the current query in the user's client environement cookie
 if (!isset($fields)) {
     $fields = tracker_extractsearchcookies();

@@ -1,9 +1,9 @@
 <?php
 
 /**
-*
-*
-*/
+ *
+ *
+ */
 function tracker_require_jqplot_libs() {
     global $CFG, $PAGE;
     static $jqplotloaded = false;
