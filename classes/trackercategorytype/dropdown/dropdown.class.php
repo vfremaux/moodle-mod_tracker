@@ -105,12 +105,12 @@ class dropdownelement extends trackerelement {
         $elmname = 'element'.$this->name;
 
         if (!$this->multiple) {
-            $attribute->elementitemid = $data->$elmname;
+            $attribute->elementitemid = @$data->$elmname;
         } else {
             if (is_array($data->$elmname)) {
-                $attribute->elementitemid = implode(',', $data->$elmname);
+                $attribute->elementitemid = implode(',', @$data->$elmname);
             } else {
-                $attribute->elementitemid = $data->$elmname;
+                $attribute->elementitemid = @$data->$elmname;
             }
         }
 
