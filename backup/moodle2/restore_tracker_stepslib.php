@@ -1,15 +1,18 @@
 <?php
 
 // This file is part of Moodle - http://moodle.org/
-// // Moodle is free software: you can redistribute it and/or modify
+//
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// // Moodle is distributed in the hope that it will be useful,
+//
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// // You should have received a copy of the GNU General Public License
+//
+// You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
@@ -40,17 +43,17 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         $paths[] = $elementitem;
         $usedelement = new restore_path_element('tracker_usedelement', '/activity/tracker/usedelements/usedelement');
         $paths[] = $usedelement;
-
-        if ($userinfo) {
-            $paths[] = new restore_path_element('tracker_issue', '/activity/tracker/issues/issue');
-            $paths[] = new restore_path_element('tracker_issueattribute', '/activity/tracker/issues/issue/attribs/attrib');
-            $paths[] = new restore_path_element('tracker_issuecc', '/activity/tracker/issues/issue/ccs/cc');
-            $paths[] = new restore_path_element('tracker_issuecomment', '/activity/tracker/issues/issue/comments/comment');
-            $paths[] = new restore_path_element('tracker_issueownership', '/activity/tracker/issues/issue/ownerships/ownership');
-            $paths[] = new restore_path_element('tracker_state_change', '/activity/tracker/issues/issue/statechanges/state');
-            $paths[] = new restore_path_element('tracker_issuedependancy', '/activity/tracker/dependancies/dependancy');
-            $paths[] = new restore_path_element('tracker_query', '/activity/tracker/queries/query');
-            $paths[] = new restore_path_element('tracker_preferences', '/activity/tracker/preferences/preference');
+        
+        if ($userinfo){
+	        $paths[] = new restore_path_element('tracker_issue', '/activity/tracker/issues/issue');
+	        $paths[] = new restore_path_element('tracker_issueattribute', '/activity/tracker/issues/issue/attribs/attrib');
+	        $paths[] = new restore_path_element('tracker_issuecc', '/activity/tracker/issues/issue/ccs/cc');
+	        $paths[] = new restore_path_element('tracker_issuecomment', '/activity/tracker/issues/issue/comments/comment');
+	        $paths[] = new restore_path_element('tracker_issueownership', '/activity/tracker/issues/issue/ownerships/ownership');
+	        $paths[] = new restore_path_element('tracker_state_change', '/activity/tracker/issues/issue/statechanges/state');
+	        $paths[] = new restore_path_element('tracker_issuedependancy', '/activity/tracker/dependancies/dependancy');
+	        $paths[] = new restore_path_element('tracker_query', '/activity/tracker/queries/query');
+	        $paths[] = new restore_path_element('tracker_preferences', '/activity/tracker/preferences/preference');
         }
 
         // Return the paths wrapped into standard activity structure
@@ -73,23 +76,23 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
     }
 
     protected function after_execute() {
-        global $DB;
-
-        // remap element used to real values
-        if ($used = $DB->get_records('tracker_elementused', array('trackerid' => $this->get_new_parentid('tracker')))) {
-            foreach ($used as $u) {
-                $u->elementid = $this->get_mappingid('tracker_element', $u->elementid);
-                $DB->update_record('tracker_elementused', $u);
-             }
-        }
-
+    	global $DB;
+    	
+    	// remap element used to real values
+		if ($used = $DB->get_records('tracker_elementused', array('trackerid' => $this->get_new_parentid('tracker')))){
+			foreach($used as $u){
+		        $u->elementid = $this->get_mappingid('tracker_element', $u->elementid);
+		        $DB->update_record('tracker_elementused', $u);
+		     }
+		}		
+    	
         // Add tracker related files, no need to match by itemname (just internally handled context)
         $this->add_related_files('mod_tracker', 'intro', null);
     }
 
     protected function process_tracker_element($data) {
-        global $DB;
-
+    	global $DB;
+    	
         $data = (object)$data;
         $oldid = $data->id;
 
@@ -101,8 +104,8 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
     }
 
     protected function process_tracker_elementitem($data) {
-        global $DB;
-
+    	global $DB;
+    	
         $data = (object)$data;
         $oldid = $data->id;
 
@@ -114,8 +117,8 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
     }
 
     protected function process_tracker_usedelement($data) {
-        global $DB;
-
+    	global $DB;
+    	
         $data = (object)$data;
         $oldid = $data->id;
 
@@ -128,8 +131,8 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
     }
 
     protected function process_tracker_issue($data) {
-        global $DB;
-
+    	global $DB;
+    	
         $data = (object)$data;
         $oldid = $data->id;
 
@@ -151,8 +154,8 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
     }
 
     protected function process_tracker_issueattribute($data) {
-        global $DB;
-
+    	global $DB;
+    	
         $data = (object)$data;
         $oldid = $data->id;
 
@@ -172,8 +175,8 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
     }
 
     protected function process_tracker_issuecc($data) {
-        global $DB;
-
+    	global $DB;
+    	
         $data = (object)$data;
 
         $oldid = $data->id;
@@ -189,8 +192,8 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
     }
 
     protected function process_tracker_issuecomment($data) {
-        global $DB;
-
+    	global $DB;
+    	
         $data = (object)$data;
 
         $oldid = $data->id;
@@ -208,8 +211,8 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
     }
 
     protected function process_tracker_issuedependancy($data) {
-        global $DB;
-
+    	global $DB;
+    	
         $data = (object)$data;
 
         $data->trackerid = $this->get_new_parentid('tracker');
@@ -223,8 +226,8 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
     }
 
     protected function process_tracker_issueownership($data) {
-        global $DB;
-
+    	global $DB;
+    	
         $data = (object)$data;
 
         $data->trackerid = $this->get_mappingid('tracker', $data->trackerid);
@@ -239,8 +242,8 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
     }
 
     protected function process_tracker_preferences($data) {
-        global $DB;
-
+    	global $DB;
+    	
         $data = (object)$data;
 
         $data->trackerid = $this->get_new_parentid('tracker');
@@ -253,8 +256,8 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
     }
 
     protected function process_tracker_query($data) {
-        global $DB;
-
+    	global $DB;
+    	
         $data = (object)$data;
 
         $data->trackerid = $this->get_new_parentid('tracker');
@@ -267,8 +270,8 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
     }
 
     protected function process_tracker_state_change($data) {
-        global $DB;
-
+    	global $DB;
+    	
         $data = (object)$data;
 
         $data->trackerid = $this->get_mappingid('tracker', $data->trackerid);

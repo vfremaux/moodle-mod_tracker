@@ -1,23 +1,23 @@
-<?PHP
+<?php
 
 /**
-* A view of owned issues
-* @package mod-tracker
-* @category mod
-* @author Clifford Thamm, Valery Fremaux > 1.8
-* @date 02/12/2007
-*
-* Print Bug List
-*/
+ * A view of owned issues
+ * @package mod-tracker
+ * @category mod
+ * @author Clifford Thamm, Valery Fremaux > 1.8
+ * @date 02/12/2007
+ *
+ * Print Bug List
+ */
 
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    // It must be included from view.php in mod/tracker
+    die('Direct access to this script is forbidden.');
 }
 
 include_once $CFG->libdir.'/tablelib.php';
 
-// get search engine related information
-// fields can come from a stored query,or from the current query in the user's client environement cookie
+// Get search engine related information.
+// Fields can come from a stored query,or from the current query in the user's client environement cookie.
 if (!isset($fields)) {
     $fields = tracker_extractsearchcookies();
 }
@@ -222,14 +222,14 @@ if (!empty($issues)) {
         $user = $DB->get_record('user', array('id' => $issue->assignedto));
         if (has_capability('mod/tracker:manage', $context)) { // managers can assign bugs
             $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;"));
-            $developers = get_users_by_capability($context, 'mod/tracker:develop', 'u.id,lastname,firstname', 'lastname');
+            $developers = get_users_by_capability($context, 'mod/tracker:develop', 'u.id,'.get_all_user_name_fields(true, 'u'), 'lastname');
             foreach ($developers as $developer) {
                 $developersmenu[$developer->id] = fullname($developer);
             }
             $assignedto = html_writer::select($developersmenu, "assignedto{$issue->id}", $issue->assignedto, array('' => get_string('unassigned', 'tracker')), array('onchange' => "document.forms['manageform'].changed{$issue->id}.value = 1;"));
         } elseif (has_capability('mod/tracker:resolve', $context)) { // resolvers can give a bug back to managers
             $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;"));
-            $managers = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,lastname,firstname', 'lastname');
+            $managers = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,'.get_all_user_name_fields(true, 'u'), 'lastname');
             foreach ($managers as $manager) {
                 $managersmenu[$manager->id] = fullname($manager);
             }

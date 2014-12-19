@@ -1,15 +1,18 @@
 <?php
 
 // This file is part of Moodle - http://moodle.org/
-// // Moodle is free software: you can redistribute it and/or modify
+//
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// // Moodle is distributed in the hope that it will be useful,
+//
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// // You should have received a copy of the GNU General Public License
+//
+// You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
@@ -35,9 +38,9 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
 
         // Define each element separated
         $tracker = new backup_nested_element('tracker', array('id'), array(
-            'name', 'intro', 'introformat', 'requirelogin', 'allownotifications', 'enablecomments', 'ticketprefix',
-            'timemodified', 'parent', 'supportmode', 'defaultassignee', 'subtrackers', 'enablestates',
-            'thanksmessage', 'strictworkflow'));
+			'name', 'intro', 'introformat', 'requirelogin', 'allownotifications', 'enablecomments', 'ticketprefix', 
+			'timemodified', 'parent', 'supportmode', 'defaultassignee', 'subtrackers', 'enablestates',
+			'thanksmessage', 'strictworkflow'));
 
         $elements = new backup_nested_element('elements');
 
@@ -53,17 +56,17 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
 
         $used = new backup_nested_element('used', array('id'), array(
             'trackerid', 'elementid', 'sortorder', 'canbemodifiedby', 'active'));
-
+            
         $issues = new backup_nested_element('issues');
-
+        
         $issue = new backup_nested_element('elementused', array('id'), array(
-            'trackerid', 'summary', 'description', 'format', 'datereported', 'reportedby', 'status', 'assignedto', 'bywhomid', 'timeassigned', 'resolution', 'resolutionformat', 'resolutionpriority'));
-
+			'trackerid', 'summary', 'description', 'format', 'datereported', 'reportedby', 'status', 'assignedto', 'bywhomid', 'timeassigned', 'resolution', 'resolutionformat', 'resolutionpriority'));
+            
         $attribs = new backup_nested_element('issueattributes');
-
+        
         $attrib = new backup_nested_element('issueattribute', array('id'), array(
             'trackerid', 'issueid', 'elementid', 'elementitemid', 'timemodified'));
-
+            
         $ccs = new backup_nested_element('ccs');
 
         $cc = new backup_nested_element('cc', array('id'), array(
@@ -103,8 +106,8 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
         // (love this)
         $tracker->add_child($elements);
         $elements->add_child($element);
-        $element->add_child($elementitems);
-        $elementitems->add_child($item);
+		$element->add_child($elementitems);
+		$elementitems->add_child($item);
 
         $tracker->add_child($usedelements);
         $usedelements->add_child($used);
@@ -112,19 +115,19 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
         $tracker->add_child($issues);
         $issues->add_child($issue);
 
-        $issue->add_child($attribs);
-        $attribs->add_child($attrib);
-        $issue->add_child($ccs);
-        $ccs->add_child($cc);
-        $issue->add_child($comments);
-        $comments->add_child($comment);
-        $issue->add_child($ownerships);
-        $ownerships->add_child($ownership);
-        $issue->add_child($statechanges);
-        $statechanges->add_child($state);
+		$issue->add_child($attribs);
+		$attribs->add_child($attrib);
+		$issue->add_child($ccs);
+		$ccs->add_child($cc);
+		$issue->add_child($comments);
+		$comments->add_child($comment);
+		$issue->add_child($ownerships);
+		$ownerships->add_child($ownership);
+		$issue->add_child($statechanges);
+		$statechanges->add_child($state);
 
-        $tracker->add_child($dependancies);
-        $dependancies->add_child($dependancy);
+		$tracker->add_child($dependancies);
+		$dependancies->add_child($dependancy);
 
         $tracker->add_child($queries);
         $queries->add_child($query);
@@ -166,9 +169,9 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
         // Define file annotations
         $tracker->annotate_files('mod_tracker', 'intro', null); // This file area hasn't itemid
         $comment->annotate_files('mod_tracker', 'issuecomment', 'id');
-        $issue->annotate_files('mod_tracker', 'issuedescription', 'id');
-        $issue->annotate_files('mod_tracker', 'issueresolution', 'id');
-        $attrib->annotate_files('mod_tracker', 'issueattribute', 'id');
+        $issue->annotate_files('mod_tracker', 'issuedescription', 'id'); 
+        $issue->annotate_files('mod_tracker', 'issueresolution', 'id'); 
+		$attrib->annotate_files('mod_tracker', 'issueattribute', 'id');
 
         // Return the root element (tracker), wrapped into standard activity structure
         return $this->prepare_activity_structure($tracker);

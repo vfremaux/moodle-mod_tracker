@@ -1,19 +1,15 @@
 <?php
 
 /**
-* This view allows checking deck states
-*
-* @package mod-tracker
-* @category mod
-* @author Valery Fremaux
-* @license http://www.gnu.org/copyleft/gpl.html GNU Public License
-*/
+ * This view allows checking deck states
+ *
+ * @package mod-tracker
+ * @category mod
+ * @author Valery Fremaux
+ * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+ */
 
-/**
-* Requires and includes
-*/
-
-require_once ($CFG->dirroot.'/course/moodleform_mod.php');
+require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
 /**
 * overrides moodleform for test setup

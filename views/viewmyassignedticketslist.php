@@ -1,23 +1,23 @@
 <?PHP
 
 /**
-* A view of owned issues
-* @package mod-tracker
-* @category mod
-* @author Valery Fremaux
-* @date 02/12/2007
-* @version Moodle 2.0
-*
-* Print Bug List
-*/
+ * A view of owned issues
+ * @package mod-tracker
+ * @category mod
+ * @author Valery Fremaux
+ * @date 02/12/2007
+ * @version Moodle 2.0
+ *
+ * Print Bug List
+ */
 
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    // It must be included from view.php in mod/tracker
+    die('Direct access to this script is forbidden.');
 }
 
 include_once $CFG->libdir.'/tablelib.php';
 
-// get search engine related information
+// Get search engine related information
 // fields can come from a stored query,or from the current query in the user's client environement cookie
 if (!isset($fields)) {
     $fields = tracker_extractsearchcookies();
@@ -221,13 +221,13 @@ if (!empty($issues)) {
         $datereported = date('Y/m/d h:i', $issue->datereported);
         if (has_capability('mod/tracker:manage', $context)) { // managers can assign bugs
             $status = html_writer::select($STATUSKEYS, "status{$issue->id}", $issue->status, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
-            $developers = get_users_by_capability($context, 'mod/tracker:develop', 'u.id,lastname,firstname', 'lastname');
+            $developers = get_users_by_capability($context, 'mod/tracker:develop', 'u.id,'.get_all_user_name_fields(true, 'u'), 'lastname');
             foreach ($developers as $developer) {
                 $developersmenu[$developer->id] = fullname($developer);
             }
         } elseif (has_capability('mod/tracker:resolve', $context)) { // resolvers can give a bug back to managers
             $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
-            $managers = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,lastname,firstname', 'lastname');
+            $managers = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,'.get_all_user_name_fields(true, 'u'), 'lastname');
             foreach ($managers as $manager) {
                 $managersmenu[$manager->id] = fullname($manager);
             }

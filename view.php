@@ -1,20 +1,24 @@
 <?php
 // This file is part of Moodle - http://moodle.org/
-// // Moodle is free software: you can redistribute it and/or modify
+//
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// // Moodle is distributed in the hope that it will be useful,
+//
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// // You should have received a copy of the GNU General Public License
+//
+// You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @package mod-tracker
  * @category mod
- * @author Clifford Tham, Valery Fremaux > 1.8
+ * @author Clifford Tham, Valery Fremaux from Moodle 1.8 ahead
+ * @copyright  2007 MyLearningFactory (http://www.mylearningfactory.com)
  * @date 02/12/2007
  *
  * This page prints a particular instance of a tracker and handles
@@ -78,6 +82,8 @@ if ($issueid) {
 
 require_course_login($course->id, true, $cm);
 
+$context = context_module::instance($cm->id);
+
 add_to_log($course->id, 'tracker', "$view:$screen/$action", "view.php?id=$cm->id", "$tracker->id", $cm->id);
 
 tracker_loadpreferences($tracker->id, $USER->id);
@@ -110,10 +116,9 @@ $strtracker  = get_string('modulename', 'tracker');
 
 if ($view == 'reports') {
     require_once($CFG->dirroot.'/mod/tracker/js/jqplotlib.php');
-    require_jqplot_libs();
+    tracker_require_jqplot_libs();
 }
 
-$context = context_module::instance($cm->id);
 $PAGE->set_context($context);
 $PAGE->set_title(format_string($tracker->name));
 $PAGE->set_heading(format_string($tracker->name));

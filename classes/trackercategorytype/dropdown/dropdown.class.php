@@ -13,21 +13,21 @@ require_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelem
 
 class dropdownelement extends trackerelement {
 
-    var $options;
     var $multiple;
-
-    function dropdownelement(&$tracker, $id = null, $used) {
+    
+    function dropdownelement(&$tracker, $id = null, $used = false) {
         parent::__construct($tracker, $id, $used);
         $this->setoptionsfromdb();
     }
 
     function view($issueid = 0) {
+
         $this->getvalue($issueid); // loads $this->value with current value for this issue
         if (isset($this->options)) {
             $optionstrs = array();
             foreach ($this->options as $option) {
                 if ($this->value != null) {
-                    if ($this->value == $option->id) {
+                    if ($this->value == $option->name) {
                         $optionstrs[] = format_string($option->description);
                     }
                 }
@@ -37,20 +37,17 @@ class dropdownelement extends trackerelement {
     }
 
     function edit($issueid = 0) {
+
         $this->getvalue($issueid);
-        $values = implode(',', $this->value); // whatever the form ... revert to an array.
+
+        $values = explode(',', $this->value); // whatever the form ... revert to an array.
+
         if (isset($this->options)) {
-            $optionsstrs = array();
-            echo html_writer::empty_tag('imput', array('type' => 'checkbox', 'id' => 'element'.$elmname.$option->id, 'value' => 1, 'checked' => 'checked'));
-            foreach ($this->options as $option) {
-                if (in_array($option->id, $values)) {
-                    echo html_writer::empty_tag('input', array('type' => 'checkbox', 'id' => 'element'.$elmname.$option->id, 'value' => 1, 'checked' => 'checked'));
-                } else {
-                    echo html_writer::empty_tag('input', array('type' => 'checkbox', 'id' => 'element'.$elmname.$option->id, 'value' => 1));
-                }
-                echo format_string($option->description);
-                echo html_writer::empty_tag('br');
+            foreach($this->options as $optionobj) {
+                $selectoptions[$optionobj->name] = $optionobj->description;
             }
+            echo html_writer::select($selectoptions, $this->name, $values, array('' => 'choosedots'));
+            echo html_writer::empty_tag('br');
         }
     }
 
@@ -61,20 +58,21 @@ class dropdownelement extends trackerelement {
                 $optionsmenu[$option->id] = format_string($option->description);
             }
 
-            $mform->addElement('select', "element$this->name", format_string($this->description));
+            $form->addElement('select', $this->name, format_string($this->description), $optionsmenu);
         }
     }
 
     function set_data(&$defaults, $issueid = 0) {
-        if ($issueid) {
+        if ($issueid){
 
-            $elementname = "element{$this->name}";
+            $elementname = $this->name;
 
             if (!empty($this->options)) {
                 $values = $this->getvalue($issueid);
                 if ($multiple && is_array($values)) {
                     foreach ($values as $v) {
-                        if (array_key_exists($v, $this->options)) { // check option still exists
+                        if (array_key_exists($v, $this->options)) {
+                            // Check option still exists.
                             $choice[] = $v;
                         }
                         if (!empty($choice)) {
@@ -83,7 +81,8 @@ class dropdownelement extends trackerelement {
                     }
                 } else {
                     $v = $values; // single value
-                    if (array_key_exists($v, $this->options)) { // check option still exists
+                    if (array_key_exists($v, $this->options)) {
+                        // Check option still exists.
                         $defaults->$elementname = $v;
                     }
                 }
@@ -102,13 +101,15 @@ class dropdownelement extends trackerelement {
             $attribute->elementid = $this->id;
         }
 
-        $elmname = 'element'.$this->name;
+        $elmname = $this->name;
 
         if (!$this->multiple) {
-            $attribute->elementitemid = $data->$elmname;
+            $value = optional_param($elmname, '', PARAM_TEXT);
+            $attribute->elementitemid = $value;
         } else {
+            $valuearr = optional_param_array($elmname, '', PARAM_TEXT);
             if (is_array($data->$elmname)) {
-                $attribute->elementitemid = implode(',', $data->$elmname);
+                $attribute->elementitemid = implode(',', $valuearr);
             } else {
                 $attribute->elementitemid = $data->$elmname;
             }
@@ -117,10 +118,7 @@ class dropdownelement extends trackerelement {
         $attribute->timemodified = time();
 
         if (!isset($attribute->id)) {
-            $attribute->id = $DB->insert_record('tracker_issueattribute', $attribute);
-            if (empty($attributeid)) {
-                print_error('erroraddissueattribute', 'tracker', '', 2);
-            }
+            $DB->insert_record('tracker_issueattribute', $attribute);
         } else {
             $DB->update_record('tracker_issueattribute', $attribute);
         }

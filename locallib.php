@@ -1,16 +1,16 @@
 <?php
 // This file is part of Moodle - http://moodle.org/
-// 
+//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -669,8 +669,7 @@ function tracker_setsearchcookies($fields) {
             foreach ($fields[$key] as $value) {
                 if (empty($cookie)) {
                     $cookie = $cookie . $value;
-                }
-                else{
+                } else {
                     $cookie = $cookie . ', ' . $value;
                 }
             }
@@ -1016,19 +1015,24 @@ function tracker_register_cc(&$tracker, &$issue, $userid) {
 * @uses $CFG
 * @param object $user the user record
 */
-function tracker_print_user($user) {
+function tracker_print_user($user, $return = false) {
     global $COURSE, $CFG, $OUTPUT;
 
+    $str = '';
+
     if ($user) {
-        echo $OUTPUT->user_picture ($user, array('courseid' => $COURSE->id, 'size' => 25));
+        $str .= $OUTPUT->user_picture ($user, array('courseid' => $COURSE->id, 'size' => 25));
         if ($CFG->messaging) {
-            echo "&nbsp;<a href=\"$CFG->wwwroot/user/view.php?id={$user->id}&amp;course={$COURSE->id}\">".fullname($user)."</a> <a href=\"\" onclick=\"this.target='message'; return openpopup('/message/discussion.php?id={$user->id}', 'message', 'menubar=0,location=0,scrollbars,status,resizable,width=400,height=500', 0);\" ><img src=\"".$OUTPUT->pix_url('t/message', 'core')."\"></a>";
+            $str .= "&nbsp;<a href=\"$CFG->wwwroot/user/view.php?id={$user->id}&amp;course={$COURSE->id}\">".fullname($user)."</a> <a href=\"\" onclick=\"this.target='message'; return openpopup('/message/discussion.php?id={$user->id}', 'message', 'menubar=0,location=0,scrollbars,status,resizable,width=400,height=500', 0);\" ><img src=\"".$OUTPUT->pix_url('t/message', 'core')."\"></a>";
         } elseif (!$user->emailstop && $user->maildisplay) {
-            echo "&nbsp;<a href=\"$CFG->wwwroot/user/view.php?id={$user->id}&amp;course={$COURSE->id}\">".fullname($user)."</a> <a href=\"mailto:{$user->email}\"><img src=\"".$OUTPUT->pix_url('t/mail', 'core')."\"></a>";
+            $str .= "&nbsp;<a href=\"$CFG->wwwroot/user/view.php?id={$user->id}&amp;course={$COURSE->id}\">".fullname($user)."</a> <a href=\"mailto:{$user->email}\"><img src=\"".$OUTPUT->pix_url('t/mail', 'core')."\"></a>";
         } else {
-            echo '&nbsp;'.fullname($user);
+            $str .= '&nbsp;'.fullname($user);
         }
     }
+
+    if ($return) return $str;
+    echo $str;
 }
 
 /**
