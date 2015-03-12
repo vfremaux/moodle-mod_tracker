@@ -53,8 +53,8 @@ class backup_tracker_activity_task extends backup_activity_task {
      * order to get transportable (encoded) links
      */
     static public function encode_content_links($content) {
-    	global $CFG;
-    	
+        global $CFG;
+
         $base = preg_quote($CFG->wwwroot,"/");
 
         // Link to the list of trackers

@@ -9,7 +9,7 @@
 * @version Moodle 2
 *
 * Library of functions for rpc remote calls at tracker. All complex
-* variables transport are performed using JSON format. 
+* variables transport are performed using JSON format.
 */
 
 /**
@@ -17,13 +17,13 @@
 *
 */
 if (!defined('RPC_SUCCESS')) {
-	    define('RPC_TEST', 100);
-	    define('RPC_SUCCESS', 200);
-	    define('RPC_FAILURE', 500);
-	    define('RPC_FAILURE_USER', 501);
-	    define('RPC_FAILURE_CONFIG', 502);
-	    define('RPC_FAILURE_DATA', 503);
-	    define('RPC_FAILURE_CAPABILITY', 510);
+        define('RPC_TEST', 100);
+        define('RPC_SUCCESS', 200);
+        define('RPC_FAILURE', 500);
+        define('RPC_FAILURE_USER', 501);
+        define('RPC_FAILURE_CONFIG', 502);
+        define('RPC_FAILURE_DATA', 503);
+        define('RPC_FAILURE_CAPABILITY', 510);
 }
 
 /**
@@ -33,17 +33,17 @@ if (!defined('RPC_SUCCESS')) {
 * @return a failure report if unchecked, null elsewhere.
 *
 */
-function tracker_rpc_check($username, $remotehostroot, &$localuser){
-	global $DB;
+function tracker_rpc_check($username, $remotehostroot, &$localuser) {
+    global $DB;
 
     // get local identity for user
 
-    if (!$remotehost = $DB->get_record('mnet_host', array('wwwroot' => $remotehostroot))){
+    if (!$remotehost = $DB->get_record('mnet_host', array('wwwroot' => $remotehostroot))) {
         $response->status = RPC_FAILURE;
         $response->error = "Calling host is not registered. Check MNET configuration";
         return json_encode($response);
     }
-    if (!$localuser = $DB->get_record_select('user', "username = '".addslashes($username)."' AND mnethostid = $remotehost->id AND deleted = 0")){
+    if (!$localuser = $DB->get_record_select('user', "username = '".addslashes($username)."' AND mnethostid = $remotehost->id AND deleted = 0")) {
         $response->status = RPC_FAILURE_USER;
         $response->error = "Calling user has no local account. Register remote user first";
         return json_encode($response);
@@ -59,7 +59,7 @@ function tracker_rpc_check($username, $remotehostroot, &$localuser){
 * @param boolean $nojson when true, avoids serializing through JSON syntax
 * @return string a JSON encoded information structure.
 */
-function tracker_rpc_get_infos($trackerid, $nojson = false){
+function tracker_rpc_get_infos($trackerid, $nojson = false) {
     global $CFG, $DB;
 
     $tracker = $DB->get_record('tracker', array('id' => "$trackerid"));
@@ -67,7 +67,7 @@ function tracker_rpc_get_infos($trackerid, $nojson = false){
         SELECT
             te.name,
             te.description,
-            te.type 
+            te.type
         FROM
             {tracker_element} te,
             {tracker_elementused} teu
@@ -78,7 +78,7 @@ function tracker_rpc_get_infos($trackerid, $nojson = false){
     $elementused = $DB->get_records_sql($query);
     $tracker->elements = $elementused;
 
-    if ($nojson){
+    if ($nojson) {
         return $tracker;
     }
 
@@ -93,19 +93,19 @@ function tracker_rpc_get_infos($trackerid, $nojson = false){
 * @param string $remotehostroot the host he comes from
 * @return a stub of instance descriptions
 */
-function tracker_rpc_get_instances($username, $remotehostroot){
+function tracker_rpc_get_instances($username, $remotehostroot) {
     global $CFG, $DB;
 
     if ($failedcheck = tracker_rpc_check($username, $remotehostroot, $localuser)) return $failedcheck;
     $response->status = RPC_SUCCESS;
     $trackers = $DB->get_records('tracker', null, 'name', 'id,name');
-    if(!empty($trackers)){
-        foreach($trackers as $id => $tracker){
+    if (!empty($trackers)) {
+        foreach ($trackers as $id => $tracker) {
             $cm = get_coursemodule_from_instance('tracker', $id);
             $modulecontext = context_module::instance($cm->id);
-            if (!has_capability('mod/tracker:report', $modulecontext, $localuser->id)){
+            if (!has_capability('mod/tracker:report', $modulecontext, $localuser->id)) {
                 unset($trackers[$id]);
-                $response->report[] = "ignoring tracker $id for capability reasons"; 
+                $response->report[] = "ignoring tracker $id for capability reasons";
             }
         }
     }
@@ -122,8 +122,8 @@ function tracker_rpc_get_instances($username, $remotehostroot){
 * information about an issue.
 * @return the local issue record id
 */
-function tracker_rpc_post_issue($username, $remoteuserhostroot, $trackerid, $remote_issue){
-	global $DB;
+function tracker_rpc_post_issue($username, $remoteuserhostroot, $trackerid, $remote_issue) {
+    global $DB;
 
     if ($failedcheck = tracker_rpc_check($username, $remoteuserhostroot, $localuser)) return $failedcheck;
 
@@ -132,7 +132,7 @@ function tracker_rpc_post_issue($username, $remoteuserhostroot, $trackerid, $rem
     $issue = json_decode($remote_issue);
 
     // get additional data and cleanup the issue record for insertion
-    if (isset($issue->attributes)){
+    if (isset($issue->attributes)) {
         $attributes = $issue->attributes;
         unset($issue->attributes); // clears attributes so we have an issue record
     }
@@ -147,16 +147,16 @@ function tracker_rpc_post_issue($username, $remoteuserhostroot, $trackerid, $rem
     $issue->assignedto = 0;
     $issue->bywhomid = 0;
 
-    if (! $followid = $DB->insert_record('tracker_issue', addslashes_recursive($issue))){
+    if (! $followid = $DB->insert_record('tracker_issue', addslashes_recursive($issue))) {
         // TODO : error report
         $response->status = RPC_FAILURE;
         $response->error = "Remote error : Could not insert cascade issue record";
     }
     //TODO : rebind attributes and add them
-    if (!empty($issue->attributes)){
+    if (!empty($issue->attributes)) {
         $tracker = $DB->get_record('tracker', array('id' => "$trackerid"));
         $used = tracker_getelementsused_by_name($tracker);
-        foreach($issue->attributes as $attribute){
+        foreach ($issue->attributes as $attribute) {
             // cleanup and crossmap attribute records
             $attribute->elementid = $used[$attribute->elementname]->id;
             unset($attribute->elementname);
@@ -174,7 +174,7 @@ function tracker_rpc_post_issue($username, $remoteuserhostroot, $trackerid, $rem
     $issuecomment->comment = $comment;
     $issuecomment->commentformat = FORMAT_HTML;
     $issuecomment->datecreated = time();
-    if (!$DB->insert_record('tracker_issuecomment', addslashes_recursive($issuecomment))){
+    if (!$DB->insert_record('tracker_issuecomment', addslashes_recursive($issuecomment))) {
         $response->status = RPC_FAILURE;
         $response->error = "Remote error : Could not insert cascade commment record";
     }
@@ -184,4 +184,3 @@ function tracker_rpc_post_issue($username, $remoteuserhostroot, $trackerid, $rem
     return json_encode($response);
 }
 
-?>

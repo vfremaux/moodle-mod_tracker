@@ -10,53 +10,53 @@
 * Print Bug Description
 */
 
-	if (!defined('MOODLE_INTERNAL')) {
-	    die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
-	}
-	
-	// set initial view mode for additional pannels
-	$initialviewmode = ($action == 'doaddcomment') ? 'visiblediv' : 'hiddendiv' ;
-	$initialviewmodeforccs = ($action == 'register' || $action == 'unregister') ? 'visiblediv' : 'hiddendiv' ;
-	
-	$issue = $DB->get_record('tracker_issue', array('id' => $issueid));
-	
-	if (!$issue){
-	    if ($tracker->supportmode == 'bugtrack'){
-	        redirect("view.php?view=view&amp;screen=browse&amp;a=$tracker->id");
-	    } else {
-	        redirect("view.php?view=view&amp;screen=mytickets&amp;a=$tracker->id");
-	    }
-	}
-	
-	$issue->reporter = $DB->get_record('user', array('id' => $issue->reportedby));
-	$issue->owner = $DB->get_record('user', array('id' => $issue->assignedto));
-	
-	tracker_loadelementsused($tracker, $elementsused);
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
+}
+
+// set initial view mode for additional pannels
+$initialviewmode = ($action == 'doaddcomment') ? 'visiblediv' : 'hiddendiv' ;
+$initialviewmodeforccs = ($action == 'register' || $action == 'unregister') ? 'visiblediv' : 'hiddendiv' ;
+
+$issue = $DB->get_record('tracker_issue', array('id' => $issueid));
+
+if (!$issue){
+    if ($tracker->supportmode == 'bugtrack'){
+        redirect("view.php?view=view&amp;screen=browse&amp;a=$tracker->id");
+    } else {
+        redirect("view.php?view=view&amp;screen=mytickets&amp;a=$tracker->id");
+    }
+}
+
+$issue->reporter = $DB->get_record('user', array('id' => $issue->reportedby));
+$issue->owner = $DB->get_record('user', array('id' => $issue->assignedto));
+
+tracker_loadelementsused($tracker, $elementsused);
 
 // check for lower dependancies
 
-	$childtree = tracker_printchilds($tracker, $issue->id, true, 20);
-	$parenttree = tracker_printparents($tracker, $issue->id, true, -20);
-	$ccs = $DB->get_records('tracker_issuecc', array('issueid' => $issue->id));
-	$cced = array();
-	$history = $DB->get_records_select('tracker_issueownership', " trackerid = ? AND issueid = ? ", array($tracker->id, $issue->id), 'timeassigned DESC');
-	$statehistory = $DB->get_records_select('tracker_state_change', " trackerid = ? AND issueid = ? ", array($tracker->id, $issue->id),'timechange ASC');
-	$showdependancieslink = (!empty($childtree) || !empty($parenttree)) ? "<a id=\"toggledependancieslink\" href=\"javascript:toggledependancies()\">".get_string(($initialviewmode == 'visiblediv') ? 'hidedependancies' : 'showdependancies', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
-	$showccslink = (!empty($ccs)) ? "<a id=\"toggleccslink\" href=\"javascript:toggleccs()\">".get_string(($initialviewmodeforccs == 'visiblediv') ? 'hideccs' : 'showccs', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
-	$showhistorylink = (!empty($history) || !empty($statehistory)) ? "<a id=\"togglehistorylink\" href=\"javascript:togglehistory()\">".get_string(($initialviewmode == 'visiblediv') ? 'hidehistory' : 'showhistory', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
-	
+$childtree = tracker_printchilds($tracker, $issue->id, true, 20);
+$parenttree = tracker_printparents($tracker, $issue->id, true, -20);
+$ccs = $DB->get_records('tracker_issuecc', array('issueid' => $issue->id));
+$cced = array();
+$history = $DB->get_records_select('tracker_issueownership', " trackerid = ? AND issueid = ? ", array($tracker->id, $issue->id), 'timeassigned DESC');
+$statehistory = $DB->get_records_select('tracker_state_change', " trackerid = ? AND issueid = ? ", array($tracker->id, $issue->id),'timechange ASC');
+$showdependancieslink = (!empty($childtree) || !empty($parenttree)) ? "<a id=\"toggledependancieslink\" href=\"javascript:toggledependancies()\">".get_string(($initialviewmode == 'visiblediv') ? 'hidedependancies' : 'showdependancies', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
+$showccslink = (!empty($ccs)) ? "<a id=\"toggleccslink\" href=\"javascript:toggleccs()\">".get_string(($initialviewmodeforccs == 'visiblediv') ? 'hideccs' : 'showccs', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
+$showhistorylink = (!empty($history) || !empty($statehistory)) ? "<a id=\"togglehistorylink\" href=\"javascript:togglehistory()\">".get_string(($initialviewmode == 'visiblediv') ? 'hidehistory' : 'showhistory', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
+
 // fixing embeded files URLS
 
-	$issue->description = file_rewrite_pluginfile_urls($issue->description, 'pluginfile.php', $context->id, 'mod_tracker', 'issuedescription', $issue->id);
-	$issue->resolution = file_rewrite_pluginfile_urls($issue->resolution, 'pluginfile.php', $context->id, 'mod_tracker', 'issueresolution', $issue->id);
+$issue->description = file_rewrite_pluginfile_urls($issue->description, 'pluginfile.php', $context->id, 'mod_tracker', 'issuedescription', $issue->id);
+$issue->resolution = file_rewrite_pluginfile_urls($issue->resolution, 'pluginfile.php', $context->id, 'mod_tracker', 'issueresolution', $issue->id);
 
 // get STATUSKEYS labels
 
-	$STATUSKEYS = tracker_get_statuskeys($tracker);
+$STATUSKEYS = tracker_get_statuskeys($tracker);
 
 // start ptinting
 
-	echo $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'bugreport');
+echo $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'bugreport');
 ?>
 
 <!-- Print Bug Form -->
@@ -123,25 +123,25 @@
 </script>
 <?php
 
-if (tracker_can_workon($tracker, $context, $issue)){
+if (tracker_can_workon($tracker, $context, $issue)) {
     // If I can resolve and I have seen, the bug is open
-    if ($issue->status < OPEN){
-    	$oldstatus = $issue->status;
+    if ($issue->status < OPEN) {
+        $oldstatus = $issue->status;
         $issue->status = OPEN;
         $DB->set_field('tracker_issue', 'status', OPEN, array('id' => $issueid));
-	    // log state change
-	    $stc = new StdClass;
-	    $stc->userid = $USER->id;
-	    $stc->issueid = $issue->id;
-	    $stc->trackerid = $tracker->id;
-	    $stc->timechange = time();
-	    $stc->statusfrom = $oldstatus;
-	    $stc->statusto = $issue->status;
-	    $DB->insert_record('tracker_state_change', $stc);
+        // log state change
+        $stc = new StdClass;
+        $stc->userid = $USER->id;
+        $stc->issueid = $issue->id;
+        $stc->trackerid = $tracker->id;
+        $stc->timechange = time();
+        $stc->statusfrom = $oldstatus;
+        $stc->statusto = $issue->status;
+        $DB->insert_record('tracker_state_change', $stc);
     }
 }
 
-if (tracker_can_edit($tracker, $context, $issue)){
+if (tracker_can_edit($tracker, $context, $issue)) {
 ?>
     <tr>
         <td colspan="4" align="right" width="800">
@@ -153,11 +153,11 @@ if (tracker_can_edit($tracker, $context, $issue)){
 <?php
 }
 ?>
-	<tr valign="top">
+    <tr valign="top">
         <td colspan="4" align="left" class="tracker-issue-summary">
             <?php echo format_string($issue->summary); ?>
         </td>
-	</tr>
+    </tr>
     <tr>
         <td align="right" width="200" class="tracker-issue-param">
             <b><?php print_string('issuenumber', 'tracker') ?>:</b><br />
@@ -190,8 +190,8 @@ if (tracker_can_edit($tracker, $context, $issue)){
             if (!$issue->owner){
                 print_string('unassigned', 'tracker');
             } else {
-            	echo $OUTPUT->user_picture($issue->owner, array('courseid' => $COURSE->id, 'size' => 35));
-            	echo '&nbsp;'.fullname($issue->owner); 
+                echo $OUTPUT->user_picture($issue->owner, array('courseid' => $COURSE->id, 'size' => 35));
+                echo '&nbsp;'.fullname($issue->owner); 
             }
             ?>
         </td>
@@ -210,10 +210,10 @@ if (tracker_can_edit($tracker, $context, $issue)){
     <!--Print Bug Attributes-->
     
 <?php
-if (is_array($elementsused)){   
+if (is_array($elementsused)) {
     $keys = array_keys($elementsused);
-    if(!empty($keys)){
-        for ($i=0; $i < count($keys);){
+    if (!empty($keys)) {
+        for ($i=0; $i < count($keys);) {
             // Print first category in one column
             $key = $keys[$i];
             echo "<tr valign=\"top\">";
@@ -221,9 +221,9 @@ if (is_array($elementsused)){
             echo "<b>";
             echo format_string($elementsused[$key]->description);
             echo ":</b><br />";
-            echo "</td>";   
-            
-            echo "<td colspan=\"3\" align=\"left\" >";          
+            echo "</td>";
+
+            echo "<td colspan=\"3\" align=\"left\" >";
             echo $elementsused[$key]->view($issue->id);
             echo "</td>";
             echo "</tr>";
@@ -231,7 +231,7 @@ if (is_array($elementsused)){
         }
     }
 }
-if (!empty($issue->resolution)){
+if (!empty($issue->resolution)) {
 ?>
     <tr valign="top">
         <td align="right" height="200" class="tracker-issue-param"><b><?php print_string('resolution', 'tracker') ?>:</b></td>
@@ -243,14 +243,14 @@ if (!empty($issue->resolution)){
 }
 $showcommentslink = '';
 $addcommentlink = '';
-if ($tracker->enablecomments){
-	$commentscount = $DB->count_records('tracker_issuecomment', array('issueid' => $issue->id));
+if ($tracker->enablecomments) {
+    $commentscount = $DB->count_records('tracker_issuecomment', array('issueid' => $issue->id));
     $addcommentlink = '';
-    if (has_capability('mod/tracker:comment', $context)){
+    if (has_capability('mod/tracker:comment', $context)) {
         $addcommentlink = "<a href=\"addcomment.php?id={$cm->id}&amp;issueid={$issueid}\">".get_string('addacomment', 'tracker').'</a>';
     }
     $showcommentslink = '';
-    if ($commentscount){
+    if ($commentscount) {
         $showcommentslink = "<a id=\"togglecommentlink\" href=\"javascript:togglecomments()\">".get_string('showcomments', 'tracker').'</a>&nbsp;-&nbsp;';
     } else {
         $showcommentslink = '<i>'.get_string('nocomments','tracker').'</i>&nbsp;-&nbsp;';
@@ -258,34 +258,34 @@ if ($tracker->enablecomments){
 }
 
 $transferlink = '';
-if ($tracker->parent && $issue->status != TRANSFERED && (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context) || has_capability('mod/tracker:develop', $context))){
+if ($tracker->parent && $issue->status != TRANSFERED && (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context) || has_capability('mod/tracker:develop', $context))) {
     $transferlink = " - <a href=\"view.php?id={$cm->id}&amp;view=view&amp;what=cascade&amp;issueid={$issueid}\">".get_string('cascade','tracker')."</a>";
 }
 
 $distribute = '';
-if ($tracker->subtrackers && $issue->status != TRANSFERED && (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context) || has_capability('mod/tracker:develop', $context))){
-	$choosetargetstr = get_string('choosetarget', 'tracker');
-	$distribute .= " <form name=\"distribute\" style=\"display:inline\">";
-	$distribute .= "<input type=\"hidden\" name=\"view\" value=\"view\" >";
-	$distribute .= "<input type=\"hidden\" name=\"what\" value=\"distribute\" >";
-	$distribute .= "<input type=\"hidden\" name=\"issueid\" value=\"{$issue->id}\" >";
-	$distribute .= "<input type=\"hidden\" name=\"id\" value=\"{$cm->id}\" >";
-	$distribute .= "<select name=\"target\">";
-	$distribute .= "<option value=\"0\">$choosetargetstr</option>";
-	$trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
-	if ($subtrackers = $DB->get_records('tracker', array('id' => $tracker->subtrackers), 'name', 'id,name,course')){
-		$trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
-		foreach($subtrackers as $st){
-			$targetcm = $DB->get_record('course_modules', array('instance' => $st->id, 'module' => $trackermoduleid));
-			$courseshort = $DB->get_field('course', 'shortname', array('id' => $st->course));
-			$targetcontext = context_module::instance($targetcm->id);
-			if (has_any_capability(array('mod/tracker:manage', 'mod/tracker:develop', 'mod/tracker:resolve'), $targetcontext)){
-				$distribute .= "<option value=\"{$st->id}\">{$courseshort} - {$st->name}</option>";
-			}
-		}
-	}
-	$distribute .= "</select>";
-	$distribute .= "</form>";
+if ($tracker->subtrackers && $issue->status != TRANSFERED && (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context) || has_capability('mod/tracker:develop', $context))) {
+    $choosetargetstr = get_string('choosetarget', 'tracker');
+    $distribute .= " <form name=\"distribute\" style=\"display:inline\">";
+    $distribute .= "<input type=\"hidden\" name=\"view\" value=\"view\" >";
+    $distribute .= "<input type=\"hidden\" name=\"what\" value=\"distribute\" >";
+    $distribute .= "<input type=\"hidden\" name=\"issueid\" value=\"{$issue->id}\" >";
+    $distribute .= "<input type=\"hidden\" name=\"id\" value=\"{$cm->id}\" >";
+    $distribute .= "<select name=\"target\">";
+    $distribute .= "<option value=\"0\">$choosetargetstr</option>";
+    $trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
+    if ($subtrackers = $DB->get_records_list('tracker', array('id' => $tracker->subtrackers), 'name', 'id,name,course')) {
+        $trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
+        foreach ($subtrackers as $st) {
+            $targetcm = $DB->get_record('course_modules', array('instance' => $st->id, 'module' => $trackermoduleid));
+            $courseshort = $DB->get_field('course', 'shortname', array('id' => $st->course));
+            $targetcontext = context_module::instance($targetcm->id);
+            if (has_any_capability(array('mod/tracker:manage', 'mod/tracker:develop', 'mod/tracker:resolve'), $targetcontext)) {
+                $distribute .= "<option value=\"{$st->id}\">{$courseshort} - {$st->name}</option>";
+            }
+        }
+    }
+    $distribute .= "</select>";
+    $distribute .= "</form>";
     $distribute .= " <a href=\"Javascript:document.forms['distribute'].submit();\">".get_string('distribute','tracker')."</a>";
 }
 
@@ -296,8 +296,8 @@ if ($tracker->subtrackers && $issue->status != TRANSFERED && (has_capability('mo
         </td>
     </tr>
 <?php
-if ($tracker->enablecomments){
-	if (!empty($commentscount)){
+if ($tracker->enablecomments) {
+    if (!empty($commentscount)) {
 ?>
     <tr>
         <td colspan="4">
@@ -309,7 +309,7 @@ if ($tracker->enablecomments){
         </td>
     </tr>
 <?php
-	}
+    }
 }
 ?>
     <tr>
@@ -330,7 +330,7 @@ if ($tracker->enablecomments){
         </td>
     </tr>
 <?php
-if ($showccslink){
+if ($showccslink) {
 ?>
     <tr>
         <td colspan="4" align="center" width="100%">
@@ -341,7 +341,7 @@ if ($showccslink){
                     </td>
                 </tr>
 <?php 
-    foreach($ccs as $cc){
+    foreach ($ccs as $cc) {
 ?>
                 <tr>
                     <td width="20%" valign="top">&nbsp;</td>
@@ -368,7 +368,7 @@ if ($showccslink){
     </tr>
 <?php
 }
-if (has_capability('mod/tracker:managewatches', $context)){
+if (has_capability('mod/tracker:managewatches', $context)) {
 ?>
     <tr>
         <td>&nbsp;</td>
@@ -381,11 +381,13 @@ if (has_capability('mod/tracker:managewatches', $context)){
             <?php 
             echo get_string('addawatcher', 'tracker').':&nbsp;';
             $contextmodule = context_module::instance($cm->id);
-            $potentials = get_users_by_capability($contextmodule, 'mod/tracker:canbecced', 'u.id, firstname, lastname, picture, email,emailstop', 'lastname,firstname');
+            $potentials = get_users_by_capability($contextmodule, 'mod/tracker:canbecced', 'u.id,'.get_all_user_name_fields(true, 'u').',picture,imagealt');
             $potentialsmenu = array();
-            if ($potentials){
-                foreach($potentials as $potential){
-                    if (in_array($potential->id, $cced)) continue;
+            if ($potentials) {
+                foreach ($potentials as $potential) {
+                    if (in_array($potential->id, $cced)) {
+                        continue;
+                    }
                     $potentialsmenu[$potential->id] = fullname($potential);
                 }
             }
@@ -397,7 +399,7 @@ if (has_capability('mod/tracker:managewatches', $context)){
     </tr>
 <?php
 }
-if ($showhistorylink){
+if ($showhistorylink) {
 ?>
     <tr>
         <td colspan="4" align="center" width="100%">
@@ -411,62 +413,62 @@ if ($showhistorylink){
                     </td>
                 </tr>
                 <tr>
-                	<td width="50%">
-                		<table width="100%">
+                    <td width="50%">
+                        <table width="100%">
 <?php
-	if (!empty($history)){
-	    foreach($history as $owner){
-	        $user = $DB->get_record('user', array('id' => $owner->userid));
-	        $bywhom = $DB->get_record('user', array('id' => $owner->bywhomid));
+    if (!empty($history)) {
+        foreach ($history as $owner) {
+            $user = $DB->get_record('user', array('id' => $owner->userid));
+            $bywhom = $DB->get_record('user', array('id' => $owner->bywhomid));
 ?>
-			                <tr>
-			                    <td align="left">
-			                        <?php echo userdate($owner->timeassigned) ?>
-			                    </td>
-			                    <td align="left">
-			                        <?php tracker_print_user($user); ?>
-			                    </td>
-			                    <td align="left">
-			                        <?php echo get_string('by', 'tracker') . ' ' . fullname($bywhom); ?>
-			                    </td>
-			                </tr>
+                            <tr>
+                                <td align="left">
+                                    <?php echo userdate($owner->timeassigned) ?>
+                                </td>
+                                <td align="left">
+                                    <?php tracker_print_user($user); ?>
+                                </td>
+                                <td align="left">
+                                    <?php echo get_string('by', 'tracker') . ' ' . fullname($bywhom); ?>
+                                </td>
+                            </tr>
 <?php
-		}
+        }
     }
 ?>
-						</table>
-					</td>
-					<td width="50%">
-                		<table width="100%">
+                        </table>
+                    </td>
+                    <td width="50%">
+                        <table width="100%">
 <?php
-	if (!empty($statehistory)){
-	    foreach($statehistory as $state){
-	        $bywhom = $DB->get_record('user', array('id' => $state->userid));
+    if (!empty($statehistory)) {
+        foreach ($statehistory as $state) {
+            $bywhom = $DB->get_record('user', array('id' => $state->userid));
 ?>
-			                <tr valign="top">
-			                    <td align="left">
-			                        <?php echo userdate($state->timechange) ?>
-			                    </td>
-			                    <td align="left">
-			                        <?php tracker_print_user($bywhom); ?>
-			                    </td>
-			                    <td align="left">
-			                    	<span class="status_<?php echo $STATUSCODES[$state->statusfrom] ?>"><?php echo $STATUSKEYS[$state->statusfrom] ?></span>
-			                    </td>
-			                    <td align="left">
-			                        >
-			                    </td>
-			                    <td align="left">
-			                        <span class="status_<?php echo $STATUSCODES[$state->statusto] ?>"><?php echo $STATUSKEYS[$state->statusto] ?></span>
-			                    </td>
-			                </tr>
+                            <tr valign="top">
+                                <td align="left">
+                                    <?php echo userdate($state->timechange) ?>
+                                </td>
+                                <td align="left">
+                                    <?php tracker_print_user($bywhom); ?>
+                                </td>
+                                <td align="left">
+                                    <span class="status_<?php echo $STATUSCODES[$state->statusfrom] ?>"><?php echo $STATUSKEYS[$state->statusfrom] ?></span>
+                                </td>
+                                <td align="left">
+                                    >
+                                </td>
+                                <td align="left">
+                                    <span class="status_<?php echo $STATUSCODES[$state->statusto] ?>"><?php echo $STATUSKEYS[$state->statusto] ?></span>
+                                </td>
+                            </tr>
 <?php
-		}
+        }
     }
 ?>
-						</table>
-					</td>
-				</tr>
+                        </table>
+                    </td>
+                </tr>
             </table>
          </td>
      </tr>

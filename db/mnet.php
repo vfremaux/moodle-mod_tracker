@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * This file contains the mnet services for the Moodle tracker module
  *
@@ -33,7 +32,7 @@ $publishes = array(
         'classname'  => '',
         'filename'   => 'rpclib.php',
         'methods'    => array(
-            'tracker_rpc_check', 
+            'tracker_rpc_check',
             'tracker_rpc_get_infos',
             'tracker_rpc_get_instances',
             'tracker_rpc_post_issue'
