@@ -97,7 +97,6 @@ if (!$form->is_cancelled()) {
         echo $OUTPUT->box_end();
         echo $OUTPUT->continue_button(new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => 'view', 'screen' => 'browse')));
         echo $OUTPUT->footer();
-        die;
         // notify all admins
         if ($tracker->allownotifications) {
             tracker_notify_submission($issue, $cm, $tracker);
