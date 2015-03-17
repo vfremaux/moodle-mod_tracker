@@ -221,7 +221,7 @@ if ($limit > $numrecords) {
 }
 $sql = $sql . ' LIMIT ' . $limit . ',' . $offset;
 */
-// $issues = $DB->get_records_sql($sql, null, $table->get_page_start(), $table->get_page_size());
+$issues = $DB->get_records_sql($sql, null, $table->get_page_start(), $table->get_page_size());
 
 $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', " trackerid = $tracker->id GROUP BY trackerid ");
 
