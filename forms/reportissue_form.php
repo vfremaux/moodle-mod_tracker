@@ -34,9 +34,35 @@ class TrackerIssueForm extends moodleform{
 
         $mform->addElement('text', 'summary', get_string('summary', 'tracker'), array('size' => 80));
         $mform->setType('summary', PARAM_TEXT);
-          $mform->addRule('summary', null, 'required', null, 'client');
+        $mform->addRule('summary', null, 'required', null, 'client');
 
         $mform->addElement('editor', 'description_editor', get_string('description'), $this->editoroptions);
+
+        global $STATUSCODES;
+        $choices = $STATUSCODES;
+
+        $mform->addElement('select', 'status', get_string('status', 'tracker'), $choices);
+        $mform->setDefault('status', POSTED);
+
+        // 
+        if (has_capability('mod/tracker:manage', $this->context)) { // managers can assign bugs
+            // $asigners = tracker_getdevelopers($context);
+            $asigners = get_users_by_capability($this->context, 'mod/tracker:develop', '', 'lastname');
+        } elseif (has_capability('mod/tracker:resolve', $this->context)) { // resolvers can give a bug back to managers
+            $asigners = tracker_getadministrators($this->context);
+            $asigners = get_users_by_capability($this->context, 'mod/tracker:manage', '', 'lastname');
+        } else {
+            $asigners = array( $user->id, $user );
+        }
+
+        $asignedto = array();
+        foreach ($asigners as $userid => $register) {
+            $asignedto[ $userid ] = fullname( $register );
+        }
+
+        $mform->addElement('select', 'assignedto', get_string('assignedto', 'tracker'), $asignedto);
+        $mform->setDefault('assignedto', $tracker->defaultassignee );
+
 
         tracker_loadelementsused($tracker, $this->elements);
 

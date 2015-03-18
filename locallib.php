@@ -22,7 +22,6 @@
  *
  * Library of internal functions and constants for module tracker
  */
-
 require_once($CFG->dirroot.'/mod/tracker/filesystemlib.php');
 require_once($CFG->dirroot.'/lib/uploadlib.php');
 require_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
@@ -884,10 +883,10 @@ function tracker_submitanissue(&$tracker, &$data) {
     $issue->summary = $data->summary;
     $issue->description = $data->description_editor['text'];
     $issue->descriptionformat = $data->description_editor['format'];
-    $issue->assignedto = $tracker->defaultassignee;
+    $issue->assignedto = $data->assignedto; //$tracker->defaultassignee;
     $issue->bywhomid = 0;
     $issue->trackerid = $tracker->id;
-    $issue->status = POSTED;
+    $issue->status = $data->status; //POSTED;
     $issue->reportedby = $USER->id;
 
     // Fetch max actual priority.
