@@ -39,7 +39,10 @@ class TrackerIssueForm extends moodleform{
         $mform->addElement('editor', 'description_editor', get_string('description'), $this->editoroptions);
 
         global $STATUSCODES;
-        $choices = $STATUSCODES;
+        $choices = array();
+        foreach ($STATUSCODES as $key => $value) {
+            $choices[ $key ] = get_string( $value, 'tracker' );
+        }
 
         $mform->addElement('select', 'status', get_string('status', 'tracker'), $choices);
         $mform->setDefault('status', POSTED);
