@@ -371,6 +371,8 @@ $string['waiting'] = 'Waiting';
 $string['watches'] = 'Watches';
 $string['youneedanaccount'] = 'You need an authorized account here to report a ticket';
 $string['statehistory'] = 'States';
+$string['eventtrackerissuereported'] = 'eventtrackerissuereported';
+
 
 // help strings
 
