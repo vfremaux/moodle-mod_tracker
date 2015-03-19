@@ -1,3 +1,3 @@
 $(document).ready(function (event) {
-	$(".collapsed").removeClass('collapsed');
+	$("#mform1 .collapsed").removeClass('collapsed');
 });
