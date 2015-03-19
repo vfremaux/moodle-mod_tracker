@@ -8,7 +8,7 @@ class tracker_moodle_form extends moodle_form{
         $mform = $this->_form;
         $mform->addElement('text', 'name', get_string('name'), '');
         $mform->setType('name', PARAM_CLEANHTML);
-          $mform->addRule('name', null, 'required', null, 'client');
+        $mform->addRule('name', null, 'required', null, 'client');
 
         $mform->addElement('textarea', 'description', get_string('description'));
     }
