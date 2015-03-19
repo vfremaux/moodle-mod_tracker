@@ -63,6 +63,7 @@ $PAGE->set_context($context);
 $PAGE->set_title(format_string($tracker->name));
 $PAGE->set_heading(format_string($tracker->name));
 $PAGE->set_button($OUTPUT->update_module_button($cm->id, 'tracker'));
+$PAGE->requires->js( new moodle_url('/mod/tracker/js/reportissue.js') );
 
 $form = new TrackerIssueForm(new moodle_url('/mod/tracker/reportissue.php'), array('trackerid' => $tracker->id, 'cmid' => $id));
 
