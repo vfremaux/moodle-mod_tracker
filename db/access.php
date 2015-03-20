@@ -186,4 +186,14 @@ $capabilities = array(
         )
     ),
 
+    'mod/tracker:reportissue' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+        )
+    ),
+
 );
