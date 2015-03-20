@@ -38,7 +38,7 @@ class TrackerIssueForm extends moodleform{
 
         $mform->addElement('editor', 'description_editor', get_string('description'), $this->editoroptions);
 
-        if( has_capability('mod/tracker:reportissue', $this->context) )
+        if( has_capability('mod/tracker:manage', $this->context) )
         {
 
             global $STATUSCODES;
