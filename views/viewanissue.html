@@ -273,7 +273,7 @@ if ($tracker->subtrackers && $issue->status != TRANSFERED && (has_capability('mo
     $distribute .= "<select name=\"target\">";
     $distribute .= "<option value=\"0\">$choosetargetstr</option>";
     $trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
-    if ($subtrackers = $DB->get_records_list('tracker', array('id' => $tracker->subtrackers), 'name', 'id,name,course')) {
+    if ($subtrackers = $DB->get_records('tracker', array('id' => $tracker->subtrackers), 'name', 'id,name,course')) {
         $trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
         foreach ($subtrackers as $st) {
             $targetcm = $DB->get_record('course_modules', array('instance' => $st->id, 'module' => $trackermoduleid));
