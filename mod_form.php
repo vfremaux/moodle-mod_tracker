@@ -70,7 +70,7 @@ class mod_tracker_mod_form extends moodleform_mod {
           $mform->addElement('checkbox', 'strictworkflow', get_string('strictworkflow', 'tracker'));
           $mform->addHelpButton('strictworkflow', 'strictworkflow', 'tracker');
 
-          if (isset($this->_cm->id) && $assignableusers = get_users_by_capability(context_module::instance($this->_cm->id), 'mod/tracker:resolve', 'u.id, firstname,lastname', 'lastname,firstname')) {
+          if (isset($this->_cm->id) && $assignableusers = get_users_by_capability(context_module::instance($this->_cm->id), 'mod/tracker:resolve', '*, u.id', 'lastname,firstname')) {
               $useropts[0] = get_string('none');
               foreach ($assignableusers as $assignable) {
                     $useropts[$assignable->id] = fullname($assignable);
