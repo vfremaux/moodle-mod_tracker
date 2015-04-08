@@ -362,10 +362,10 @@ function tracker_get_participants($trackerid) {
         $commenters = array();
     }
     $participants = array_merge(array_keys($resolvers), array_keys($developers), array_keys($reporters), array_keys($admins));
-    $participantlist = implode(',', array_unique($participants));
+    $participantlist = array_unique( $participants );
 
     if (!empty($participantlist)) {
-        return $DB->get_records_list('user', array('id' => $participantlist));
+        return $DB->get_records_list( 'user', 'id', participantlist, 'lastname' );
     }
     return array();
 }
