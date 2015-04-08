@@ -1,4 +1,5 @@
 <?php
+// ultima actualización: 2015040801
 
 $plugin->version  = 2015032001;  // The current module version (Date: YYYYMMDDXX)
 $plugin->requires = 2014041100;
