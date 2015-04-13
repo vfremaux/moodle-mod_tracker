@@ -1319,10 +1319,14 @@ function tracker_notify_submission($issue, &$cm, $tracker = null) {
                       );
         include_once($CFG->dirroot."/mod/tracker/mailtemplatelib.php");
         foreach ($managers as $manager) {
+            $manager = $DB->get_record( 'user', array( 'id' => $manager->id ) );
+            $user = $DB->get_record( 'user', array( 'id' => $USER->id ) );
+
             $notification = tracker_compile_mail_template('submission', $vars, 'tracker', $manager->lang);
             $notification_html = tracker_compile_mail_template('submission_html', $vars, 'tracker', $manager->lang);
             if ($CFG->debugsmtp) echo "Sending Submission Mail Notification to " . fullname($manager) . '<br/>'.$notification_html;
-            email_to_user($manager, $USER, get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name)), $notification, $notification_html);
+
+            email_to_user($manager, $user, get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name)), $notification, $notification_html);
         }
     }
 }
