@@ -1,16 +1,16 @@
 <?php
 // This file is part of Moodle - http://moodle.org/
-// 
+//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -291,10 +291,12 @@ function tracker_print_overview($courses, &$htmlarray) {
         }
         $str .= '</div>';
 
-        if (empty($htmlarray[$tracker->course]['tracker'])) {
-            $htmlarray[$tracker->course]['tracker'] = $str;
-        } else {
-            $htmlarray[$tracker->course]['tracker'] .= $str;
+        if (@$yours || @$unassigned) {
+            if (empty($htmlarray[$tracker->course]['tracker'])) {
+                $htmlarray[$tracker->course]['tracker'] = $str;
+            } else {
+                $htmlarray[$tracker->course]['tracker'] .= $str;
+            }
         }
     }
 }
@@ -380,7 +382,7 @@ function tracker_scale_used ($trackerid, $scaleid) {
     $return = false;
 
     //$rec = get_record("tracker","id","$trackerid","scale","-$scaleid");
-    // 
+    //
 	//if (!empty($rec)  && !empty($scaleid)) {
     // $return = true;
     //}
@@ -908,7 +910,7 @@ function tracker_preset_params(&$tracker) {
         $tracker->thanksmessage = get_string('message_bugtracker', 'tracker');
     } elseif ($tracker->supportmode == 'ticketting') {
         if ($tracker->defaultassignee) {
-            $defaultassignee = $DB->get_record('user', array('id' => $tracker->defaultassignee), 'id, firstname, lastname');
+            $defaultassignee = $DB->get_record('user', array('id' => $tracker->defaultassignee), 'id'.get_all_user_name_fields(true, ''));
             $tracker->thanksmessage = get_string('message_ticketting_preassigned', 'tracker', fullname($defaultassignee));
         } else {
             $tracker->thanksmessage = get_string('message_ticketting', 'tracker');

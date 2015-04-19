@@ -1,17 +1,31 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* @package tracker
-* @author Clifford Tham
-* @review Valery Fremaux / 1.8
-* @date 02/12/2007
-*
-* A class implementing a checkbox element
-*/
+ * @package tracker
+ * @author Clifford Tham
+ * @review Valery Fremaux / 1.8
+ * @date 02/12/2007
+ *
+ * A class implementing a checkbox element
+ */
 
 require_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php';
 
-class checkboxelement extends trackerelement{
+class checkboxelement extends trackerelement {
 
     function __construct(&$tracker, $id = null, $used = false) {
         parent::__construct($tracker, $id, $used);
@@ -19,8 +33,11 @@ class checkboxelement extends trackerelement{
     }
 
     function edit($issueid = 0) {
+
         $this->getvalue($issueid);
+
         $values = explode(',', $this->value); // whatever the form ... revert to an array.
+
         if (isset($this->options)) {
             $optionsstrs = array();
             foreach ($this->options as $option) {
@@ -62,7 +79,8 @@ class checkboxelement extends trackerelement{
                 $values = explode(',', $elmvalues);
                 if (!empty($values)) {
                     foreach ($values as $v) {
-                        if (array_key_exists($v, $this->options)) { // check option still exists
+                        if (array_key_exists($v, $this->options)) {
+                            // Check option still exists.
                             $elementname = "element{$this->name}{$option->id}";
                             $defaults->$elementname = 1;
                         }

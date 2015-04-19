@@ -5,5 +5,5 @@ $plugin->requires = 2014041100;
 $plugin->component = 'mod_tracker';   // Full name of the plugin (used for diagnostics)
 $plugin->cron     = 0;           // Period for cron to check this module (secs)
 $plugin->maturity = MATURITY_RC;
-$plugin->release = '2.7.0 (Build 2014071100)';
+$plugin->release = '2.8.0 (Build 2014071100)';
 

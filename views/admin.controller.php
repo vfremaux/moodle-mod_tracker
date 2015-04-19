@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
 * @package mod-tracker
@@ -31,7 +45,8 @@
 */
 
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    // It must be included from view.php in mod/tracker
+    die('Direct access to this script is forbidden.');
+    // It must be included from view.php in mod/tracker.
 }
 
 /************************************* Create element form *****************************/
@@ -130,7 +145,7 @@ if ($action == 'doupdateelement') {
         $element->type = $form->type;
         $element->description = $form->description;
         $element->format = $form->format;
-        $element->course = ($form->shared) ? 0 : $COURSE->id ;
+        $element->course = ($form->shared) ? 0 : $COURSE->id;
         if (!$DB->update_record('tracker_element', $element)) {
             print_error('errorcannotupdateelement', 'tracker', $url);
         }
@@ -183,6 +198,7 @@ if ($action == 'submitelementoption') {
         $error->on = 'description';
         $errors[] = $error;
     }
+
     if (!count($errors)) {
         $option = new StdClass;
         $option->name = strtolower($form->name);
@@ -196,7 +212,7 @@ if ($action == 'submitelementoption') {
         $form->name = '';
         $form->description = '';
     } else {
-        // print errors
+        // Print errors.
         $errorstr = '';
         foreach ($errors as $anError) {
             $errorstrs[] = $anError->message;
@@ -245,7 +261,8 @@ if ($action == 'deleteelementoption') {
     if (!$DB->delete_records('tracker_elementitem', array('id' => $form->optionid))) {
         print_error('errorcannotdeleteoption', 'tracker');
     }
-    // renumber higher records
+
+    // Renumber higher records.
     $sql = "
         UPDATE
             {tracker_elementitem}
@@ -329,7 +346,7 @@ if ($action == 'updateelementoption') {
             print_error('errorcannotupdateoptionbecauseused', 'tracker', $url);
         }
     } else {
-        // print errors
+        // Print errors.
         $errorstr = '';
         foreach ($errors as $anError) {
             $errorstrs[] = $anError->message;
@@ -408,12 +425,12 @@ if ($action == 'addelement') {
     $elementid = required_param('elementid', PARAM_INT);
 
     if (!tracker_iselementused($tracker->id, $elementid)) {
-        // Add element to element used table;
+        // Add element to element used table.
         $used = new StdClass;
         $used->elementid = $elementid;
         $used->trackerid = $tracker->id;
         $used->canbemodifiedby = $USER->id;
-        // get last sort order
+        // Get last sort order.
         $sortorder = 0 + $DB->get_field_select('tracker_elementused', 'MAX(sortorder)', "trackerid = {$tracker->id} GROUP BY trackerid");
         $used->sortorder = $sortorder + 1;
         if (!$DB->insert_record ('tracker_elementused', $used)) {
@@ -464,20 +481,21 @@ if ($action == 'localparent') {
 if ($action == 'remoteparent') {
     $step = optional_param('step', 0, PARAM_INT);
     switch ($step) {
-        case 1 : { // we choose the host
+        case 1 :
+            // We choose the host.
             $parenthost = optional_param('remotehost', null, PARAM_RAW);
-        }
-        break;
-        case 2 : { // we choose the tracker
+            break;
+
+        case 2 :
+            // We choose the tracker.
             $remoteparent = optional_param('remotetracker', null, PARAM_RAW);
 
             if (!$DB->set_field('tracker', 'parent', $remoteparent, array('id' => $tracker->id))) {
                 print_error('errorcannotsetparent', 'tracker');
             }
-        $tracker->parent = $remoteparent;
-        $step = 0;
-        break;
-        }
+            $tracker->parent = $remoteparent;
+            $step = 0;
+            break;
     }
 }
 /*************************** unbinds any cascade  *******************************/

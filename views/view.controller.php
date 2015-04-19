@@ -96,7 +96,7 @@ elseif ($action == 'updateanissue') {
     tracker_clearelements($issue->id);
     tracker_recordelements($issue, $issue);
     // TODO : process dependancies
-    $dependancies = optional_param('dependancies', null, PARAM_INT);
+    $dependancies = optional_param_array('dependancies', null, PARAM_INT);
     if (is_array($dependancies)) {
         // cleanup previous depdendancies
         if (!$DB->delete_records('tracker_issuedependancy', array('childid' => $issue->id))) {

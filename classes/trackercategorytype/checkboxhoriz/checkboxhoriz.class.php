@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
 * @package tracker
@@ -11,7 +25,7 @@
 
 include_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php';
 
-class checkboxhorizelement extends trackerelement{
+class checkboxhorizelement extends trackerelement {
 
     function __construct(&$tracker, $id = null, $used = false) {
 
@@ -69,14 +83,16 @@ class checkboxhorizelement extends trackerelement{
                 $values = $this->getvalue($issueid);
                 if (is_array($values)) {
                     foreach ($values as $v) {
-                        if (array_key_exists($v, $this->options)) { // check option still exists
+                        if (array_key_exists($v, $this->options)) {
+                            // Check option still exists.
                             $elementname = "element{$this->name}{$option->id}";
                             $defaults->$elementname = 1;
                         }
                     }
                 } else {
                     $v = $values; // single value
-                    if (array_key_exists($v, $this->options)) { // check option still exists
+                    if (array_key_exists($v, $this->options)) {
+                        // Check option still exists.
                         $elementname = "element{$this->name}{$option->id}";
                         $defaults->$elementname = 1;
                     }
@@ -106,7 +122,8 @@ class checkboxhorizelement extends trackerelement{
             }
         }
 
-        $attribute->elementitemid = implode(',', $elmvalues); // in this case we have elementitem id or idlist
+        $attribute->elementitemid = implode(',', $elmvalues);
+        // In this case we have elementitem id or idlist.
         $attribute->timemodified = time();
 
         if (!isset($attribute->id)) {
@@ -119,4 +136,3 @@ class checkboxhorizelement extends trackerelement{
         }
     }
 }
-
