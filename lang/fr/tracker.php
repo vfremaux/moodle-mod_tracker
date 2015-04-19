@@ -1,8 +1,20 @@
 <?php
-// tracker.php - created with Moodle 1.2 development (2003111400)
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 // Capabilities
-
 $string['tracker:addinstance'] = 'Ajouter un gestionnaire de tickets';
 $string['tracker:canbecced'] = 'Peut être observateur';
 $string['tracker:comment'] = 'Commenter les tickets';
@@ -111,6 +123,7 @@ $string['errornoaccessallissues'] = 'Vous n\'avez pas l\'autorisation de voir to
 $string['errornoaccessissue'] = 'Vous n\'avez pas l\'autorisation de voir ce ticket.';
 $string['errornoeditissue'] = 'Vous n\'avez pas l\'autorisaton de modifier ce ticket.';
 $string['errorremote'] = 'Erreur distante: {$a}';
+$string['evolution'] = 'Tendances';
 $string['evolutionbymonth'] = 'Evolution par mois';
 $string['eventcourse_module_edited'] = 'Gestionnaire modifié';
 $string['eventcourse_module_list_viewed'] = 'Liste des Gestionnaires visitée';
@@ -151,13 +164,13 @@ $string['managenetwork'] = 'Fonctions cascade et réseau';
 $string['manager'] = 'Mes ressources ';
 $string['me'] = 'Mon profil';
 $string['message_bugtracker'] = 'Merci pour votre contribution à l\'amélioration générale du service.';
+$string['message_taskspread'] = 'Vous venez de définir une tâche. Pour finaliser votre action, n\'oubliez pas de l\'assigner à un destinataire.';
 $string['message_ticketting'] = 'Nous avons bien enregistré votre demande. Elle a été assignée à {$a}.';
 $string['message_ticketting_preassigned'] = 'Nous avons bien enregistré votre demande. Elle sera traitée très prochainement.';
-$string['message_taskspread'] = 'Vous venez de définir une tâche. Pour finaliser votre action, n\'oubliez pas de l\'assigner à un destinataire.';
 $string['mode_bugtracker'] = 'Traqueur de défauts ';
-$string['mode_ticketting'] = 'Service support utilisateur ';
-$string['mode_taskspread'] = 'Distribution de tâches individuelles';
 $string['mode_customized'] = 'Gestionnaire customisé';
+$string['mode_taskspread'] = 'Distribution de tâches individuelles';
+$string['mode_ticketting'] = 'Service support utilisateur ';
 $string['modulename'] = 'Gestionnaire de tickets';
 $string['modulenameplural'] = 'Gestionnaires de tickets';
 $string['nofileloaded'] = 'Pas de fichier chargé.';
@@ -288,10 +301,6 @@ $string['thanksmessage'] = 'Feedback après dépôt';
 $string['ticketprefix'] = 'Préfixe du ticket';
 $string['tickets'] = 'Tickets';
 $string['tracker-levelaccess'] = 'Mes possibilités dans ce traqueur ';
-$string['tracker_description'] = '<p>La publication de ce service permet à des trackers du site {$a} de cascader leur collecte vers l\'un de vos trackeurs.</p>
-<ul><li><i>Dépendance</i> : Vous devez abonner le serveur {$a} à ce service.</li></ul>
-<p>L\'abonement à ce service permet à des trackeurs de cascader des tickets de support vers les trackeurs du site {$a}.</p>
-<ul><li><i>Dépendance</i> : Le site {$a} doit publier le service de cascade de trackeurs.</li></ul>';
 $string['tracker_name'] = 'Services du gestionnaire de tickets';
 $string['tracker_service_name'] = 'Services du gestionnaire de tickets';
 $string['trackerelements'] = 'Définition du trackeur ';
@@ -327,6 +336,11 @@ $string['watches'] = 'Obs.';
 $string['youneedanaccount'] = 'Vous devez posséder un compte dans cet espace pour pouvoir poster';
 
 // help strings
+
+$string['tracker_description'] = '<p>La publication de ce service permet à des trackers du site {$a} de cascader leur collecte vers l\'un de vos trackeurs.</p>
+<ul><li><i>Dépendance</i> : Vous devez abonner le serveur {$a} à ce service.</li></ul>
+<p>L\'abonement à ce service permet à des trackeurs de cascader des tickets de support vers les trackeurs du site {$a}.</p>
+<ul><li><i>Dépendance</i> : Le site {$a} doit publier le service de cascade de trackeurs.</li></ul>';
 
 $string['modulename_help'] = 'Le gestionnaire de tickets permet la gestion de tickets d\'aide, de rapport de défaut, ou de toute activité ou tâche qui nécessite un suivi d\'état dans un cours.
 

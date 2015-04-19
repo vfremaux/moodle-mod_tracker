@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
 * @package mod-tracker
@@ -110,7 +124,7 @@ if (isset($searchqueries)) {
     $numrecords = $DB->count_records_sql($sqlcount);
 }
 
-// display list of issues
+// Display list of issues.
 ?>
 <center>
 <table border="1" width="100%">
@@ -137,7 +151,7 @@ if (isset($searchqueries)) {
 <input type="hidden" name="screen" value="browse" />
 <?php
 
-// define table object
+// Define table object.
 $prioritystr = get_string('priority', 'tracker');
 $issuenumberstr = get_string('issuenumber', 'tracker');
 $summarystr = get_string('summary', 'tracker');
@@ -201,7 +215,7 @@ if (!empty($tracker->parent)) {
 
 $table->setup();
 
-// get extra query parameters from flexible_table behaviour
+// Get extra query parameters from flexible_table behaviour.
 $where = $table->get_sql_where();
 $sort = $table->get_sql_sort();
 $table->pagesize($limit, $numrecords);
@@ -212,7 +226,7 @@ if (!empty($sort)) {
     $sql .= " ORDER BY resolutionpriority ASC";
 }
 
-// set list length limits
+// Set list length limits.
 /*
 if ($limit > $numrecords) {
     $offset = 0;
@@ -221,12 +235,14 @@ if ($limit > $numrecords) {
 }
 $sql = $sql . ' LIMIT ' . $limit . ',' . $offset;
 */
-// $issues = $DB->get_records_sql($sql, null, $table->get_page_start(), $table->get_page_size());
+//
+
+$issues = $DB->get_records_sql($sql, null, $table->get_page_start(), $table->get_page_size());
 
 $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', " trackerid = $tracker->id GROUP BY trackerid ");
 
 if (!empty($issues)) {
-    // product data for table
+    // Product data for table.
     foreach ($issues as $issue) {
         $issuenumber = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;issueid={$issue->id}\">{$tracker->ticketprefix}{$issue->id}</a>";
         $summary = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}\">".format_string($issue->summary).'</a>';
@@ -244,7 +260,8 @@ if (!empty($issues)) {
                 }
                 $assignedto = html_writer::select($developersmenu, "assignedto{$issue->id}", $issue->assignedto, array('' => get_string('unassigned', 'tracker')), array('onchange' => "document.forms['manageform'].changed{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"changed{$issue->id}\" value=\"0\" />";
             }
-        } elseif (has_capability('mod/tracker:resolve', $context)) { // resolvers can give a bug back to managers
+        } elseif (has_capability('mod/tracker:resolve', $context)) {
+            // Resolvers can give a bug back to managers.
             $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array('' => 'choose'), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
             $managers = tracker_getadministrators($context);
             if (!empty($managers)) {

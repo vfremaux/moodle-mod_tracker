@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
 * @package mod-tracker
@@ -27,7 +41,13 @@ $issue = file_prepare_standard_editor($issue, 'resolution', $editoroptions, $con
 
 <!-- Print Bug Form -->
 
-<table border="1" cellpadding="5" class="tracker-issue-editor">
+<form action="view.php" name="editissue" method="post">
+<input type="hidden" name="id" value="<?php p($cm->id) ?>" />
+<input type="hidden" name="issueid" value="<?php p($issueid) ?>" />
+<input type="hidden" name="view" value="view" />
+<input type="hidden" name="screen" value="viewanissue" />
+<input type="hidden" name="what" value="updateanissue" />
+<table cellpadding="5" class="tracker-issue-editor">
 <?php
 if (tracker_can_edit($tracker, $context, $issue)){
     /// Opens the issue if I have capability to resolve
@@ -46,19 +66,13 @@ if (tracker_can_edit($tracker, $context, $issue)){
 <?php
 }
 ?>  
-    <form action="view.php" name="editissue" method="post">
-    <input type="hidden" name="id" value="<?php p($cm->id) ?>" />
-    <input type="hidden" name="issueid" value="<?php p($issueid) ?>" />
-    <input type="hidden" name="view" value="view" />
-    <input type="hidden" name="screen" value="viewanissue" />
-    <input type="hidden" name="what" value="updateanissue" />
     <tr>
-        <td align="right" width="200" class="tracker-issue-param"><b><?php print_string('issuenumber', 'tracker') ?>:</b></td>
-        <td width="200">
+        <td align="right" width="25%" class="tracker-issue-param"><b><?php print_string('issuenumber', 'tracker') ?>:</b></td>
+        <td width="25%">
             <?php echo $tracker->ticketprefix.$issueid; ?>
         </td>
-        <td align="right" width="150" class="tracker-issue-param"><b><?php print_string('dependson', 'tracker') ?>:</b></td>
-        <td width="250">
+        <td align="right" width="22%" class="tracker-issue-param"><b><?php print_string('dependson', 'tracker') ?>:</b></td>
+        <td width="28%">
             <?php 
             $dependancies = tracker_getpotentialdependancies($tracker->id, $issueid);
             ?>
@@ -73,64 +87,64 @@ if (tracker_can_edit($tracker, $context, $issue)){
         </td>
     </tr>
     <tr>
-        <td align="right" width="200" class="tracker-issue-param"><b><?php print_string('reportedby', 'tracker') ?>:</b><br /></td>
-        <td width="200">
+        <td align="right" width="25%" class="tracker-issue-param"><b><?php print_string('reportedby', 'tracker') ?>:</b><br /></td>
+        <td width="25%">
             <?php echo fullname($issue->reporter);  ?>
         </td>
-        <td align="right" width="150" class="tracker-issue-param">
+        <td align="right" width="22%" class="tracker-issue-param">
             <b><?php print_string('datereported', 'tracker') ?>:</b>
         </td>
-        <td width="250">
+        <td width="28%">
             <?php echo userdate($issue->datereported); ?>
             <input type="hidden" name="datereported" value="<?php p($issue->datereported) ?>"/>
         </td>
     </tr>
     <tr>
-        <td align="right" width="200" class="tracker-issue-param"><b><?php print_string('assignedto', 'tracker') ?>:</b><br /></td>
-        <td width="200">
+        <td align="right" width="25%" class="tracker-issue-param"><b><?php print_string('assignedto', 'tracker') ?>:</b><br /></td>
+        <td width="25%">
             <?php 
             $resolvers = tracker_getresolvers($context);
             if ($resolvers){
-	            foreach($resolvers as $resolver){
-	                $resolversmenu[$resolver->id] = fullname($resolver);
-	            }
-	            echo html_writer::select($resolversmenu, 'assignedto', @$issue->assignedto);
-	        } else {
-	        	print_string('noresolvers', 'tracker');
-	        	echo '<input type="hidden" name="assignedto" value="0" />';
-	        }
+                foreach ($resolvers as $resolver) {
+                    $resolversmenu[$resolver->id] = fullname($resolver);
+                }
+                echo html_writer::select($resolversmenu, 'assignedto', @$issue->assignedto);
+            } else {
+                print_string('noresolvers', 'tracker');
+                echo '<input type="hidden" name="assignedto" value="0" />';
+            }
             ?>
         </td>
-        <td align="right" width="150" class="tracker-issue-param"><b><?php print_string('status', 'tracker') ?>:</b></td>
-        <td width="250" class="<?php echo 'status_'.$STATUSCODES[$issue->status] ?>">
+        <td align="right" width="22%" class="tracker-issue-param"><b><?php print_string('status', 'tracker') ?>:</b></td>
+        <td width="28%" class="<?php echo 'status_'.$STATUSCODES[$issue->status] ?>">
             <?php echo html_writer::select(tracker_get_statuskeys($tracker), 'status', $issue->status); ?>
         </td>
     </tr>
     <tr>
-        <td align="right" width="150" class="tracker-issue-param"><b><?php print_string('summary', 'tracker') ?>:</b></td>
-        <td colspan="3">
+        <td align="right" width="25%" class="tracker-issue-param"><b><?php print_string('summary', 'tracker') ?>:</b></td>
+        <td colspan="3" width="75%">
             <input type="text" name="summary" size="70" value="<?php echo $issue->summary ?>" />
         </td>
     </tr>
     <tr valign="top">
-        <td align="right" height="200" class="tracker-issue-param"><b><?php print_string('description') ?>:</b></td>
-        <td align="left" colspan="3" width="600">
+        <td align="right" height="25%" class="tracker-issue-param"><b><?php print_string('description') ?>:</b></td>
+        <td align="left" colspan="3" width="75%">
 <?php
             // print_textarea($usehtmleditor, 20, 60, 680, 400, 'description_editor', $issue->description, 0, false, 'id_description');
 
-			$attributes = array('id' => 'id_description', 'name' => 'description_editor');
-			$values = array('text' => $issue->description_editor['text'], 'format' => $issue->description_editor['format'], 'itemid' => $issue->description_editor['itemid']);
-			$options = array('maxfiles' => 99, 'maxbytes' => $COURSE->maxbytes, 'context' => $context);
-			echo tracker_print_direct_editor($attributes, $values, $options);
+            $attributes = array('id' => 'id_description', 'name' => 'description_editor');
+            $values = array('text' => $issue->description_editor['text'], 'format' => $issue->description_editor['format'], 'itemid' => $issue->description_editor['itemid']);
+            $options = array('maxfiles' => 99, 'maxbytes' => $COURSE->maxbytes, 'context' => $context);
+            echo tracker_print_direct_editor($attributes, $values, $options);
 ?>
         </td>
     </tr>
 <!--Print Bug Attributes-->
-<?php       
-if (is_array($elementsused)){   
+<?php
+if (is_array($elementsused)) {
     $keys = array_keys($elementsused);
-    if(!empty($keys)){      
-        for ($i=0; $i < count($keys); $i++){
+    if (!empty($keys)) {
+        for ($i = 0; $i < count($keys); $i++) {
             // Print first category in one column
             $key = $keys[$i];
             echo "<tr valign=\"top\">";
@@ -148,13 +162,13 @@ if (is_array($elementsused)){
 }
 ?>
     <tr valign="top">
-        <td align="right" height="200" class="tracker-issue-param"><b><?php print_string('resolution', 'tracker') ?>:</b></td>
-        <td align="left" colspan="3">
+        <td align="right" height="25%" class="tracker-issue-param"><b><?php print_string('resolution', 'tracker') ?>:</b></td>
+        <td align="left" colspan="3" width="75%">
 <?php
-			$attributes = array('id' => 'id_resolution', 'name' => 'resolution_editor');
-			$values = array('text' => $issue->resolution_editor['text'], 'format' => $issue->resolution_editor['format'], 'itemid' => $issue->resolution_editor['itemid']);
-			$options = array('maxfiles' => 99, 'maxbytes' => $COURSE->maxbytes, 'context' => $context);
-			echo tracker_print_direct_editor($attributes, $values, $options);
+            $attributes = array('id' => 'id_resolution', 'name' => 'resolution_editor');
+            $values = array('text' => $issue->resolution_editor['text'], 'format' => $issue->resolution_editor['format'], 'itemid' => $issue->resolution_editor['itemid']);
+            $options = array('maxfiles' => 99, 'maxbytes' => $COURSE->maxbytes, 'context' => $context);
+            echo tracker_print_direct_editor($attributes, $values, $options);
 ?>
         </td>
     </tr>
@@ -163,8 +177,8 @@ if (is_array($elementsused)){
             <input type="submit" value="<?php print_string('savechanges') ?>" />
         </td>
     </tr>
-    </form>
 </table>
+</form>
 
 <?php
 $OUTPUT->box_end();

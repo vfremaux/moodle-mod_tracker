@@ -28,73 +28,73 @@ echo '</p>';
 <input type="hidden" name="what" value="saveprefs" />
 <input type="hidden" name="view" value="profile" />
 <table border="1">
-	<?php if ($tracker->enabledstates & ENABLED_OPEN){ ?>
-	<tr valign="top">
-	    <td align="right" width="33%"><b><?php print_string('unsetwhenopens', 'tracker') ?></b></td>
-		<td colspan="3" align="left">
-		    <?php echo html_writer::select_yes_no('open', @$USER->trackerprefs->eventmask & EVENT_OPEN); ?>
-		</td>
-	</tr>
-	<?php }
-	if ($tracker->enabledstates & ENABLED_RESOLVING){ ?>
-	<tr valign="top">
-	    <td align="right"><b><?php print_string('unsetwhenworks', 'tracker') ?></b></td>
-		<td colspan="3" align="left">
-		    <?php echo html_writer::select_yes_no('resolving', @$USER->trackerprefs->eventmask & EVENT_RESOLVING); ?>
-		</td>
-	</tr>
-	<?php }
-	if ($tracker->enabledstates & ENABLED_WAITING){ ?>
-	<tr valign="top">
-	    <td align="right"><b><?php print_string('unsetwhenwaits', 'tracker') ?></b></td>
-		<td colspan="3" align="left">
-		    <?php echo html_writer::select_yes_no('waiting', @$USER->trackerprefs->eventmask & EVENT_WAITING); ?>
-		</td>
-	</tr>
-	<?php }
-	if ($tracker->enabledstates & ENABLED_TESTING){ ?>
-	<tr valign="top">
-	    <td align="right"><b><?php print_string('unsetwhentesting', 'tracker') ?></b></td>
-		<td colspan="3" align="left">
-		    <?php echo html_writer::select_yes_no('testing', @$USER->trackerprefs->eventmask & EVENT_TESTING); ?>
-		</td>
-	</tr>
-	<?php }
-	if ($tracker->enabledstates & ENABLED_PUBLISHED){ ?>
-	<tr valign="top">
-	    <td align="right"><b><?php print_string('unsetwhenpublished', 'tracker') ?></b></td>
-		<td colspan="3" align="left">
-		    <?php echo html_writer::select_yes_no('published', @$USER->trackerprefs->eventmask & EVENT_PUBLISHED); ?>
-		</td>
-	</tr>
-	<?php }
-	if ($tracker->enabledstates & ENABLED_RESOLVED){ ?>
-	<tr valign="top">
-	    <td align="right"><b><?php print_string('unsetwhenresolves', 'tracker') ?></b></td>
-		<td colspan="3" align="left">
-		    <?php echo html_writer::select_yes_no('resolved', @$USER->trackerprefs->eventmask & EVENT_RESOLVED); ?>
-		</td>
-	</tr>
-	<?php }
-	if ($tracker->enabledstates & ENABLED_ABANDONNED){ ?>
-	<tr valign="top">
-	    <td align="right"><b><?php print_string('unsetwhenthrown', 'tracker') ?></b></td>
-		<td colspan="3" align="left">
-		    <?php echo html_writer::select_yes_no('abandonned', @$USER->trackerprefs->eventmask & EVENT_ABANDONNED); ?>
-		</td>
-	</tr>
-	<?php } ?>
-	<tr valign="top">
-	    <td align="right"><b><?php print_string('unsetoncomment', 'tracker') ?></b></td>
-		<td colspan="3" align="left">
-		    <?php echo html_writer::select_yes_no('oncomment', @$USER->trackerprefs->eventmask & ON_COMMENT); ?>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="4" align="center">
-		    <input type="submit" name="go_btn" value="<?php print_string('savechanges') ?>" />
-		</td>
-	</tr>
+    <?php if ($tracker->enabledstates & ENABLED_OPEN){ ?>
+    <tr valign="top">
+        <td align="right" width="33%"><b><?php print_string('unsetwhenopens', 'tracker') ?></b></td>
+        <td colspan="3" align="left">
+            <?php echo html_writer::select_yes_no('open', @$USER->trackerprefs->eventmask & EVENT_OPEN); ?>
+        </td>
+    </tr>
+    <?php }
+    if ($tracker->enabledstates & ENABLED_RESOLVING){ ?>
+    <tr valign="top">
+        <td align="right"><b><?php print_string('unsetwhenworks', 'tracker') ?></b></td>
+        <td colspan="3" align="left">
+            <?php echo html_writer::select_yes_no('resolving', @$USER->trackerprefs->eventmask & EVENT_RESOLVING); ?>
+        </td>
+    </tr>
+    <?php }
+    if ($tracker->enabledstates & ENABLED_WAITING){ ?>
+    <tr valign="top">
+        <td align="right"><b><?php print_string('unsetwhenwaits', 'tracker') ?></b></td>
+        <td colspan="3" align="left">
+            <?php echo html_writer::select_yes_no('waiting', @$USER->trackerprefs->eventmask & EVENT_WAITING); ?>
+        </td>
+    </tr>
+    <?php }
+    if ($tracker->enabledstates & ENABLED_TESTING){ ?>
+    <tr valign="top">
+        <td align="right"><b><?php print_string('unsetwhentesting', 'tracker') ?></b></td>
+        <td colspan="3" align="left">
+            <?php echo html_writer::select_yes_no('testing', @$USER->trackerprefs->eventmask & EVENT_TESTING); ?>
+        </td>
+    </tr>
+    <?php }
+    if ($tracker->enabledstates & ENABLED_PUBLISHED){ ?>
+    <tr valign="top">
+        <td align="right"><b><?php print_string('unsetwhenpublished', 'tracker') ?></b></td>
+        <td colspan="3" align="left">
+            <?php echo html_writer::select_yes_no('published', @$USER->trackerprefs->eventmask & EVENT_PUBLISHED); ?>
+        </td>
+    </tr>
+    <?php }
+    if ($tracker->enabledstates & ENABLED_RESOLVED){ ?>
+    <tr valign="top">
+        <td align="right"><b><?php print_string('unsetwhenresolves', 'tracker') ?></b></td>
+        <td colspan="3" align="left">
+            <?php echo html_writer::select_yes_no('resolved', @$USER->trackerprefs->eventmask & EVENT_RESOLVED); ?>
+        </td>
+    </tr>
+    <?php }
+    if ($tracker->enabledstates & ENABLED_ABANDONNED){ ?>
+    <tr valign="top">
+        <td align="right"><b><?php print_string('unsetwhenthrown', 'tracker') ?></b></td>
+        <td colspan="3" align="left">
+            <?php echo html_writer::select_yes_no('abandonned', @$USER->trackerprefs->eventmask & EVENT_ABANDONNED); ?>
+        </td>
+    </tr>
+    <?php } ?>
+    <tr valign="top">
+        <td align="right"><b><?php print_string('unsetoncomment', 'tracker') ?></b></td>
+        <td colspan="3" align="left">
+            <?php echo html_writer::select_yes_no('oncomment', @$USER->trackerprefs->eventmask & ON_COMMENT); ?>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4" align="center">
+            <input type="submit" name="go_btn" value="<?php print_string('savechanges') ?>" />
+        </td>
+    </tr>
 </table>
 </form>
 </center>

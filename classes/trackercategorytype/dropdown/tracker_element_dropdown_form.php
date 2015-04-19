@@ -1,8 +1,8 @@
 <?php
 
-require_once '../tracker_element_form.php';
+require_once('../tracker_element_form.php');
 
-class tracker_element_dropdown_form extends tracker_moodle_form{
+class tracker_element_dropdown_form extends tracker_moodle_form {
 
     function definition() {
         $this->start_form();

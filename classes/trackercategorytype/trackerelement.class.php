@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
 * @package tracker
@@ -9,7 +23,7 @@
 * A generic class for collecting all that is common to all elements
 */
 
-abstract class trackerelement{
+abstract class trackerelement {
     var $id;
     var $course;
     var $usedid;
@@ -71,10 +85,10 @@ abstract class trackerelement{
     }
 
     /**
-    * in case we have options (such as checkboxes or radio lists, get options from db.
-    * this is backcalled by specific type constructors after core construction.
-    *
-    */
+     * in case we have options (such as checkboxes or radio lists, get options from db.
+     * this is backcalled by specific type constructors after core construction.
+     *
+     */
     function setoptionsfromdb() {
         global $DB;
 
@@ -91,10 +105,11 @@ abstract class trackerelement{
             print_error ('errorinvalidelementID', 'tracker');
         }
     }
+
     /**
-    *
-    *
-    */
+     *
+     *
+     */
     function getvalue($issueid) {
         global $CFG, $DB;
 
@@ -151,9 +166,9 @@ abstract class trackerelement{
     }
 
     /**
-    * given a tracker and an element form key in a static context,
-    * build a suitable trackerelement object that represents it.
-    */
+     * given a tracker and an element form key in a static context,
+     * build a suitable trackerelement object that represents it.
+     */
     static function find_instance(&$tracker, $elementkey) {
         global $DB;
 
@@ -187,11 +202,11 @@ abstract class trackerelement{
     abstract function formprocess(&$data);
 
     /**
-    * given a tracker and an id of a used element in a static context,
-    * build a suitable trackerelement object that represents it.
-    * what we need to knwo is the type of the element to call the adequate
-    * constructor.
-    */
+     * given a tracker and an id of a used element in a static context,
+     * build a suitable trackerelement object that represents it.
+     * what we need to knwo is the type of the element to call the adequate
+     * constructor.
+     */
     static function find_instance_by_usedid(&$tracker, $usedid) {
         global $DB, $CFG;
 
@@ -219,11 +234,11 @@ abstract class trackerelement{
     }
 
     /**
-    * given a tracker and an id of a used element in a static context,
-    * build a suitable trackerelement object that represents it.
-    * what we need to knwo is the type of the element to call the adequate
-    * constructor.
-    */
+     * given a tracker and an id of a used element in a static context,
+     * build a suitable trackerelement object that represents it.
+     * what we need to knwo is the type of the element to call the adequate
+     * constructor.
+     */
     static function find_instance_by_id(&$tracker, $id) {
         global $DB, $CFG;
 

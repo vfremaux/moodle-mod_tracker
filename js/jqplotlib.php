@@ -34,7 +34,7 @@ function tracker_require_jqplot_libs() {
 * prints any JQplot graph type given a php descriptor and dataset
 *
 */
-function jqplot_print_graph($htmlid, $graph, &$data, $width, $height, $addstyle = '', $return = false, $ticks = null) {
+function tracker_jqplot_print_graph($htmlid, $graph, &$data, $width, $height, $addstyle = '', $return = false, $ticks = null) {
     global $PLOTID;
     static $instance = 0;
 
@@ -75,8 +75,8 @@ function jqplot_print_graph($htmlid, $graph, &$data, $width, $height, $addstyle 
 /**
 * TODO : unfinished
 *
-*/
-function jqplot_print_vert_bar_graph(&$data, $title, $htmlid) {
+*
+function tracker_jqplot_print_vert_bar_graph(&$data, $title, $htmlid) {
     global $PLOTID;
     static $instance = 0;
 
@@ -95,9 +95,9 @@ function jqplot_print_vert_bar_graph(&$data, $title, $htmlid) {
     $matchedarr = array($data->matched, $data->amatched, $data->cmatched);
     $hitratioarr = array($data->hitratio * 100, $data->ahitratio * 100, $data->chitratio * 100);
 
-    print_jqplot_barline('answered', $answeredarr);
-    print_jqplot_barline('matched', $matchedarr);
-    print_jqplot_barline('hitratio', $hitratioarr);
+    tracker_print_jqplot_barline('answered', $answeredarr);
+    tracker_print_jqplot_barline('matched', $matchedarr);
+    tracker_print_jqplot_barline('hitratio', $hitratioarr);
     echo "
         plot{$PLOTID} = $.jqplot(
             '$htmlid',
@@ -123,11 +123,11 @@ function jqplot_print_vert_bar_graph(&$data, $title, $htmlid) {
 
 }
 
-/**
+**
 *
 *
-*/
-function jqplot_print_labelled_graph(&$data, $title, $htmlid, $xlabel = '', $ylabel = '') {
+*
+function tracker_jqplot_print_labelled_graph(&$data, $title, $htmlid, $xlabel = '', $ylabel = '') {
     global $PLOTID;
     static $instance = 0;
 
@@ -142,7 +142,7 @@ function jqplot_print_labelled_graph(&$data, $title, $htmlid, $xlabel = '', $yla
 
     $title = addslashes($title);
 
-    print_jqplot_labelled_rawline($data, 'data_'.$htmlid);
+    tracker_print_jqplot_labelled_rawline($data, 'data_'.$htmlid);
 
     echo "
         plot{$PLOTID} = $.jqplot(
@@ -170,11 +170,11 @@ function jqplot_print_labelled_graph(&$data, $title, $htmlid, $xlabel = '', $yla
 
 }
 
-/**
+**
 *
 *
-*/
-function jqplot_print_simple_bargraph(&$data, $title, $htmlid) {
+*
+function tracker_jqplot_print_simple_bargraph(&$data, $title, $htmlid) {
     global $PLOTID;
     static $instance = 0;
 
@@ -189,7 +189,7 @@ function jqplot_print_simple_bargraph(&$data, $title, $htmlid) {
 
     $title = addslashes($title);
 
-    print_jqplot_simplebarline('data_'.$htmlid, $data);
+    tracker_print_jqplot_simplebarline('data_'.$htmlid, $data);
 
     echo "
 
@@ -217,3 +217,4 @@ function jqplot_print_simple_bargraph(&$data, $title, $htmlid) {
     $PLOTID++;
 
 }
+*/

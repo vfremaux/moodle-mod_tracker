@@ -12,7 +12,7 @@ if (!empty($ticketsbymonth)) {
     $ticketdates = $ticketsbymonth;
     unset($ticketdates['sum']);
     $availdates = array_keys($ticketdates);
-    if (!empty($availdates)){
+    if (!empty($availdates)) {
         $lowest = $availdates[0];
         
         $highest = $availdates[count($availdates) - 1];
@@ -62,7 +62,7 @@ if (!$alltickets){
                 ?>
                 <td align="right" width="<?php echo $colwidth ?>%">
                     <?php 
-                    $new = 0 + @$ticketsbymonth[$current][$key];                
+                    $new = 0 + @$ticketsbymonth[$current][$key];
                     $diff = $new - $last;
                     $valueclass = ($new == 0) ? 'nullclass' : '' ;
                     echo "<span class=\"$valueclass\">$new</span>";
@@ -171,7 +171,7 @@ if (!$alltickets){
             ?>
             <td align="right" width="<?php echo $colwidth ?>%">
                 <?php 
-                $new = 0 + @$ticketsprogressbymonth[$current][$key];                
+                $new = 0 + @$ticketsprogressbymonth[$current][$key];
                 $diff = $new - $last;
                 $valueclass = ($new == 0) ? 'nullclass' : '' ;
                 echo "<span class=\"$valueclass\">$new</span>";
@@ -334,7 +334,7 @@ if (!$alltickets){
                 array('color' => '#00C000'),
             ),
         );
-        jqplot_print_graph('plot1', $jqplot, $data, 550, 250, 'margin-top:20px;');        
+        tracker_jqplot_print_graph('plot1', $jqplot, $data, 550, 250, 'margin-top:20px;');        
         ?>
         </td>
     </tr>
