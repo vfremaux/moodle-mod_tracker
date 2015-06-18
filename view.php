@@ -198,18 +198,18 @@ if ($view == 'view') {
 } elseif ($view == 'resolved') {
     $result = 0 ;
     if ($action != '') {
-        $result = include 'views/view.controller.php';
+        $result = include $CFG->dirroot.'/mod/tracker/views/view.controller.php';
     }
     if ($result != -1) {
         switch ($screen) {
             case 'mytickets':
                 $resolved = 1;
-                include 'views/viewmyticketslist.php';
+                include $CFG->dirroot.'/mod/tracker/views/viewmyticketslist.php';
                 break;
 
             case 'mywork':
                 $resolved = 1;
-                include 'views/viewmyassignedticketslist.php';
+                include $CFG->dirroot.'/mod/tracker/views/viewmyassignedticketslist.php';
                 break;
 
             case 'browse':
@@ -217,7 +217,7 @@ if ($view == 'view') {
                     print_error('errornoaccessallissues', 'tracker');
                 } else {
                     $resolved = 1;
-                    include 'views/viewissuelist.php';
+                    include $CFG->dirroot.'/mod/tracker/views/viewissuelist.php';
                 }
                 break;
         }
@@ -259,22 +259,22 @@ if ($view == 'view') {
     $result = 0;
 
     if ($action != '') {
-        $result = include 'views/profile.controller.php';
+        $result = include $CFG->dirroot.'/mod/tracker/views/profile.controller.php';
     }
 
     if ($result != -1) {
         switch ($screen) {
             case 'myprofile' :
-                include 'views/profile.html';
+                include $CFG->dirroot.'/mod/tracker/views/profile.html';
                 break;
             case 'mypreferences' :
-                include 'views/mypreferences.html';
+                include $CFG->dirroot.'/mod/tracker/views/mypreferences.html';
                 break;
             case 'mywatches' :
-                include 'views/mywatches.html';
+                include $CFG->dirroot.'/mod/tracker/views/mywatches.html';
                 break;
             case 'myqueries':
-                include 'views/myqueries.html';
+                include $CFG->dirroot.'/mod/tracker/views/myqueries.html';
                 break;
         }
     }

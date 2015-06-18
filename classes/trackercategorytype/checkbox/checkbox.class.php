@@ -64,9 +64,10 @@ class checkboxelement extends trackerelement {
 
     function add_form_element(&$form) {
         if (isset($this->options)) {
-            $form->addElement('header', "head{$this->name}", $this->description);
+            $form->addElement('header', "head{$this->name}", format_string($this->description));
+            $form->setExpanded("head{$this->name}");
             foreach ($this->options as $option) {
-                $form->addElement('checkbox', "element{$this->name}{$option->id}", $option->description);
+                $form->addElement('checkbox', "element{$this->name}{$option->id}", format_string($option->description));
                 $form->setType("element{$this->name}{$option->id}", PARAM_TEXT);
             }
         }

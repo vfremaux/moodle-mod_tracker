@@ -1,31 +1,45 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* @package mod-tracker
-* @category mod
-* @author Valery Fremaux
-* @date 02/12/2007
-*
-* Controller for all "view" related views
-*
-* // @usecase submitanissue // gone away
-* @usecase updateanissue
-* @usecase delete
-* @usecase updatelist
-* @usecase addcomment (form)
-* @usecase doaddcomment
-* @usecase usequery
-* @usecase register
-* @usecase unregister
-* @usecase cascade
-* @usecase distribute
-* @usecase raisepriority
-* @usecase lowerpriority
-* @usecase raisetotop
-* @usecase lowertobottom
-* @usecase askraise (form)
-* @usecase doaskraise
-*/
+ * @package mod-tracker
+ * @category mod
+ * @author Valery Fremaux
+ * @date 02/12/2007
+ *
+ * Controller for all "view" related views
+ *
+ * // @usecase submitanissue // gone away
+ * @usecase updateanissue
+ * @usecase delete
+ * @usecase updatelist
+ * @usecase addcomment (form)
+ * @usecase doaddcomment
+ * @usecase usequery
+ * @usecase register
+ * @usecase unregister
+ * @usecase cascade
+ * @usecase distribute
+ * @usecase raisepriority
+ * @usecase lowerpriority
+ * @usecase raisetotop
+ * @usecase lowertobottom
+ * @usecase askraise (form)
+ * @usecase doaskraise
+ */
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    // It must be included from view.php in mod/tracker
@@ -213,7 +227,7 @@ elseif ($action == 'updatelist') {
                 $ownership->issueid = $issueid;
                 $ownership->userid = $oldassign->assignedto;
                 $ownership->bywhomid = $oldassign->bywhomid;
-                $ownership->timeassigned = $oldassign->timeassigned;
+                $ownership->timeassigned = 0 + @$oldassign->timeassigned;
                 if (!$DB->insert_record('tracker_issueownership', $ownership)) {
                     notice ("Error saving ownership for issue $issueid");
                 }

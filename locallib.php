@@ -2241,14 +2241,14 @@ function tracker_resolve_screen(&$tracker, &$cm) {
     }
 
     // Some forced modes
-    if ($tracker->supportmode == 'taskspread' && $SESSION->tracker_current_view == 'view') {
+    if ($tracker->supportmode == 'taskspread' && @$SESSION->tracker_current_view == 'view') {
         if (has_capability('mod/tracker:develop', $context) && ($screen != 'viewanissue')) {
             $screen = 'mywork';
         }
     }
 
     // Some forced modes
-    if ($tracker->supportmode == 'taskspread' && $SESSION->tracker_current_view == 'resolved') {
+    if ($tracker->supportmode == 'taskspread' && @$SESSION->tracker_current_view == 'resolved') {
         if (has_capability('mod/tracker:develop', $context) && ($screen != 'viewanissue')) {
             $screen = 'mywork';
         }

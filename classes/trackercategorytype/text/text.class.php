@@ -43,7 +43,8 @@ class textelement extends trackerelement {
 
     function add_form_element(&$mform) {
         $mform->addElement('header', "header{$this->name}", '');
-        $mform->addElement('text', "element{$this->name}", $this->description, array('size' => 80));
+        $mform->setExpanded("header{$this->name}");
+        $mform->addElement('text', "element{$this->name}", format_string($this->description), array('size' => 80));
         $mform->setType("element{$this->name}", PARAM_TEXT);
     }
 

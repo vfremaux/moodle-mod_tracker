@@ -34,13 +34,13 @@ function xmldb_tracker_upgrade($oldversion=0) {
         // Launch add field parent.
         $dbman->add_field($table, $field);
 
-        // tracker savepoint reached.
+        // Tracker savepoint reached.
         upgrade_mod_savepoint(true, 2008091900, 'tracker');
     }
 
     if ($result && $oldversion < 2008092400) {
 
-        // setup XML-RPC services for tracker.
+        // Setup XML-RPC services for tracker.
 
         if (!$DB->get_record('mnet_service', array('name' => 'tracker_cascade'))) {
             $service->name = 'tracker_cascade';

@@ -1,21 +1,20 @@
-<?PHP  // $Id: rpclib.php,v 1.2 2012-08-12 21:43:55 vf Exp $
+<?php
+/**
+ * @package mod-tracker
+ * @category mod
+ * @author Clifford Tham (original < 1.8)
+ * @author Valery Fremaux
+ * @date 02/12/2012
+ * @version Moodle 2
+ *
+ * Library of functions for rpc remote calls at tracker. All complex
+ * variables transport are performed using JSON format.
+ */
 
 /**
-* @package mod-tracker
-* @category mod
-* @author Clifford Tham (original < 1.8)
-* @author Valery Fremaux
-* @date 02/12/2012
-* @version Moodle 2
-*
-* Library of functions for rpc remote calls at tracker. All complex
-* variables transport are performed using JSON format.
-*/
-
-/**
-* Constants
-*
-*/
+ * Constants
+ *
+ */
 if (!defined('RPC_SUCCESS')) {
         define('RPC_TEST', 100);
         define('RPC_SUCCESS', 200);
@@ -27,12 +26,11 @@ if (!defined('RPC_SUCCESS')) {
 }
 
 /**
-* checks an user has local identity and comes from a known host
-* @param string $username the user's login
-* @param string $remotehostroot the host he comes from
-* @return a failure report if unchecked, null elsewhere.
-*
-*/
+ * checks an user has local identity and comes from a known host
+ * @param string $username the user's login
+ * @param string $remotehostroot the host he comes from
+ * @return a failure report if unchecked, null elsewhere.
+ */
 function tracker_rpc_check($username, $remotehostroot, &$localuser) {
     global $DB;
 
@@ -53,12 +51,12 @@ function tracker_rpc_check($username, $remotehostroot, &$localuser) {
 }
 
 /*
-* sends tracker information to remote caller. This is intended for
-* administrative binding GUIs.
-* @param int $trackerid
-* @param boolean $nojson when true, avoids serializing through JSON syntax
-* @return string a JSON encoded information structure.
-*/
+ * sends tracker information to remote caller. This is intended for
+ * administrative binding GUIs.
+ * @param int $trackerid
+ * @param boolean $nojson when true, avoids serializing through JSON syntax
+ * @return string a JSON encoded information structure.
+ */
 function tracker_rpc_get_infos($trackerid, $nojson = false) {
     global $CFG, $DB;
 
@@ -85,14 +83,14 @@ function tracker_rpc_get_infos($trackerid, $nojson = false) {
     return json_encode($tracker);
 }
 
-/*
-* sends an array of available trackers. Returns only trackers
-* the remote user has capability to manage. Note that this
-* RPC call can be used locally.
-* @param string $username the user's login
-* @param string $remotehostroot the host he comes from
-* @return a stub of instance descriptions
-*/
+/**
+ * sends an array of available trackers. Returns only trackers
+ * the remote user has capability to manage. Note that this
+ * RPC call can be used locally.
+ * @param string $username the user's login
+ * @param string $remotehostroot the host he comes from
+ * @return a stub of instance descriptions
+ */
 function tracker_rpc_get_instances($username, $remotehostroot) {
     global $CFG, $DB;
 
@@ -114,14 +112,14 @@ function tracker_rpc_get_instances($username, $remotehostroot) {
 }
 
 /**
-* remote post an entry in a tracker
-* @param int $username the userame the post should come from
-* @param string $remoteuserhostroot the userame the post should come from
-* @param int $trackerid the local trackerid where to post
-* @param string $remote_issue a JSON encoded variable containing all
-* information about an issue.
-* @return the local issue record id
-*/
+ * remote post an entry in a tracker
+ * @param int $username the userame the post should come from
+ * @param string $remoteuserhostroot the userame the post should come from
+ * @param int $trackerid the local trackerid where to post
+ * @param string $remote_issue a JSON encoded variable containing all
+ * information about an issue.
+ * @return the local issue record id
+ */
 function tracker_rpc_post_issue($username, $remoteuserhostroot, $trackerid, $remote_issue) {
     global $DB;
 

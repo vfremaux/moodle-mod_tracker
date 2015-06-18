@@ -129,7 +129,8 @@ class fileelement extends trackerelement{
     function add_form_element(&$form) {
         global $COURSE;
 
-        $form->addElement('header', "head{$this->name}", $this->description);
+        $form->addElement('header', "head{$this->name}", format_string($this->description));
+        $form->setExpanded("head{$this->name}");
         $form->addElement('filepicker', 'element'.$this->name, '', null, $this->options);
     }
 

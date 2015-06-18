@@ -67,6 +67,8 @@ class dropdownelement extends trackerelement {
 
     function add_form_element(&$form) {
 
+        $form->addElement('header', "head{$this->name}", format_string($this->description));
+        $form->setExpanded("head{$this->name}");
         if (isset($this->options)) {
             foreach ($this->options as $option) {
                 $optionsmenu[$option->id] = format_string($option->description);

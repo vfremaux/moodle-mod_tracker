@@ -246,7 +246,7 @@ if (!empty($issues)) {
     foreach ($issues as $issue) {
         $issuenumber = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;issueid={$issue->id}\">{$tracker->ticketprefix}{$issue->id}</a>";
         $summary = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}\">".format_string($issue->summary).'</a>';
-        $datereported = date('Y/m/d h:i', $issue->datereported);
+        $datereported = date('Y/m/d H:i', $issue->datereported);
         $user = $DB->get_record('user', array('id' => $issue->reportedby));
         $reportedby = fullname($user);
         $user = $DB->get_record('user', array('id' => $issue->assignedto));
