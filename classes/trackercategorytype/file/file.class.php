@@ -126,11 +126,15 @@ class fileelement extends trackerelement{
         echo $html;
     }
 
-    function add_form_element(&$form) {
+    function add_form_element(&$mform) {
         global $COURSE;
 
-        $form->addElement('header', "head{$this->name}", $this->description);
-        $form->addElement('filepicker', 'element'.$this->name, '', null, $this->options);
+        $mform->addElement('header', "head{$this->name}", format_string($this->description));
+        $mform->setExpanded("head{$this->name}");
+        $mform->addElement('filepicker', 'element'.$this->name, '', null, $this->options);
+        if (!empty($this->mandatory)) {
+            $mform->addRule('element'.$this->name, null, 'required', null, 'client');
+        }
     }
 
     function set_data($defaults) {

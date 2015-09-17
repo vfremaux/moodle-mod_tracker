@@ -65,14 +65,19 @@ class dropdownelement extends trackerelement {
         }
     }
 
-    function add_form_element(&$form) {
+    function add_form_element(&$mform) {
 
+        $mform->addElement('header', "head{$this->name}", format_string($this->description));
+        $mform->setExpanded("head{$this->name}");
         if (isset($this->options)) {
             foreach ($this->options as $option) {
                 $optionsmenu[$option->id] = format_string($option->description);
             }
 
-            $form->addElement('select', $this->name, format_string($this->description), $optionsmenu);
+            $mform->addElement('select', $this->name, format_string($this->description), $optionsmenu);
+            if (!empty($this->mandatory)) {
+                $mform->addRule($this->name, null, 'required', null, 'client');
+            }
         }
     }
 
@@ -136,6 +141,10 @@ class dropdownelement extends trackerelement {
         } else {
             $DB->update_record('tracker_issueattribute', $attribute);
         }
+    }
+
+    function type_has_options() {
+        return true;
     }
 }
 

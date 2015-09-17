@@ -19,7 +19,7 @@ $a  = optional_param('a', 0, PARAM_INT);  // course ID
 $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'description');
 
 ?>
-<form name="addelement" method="post" action="view.php">
+<form name="addelement" method="post" action="<?php echo $CFG->wwwroot ?>/mod/tracker/view.php">
 <table border="0" width="100%">
     <tr>
         <td valign="top">
@@ -27,9 +27,9 @@ $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'description');
         </td>
         <td valign="top">
                 <?php
-                    echo "<input type=\"hidden\" name=\"view\" value=\"admin\" />";
-                    echo "<input type=\"hidden\" name=\"id\" value=\"{$cm->id}\" />";
-                    echo "<input type=\"hidden\" name=\"what\" value=\"createelement\" />";
+                    echo '<input type="hidden" name="view" value="admin" />';
+                    echo '<input type="hidden" name="id" value="'.$cm->id.'" />';
+                    echo '<input type="hidden" name="what" value="createelement" />';
                     $types = tracker_getelementtypes();
                     foreach ($types as $type) {
                         $elementtypesmenu[$type] = get_string($type, 'tracker');
@@ -80,14 +80,28 @@ if (!empty($elements)) {
         if ($element->hasoptions() && empty($element->options)) {
             $name .= ' <span class="error">('.get_string('nooptions', 'tracker').')</span>';
         }
-        $actions = "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=addelement&amp;elementid={$element->id}\" title=\"".get_string('addtothetracker', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('t/moveleft', 'core') ."\" /></a>";
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=viewelementoptions&amp;elementid={$element->id}\" title=\"".get_string('editoptions', 'tracker')."\"><img src=\"".$OUTPUT->pix_url('editoptions', 'mod_tracker')."\" /></a>";
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=editelement&amp;elementid={$element->id}\" title=\"".get_string('editproperties', 'tracker')."\"><img src=\"".$OUTPUT->pix_url('t/edit', 'core') ."\" /></a>";
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=deleteelement&amp;elementid={$element->id}\" title=\"".get_string('delete')."\"><img src=\"".$OUTPUT->pix_url('t/delete', 'core') ."\" /></a>";
+
+        $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'addelement', 'elementid' => $element->id);
+        $url = new moodle_url('/mod/tracker/view.php', $params);
+        $actions = '&nbsp;<a href="'.$url.'" title="'.get_string('addtothetracker', 'tracker').'" ><img src="'.$OUTPUT->pix_url('t/moveleft', 'core') .'" /></a>';
+
+        if ($element->type_has_options()) {
+            $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'viewelementoptions', 'elementid' => $element->id);
+            $url = new moodle_url('/mod/tracker/view.php', $params);
+            $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('editoptions', 'tracker').'"><img src="'.$OUTPUT->pix_url('editoptions', 'mod_tracker').'" /></a>';
+        }
+
+        $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'editelement', 'elementid' => $element->id, 'type' => $element->type);
+        $url = new moodle_url('/mod/tracker/view.php', $params);
+        $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('editproperties', 'tracker').'"><img src="'.$OUTPUT->pix_url('t/edit', 'core') .'" /></a>';
+
+        $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'deleteelement', 'elementid' => $element->id);
+        $url = new moodle_url('/mod/tracker/view.php', $params);
+        $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('delete').'"><img src="'.$OUTPUT->pix_url('t/delete', 'core') .'" /></a>';
 
         $local = '';
         if ($element->course == $COURSE->id) {
-            $local = "<img src=\"".$OUTPUT->pix_url('i/course', 'core') ."\" />";
+            $local = '<img src="'.$OUTPUT->pix_url('i/course', 'core') .'" />';
         }
         $type = "<img src=\"".$OUTPUT->pix_url("types/{$element->type}", 'mod_tracker')."\" />";
         $table->data[] = array($actions, $name, $local, $type);

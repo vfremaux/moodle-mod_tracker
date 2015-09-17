@@ -214,17 +214,6 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
         */
         $data['intro'] = moodle1_converter::migrate_referenced_files($data['intro'], $this->fileman);
 
-        // write inforef.xml
-        $this->open_xml_writer("activities/tracker_{$moduleid}/inforef.xml");
-        $this->xmlwriter->begin_tag('inforef');
-        $this->xmlwriter->begin_tag('fileref');
-        foreach ($this->fileman->get_fileids() as $fileid) {
-            $this->write_xml('file', array('id' => $fileid));
-        }
-        $this->xmlwriter->end_tag('fileref');
-        $this->xmlwriter->end_tag('inforef');
-        $this->close_xml_writer();
-
         // write tracker.xml
         $this->open_xml_writer("activities/tracker_{$moduleid}/tracker.xml");
         $this->xmlwriter->begin_tag('activity', array('id' => $instanceid, 'moduleid' => $moduleid,

@@ -16,49 +16,47 @@
 
 /**
 * @package tracker
-* @author Clifford Tham
-* @review Valery Fremaux / 1.8
-* @date 02/12/2007
+* @author Valery Fremaux / 1.8
+* @date 06/08/2015
 *
-* A class implementing a textarea element and all its representations
+* A class implementing a hidden/labelled element that captures the referer url
 */
 
-require_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php';
+include_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php';
 
-class textareaelement extends trackerelement{
+class autourlelement extends trackerelement {
 
     function __construct(&$tracker, $id = null, $used = false) {
         parent::__construct($tracker, $id, $used);
     }
 
+    function has_mandatory_option() {
+        return false;
+    }
+
     function view($issueid = 0) {
         $this->getvalue($issueid);
-        echo format_text(format_string($this->value), $this->format);
+        return '<a href="'.$this->value.'">'.$this->value.'</a>';
     }
 
     function edit($issueid = 0) {
         $this->getvalue($issueid);
-        echo html_writer::start_tag('textarea', array('name' => 'element'.$this->name, 'cols' => 80, 'rows' => 15));
-        echo format_string($this->value);
-        echo html_writer::end_tag('textarea');
-    }
-
-    function viewsearch() {
-        echo '<input type="text" name="element'.$this->name.'" style="width:100%" />';
-    }
-
-    function viewquery() {
-       echo '<input type="text" name="element'.$this->name.'" style="width:100%" />';
+        $str = '';
+        $str .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'element'.$this->name, 'value' => format_string($this->value)));
+        $str .= html_writer::empty_tag('input', array('type' => 'text', 'name' => 'element'.$this->name.'_disabled', 'value' => format_string($this->value), 'disabled' => 'disabled', 'size' => 120));
+        return $str;
     }
 
     function add_form_element(&$mform) {
-        $mform->addElement('header', "header{$this->name}", format_string($this->description));
+        $mform->addElement('header', "header{$this->name}", '');
         $mform->setExpanded("header{$this->name}");
-        $mform->addElement('textarea', "element{$this->name}", '', array('cols' => 60, 'rows' => 15));
-        $mform->setType("element{$this->name}", PARAM_TEXT);
-        if (!empty($this->mandatory)) {
-            $mform->addRule('element'.$this->name, null, 'required', null, 'client');
-        }
+        $mform->addElement('hidden', "element{$this->name}");
+        $mform->setDefault("element{$this->name}", $_SERVER['HTTP_REFERER']);
+        $mform->addElement('text', "element{$this->name}shadow", get_string('autourl', 'tracker'));
+        $mform->setType("element{$this->name}shadow", PARAM_URL);
+        $mform->disabledIf("element{$this->name}shadow", "element{$this->name}");
+        $mform->setDefault("element{$this->name}shadow", $_SERVER['HTTP_REFERER']);
+        $mform->setType("element{$this->name}", PARAM_URL);
     }
 
     function set_data(&$defaults, $issueid = 0) {
@@ -66,10 +64,13 @@ class textareaelement extends trackerelement{
             $elementname = "element{$this->name}";
             $defaults->$elementname = $this->getvalue($issueid);
         } else {
-            $defaults->$elementname = '';
+            $defaults->$elementname = $_SERVER['HTTP_REFERER'];
         }
     }
 
+    /**
+     * updates or creates the element instance for this issue
+     */
     function formprocess(&$data) {
         global $DB;
 

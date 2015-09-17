@@ -37,6 +37,7 @@ abstract class trackerelement {
     var $options;
     var $tracker;
     var $active;
+    var $private;
     var $canbemodifiedby;
     var $context;
 
@@ -50,6 +51,8 @@ abstract class trackerelement {
             $this->usedid = $elementid;
             $elementid = $elmusedrec->elementid;
             $this->active = $elmusedrec->active;
+            $this->mandatory = $elmusedrec->mandatory;
+            $this->private = $elmusedrec->private;
             $this->sortorder = $elmusedrec->sortorder;
             $this->canbemodifiedby = $elmusedrec->canbemodifiedby;
         }
@@ -68,6 +71,10 @@ abstract class trackerelement {
         $this->tracker = $tracker;
     }
 
+    function type_has_options() {
+        return false;
+    }
+
     function hasoptions() {
         return $this->options !== null;
     }
@@ -78,6 +85,14 @@ abstract class trackerelement {
 
     function setoptions($options) {
         $this->options = $options;
+    }
+
+    function has_mandatory_option() {
+        return true;
+    }
+
+    function has_private_option() {
+        return true;
     }
 
     function setcontext(&$context) {
@@ -139,22 +154,32 @@ abstract class trackerelement {
         $strsortorder = get_string('sortorder', 'tracker');
         $straction = get_string('action');
         $table = new html_table();
-        $table->width = "800";
-        $table->size = array(100,110,240,75,75);
+        $table->width = "90%";
+        $table->size = array('15%', '15%', '50%', '30%');
         $table->head = array('', "<b>$strname</b>","<b>$strdescription</b>","<b>$straction</b>");
         if (!empty($this->options)) {
             foreach ($this->options as $option) {
-                $actions  = "<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=editelementoption&amp;optionid={$option->id}&amp;elementid={$option->elementid}\" title=\"".get_string('edit')."\"><img src=\"".$OUTPUT->pix_url('/t/edit', 'core')."\" /></a>&nbsp;" ;
-                $img = ($option->sortorder > 1) ? 'up' : 'up_shadow' ;
-                $actions .= "<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=moveelementoptionup&amp;optionid={$option->id}&amp;elementid={$option->elementid}\" title=\"".get_string('up')."\"><img src=\"".$OUTPUT->pix_url("{$img}", 'mod_tracker')."\"></a>&nbsp;";
-                $img = ($option->sortorder < $this->maxorder) ? 'down' : 'down_shadow' ;
-                $actions .= "<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=moveelementoptiondown&amp;optionid={$option->id}&amp;elementid={$option->elementid}\" title=\"".get_string('down')."\"><img src=\"".$OUTPUT->pix_url("{$img}", 'mod_tracker')."\"></a>&nbsp;";
+                $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'editelementoption', 'optionid' => $option->id, 'elementid' => $option->elementid);
+                $editoptionurl = new moodle_url('/mod/tracker/view.php', $params);
+                $actions  = '<a href="'.$editoptionurl.'" title="'.get_string('edit').'"><img src="'.$OUTPUT->pix_url('/t/edit', 'core').'" /></a>&nbsp;';
 
-                $actions .= "<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=deleteelementoption&amp;optionid={$option->id}&amp;elementid={$option->elementid}\" title=\"".get_string('delete')."\"><img src=\"".$OUTPUT->pix_url('/t/delete', 'core')."\"></a>";
+                $img = ($option->sortorder > 1) ? 'up' : 'up_shadow';
+                $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'moveelementoptionup', 'optionid' => $option->id, 'elementid' => $option->elementid);
+                $moveurl = new moodle_url('/mod/tracker/view.php', $params);
+                $actions .= '<a href="'.$moveurl.'" title="'.get_string('up').'"><img src="'.$OUTPUT->pix_url("{$img}", 'mod_tracker').'"></a>&nbsp;';
+
+                $img = ($option->sortorder < $this->maxorder) ? 'down' : 'down_shadow' ;
+                $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'moveelementoptiondown', 'optionid' => $option->id, 'elementid' => $option->elementid);
+                $moveurl = new moodle_url('/mod/tracker/view.php', $params);
+                $actions .= '<a href="'.$moveurl.'" title="'.get_string('down').'"><img src="'.$OUTPUT->pix_url("{$img}", 'mod_tracker').'"></a>&nbsp;';
+
+                $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'deleteelementoption', 'optionid' => $option->id, 'elementid' => $option->elementid);
+                $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
+                $actions .= '<a href="'.$deleteurl.'" title="'.get_string('delete').'"><img src="'.$OUTPUT->pix_url('/t/delete', 'core').'"></a>';
                 $table->data[] = array('<b> '.get_string('option', 'tracker').' '.$option->sortorder.':</b>',$option->name, format_string($option->description, true, $COURSE->id), $actions);
             }
         }
-        echo html_writer::table($table);
+        return html_writer::table($table);
     }
 
     function viewsearch() {
@@ -225,7 +250,7 @@ abstract class trackerelement {
         if ($element = $DB->get_record_sql($sql, array($usedid))) {
 
             $eltypeconstructor = $element->type.'element';
-            include_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/'.$element->type.'/'.$element->type.'.class.php';
+            include_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/'.$element->type.'/'.$element->type.'.class.php');
             $instance = new $eltypeconstructor($tracker, $usedid, true);
             return $instance;
         }
@@ -244,7 +269,7 @@ abstract class trackerelement {
 
         if ($element = $DB->get_record('tracker_element', array('id' => $id), 'id, type', 'id')) {
             $eltypeconstructor = $element->type.'element';
-            include_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/'.$element->type.'/'.$element->type.'.class.php';
+            include_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/'.$element->type.'/'.$element->type.'.class.php');
             $instance = new $eltypeconstructor($tracker, $id, false);
             return $instance;
         }

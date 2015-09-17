@@ -88,12 +88,15 @@ if (isset($searchqueries)) {
             u.lastname lastname,
             COUNT(ic.issueid) watches
         FROM
-            {user} u,
             {tracker_issue} i
         LEFT JOIN
             {tracker_issuecc} ic
         ON
             ic.issueid = i.id
+        LEFT JOIN
+            {user} u
+        ON
+            i.reportedby = u.id
         WHERE
             i.reportedby = u.id AND
             i.trackerid = {$tracker->id}
@@ -185,7 +188,7 @@ $table = new flexible_table('mod-tracker-issuelist');
 $table->define_columns($tablecolumns);
 $table->define_headers($tableheaders);
 
-$table->define_baseurl($CFG->wwwroot.'/mod/tracker/view.php?id='.$cm->id.'&view='.$view.'&screen='.$screen);
+$table->define_baseurl(new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => $view, 'screen' => $screen)));
 
 $table->sortable(true, 'resolutionpriority', SORT_ASC); //sorted by priority by default
 $table->collapsible(true);
@@ -209,6 +212,7 @@ $table->column_class('assignedto', 'list_assignedto');
 $table->column_class('watches', 'list_watches');
 $table->column_class('status', 'list_status');
 $table->column_class('action', 'list_action');
+
 if (!empty($tracker->parent)) {
     $table->column_class('transfered', 'list_transfered');
 }
@@ -246,9 +250,10 @@ if (!empty($issues)) {
     foreach ($issues as $issue) {
         $issuenumber = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;issueid={$issue->id}\">{$tracker->ticketprefix}{$issue->id}</a>";
         $summary = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}\">".format_string($issue->summary).'</a>';
-        $datereported = date('Y/m/d h:i', $issue->datereported);
+        $datereported = date('Y/m/d H:i', $issue->datereported);
         $user = $DB->get_record('user', array('id' => $issue->reportedby));
         $reportedby = fullname($user);
+        $assignedto = '';
         $user = $DB->get_record('user', array('id' => $issue->assignedto));
         if (has_capability('mod/tracker:manage', $context)) { // managers can assign bugs
             $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array('' => 'choose'), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")). "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";

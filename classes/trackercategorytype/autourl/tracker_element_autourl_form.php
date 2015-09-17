@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-require_once($CFG->dirroot.'/mod/tracker/trackercategorytype//tracker_element_form.php');
+require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/tracker_element_form.php');
 
-class tracker_element_checkbox_form extends tracker_moodle_form {
+class tracker_element_autourl_form extends tracker_moodle_form {
 
     function definition() {
         $this->start_form();

@@ -62,12 +62,13 @@ class checkboxelement extends trackerelement {
         }
     }
 
-    function add_form_element(&$form) {
+    function add_form_element(&$mform) {
         if (isset($this->options)) {
-            $form->addElement('header', "head{$this->name}", $this->description);
+            $mform->addElement('header', "head{$this->name}", format_string($this->description));
+            $mform->setExpanded("head{$this->name}");
             foreach ($this->options as $option) {
-                $form->addElement('checkbox', "element{$this->name}{$option->id}", $option->description);
-                $form->setType("element{$this->name}{$option->id}", PARAM_TEXT);
+                $mform->addElement('checkbox', "element{$this->name}{$option->id}", format_string($option->description));
+                $mform->setType("element{$this->name}{$option->id}", PARAM_TEXT);
             }
         }
     }
@@ -122,6 +123,10 @@ class checkboxelement extends trackerelement {
         } else {
             $DB->update_record('tracker_issueattribute', $attribute);
         }
+    }
+
+    function type_has_options() {
+        return true;
     }
 }
 

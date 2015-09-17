@@ -102,6 +102,8 @@ function tracker_update_instance($tracker, $mform) {
 
     if (is_array(@$tracker->subtrackers)) {
         $tracker->subtrackers = implode(',', $tracker->subtrackers);
+    } else {
+        $tracker->subtrackers = '';
     }
 
     $context = context_module::instance($tracker->coursemodule);
@@ -910,7 +912,7 @@ function tracker_preset_params(&$tracker) {
         $tracker->thanksmessage = get_string('message_bugtracker', 'tracker');
     } elseif ($tracker->supportmode == 'ticketting') {
         if ($tracker->defaultassignee) {
-            $defaultassignee = $DB->get_record('user', array('id' => $tracker->defaultassignee), 'id'.get_all_user_name_fields(true, ''));
+            $defaultassignee = $DB->get_record('user', array('id' => $tracker->defaultassignee), 'id,'.get_all_user_name_fields(true, ''));
             $tracker->thanksmessage = get_string('message_ticketting_preassigned', 'tracker', fullname($defaultassignee));
         } else {
             $tracker->thanksmessage = get_string('message_ticketting', 'tracker');

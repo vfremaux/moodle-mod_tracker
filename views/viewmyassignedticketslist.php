@@ -232,7 +232,7 @@ if (!empty($issues)) {
     foreach ($issues as $issue) {
         $issuenumber = "<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}\">{$issue->ticketprefix}{$issue->id}</a>";
         $summary = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}\">".format_string($issue->summary).'</a>';
-        $datereported = date('Y/m/d h:i', $issue->datereported);
+        $datereported = date('Y/m/d H:i', $issue->datereported);
         if (has_capability('mod/tracker:manage', $context)) { // managers can assign bugs
             $status = html_writer::select($STATUSKEYS, "status{$issue->id}", $issue->status, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
             $developers = get_users_by_capability($context, 'mod/tracker:develop', 'u.id,'.get_all_user_name_fields(true, 'u'), 'lastname');

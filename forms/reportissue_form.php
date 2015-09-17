@@ -34,7 +34,7 @@ class TrackerIssueForm extends moodleform{
 
         $mform->addElement('text', 'summary', get_string('summary', 'tracker'), array('size' => 80));
         $mform->setType('summary', PARAM_TEXT);
-          $mform->addRule('summary', null, 'required', null, 'client');
+        $mform->addRule('summary', null, 'required', null, 'client');
 
         $mform->addElement('editor', 'description_editor', get_string('description'), $this->editoroptions);
 
@@ -42,7 +42,9 @@ class TrackerIssueForm extends moodleform{
 
         if (!empty($this->elements)) {
             foreach ($this->elements as $element) {
-                $element->add_form_element($mform);
+                if ($element->active && !$element->private) {
+                    $element->add_form_element($mform);
+                }
             }
         }
 

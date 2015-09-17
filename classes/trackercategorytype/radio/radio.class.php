@@ -66,12 +66,16 @@ class radioelement extends trackerelement {
         }
     }
 
-    function add_form_element(&$form) {
+    function add_form_element(&$mform) {
         if (isset($this->options)) {
-            $form->addElement('header', "head{$this->name}", $this->description);
+            $mform->addElement('header', "head{$this->name}", format_string($this->description));
+            $mform->setExpanded("head{$this->name}");
             foreach ($this->options as $option) {
-                $form->addElement('radio', 'element'.$this->name, $option->description, '', $option->name);
-                $form->setType('element'.$this->name, PARAM_TEXT);
+                $mform->addElement('radio', 'element'.$this->name, format_string($option->description), '', $option->name);
+                $mform->setType('element'.$this->name, PARAM_TEXT);
+            }
+            if (!empty($this->mandatory)) {
+                $mform->addRule('element'.$this->name, null, 'required', null, 'client');
             }
         }
     }
@@ -117,6 +121,10 @@ class radioelement extends trackerelement {
         } else {
             $DB->update_record('tracker_issueattribute', $attribute);
         }
+    }
+
+    function type_has_options() {
+        return true;
     }
 }
 

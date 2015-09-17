@@ -31,12 +31,10 @@ class AddCommentForm extends moodleform {
         $this->editoroptions = array('trusttext' => true, 'subdirs' => false, 'maxfiles' => $maxfiles, 'maxbytes' => $maxbytes, 'context' => $this->context);
 
         $mform->addElement('hidden', 'id', $this->_customdata['cmid']); // issue id
-        $mform->addElement('hidden', 'issueid', $this->_customdata['issueid']); // issue id
         $mform->setType('id', PARAM_INT);
 
-        $mform->addElement('text', 'summary', get_string('summary', 'tracker'), '', array('size' => 80));
-        $mform->setType('summary', PARAM_TEXT);
-        $mform->addRule('summary', null, 'required', null, 'client');
+        $mform->addElement('hidden', 'issueid', $this->_customdata['issueid']); // issue id
+        $mform->setType('issueid', PARAM_INT);
 
         $mform->addElement('editor', 'comment_editor', get_string('comment', 'tracker'), $this->editoroptions);
 

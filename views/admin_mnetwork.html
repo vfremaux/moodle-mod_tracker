@@ -49,67 +49,69 @@ if (!empty($tracker->parent)){
         $rpcclient->add_param($remoteid, 'int');
         $parent_mnet = new mnet_peer();
         $parent_mnet->set_wwwroot($mnet_host);
-        if (!empty($parent_mnet->wwwroot)){
-            if (!$rpcclient->send($parent_mnet)){
+        if (!empty($parent_mnet->wwwroot)) {
+            if (!$rpcclient->send($parent_mnet)) {
                 print_error('errorremote', 'tracker', implode("<br/>", $rpcclient->error));
             }
             $parent = json_decode($rpcclient->response);
             // fix a bug in XML-RPC transfer of arrays
-            $parent->elements = get_object_vars($parent->elements);
+            if (is_object($parent->elements)) {
+                $parent->elements = get_object_vars($parent->elements);
+            }
         } else {
             $tracker->parent = '';
         }
     }
 }
 
-if (!empty($tracker->parent)){
+if (!empty($tracker->parent)) {
 ?>
 <table border="0" cellpadding="3" width="90%">
-	<tr valign="top">
-		<td align="right" width="250"><b><?php print_string('trackerhost', 'tracker') ?>: </b></td>
-		<td align="left">
-			<?php
-			if (!empty($parent_mnet)){
-				echo format_text($parent_mnet->wwwroot);
-				echo "({$parent_mnet->ip_address})";
-			} else {
-				echo get_string('nomnet', 'tracker');
-			}
-			?>
-		</td>
-	</tr>
-	<tr valign="top">
-		<td align="right"><b><?php print_string('trackername', 'tracker') ?>: </b></td>
-		<td align="left">
-			<?php echo format_string($parent->name) ?>
-		</td>
-	</tr>
-	<tr valign="top">
-		<td align="right"><b><?php print_string('trackerelements', 'tracker') ?>: </b></td>
-		<td align="left">
-			<?php 
-			echo "<i>".get_string('knownelements', 'tracker').":</i><br/>";
-			if (!empty($parent->elements)){
-			    $child = tracker_rpc_get_infos($tracker->id, true);
-			    if (!tracker_display_elementmatch($child, $parent)){
-			       echo $OUTPUT->notification(get_string('unmatchingelements', 'tracker'));
-        	    }
-    		} else {
-    		    echo $OUTPUT->notification(get_string('emptydefinition', 'tracker'));
-    		}
-			?>
-		</td>
-	</tr>
+    <tr valign="top">
+        <td align="right" width="250"><b><?php print_string('trackerhost', 'tracker') ?>: </b></td>
+        <td align="left">
+            <?php
+            if (!empty($parent_mnet)) {
+                echo format_text($parent_mnet->wwwroot);
+                echo "({$parent_mnet->ip_address})";
+            } else {
+                echo get_string('nomnet', 'tracker');
+            }
+            ?>
+        </td>
+    </tr>
+    <tr valign="top">
+        <td align="right"><b><?php print_string('trackername', 'tracker') ?>: </b></td>
+        <td align="left">
+            <?php echo format_string($parent->name) ?>
+        </td>
+    </tr>
+    <tr valign="top">
+        <td align="right"><b><?php print_string('trackerelements', 'tracker') ?>: </b></td>
+        <td align="left">
+            <?php 
+            echo "<i>".get_string('knownelements', 'tracker').":</i><br/>";
+            if (!empty($parent->elements)){
+                $child = tracker_rpc_get_infos($tracker->id, true);
+                if (!tracker_display_elementmatch($child, $parent)) {
+                   echo $OUTPUT->notification(get_string('unmatchingelements', 'tracker'));
+                }
+            } else {
+                echo $OUTPUT->notification(get_string('emptydefinition', 'tracker'));
+            }
+            ?>
+        </td>
+    </tr>
 </table>
 <?php 
 } else {
 ?>
 <table border="0" cellpadding="3">
-	<tr>
-		<td align="center">
-			<?php print_string('standalone', 'tracker') ?>
-		</td>
-	</tr>
+    <tr>
+        <td align="center">
+            <?php print_string('standalone', 'tracker') ?>
+        </td>
+    </tr>
 </table>
 
 <?php 
@@ -127,9 +129,10 @@ switch ($step) {
     case 1 : {
         $remote_hosts = $DB->get_records_select('mnet_host', "applicationid = 1 AND deleted = 0");
         $options = array();
-        if (!empty($remote_hosts)){
-            foreach($remote_hosts as $host){
-                if (empty($host->wwwroot)) continue;
+        if (!empty($remote_hosts)) {
+            foreach ($remote_hosts as $host) {
+                if (empty($host->wwwroot)) continue; // Avoid "all hosts" as remote.
+                if ($host->wwwroot == $CFG->wwwroot) continue; // Avoid ourself as remote.
                 $options[$host->id] = $host->wwwroot;
             }
         }
@@ -183,18 +186,18 @@ function submitform(formname){
 <input type="hidden" name="view" value="admin" />
 <input type="hidden" name="what" value="localparent" />
 <table width="90%">
-	<tr>
-		<td align="right" width="350"><b><?php print_string('chooselocal', 'tracker') ?>: </b></td>
-		<td align="left">
-			<?php 
-			if (empty($localtrackersmenu)){
-			    print_string('nolocalcandidate', 'tracker');
-			} else {
-			    echo html_writer::select($localtrackersmenu, 'localtracker', '', array('' => 'choose'), array('onchange' => "submitform('bindlocalparent')"));
-			}
-			?>
-		</td>
-	</tr>
+    <tr>
+        <td align="right" width="350"><b><?php print_string('chooselocal', 'tracker') ?>: </b></td>
+        <td align="left">
+            <?php 
+            if (empty($localtrackersmenu)){
+                print_string('nolocalcandidate', 'tracker');
+            } else {
+                echo html_writer::select($localtrackersmenu, 'localtracker', '', array('' => 'choose'), array('onchange' => "submitform('bindlocalparent')"));
+            }
+            ?>
+        </td>
+    </tr>
 </table>
 </form>
 
@@ -203,37 +206,37 @@ function submitform(formname){
 <input type="hidden" name="what" value="remoteparent" />
 <input type="hidden" name="step" value="<?php p($step) ?>" />
 <table width="90%">
-	<tr valign="top">
-		<td align="right" width="350"><b><?php print_string('chooseremote', 'tracker') ?>: </b></td>
-		<td align="left">
-			<?php 
-			if ($step < 2) {
+    <tr valign="top">
+        <td align="right" width="350"><b><?php print_string('chooseremote', 'tracker') ?>: </b></td>
+        <td align="left">
+            <?php 
+            if ($step < 2) {
                 if (empty($options)){
-    			    print_string('noremotehosts', 'tracker');
-    			} else {
+                    print_string('noremotehosts', 'tracker');
+                } else {
                     echo html_writer::select($options, 'remotehost', '', array('' => 'choose'), array('onchange' => "submitform('bindremoteparent')"));
                 }
             } else {
                echo $remotehost;
             }
             ?>
-		</td>
-	</tr>
+        </td>
+    </tr>
 <?php
 if ($step == 2){
 ?>
-	<tr valign="top">
-		<td align="right" width="350"><b><?php print_string('chooseremoteparent', 'tracker') ?>: </b></td>
-		<td align="left">
-			<?php 
+    <tr valign="top">
+        <td align="right" width="350"><b><?php print_string('chooseremoteparent', 'tracker') ?>: </b></td>
+        <td align="left">
+            <?php 
             if (empty($trackersmenu)){
-			    print_string('noremotetrackers', 'tracker');
-			} else {
+                print_string('noremotetrackers', 'tracker');
+            } else {
                 echo html_writer::select($trackersmenu, 'remotetracker', $remoteid, array('' => 'choose'), array('onchange' => "submitform('bindremoteparent')"));
             }
             ?>
-		</td>
-	</tr>
+        </td>
+    </tr>
 <?php
 }
 ?>

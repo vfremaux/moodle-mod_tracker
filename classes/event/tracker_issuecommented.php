@@ -55,7 +55,7 @@ class tracker_issuecommented extends \core\event\base {
     }
 
     public static function get_name() {
-        return get_string('eventtrackerissuecommented', 'tracker');
+        return get_string('event_tracker_issue_commented', 'tracker');
     }
 
     /**
