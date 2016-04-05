@@ -39,7 +39,7 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
         $tracker = new backup_nested_element('tracker', array('id'), array(
             'name', 'intro', 'introformat', 'requirelogin', 'allownotifications', 'enablecomments', 'ticketprefix',
             'timemodified', 'parent', 'supportmode', 'defaultassignee', 'subtrackers', 'enablestates',
-            'thanksmessage', 'strictworkflow'));
+            'thanksmessage', 'strictworkflow', 'networkable'));
 
         $elements = new backup_nested_element('elements');
 
@@ -53,13 +53,13 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
 
         $usedelements = new backup_nested_element('usedelements');
 
-        $used = new backup_nested_element('used', array('id'), array(
+        $usedelement = new backup_nested_element('usedelement', array('id'), array(
             'trackerid', 'elementid', 'sortorder', 'canbemodifiedby', 'active'));
 
         $issues = new backup_nested_element('issues');
 
-        $issue = new backup_nested_element('elementused', array('id'), array(
-            'trackerid', 'summary', 'description', 'format', 'datereported', 'reportedby', 'status', 'assignedto', 'bywhomid', 'timeassigned', 'resolution', 'resolutionformat', 'resolutionpriority'));
+        $issue = new backup_nested_element('issue', array('id'), array(
+            'trackerid', 'summary', 'description', 'format', 'datereported', 'reportedby', 'status', 'assignedto', 'bywhomid', 'timeassigned', 'resolution', 'resolutionformat', 'resolutionpriority', 'downlink', 'uplink'));
 
         $attribs = new backup_nested_element('issueattributes');
 
@@ -109,7 +109,7 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
         $elementitems->add_child($item);
 
         $tracker->add_child($usedelements);
-        $usedelements->add_child($used);
+        $usedelements->add_child($usedelement);
 
         $tracker->add_child($issues);
         $issues->add_child($issue);
@@ -138,7 +138,7 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
         $tracker->set_source_table('tracker', array('id' => backup::VAR_ACTIVITYID));
         $element->set_source_table('tracker_element', array('course' => backup::VAR_COURSEID));
         $item->set_source_table('tracker_elementitem', array('elementid' => backup::VAR_PARENTID));
-        $used->set_source_table('tracker_elementused', array('trackerid' => backup::VAR_ACTIVITYID));
+        $usedelement->set_source_table('tracker_elementused', array('trackerid' => backup::VAR_ACTIVITYID));
 
         if ($userinfo) {
             $issue->set_source_table('tracker_issue', array('trackerid' => backup::VAR_PARENTID));

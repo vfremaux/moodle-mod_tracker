@@ -293,6 +293,84 @@ function xmldb_tracker_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014010100, 'tracker');
     }
 
+    if ($result && $oldversion < 2015072300) {
+
+        // Define field uplink to be added to tracker.
+        $table = new xmldb_table('tracker_issue');
+        $field = new xmldb_field('uplink', XMLDB_TYPE_CHAR, 10, null, null, null, null, 'resolutionpriority');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field downlink to be added to tracker.
+        $field = new xmldb_field('downlink', XMLDB_TYPE_CHAR, 10, null, null, null, null, 'uplink');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Tracker savepoint reached.
+        upgrade_mod_savepoint(true, 2015072300, 'tracker');
+    }
+
+    if ($result && $oldversion < 2015080400) {
+
+        // Define field uplink to be added to tracker.
+        $table = new xmldb_table('tracker');
+        $field = new xmldb_field('networkable', XMLDB_TYPE_INTEGER, 1, null, null, null, 0, 'strictworkflow');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Tracker savepoint reached.
+        upgrade_mod_savepoint(true, 2015080400, 'tracker');
+    }
+    if ($result && $oldversion < 2015080500) {
+
+        // Define field uplink to be added to tracker.
+        $table = new xmldb_table('tracker_elementused');
+        $field = new xmldb_field('mandatory', XMLDB_TYPE_INTEGER, 1, null, null, null, 0, 'active');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('private', XMLDB_TYPE_INTEGER, 1, null, null, null, 0, 'mandatory');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Tracker savepoint reached.
+        upgrade_mod_savepoint(true, 2015080500, 'tracker');
+    }
+
+    if ($result && $oldversion < 2015080600) {
+
+        // Define field uplink to be added to tracker.
+        $table = new xmldb_table('tracker_element');
+        $field = new xmldb_field('paramint1', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'type');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('paramint2', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'paramint1');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('paramchar1', XMLDB_TYPE_CHAR, 32, null, null, null, null, 'paramint2');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('paramchar2', XMLDB_TYPE_CHAR, 100, null, null, null, null, 'paramchar1');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+
+        // Tracker savepoint reached.
+        upgrade_mod_savepoint(true, 2015080600, 'tracker');
+    }
+
     return $result;
 }
 

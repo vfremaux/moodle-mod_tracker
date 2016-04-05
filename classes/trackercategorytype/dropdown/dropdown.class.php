@@ -46,8 +46,9 @@ class dropdownelement extends trackerelement {
                     }
                 }
             }
-            echo implode(', ', $optionstrs);
+            return implode(', ', $optionstrs);
         }
+        return '';
     }
 
     function edit($issueid = 0) {
@@ -60,28 +61,31 @@ class dropdownelement extends trackerelement {
             foreach ($this->options as $optionobj) {
                 $selectoptions[$optionobj->name] = $optionobj->description;
             }
-            echo html_writer::select($selectoptions, $this->name, $values, array('' => 'choosedots'));
+            echo html_writer::select($selectoptions, 'element'.$this->name, $values, array('' => 'choosedots'));
             echo html_writer::empty_tag('br');
         }
     }
 
-    function add_form_element(&$form) {
+    function add_form_element(&$mform) {
 
-        $form->addElement('header', "head{$this->name}", format_string($this->description));
-        $form->setExpanded("head{$this->name}");
+        $mform->addElement('header', "head{$this->name}", format_string($this->description));
+        $mform->setExpanded("head{$this->name}");
         if (isset($this->options)) {
             foreach ($this->options as $option) {
                 $optionsmenu[$option->id] = format_string($option->description);
             }
 
-            $form->addElement('select', $this->name, format_string($this->description), $optionsmenu);
+            $mform->addElement('select', 'element'.$this->name, format_string($this->description), $optionsmenu);
+            if (!empty($this->mandatory)) {
+                $mform->addRule($this->name, null, 'required', null, 'client');
+            }
         }
     }
 
     function set_data(&$defaults, $issueid = 0) {
         if ($issueid) {
 
-            $elementname = $this->name;
+            $elementname = 'element'.$this->name;
 
             if (!empty($this->options)) {
                 $values = $this->getvalue($issueid);
@@ -117,7 +121,7 @@ class dropdownelement extends trackerelement {
             $attribute->elementid = $this->id;
         }
 
-        $elmname = $this->name;
+        $elmname = 'element'.$this->name;
 
         if (!$this->multiple) {
             $value = optional_param($elmname, '', PARAM_TEXT);
@@ -138,6 +142,10 @@ class dropdownelement extends trackerelement {
         } else {
             $DB->update_record('tracker_issueattribute', $attribute);
         }
+    }
+
+    function type_has_options() {
+        return true;
     }
 }
 

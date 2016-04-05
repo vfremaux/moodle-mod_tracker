@@ -26,13 +26,13 @@
  */
 
 require('../../config.php');
-require_once($CFG->dirroot."/mod/tracker/lib.php");
-require_once($CFG->dirroot."/mod/tracker/locallib.php");
+require_once($CFG->dirroot.'/mod/tracker/lib.php');
+require_once($CFG->dirroot.'/mod/tracker/locallib.php');
+$PAGE->requires->js('/mod/tracker/js/trackerview.js');
 
 // Check for required parameters.
-
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID
-$a  = optional_param('a', 0, PARAM_INT);  // Tracker instance ID.
+$t  = optional_param('t', 0, PARAM_INT);  // Tracker instance ID.
 $issueid = optional_param('issueid', '', PARAM_INT);  // Ticket number.
 $action = optional_param('what', '', PARAM_ALPHA);
 
@@ -47,7 +47,7 @@ if ($id) {
         print_error('errormoduleincorrect', 'tracker');
     }
 } else {
-    if (! $tracker = $DB->get_record('tracker', array('id' => $a))) {
+    if (! $tracker = $DB->get_record('tracker', array('id' => $t))) {
         print_error('errormoduleincorrect', 'tracker');
     }
     if (! $course = $DB->get_record('course', array('id' => $tracker->course))) {
@@ -140,11 +140,38 @@ if ($screen == 'print') {
     $PAGE->set_pagelayout('embedded');
 }
 
+$renderer = $PAGE->get_renderer('tracker');
+
+// Process controllers
+
+$result = 0 ;
+if ($view == 'view') {
+    if ($action != '') {
+        $result = include($CFG->dirroot.'/mod/tracker/views/view.controller.php');
+    }
+} elseif ($view == 'resolved') {
+    if ($action != '') {
+        $result = include($CFG->dirroot.'/mod/tracker/views/view.controller.php');
+    }
+} elseif ($view == 'admin') {
+    if ($action != '') {
+        $result = include($CFG->dirroot.'/mod/tracker/views/admin.controller.php');
+    }
+} elseif ($view == 'profile') {
+    if ($action != '') {
+        $result = include($CFG->dirroot.'/mod/tracker/views/profile.controller.php');
+    }
+}
+
 echo $OUTPUT->header();
 
 echo $OUTPUT->box_start('', 'tracker-view');
+echo $renderer->tabs($view, $screen, $tracker, $cm);
 
-include($CFG->dirroot.'/mod/tracker/menus.php');
+// A pre-buffer that may be a controller output.
+if (!empty($out)) {
+    echo $out;
+}
 
 /*
  * Print the main part of the page
@@ -153,15 +180,11 @@ include($CFG->dirroot.'/mod/tracker/menus.php');
  */
 
 if ($view == 'view') {
-    $result = 0 ;
-    if ($action != '') {
-        $result = include($CFG->dirroot.'/mod/tracker/views/view.controller.php');
-    }
     if ($result != -1) {
         switch ($screen) {
             case 'mytickets':
                 $resolved = 0;
-                include "views/viewmyticketslist.php";
+                include($CFG->dirroot.'/mod/tracker/views/viewmyticketslist.php');
                 break;
             case 'mywork':
                 $resolved = 0;
@@ -172,7 +195,7 @@ if ($view == 'view') {
                     print_error ('errornoaccessallissues', 'tracker');
                 } else {
                     $resolved = 0;
-                    include "views/viewissuelist.php";
+                    include($CFG->dirroot.'/mod/tracker/views/viewissuelist.php');
                 }
                 break;
             case 'search':
@@ -183,33 +206,29 @@ if ($view == 'view') {
                 if (!has_any_capability(array('mod/tracker:seeissues','mod/tracker:resolve','mod/tracker:develop','mod/tracker:manage'), $context)) {
                     print_error('errornoaccessissue', 'tracker');
                 } else {
-                    include "views/viewanissue.html";
+                    include($CFG->dirroot.'/mod/tracker/views/viewanissue.html');
                 }
                 break;
             case 'editanissue' :
                 if (!has_capability('mod/tracker:manage', $context)) {
                     print_error('errornoaccessissue', 'tracker');
                 } else {
-                    include "views/editanissue.html";
+                    include($CFG->dirroot.'/mod/tracker/views/editanissue.html');
                 }
                 break;
         }
     }
 } elseif ($view == 'resolved') {
-    $result = 0 ;
-    if ($action != '') {
-        $result = include $CFG->dirroot.'/mod/tracker/views/view.controller.php';
-    }
     if ($result != -1) {
         switch ($screen) {
             case 'mytickets':
                 $resolved = 1;
-                include $CFG->dirroot.'/mod/tracker/views/viewmyticketslist.php';
+                include($CFG->dirroot.'/mod/tracker/views/viewmyticketslist.php');
                 break;
 
             case 'mywork':
                 $resolved = 1;
-                include $CFG->dirroot.'/mod/tracker/views/viewmyassignedticketslist.php';
+                include($CFG->dirroot.'/mod/tracker/views/viewmyassignedticketslist.php');
                 break;
 
             case 'browse':
@@ -217,7 +236,7 @@ if ($view == 'view') {
                     print_error('errornoaccessallissues', 'tracker');
                 } else {
                     $resolved = 1;
-                    include $CFG->dirroot.'/mod/tracker/views/viewissuelist.php';
+                    include($CFG->dirroot.'/mod/tracker/views/viewissuelist.php');
                 }
                 break;
         }
@@ -227,54 +246,44 @@ if ($view == 'view') {
     if ($result != -1) {
         switch ($screen) {
             case 'status':
-                include "report/status.html";
+                include($CFG->dirroot.'/mod/tracker/report/status.html');
                 break;
             case 'evolution':
-                include "report/evolution.html";
+                include($CFG->dirroot.'/mod/tracker/report/evolution.html');
                 break;
             case 'print':
-                include "report/print.html";
+                include($CFG->dirroot.'/mod/tracker/report/print.html');
                 break;
         }
     }
 } elseif ($view == 'admin') {
-    $result = 0;
-    if ($action != '') {
-        $result = include "views/admin.controller.php";
-    }
     if ($result != -1) {
         switch ($screen) {
             case 'summary':
-                include "views/admin_summary.html";
+                include($CFG->dirroot.'/mod/tracker/views/admin_summary.html');
                 break;
             case 'manageelements':
-                include "views/admin_manageelements.html";
+                include($CFG->dirroot.'/mod/tracker/views/admin_manageelements.html');
                 break;
             case 'managenetwork':
-                include "views/admin_mnetwork.html";
+                include($CFG->dirroot.'/mod/tracker/views/admin_mnetwork.html');
                 break;
         }
     }
 } elseif ($view == 'profile') {
-    $result = 0;
-
-    if ($action != '') {
-        $result = include $CFG->dirroot.'/mod/tracker/views/profile.controller.php';
-    }
-
     if ($result != -1) {
         switch ($screen) {
             case 'myprofile' :
-                include $CFG->dirroot.'/mod/tracker/views/profile.html';
+                include($CFG->dirroot.'/mod/tracker/views/profile.html');
                 break;
             case 'mypreferences' :
-                include $CFG->dirroot.'/mod/tracker/views/mypreferences.html';
+                include($CFG->dirroot.'/mod/tracker/views/mypreferences.html');
                 break;
             case 'mywatches' :
-                include $CFG->dirroot.'/mod/tracker/views/mywatches.html';
+                include($CFG->dirroot.'/mod/tracker/views/mywatches.html');
                 break;
             case 'myqueries':
-                include $CFG->dirroot.'/mod/tracker/views/myqueries.html';
+                include($CFG->dirroot.'/mod/tracker/views/myqueries.html');
                 break;
         }
     }
@@ -283,4 +292,16 @@ if ($view == 'view') {
 }
 
 echo $OUTPUT->box_end();
+
+if ($course->format == 'page') {
+    include_once($CFG->dirroot.'/course/format/page/xlib.php');
+    page_print_page_format_navigation($cm, $backtocourse = false);
+} else {
+    if ($COURSE->format != 'singleactivity') {
+        echo '<div style="text-align:center;margin:8px">';
+        echo $OUTPUT->single_button(new moodle_url('/course/view.php', array('id' => $course->id)), get_string('backtocourse', 'tracker'), 'post', array('class' => 'backtocourse'));
+        echo '</div>';
+    }
+}
+
 echo $OUTPUT->footer();

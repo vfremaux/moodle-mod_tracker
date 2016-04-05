@@ -105,6 +105,11 @@ elseif ($action == 'updateanissue') {
         $stc->statusfrom = $oldrecord->status;
         $stc->statusto = $issue->status;
         $DB->insert_record('tracker_state_change', $stc);
+
+        if ($stc->statusto == RESOLVED || $stc->statusto == PUBLISHED) {
+            // Check if was cascaded and needs backreported then backreport
+            // TODO : backreport to original
+        }
     }
 
     tracker_clearelements($issue->id);
@@ -165,12 +170,12 @@ elseif ($action == 'delete') {
     // clear all associated fileareas
 
     $fs = get_file_storage();
-    $fs->delete_area_files($context->id, 'mod_tracker', 'issuedescription', $issue->id);
-    $fs->delete_area_files($context->id, 'mod_tracker', 'issueresolution', $issue->id);
+    $fs->delete_area_files($context->id, 'mod_tracker', 'issuedescription', $issueid);
+    $fs->delete_area_files($context->id, 'mod_tracker', 'issueresolution', $issueid);
 
     if ($attributeids) {
         foreach ($attributeids as $attributeid => $void) {
-            $fs->delete_area_files($context->id, 'mod_tracker', 'issueattribute', $issue->id);
+            $fs->delete_area_files($context->id, 'mod_tracker', 'issueattribute', $issueid);
         }
     }
 
@@ -309,6 +314,8 @@ elseif ($action == 'register') {
 elseif ($action == 'cascade') {
     global $USER;
 
+    $fs = get_file_storage();
+
     $issueid = required_param('issueid', PARAM_INT);
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
     $attributes = $DB->get_records('tracker_issueattribute', array('issueid' => $issue->id));
@@ -316,8 +323,16 @@ elseif ($action == 'cascade') {
     // remaps elementid to elementname for
     tracker_loadelementsused($tracker, $used);
     if (!empty($attributes)) {
-        foreach (array_keys($attributes) as $attkey) {
+        foreach ($attributes as $attkey => $attribute) {
             $attributes[$attkey]->elementname = @$used[$attributes[$attkey]->id]->name;
+            if ($attribute->type == 'file') {
+                // get file content, encode it
+                $files = $fs->get_area_files($context->id, 'mod_tracker', 'issueattribute', $attribute->id);
+                if ($files) {
+                    $file = array_pop($files);
+                    $issue->files[$attkey] = base64_encode($file->get_content());
+                }
+            }
         }
     }
     $issue->attributes = $attributes;
@@ -332,8 +347,8 @@ elseif ($action == 'cascade') {
         foreach ($comments as $comment) {
             $useridsarray[] = $comment->userid;
         }
-        $idlist = implode("','", $useridsarray);
-        $users = $DB->get_records_select('user', "id IN ('$idlist')", '', 'id, firstname, lastname');
+        list($insql, $inparam) = $DB->get_in_or_equal($useridsarray);
+        $users = $DB->get_records_select('user', "id $insql", array($inparams), 'lastname, firstname', 'id, firstname, lastname');
 
         // make backtrack
         foreach ($comments as $comment) {
@@ -344,46 +359,68 @@ elseif ($action == 'cascade') {
         }
     }
     $issue->comment = $track;
-    // insert a backlink header in the content
-    $olddescription = $issue->description;
+
+    // Save it for further reference.
     $oldstatus = $issue->status;
-    $issue->description = tracker_add_cascade_backlink($cm, $issue) . $issue->description;
+
+    // downlink might be appended remote side with the our remote mnet_host identity
+    $issue->downlink = $issue->trackerid.':'.$issue->id;
 
     include_once($CFG->dirroot.'/mod/tracker/rpclib.php');
 
-    if (is_numeric($tracker->parent)) {
+    $islocal = false;
+    if (strpos($tracker->parent, '@') === false) {
         // tracker is local, use the rpc entry point anyway
         // emulate response
-        $result = tracker_rpc_post_issue($USER->username, $CFG->wwwroot, $tracker->parent, json_encode($issue));
+        $islocal = true;
+        $result = tracker_rpc_post_issue(null, $tracker->parent, $issue, $islocal);
     } else {
         // tracker is remote, make an RPC call
 
-        list($remoteid, $mnet_host) = explode('@', $tracker->parent);
+        list($remoteid, $mnethostroot) = explode('@', $tracker->parent);
 
         // get network tracker properties
         include_once $CFG->dirroot.'/mnet/xmlrpc/client.php';
         $userroot = $DB->get_field('mnet_host', 'wwwroot', array('id' => $USER->mnethostid));
         $rpcclient = new mnet_xmlrpc_client();
         $rpcclient->set_method('mod/tracker/rpclib.php/tracker_rpc_post_issue');
-        $rpcclient->add_param($USER->username, 'string');
-        $rpcclient->add_param($userroot, 'string');
+        $user = new StdClass;
+        $user->username = $USER->username;
+        $user->firstname = $USER->firstname;
+        $user->lastname = $USER->lastname;
+        $user->email = $USER->email;
+        $user->country = $USER->country;
+        $user->city = $USER->city;
+        $user->lang = $USER->lang;
+        $user->hostwwwroot = $userroot;
+        $rpcclient->add_param($user, 'struct');
         $rpcclient->add_param($remoteid, 'int');
-        $rpcclient->add_param(json_encode($issue), 'string');
-        $parent_mnet = new mnet_peer();
-        $parent_mnet->set_wwwroot($mnet_host);
-        if ($rpcclient->send($parent_mnet)) {
+        $rpcclient->add_param($issue, 'struct');
+
+        $parentmnetpeer = new mnet_peer();
+        $parentmnetpeer->set_wwwroot($mnethostroot);
+        if ($rpcclient->send($parentmnetpeer)) {
             $result = $rpcclient->response;
         } else {
             $result = null;
         }
     }
-    if ($result) {
-        $response = json_decode($result);
+    if (!empty($result)) {
+        $response = (object)json_decode($result);
         if ($response->status == RPC_SUCCESS) {
-            $issue = new StdClass;
             $issue->status = TRANSFERED;
-            $issue->followid = $response->followid;
-            if (!$DB->update_record('tracker_issue', addslashes_recursive($issue))) {
+            if (!$islocal) {
+                list($remoteid, $hostroot) = explode('@', $tracker->parent);
+                $mnethostid = $DB->get_field('mnet_host', 'id', array('wwwroot' => $mnethostroot));
+                $issue->uplink = $mnethostid.':'.$remoteid.':'.$response->followid;
+            } else {
+                $remoteid = $tracker->parent;
+                $issue->uplink = '0:'.$remoteid.':'.$response->followid;
+            }
+            $issue->downlink = ''; // Reset downlink from what has been sent other side.
+            try {
+                $DB->update_record('tracker_issue', $issue);
+            } catch (Exception $e) {
                 print_error('errorcannotupdateissuecascade', 'tracker');
             }
             // log state change
@@ -396,10 +433,10 @@ elseif ($action == 'cascade') {
             $stc->statusto = $issue->status;
             $DB->insert_record('tracker_state_change', $stc);
         } else {
-            print_error('errorremote', 'tracker', '', $response->error);
+            print_error('errorremote', 'tracker', '', implode('<br/>', $response->error));
         }
     } else {
-        print_error('errorremotesendingcascade', 'tracker', '', implode('<br/>', $rpcclient->error));
+        print_error('errorremotesendingcascade', 'tracker', $tracker->parent);
     }
 }
 /******************************* move an issue to a subtracker *****************************/
@@ -460,7 +497,7 @@ elseif ($action == 'distribute') {
         }
     }
     // move the issue
-    $DB->update_record('tracker_issue', addslashes_recursive($issue));
+    $DB->update_record('tracker_issue', $issue);
     $DB->set_field_select('tracker_issueattribute', 'trackerid', $newtracker->id, " issueid = $issue->id ");
     $DB->set_field_select('tracker_state_change', 'trackerid', $newtracker->id, " issueid = $issue->id ");
     $DB->set_field_select('tracker_issueownership', 'trackerid', $newtracker->id, " issueid = $issue->id ");
@@ -479,8 +516,8 @@ elseif ($action == 'raisepriority') {
     if ($nextissue) {
         $issue->resolutionpriority++;
         $nextissue->resolutionpriority--;
-        $DB->update_record('tracker_issue', addslashes_recursive($issue));
-        $DB->update_record('tracker_issue', addslashes_recursive($nextissue));
+        $DB->update_record('tracker_issue', $issue);
+        $DB->update_record('tracker_issue', $nextissue);
     }
     tracker_update_priority_stack($tracker);
 }
@@ -504,7 +541,7 @@ elseif ($action == 'raisetotop') {
         $DB->execute($sql, array($tracker->id, $issue->resolutionpriority));
         // update to max priority
         $issue->resolutionpriority = $maxpriority;
-        $DB->update_record('tracker_issue', addslashes_recursive($issue));
+        $DB->update_record('tracker_issue', $issue);
     }
     tracker_update_priority_stack($tracker);
 }
@@ -516,8 +553,8 @@ elseif ($action == 'lowerpriority') {
         $nextissue = $DB->get_record('tracker_issue', array('trackerid' => $tracker->id, 'resolutionpriority' => $issue->resolutionpriority - 1));
         $issue->resolutionpriority--;
         $nextissue->resolutionpriority++;
-        $DB->update_record('tracker_issue', addslashes_recursive($issue));
-        $DB->update_record('tracker_issue', addslashes_recursive($nextissue));
+        $DB->update_record('tracker_issue', $issue);
+        $DB->update_record('tracker_issue', $nextissue);
     }
     tracker_update_priority_stack($tracker);
 }
@@ -540,7 +577,7 @@ elseif ($action == 'lowertobottom') {
         $DB->execute($sql, array($tracker->id, $issue->resolutionpriority));
         // update to min priority
         $issue->resolutionpriority = 0;
-        $DB->update_record('tracker_issue', addslashes_recursive($issue));
+        $DB->update_record('tracker_issue', $issue);
     }
     tracker_update_priority_stack($tracker);
 }

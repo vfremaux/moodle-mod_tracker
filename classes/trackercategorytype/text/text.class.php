@@ -33,7 +33,7 @@ class textelement extends trackerelement {
 
     function view($issueid = 0) {
         $this->getvalue($issueid);
-        echo format_text(format_string($this->value), $this->format);
+        return format_text(format_string($this->value), $this->format);
     }
 
     function edit($issueid = 0) {
@@ -46,6 +46,9 @@ class textelement extends trackerelement {
         $mform->setExpanded("header{$this->name}");
         $mform->addElement('text', "element{$this->name}", format_string($this->description), array('size' => 80));
         $mform->setType("element{$this->name}", PARAM_TEXT);
+        if (!empty($this->mandatory)) {
+            $mform->addRule('element'.$this->name, null, 'required', null, 'client');
+        }
     }
 
     function set_data(&$defaults, $issueid = 0) {
@@ -71,7 +74,11 @@ class textelement extends trackerelement {
         }
 
         $elmname = 'element'.$this->name;
-        $data->$elmname = required_param($elmname, PARAM_TEXT);
+        if ($this->private) {
+            $data->$elmname = optional_param($elmname, '', PARAM_TEXT);
+        } else {
+            $data->$elmname = required_param($elmname, PARAM_TEXT);
+        }
         $attribute->elementitemid = $data->$elmname; // in this case true value in element id
         $attribute->timemodified = time();
 

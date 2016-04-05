@@ -36,10 +36,6 @@ class AddCommentForm extends moodleform {
         $mform->addElement('hidden', 'issueid', $this->_customdata['issueid']); // issue id
         $mform->setType('issueid', PARAM_INT);
 
-        $mform->addElement('text', 'summary', get_string('summary', 'tracker'), '', array('size' => 80));
-        $mform->setType('summary', PARAM_TEXT);
-        $mform->addRule('summary', null, 'required', null, 'client');
-
         $mform->addElement('editor', 'comment_editor', get_string('comment', 'tracker'), $this->editoroptions);
 
         $this->add_action_buttons(true);

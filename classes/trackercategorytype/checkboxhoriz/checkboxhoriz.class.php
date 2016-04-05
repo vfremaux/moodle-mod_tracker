@@ -53,6 +53,8 @@ class checkboxhorizelement extends trackerelement {
     }
 
     function view($issueid = 0) {
+        $str = '';
+
         $this->getvalue($issueid); // loads $this->value with current value for this issue
         if (!empty($this->value)) {
             $values = explode(',',$this->value);
@@ -60,21 +62,22 @@ class checkboxhorizelement extends trackerelement {
             foreach ($values as $selected) {
                 $choices[] = format_string($this->options[$selected]->description);
             }
-            echo(implode(', ', $choices));
+            $str = implode(', ', $choices);
         }
+        return $str;
     }
 
-    function add_form_element(&$form) {
+    function add_form_element(&$mform) {
         if (isset($this->options)) {
             $group = array();
-            $form->addElement('header', "head{$this->name}", format_string($this->description));
-            $form->setExpanded("head{$this->name}");
+            $mform->addElement('header', "head{$this->name}", format_string($this->description));
+            $mform->setExpanded("head{$this->name}");
             foreach ($this->options as $option) {
-                $group[] = &$form->createElement('checkbox', "element{$this->name}{$option->id}", '', format_string($option->description));
-                $form->setType("element{$this->name}{$option->id}", PARAM_TEXT);
+                $group[] = &$mform->createElement('checkbox', "element{$this->name}{$option->id}", '', format_string($option->description));
+                $mform->setType("element{$this->name}{$option->id}", PARAM_INT);
             }
 
-            $form->addGroup($group, 'element' . $this->name.'_set');
+            $mform->addGroup($group, 'element' . $this->name.'_set');
         }
     }
 
@@ -135,5 +138,9 @@ class checkboxhorizelement extends trackerelement {
         } else {
             $DB->update_record('tracker_issueattribute', $attribute);
         }
+    }
+
+    function type_has_options() {
+        return true;
     }
 }

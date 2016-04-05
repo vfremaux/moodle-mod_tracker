@@ -22,7 +22,8 @@
         <FIELD NAME="subtrackers" TYPE="char" LENGTH="100" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="defaultassignee" NEXT="enabledstates" />
         <FIELD NAME="enabledstates" TYPE="int" LENGTH="11" NOTNULL="true" DEFAULT="511" SEQUENCE="false" PREVIOUS="subtrackers" NEXT="thanksmessage" />
         <FIELD NAME="thanksmessage" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="enabledstates" NEXT="strictworkflow" />
-        <FIELD NAME="strictworkflow" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="thanksmessage" />
+        <FIELD NAME="strictworkflow" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="thanksmessage" NEXT="networkable" />
+        <FIELD NAME="networkable" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" DEFAULT="0" PREVIOUS="strictworkflow" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker"/>
@@ -34,7 +35,11 @@
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="name"/>
         <FIELD NAME="name" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" PREVIOUS="course" NEXT="description"/>
         <FIELD NAME="description" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="name" NEXT="type"/>
-        <FIELD NAME="type" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" PREVIOUS="description"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" PREVIOUS="description" NEXT="paramint1"/>
+        <FIELD NAME="paramint1" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="type" NEWT="paramint2" />
+        <FIELD NAME="paramint2" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="paramint1" NEXT="paramchar1" />
+        <FIELD NAME="paramchar1" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" PREVIOUS="paramint2" NEXT="paramchar2"/>
+        <FIELD NAME="paramchar2" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" PREVIOUS="paramchar1"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_element"/>
@@ -60,7 +65,9 @@
         <FIELD NAME="elementid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="trackerid" NEXT="sortorder"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="elementid" NEXT="canbemodifiedby"/>
         <FIELD NAME="canbemodifiedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="sortorder" NEXT="active"/>
-        <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" PREVIOUS="canbemodifiedby"/>
+        <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" PREVIOUS="canbemodifiedby" NEXT="mandatory" />
+        <FIELD NAME="mandatory" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" PREVIOUS="active" NEWT="private" />
+        <FIELD NAME="private" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" PREVIOUS="mandatory"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_elementused"/>
@@ -81,7 +88,9 @@
         <FIELD NAME="timeassigned" TYPE="int" LENGTH="11" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="bywhomid" NEXT="resolution"/>
         <FIELD NAME="resolution" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="timeassigned" NEXT="resolutionformat"/>
         <FIELD NAME="resolutionformat" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="resolution" NEXT="resolutionpriority" />
-        <FIELD NAME="resolutionpriority" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="resolutionformat"/>
+        <FIELD NAME="resolutionpriority" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="resolutionformat" NEXT="uplink" />
+        <FIELD NAME="uplink" TYPE="char" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="resolutionformat" NEXT="downlink" />
+        <FIELD NAME="downlink" TYPE="char" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="uplink"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_issue"/>

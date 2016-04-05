@@ -11,7 +11,7 @@ $STATUSCODES = array(POSTED => 'posted',
                     RESOLVED => 'resolved', 
                     ABANDONNED => 'abandonned',
                     TRANSFERED => 'transfered',
-					VALIDATED => 'validated');
+                    VALIDATED => 'validated');
 
 $tickets = tracker_get_stats($tracker);
 $statsbyassignee = tracker_get_stats_by_user($tracker, 'assignedto');
@@ -21,94 +21,94 @@ $alltickets = $DB->count_records('tracker_issue', array('trackerid' => $tracker-
 $STATUSKEYS = tracker_get_statuskeys($tracker);
 ?>
 <table width="100%" cellpadding="20">
-	<tr valign="top">
-		<td width="33%">
-			<?php echo $OUTPUT->heading(get_string('countbystate', 'tracker', $alltickets), 3) ?>
-		<table width="80%">
-		<tr>
-			<td width="40%" align="left"><?php print_string('status', 'tracker') ?></td>
-			<td width="30%" align="right"><?php print_string('count', 'tracker') ?></td>
-			<td width="30%" align="right"></td>
-		</tr>
-		<?php 
-		foreach(array_keys($STATUSKEYS) as $key){
-			if ($key == ABANDONNED && $key == RESOLVED && $key == VALIDATED && $key == TRANSFERED) continue;
-		?>
-		<tr>
-			<td width="40%" align="left" class="status_<?php echo $STATUSCODES[$key] ?>"><?php echo $STATUSKEYS[$key] ?></td>
-			<td width="30%" align="right"><?php echo 0 + @$tickets[$key] ?></td>
-			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[$key])/$alltickets) * 100) .' %' : '0 %' ; ?></td>
-		</tr>
-		<?php } ?>
-		</table>
-		
-		<table width="80%">
-		<?php 
-		foreach(array_keys($STATUSKEYS) as $key){
-			if (!($key == ABANDONNED && $key == RESOLVED && $key == VALIDATED && $key == TRANSFERED)) continue;
-		?>
-		<tr>
-			<td width="40%" align="left" class="status_<?php echo $STATUSCODES[$key] ?>"><?php echo $STATUSKEYS[$key] ?></td>
-			<td width="30%" align="right"><?php echo 0 + @$tickets[$key] ?></td>
-			<td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[$key])/$alltickets) * 100).' %': '0 % '; ?></td>
-		</tr>
-		<?php } ?>
-		</table>
+    <tr valign="top">
+        <td width="33%">
+            <?php echo $OUTPUT->heading(get_string('countbystate', 'tracker', $alltickets), 3) ?>
+        <table width="80%">
+        <tr>
+            <td width="40%" align="left"><?php print_string('status', 'tracker') ?></td>
+            <td width="30%" align="right"><?php print_string('count', 'tracker') ?></td>
+            <td width="30%" align="right"></td>
+        </tr>
+        <?php 
+        foreach(array_keys($STATUSKEYS) as $key){
+            if ($key == ABANDONNED && $key == RESOLVED && $key == VALIDATED && $key == TRANSFERED) continue;
+        ?>
+        <tr>
+            <td width="40%" align="left" class="status_<?php echo $STATUSCODES[$key] ?>"><?php echo $STATUSKEYS[$key] ?></td>
+            <td width="30%" align="right"><?php echo 0 + @$tickets[$key] ?></td>
+            <td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[$key])/$alltickets) * 100) .' %' : '0 %' ; ?></td>
+        </tr>
+        <?php } ?>
+        </table>
+        
+        <table width="80%">
+        <?php 
+        foreach(array_keys($STATUSKEYS) as $key){
+            if (!($key == ABANDONNED && $key == RESOLVED && $key == VALIDATED && $key == TRANSFERED)) continue;
+        ?>
+        <tr>
+            <td width="40%" align="left" class="status_<?php echo $STATUSCODES[$key] ?>"><?php echo $STATUSKEYS[$key] ?></td>
+            <td width="30%" align="right"><?php echo 0 + @$tickets[$key] ?></td>
+            <td width="30%" align="right"><?php echo ($alltickets) ? sprintf("%2d", ((0 + @$tickets[$key])/$alltickets) * 100).' %': '0 % '; ?></td>
+        </tr>
+        <?php } ?>
+        </table>
 
-		</td>
-		<td width="33%">
-			<?php echo $OUTPUT->heading(get_string('countbyassignee', 'tracker', $alltickets), 3) ?>
-			<?php 
-				if (empty($statsbyassignee)){
-					print_string('noticketsorassignation', 'tracker');
-				} else {
-					echo '<table width="95%" class="generaltable">';
-					$line = 0;
-					foreach($statsbyassignee as $r){
-						if (empty($r->name)){
-							$r->name = get_string('unassigned', 'tracker');
-						}
-						echo "<tr class=\"r{$line}\">";
-						echo "<td width=\"50%\" align=\"left\">{$r->name}</td>";
-						echo "<td width=\"10%\" align=\"right\" style=\"font-weight:bolder;font-size:1.3em\">{$r->sum}</td>";
-						echo '<td width="40%">';
-						foreach($r->status as $statkey => $subresult){
-							$statcode = $STATUSCODES[$statkey];
-							echo "<span class=\"status_$statcode\">$subresult</span> "; 
-						}
-						echo '</td>';
+        </td>
+        <td width="33%">
+            <?php echo $OUTPUT->heading(get_string('countbyassignee', 'tracker', $alltickets), 3) ?>
+            <?php 
+                if (empty($statsbyassignee)){
+                    print_string('noticketsorassignation', 'tracker');
+                } else {
+                    echo '<table width="95%" class="generaltable">';
+                    $line = 0;
+                    foreach($statsbyassignee as $r){
+                        if (empty($r->name)){
+                            $r->name = get_string('unassigned', 'tracker');
+                        }
+                        echo "<tr class=\"r{$line}\">";
+                        echo "<td width=\"50%\" align=\"left\">{$r->name}</td>";
+                        echo "<td width=\"10%\" align=\"right\" style=\"font-weight:bolder;font-size:1.3em\">{$r->sum}</td>";
+                        echo '<td width="40%">';
+                        foreach($r->status as $statkey => $subresult){
+                            $statcode = $STATUSCODES[$statkey];
+                            echo "<span class=\"status_$statcode\">$subresult</span> "; 
+                        }
+                        echo '</td>';
 
-						echo "</tr>";
-						$line = ($line + 1) % 2;
-					}
-					echo '</table>';
-				}
-			?>
-		</td>
-		<td width="33%">
-			<?php echo $OUTPUT->heading(get_string('countbyreporter', 'tracker', $alltickets), 3) ?>
-			<?php 
-				if (empty($statsbyreporter)){
-					print_string('notickets', 'tracker');
-				} else {
-					echo '<table width="95%" class="generaltable">';
-					$line = 0;
-					foreach($statsbyreporter as $r){
-						echo "<tr class=\"r{$line}\">";
-						echo "<td width=\"50%\" align=\"left\">{$r->name}</td>";
-						echo "<td width=\"10%\" align=\"right\" style=\"font-weight:bolder;font-size:1.3em\">{$r->sum}</td>";
-						echo '<td width="40%">';
-						foreach($r->status as $statkey => $subresult){
-							$statcode = $STATUSCODES[$statkey];
-							echo "<span class=\"status_$statcode\">$subresult</span> "; 
-						}
-						echo '</td>';
-						echo "</tr>";
-						$line = ($line + 1) % 2;
-					}
-					echo '</table>';
-				}
-			?>
-		</td>
-	</tr>
+                        echo "</tr>";
+                        $line = ($line + 1) % 2;
+                    }
+                    echo '</table>';
+                }
+            ?>
+        </td>
+        <td width="33%">
+            <?php echo $OUTPUT->heading(get_string('countbyreporter', 'tracker', $alltickets), 3) ?>
+            <?php 
+                if (empty($statsbyreporter)){
+                    print_string('notickets', 'tracker');
+                } else {
+                    echo '<table width="95%" class="generaltable">';
+                    $line = 0;
+                    foreach($statsbyreporter as $r){
+                        echo "<tr class=\"r{$line}\">";
+                        echo "<td width=\"50%\" align=\"left\">{$r->name}</td>";
+                        echo "<td width=\"10%\" align=\"right\" style=\"font-weight:bolder;font-size:1.3em\">{$r->sum}</td>";
+                        echo '<td width="40%">';
+                        foreach($r->status as $statkey => $subresult){
+                            $statcode = $STATUSCODES[$statkey];
+                            echo "<span class=\"status_$statcode\">$subresult</span> "; 
+                        }
+                        echo '</td>';
+                        echo "</tr>";
+                        $line = ($line + 1) % 2;
+                    }
+                    echo '</table>';
+                }
+            ?>
+        </td>
+    </tr>
 </table>

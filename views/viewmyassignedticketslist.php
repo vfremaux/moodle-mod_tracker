@@ -25,9 +25,7 @@
  * Print Bug List
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');
-}
+defined('MOODLE_INTERNAL') || die();
 
 include_once $CFG->libdir.'/tablelib.php';
 
@@ -250,8 +248,8 @@ if (!empty($issues)) {
             $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
         } else {
             $status = $FULLSTATUSKEYS[0 + $issue->status];
-            $status = '<div class="status_'.$STATUSCODES[$issue->status].'" style="width: 110%; height: 105%; text-align:center">'.$status.'</div>';
         }
+        $status = '<div class="status_'.$STATUSCODES[$issue->status].'" style="width: 105%; height: 102%; text-align:center">'.$status.'</div>';
         $reporteruser = $DB->get_record('user', array('id' => $issue->reportedby));
         $reporter = fullname($reporteruser);
         $hassolution = $issue->status == RESOLVED && !empty($issue->resolution);

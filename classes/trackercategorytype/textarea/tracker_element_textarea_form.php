@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-require_once '../tracker_element_form.php';
+require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/tracker_element_form.php');
 
 class tracker_element_textarea_form extends tracker_moodle_form {
 
@@ -23,7 +23,7 @@ class tracker_element_textarea_form extends tracker_moodle_form {
         $this->end_form();
     }
 
-    function validation($data) {
-        return parent::validation($data);
+    function validation($data, $files) {
+        return parent::validation($data, $files);
     }
 }

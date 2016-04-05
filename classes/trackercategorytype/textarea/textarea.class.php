@@ -44,11 +44,11 @@ class textareaelement extends trackerelement{
     }
 
     function viewsearch() {
-        echo "<input type=\"text\" name=\"element{$this->name}\" style=\"width:100%\" />";
+        echo '<input type="text" name="element'.$this->name.'" style="width:100%" />';
     }
 
     function viewquery() {
-       echo "<input type=\"text\" name=\"element{$this->name}\" style=\"width:100%\" />";
+       echo '<input type="text" name="element'.$this->name.'" style="width:100%" />';
     }
 
     function add_form_element(&$mform) {
@@ -56,6 +56,9 @@ class textareaelement extends trackerelement{
         $mform->setExpanded("header{$this->name}");
         $mform->addElement('textarea', "element{$this->name}", '', array('cols' => 60, 'rows' => 15));
         $mform->setType("element{$this->name}", PARAM_TEXT);
+        if (!empty($this->mandatory)) {
+            $mform->addRule('element'.$this->name, null, 'required', null, 'client');
+        }
     }
 
     function set_data(&$defaults, $issueid = 0) {

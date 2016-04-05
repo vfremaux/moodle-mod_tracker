@@ -33,6 +33,8 @@ class radioelement extends trackerelement {
     }
 
     function view($issueid = 0) {
+        $str = '';
+
         $this->getvalue($issueid);
 
         $optbynames = array();
@@ -41,8 +43,9 @@ class radioelement extends trackerelement {
         }
 
         if (!empty($this->options) && !empty($this->value) && array_key_exists($this->value, $optbynames)) {
-            echo $optbynames[$this->value];
+            $str = $optbynames[$this->value];
         }
+        return $str;
     }
 
     function edit($issueid = 0) {
@@ -66,13 +69,16 @@ class radioelement extends trackerelement {
         }
     }
 
-    function add_form_element(&$form) {
+    function add_form_element(&$mform) {
         if (isset($this->options)) {
-            $form->addElement('header', "head{$this->name}", format_string($this->description));
-            $form->setExpanded("head{$this->name}");
+            $mform->addElement('header', "head{$this->name}", format_string($this->description));
+            $mform->setExpanded("head{$this->name}");
             foreach ($this->options as $option) {
-                $form->addElement('radio', 'element'.$this->name, format_string($option->description), '', $option->name);
-                $form->setType('element'.$this->name, PARAM_TEXT);
+                $mform->addElement('radio', 'element'.$this->name, format_string($option->description), '', $option->name);
+                $mform->setType('element'.$this->name, PARAM_TEXT);
+            }
+            if (!empty($this->mandatory)) {
+                $mform->addRule('element'.$this->name, null, 'required', null, 'client');
             }
         }
     }
@@ -118,6 +124,10 @@ class radioelement extends trackerelement {
         } else {
             $DB->update_record('tracker_issueattribute', $attribute);
         }
+    }
+
+    function type_has_options() {
+        return true;
     }
 }
 

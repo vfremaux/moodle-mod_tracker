@@ -102,6 +102,8 @@ function tracker_update_instance($tracker, $mform) {
 
     if (is_array(@$tracker->subtrackers)) {
         $tracker->subtrackers = implode(',', $tracker->subtrackers);
+    } else {
+        $tracker->subtrackers = '';
     }
 
     $context = context_module::instance($tracker->coursemodule);
@@ -211,7 +213,7 @@ function tracker_print_recent_activity($course, $isteacher, $timestart) {
         foreach ($newstuff as $anissue) {
             echo "<span style=\"font-size:0.8em\">";
             echo get_string('modulename', 'tracker').': '.format_string($anissue->name).':<br/>';
-            echo "<a href=\"{$CFG->wwwroot}/mod/tracker/view.php?a={$anissue->trackerid}&amp;view=view&amp;page=viewanissue&amp;issueid={$anissue->id}\">".shorten_text(format_string($anissue->summary), 20).'</a><br/>';
+            echo "<a href=\"{$CFG->wwwroot}/mod/tracker/view.php?t={$anissue->trackerid}&amp;view=view&amp;page=viewanissue&amp;issueid={$anissue->id}\">".shorten_text(format_string($anissue->summary), 20).'</a><br/>';
             echo '&nbsp&nbsp&nbsp<span class="trackersmalldate">'.userdate($anissue->datereported).'</span><br/>';
             echo "</span><br/>";
         }
@@ -243,12 +245,14 @@ function tracker_print_overview($courses, &$htmlarray) {
 
     foreach ($trackers as $tracker) {
 
-        $str = '<div class="tracker overview">';
+        $str = '<div class="overview tracker">';
         $str .= '<div class="name">'.$strtracker. ': '.
                '<a '.($tracker->visible ? '':' class="dimmed"').
                'title="'.$strtracker.'" href="'.$CFG->wwwroot.
                '/mod/tracker/view.php?id='.$tracker->coursemodule.'">'.
                format_string($tracker->name).'</a></div>';
+
+        $str .= '<div class="info">';
 
         $context = context_module::instance($tracker->coursemodule);
         if (has_capability('mod/tracker:develop', $context)) {
@@ -289,6 +293,7 @@ function tracker_print_overview($courses, &$htmlarray) {
                 $str .= '<div class="details"><a href="'.$link.'">'.get_string('issuestoassign', 'tracker', count($unassigned)).'</a></div>';
             }
         }
+        $str .= '</div>';
         $str .= '</div>';
 
         if (@$yours || @$unassigned) {
@@ -910,7 +915,7 @@ function tracker_preset_params(&$tracker) {
         $tracker->thanksmessage = get_string('message_bugtracker', 'tracker');
     } elseif ($tracker->supportmode == 'ticketting') {
         if ($tracker->defaultassignee) {
-            $defaultassignee = $DB->get_record('user', array('id' => $tracker->defaultassignee), 'id'.get_all_user_name_fields(true, ''));
+            $defaultassignee = $DB->get_record('user', array('id' => $tracker->defaultassignee), 'id,'.get_all_user_name_fields(true, ''));
             $tracker->thanksmessage = get_string('message_ticketting_preassigned', 'tracker', fullname($defaultassignee));
         } else {
             $tracker->thanksmessage = get_string('message_ticketting', 'tracker');

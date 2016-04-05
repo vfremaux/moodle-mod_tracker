@@ -36,25 +36,91 @@ if (!empty($used)) {
     foreach ($used as $element) {
         $icontype = "<img src=\"".$OUTPUT->pix_url("/types/{$element->type}", 'mod_tracker')."\" />";
         if ($element->sortorder > 1) {
-            $actions = "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=raiseelement&amp;elementid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/up', 'core')."\" /></a>";
+            $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'raiseelement', 'elementid' => $element->id);
+            $url = new moodle_url('/mod/tracker/view.php', $params);
+            $actions = '&nbsp;<a href="'.$url.'"><img src="'.$OUTPUT->pix_url('/t/up', 'core').'" /></a>';
         } else {
-            $actions = "&nbsp;<img src=\"".$OUTPUT->pix_url('up_shadow', 'mod_tracker')."\" />";
+            $actions = '&nbsp;<img src="'.$OUTPUT->pix_url('up_shadow', 'mod_tracker').'" />';
         }
         if ($element->sortorder < count($used)) {
-            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=lowerelement&amp;elementid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/down', 'core')."\" /></a>";
+            $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'lowerelement', 'elementid' => $element->id);
+            $url = new moodle_url('/mod/tracker/view.php', $params);
+            $actions .= '&nbsp;<a href="'.$url.'"><img src="'.$OUTPUT->pix_url('/t/down', 'core').'" /></a>';
         } else {
-            $actions .= "&nbsp;<img src=\"".$OUTPUT->pix_url('down_shadow', 'mod_tracker')."\" />";
+            $actions .= '&nbsp;<img src="'.$OUTPUT->pix_url('down_shadow', 'mod_tracker').'" />';
         }
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=editelement&amp;elementid={$element->id}&amp;used=1\"><img src=\"".$OUTPUT->pix_url('/t/edit', 'core')."\" /></a>";
 
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=viewelementoptions&amp;elementid={$element->id}\" title=\"".get_string('editoptions', 'mod_tracker')."\"><img src=\"".$OUTPUT->pix_url('editoptions', 'mod_tracker')."\" /></a>";
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=removeelement&amp;usedid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/right', 'core')."\" /></a>";
-        if ($element->active) {
-            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=setinactive&amp;usedid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/hide', 'core')."\" /></a>";
-        } else {
-            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=setactive&amp;usedid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/show', 'core')."\" /></a>";
+        $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'editelement', 'elementid' => $element->id, 'used' => 1, 'type' => $element->type);
+        $url = new moodle_url('/mod/tracker/view.php', $params);
+        $actions .= '&nbsp;<a href="'.$url.'"><img src="'.$OUTPUT->pix_url('/t/edit', 'core').'" /></a>';
+
+        if ($element->type_has_options()) {
+            $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'viewelementoptions', 'elementid' => $element->id);
+            $url = new moodle_url('/mod/tracker/view.php', $params);
+            $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('editoptions', 'mod_tracker').'"><img src="'.$OUTPUT->pix_url('editoptions', 'mod_tracker').'" /></a>';
         }
-        $table->data[] = array($element->sortorder, format_string($element->description), $icontype, $actions);
+
+        $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'removeelement', 'usedid' => $element->id);
+        $url = new moodle_url('/mod/tracker/view.php', $params);
+        $actions .= '&nbsp;<a href="'.$url.'"><img src="'.$OUTPUT->pix_url('/t/right', 'core').'" /></a>';
+
+        if ($element->active) {
+            if (!$element->mandatory) {
+                $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'setinactive', 'usedid' => $element->id);
+                $url = new moodle_url('/mod/tracker/view.php', $params);
+                $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setinactive', 'tracker').'"><img src="'.$OUTPUT->pix_url('/t/hide', 'core').'" /></a>';
+            } else {
+                $actions .= '&nbsp;<img class="dimmed" src="'.$OUTPUT->pix_url('/t/hide', 'core').'" />';
+            }
+        } else {
+            $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'setactive', 'usedid' => $element->id);
+            $url = new moodle_url('/mod/tracker/view.php', $params);
+            $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setactive', 'tracker').'"><img src="'.$OUTPUT->pix_url('/t/show', 'core').'" /></a>';
+        }
+
+        if ($element->has_mandatory_option()) {
+            if ($element->mandatory) {
+                $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'setnotmandatory', 'usedid' => $element->id);
+                $url = new moodle_url('/mod/tracker/view.php', $params);
+                $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setnotmandatory', 'tracker').'"><img src="'.$OUTPUT->pix_url('notempty', 'tracker').'" /></a>';
+            } else {
+                $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'setmandatory', 'usedid' => $element->id);
+                $url = new moodle_url('/mod/tracker/view.php', $params);
+                $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setmandatory', 'tracker').'"><img src="'.$OUTPUT->pix_url('empty', 'tracker').'" /></a>';
+            }
+        } else {
+            if ($element->mandatory) {
+                $actions .= '&nbsp;<img src="'.$OUTPUT->pix_url('notempty', 'tracker').'" />';
+            } else {
+                $actions .= '&nbsp;<img src="'.$OUTPUT->pix_url('empty', 'tracker').'" />';
+            }
+        }
+
+        if ($element->has_private_option()) {
+            if ($element->private) {
+                $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'setpublic', 'usedid' => $element->id);
+                $url = new moodle_url('/mod/tracker/view.php', $params);
+                $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setpublic', 'tracker').'"><img src="'.$OUTPUT->pix_url('t/locked', 'core').'" /></a>';
+            } else {
+                if (!$element->mandatory) {
+                    $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'setprivate', 'usedid' => $element->id);
+                    $url = new moodle_url('/mod/tracker/view.php', $params);
+                    $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setprivate', 'tracker').'"><img src="'.$OUTPUT->pix_url('t/lock', 'core').'" /></a>';
+                } else {
+                    $actions .= '&nbsp;<img class="dimmed" src="'.$OUTPUT->pix_url('t/lock', 'core').'" />';
+                }
+            }
+        } else {
+            if ($element->private) {
+                $actions .= '&nbsp;<img src="'.$OUTPUT->pix_url('t/locked', 'core').'" />';
+            } else {
+                $actions .= '&nbsp;<img src="'.$OUTPUT->pix_url('t/lock', 'core').'" />';
+            }
+        }
+
+        $description = ($element->private) ? '<span class="dimmed">'.format_string($element->description).'</span>' : format_string($element->description) ;
+
+        $table->data[] = array($element->sortorder, $description, $icontype, $actions);
     }
     echo html_writer::table($table);
 } else {

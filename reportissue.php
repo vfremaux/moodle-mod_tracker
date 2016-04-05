@@ -97,7 +97,7 @@ if (!$form->is_cancelled()) {
         echo $OUTPUT->box_end();
         echo $OUTPUT->continue_button(new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => 'view', 'screen' => 'browse')));
         echo $OUTPUT->footer();
-        die;
+
         // notify all admins
         if ($tracker->allownotifications) {
             tracker_notify_submission($issue, $cm, $tracker);
@@ -105,13 +105,14 @@ if (!$form->is_cancelled()) {
                 tracker_notifyccs_changeownership($issue->id, $tracker);
             }
         }
+        die;
     }
 }
 
 echo $OUTPUT->header();
 
 $view = 'reportanissue';
-include_once 'menus.php';
+include_once($CFG->dirroot.'/mod/tracker/menus.php');
 
 $form->display();
 
