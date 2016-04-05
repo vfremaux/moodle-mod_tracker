@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package mod-tracker
+ * @package mod_tracker
  * @category mod
  * @author Clifford Tham, Valery Fremaux from Moodle 1.8 ahead
  * @copyright  2007 MyLearningFactory (http://www.mylearningfactory.com)
@@ -24,10 +24,10 @@
  * This page prints a particular instance of a tracker and handles
  * top level interactions
  */
-
 require('../../config.php');
 require_once($CFG->dirroot.'/mod/tracker/lib.php');
 require_once($CFG->dirroot.'/mod/tracker/locallib.php');
+
 $PAGE->requires->js('/mod/tracker/js/trackerview.js');
 
 // Check for required parameters.

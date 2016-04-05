@@ -14,15 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
- * @package mod-tracker
+ * @package mod_tracker
+ * @category mod
  * @author Clifford Tham, Valery Fremaux > 1.8
  * @date 02/12/2007
- * @version Moodle 2.0
  *
  * Library of functions and constants for module tracker
  */
-
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 
@@ -213,7 +214,9 @@ function tracker_print_recent_activity($course, $isteacher, $timestart) {
         foreach ($newstuff as $anissue) {
             echo "<span style=\"font-size:0.8em\">";
             echo get_string('modulename', 'tracker').': '.format_string($anissue->name).':<br/>';
-            echo "<a href=\"{$CFG->wwwroot}/mod/tracker/view.php?t={$anissue->trackerid}&amp;view=view&amp;page=viewanissue&amp;issueid={$anissue->id}\">".shorten_text(format_string($anissue->summary), 20).'</a><br/>';
+            $params = array('t' => $anissue->trackerid, 'view' => 'view', 'page' => 'viewanissue', 'issueid' => $anissue->id);
+            $issueurl = new moodle_url('/mod/tracker/view.php', $params);
+            echo '<a href="'.$issueurl.'">'.shorten_text(format_string($anissue->summary), 20).'</a><br/>';
             echo '&nbsp&nbsp&nbsp<span class="trackersmalldate">'.userdate($anissue->datereported).'</span><br/>';
             echo "</span><br/>";
         }
@@ -245,7 +248,7 @@ function tracker_print_overview($courses, &$htmlarray) {
 
     foreach ($trackers as $tracker) {
 
-        $str = '<div class="overview tracker">';
+        $str = '<div class="tracker overview">';
         $str .= '<div class="name">'.$strtracker. ': '.
                '<a '.($tracker->visible ? '':' class="dimmed"').
                'title="'.$strtracker.'" href="'.$CFG->wwwroot.

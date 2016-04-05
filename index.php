@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package mod-tracker
+ * @package mod_tracker
  * @category mod
  * @author Clifford Tham, Valery Fremaux > 1.8
  * @date 02/12/2007
@@ -23,7 +23,6 @@
  * This page lists all the instances of tracker in a particular course
  * Replace tracker with the name of your module
  */
-
 require('../../config.php');
 require_once($CFG->dirroot.'/mod/tracker/lib.php');
 
@@ -32,6 +31,8 @@ $id = required_param('id', PARAM_INT);   // course
 if (!$course = $DB->get_record('course', array('id' => $id))) {
     print_error('invalidcourseid');
 }
+
+// Security.
 
 require_login($course->id);
 

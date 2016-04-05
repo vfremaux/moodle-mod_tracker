@@ -14,14 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
-* @package tracker
-* @review Valery Fremaux
-* @version Moodle > 2.2
-* @date 02/12/2012
-*
-* A generic class for collecting all that is common to all elements
-*/
+ * @package mod_tracker
+ * @category mod
+ * @author Clifford Tham, Valery Fremaux > 1.8
+ * @date 02/12/2007
+ */
+
+/**
+ * A generic class for collecting all that is common to all elements
+ */
 
 abstract class trackerelement {
     var $id;

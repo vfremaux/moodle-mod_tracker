@@ -12,17 +12,19 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
-* @package tracker
-* @author Valery Fremaux / 1.8
-* @date 06/08/2015
-*
-* A class implementing a hidden/labelled element that captures the referer url
-*/
-
-include_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php';
+ * @package mod_tracker
+ * @category mod
+ * @author Valery Fremaux / 1.8
+ * @date 06/08/2015
+ *
+ * A class implementing a hidden/labelled element that captures the referer url
+ */
+require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 
 class autourlelement extends trackerelement {
 

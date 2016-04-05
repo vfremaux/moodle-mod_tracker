@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * @package tracker
  * @author Valery Fremaux / 1.8
@@ -22,7 +24,6 @@
  * A class implementing a constant element from an internal configuration value or
  * an instance setting value
  */
-
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 
 class captchaelement extends trackerelement {

@@ -14,16 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
- * @package mod-tracker
+ * @package mod_tracker
  * @category mod
  * @author Clifford Tham, Valery Fremaux > 1.8
  * @date 02/12/2007
  *
  * Library of internal functions and constants for module tracker
  */
-
-require_once($CFG->dirroot.'/mod/tracker/filesystemlib.php');
 require_once($CFG->dirroot.'/lib/uploadlib.php');
 require_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
 
@@ -1105,7 +1105,9 @@ function tracker_printchilds(&$tracker, $issueid, $return=false, $indent='') {
     $res = $DB->get_records_sql($sql);
     if ($res) {
         foreach ($res as $aSub) {
-            $str .= "<span style=\"position : relative; left : {$indent}px\"><a href=\"view.php?t={$tracker->id}&amp;what=viewanissue&amp;issueid={$aSub->childid}\">".$tracker->ticketprefix.$aSub->childid.' - '.format_string($aSub->summary)."</a>";
+            $params = array('t' => $tracker->id, 'what' => 'viewanissue', 'issueid' => $aSub->childid);
+            $issueurl = new moodle_url('/mod/tracker/view.php', $params);
+            $str .= '<span style="position : relative; left : '.$indent.'px"><a href="'.$issueurl.'">'.$tracker->ticketprefix.$aSub->childid.' - '.format_string($aSub->summary).'</a>';
             $str .= "&nbsp;<span class=\"status_".$STATUSCODES[$aSub->status]."\">".$STATUSKEYS[$aSub->status]."</span></span><br/>\n";
             $indent = $indent + 20;
             $str .= tracker_printchilds($tracker, $aSub->childid, true, $indent);
@@ -1148,7 +1150,9 @@ function tracker_printparents(&$tracker, $issueid, $return=false, $indent='') {
             $indent = $indent - 20;
             $str .= tracker_printparents($tracker, $aSub->parentid, true, $indent);
             $indent = $indent + 20;
-            $str .= "<span style=\"position : relative; left : {$indent}px\"><a href=\"view.php?t={$tracker->id}&amp;what=viewanissue&amp;issueid={$aSub->parentid}\">".$tracker->ticketprefix.$aSub->parentid.' - '.format_string($aSub->summary)."</a>";
+            $params = array('t' => $tracker->id, 'what' => 'viewanissue', 'issueid' => $aSub->parentid);
+            $issueurl = new moodle_url('/mod/tracker/view.php', $params);
+            $str .= '<span style="position : relative; left : '.$indent.'px"><a href="'.$issueurl.'">'.$tracker->ticketprefix.$aSub->parentid.' - '.format_string($aSub->summary)."</a>";
             $str .= "&nbsp;<span class=\"status_".$STATUSCODES[$aSub->status]."\">".$STATUSKEYS[$aSub->status]."</span></span><br/>\n";
         }
     }

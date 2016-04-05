@@ -14,6 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * @package mod_tracker
+ * @category mod
+ * @author Clifford Tham, Valery Fremaux > 1.8
+ * @date 02/12/2007
+ */
 require('../../config.php');
 require_once($CFG->dirroot."/mod/tracker/lib.php");
 require_once($CFG->dirroot."/mod/tracker/locallib.php");
@@ -53,8 +59,9 @@ if ($id) {
 $screen = tracker_resolve_screen($tracker, $cm);
 $view = tracker_resolve_view($tracker, $cm);
 
-$context = context_module::instance($cm->id);
+// Security. 
 
+$context = context_module::instance($cm->id);
 require_course_login($course->id, false, $cm);
 require_capability('mod/tracker:report', $context);
 

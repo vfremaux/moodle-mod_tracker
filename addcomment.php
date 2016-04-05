@@ -49,8 +49,9 @@ if ($id) {
     }
 }
 
-$context = context_module::instance($cm->id);
+// Security.
 
+$context = context_module::instance($cm->id);
 require_course_login($course->id, false, $cm);
 require_capability('mod/tracker:comment', $context);
 
