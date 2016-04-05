@@ -37,11 +37,17 @@ class mod_tracker_mod_form extends moodleform_mod {
         $mform    =& $this->_form;
         //-------------------------------------------------------------------------------
         $mform->addElement('header', 'general', get_string('general', 'form'));
-        $mform->addElement('text', 'name', get_string('name'), array('size'=>'64'));
-        $mform->setType('name', PARAM_CLEANHTML);
-        $mform->addRule('name', null, 'required', null, 'client');
 
-        $this->add_intro_editor(true, get_string('intro', 'tracker'));
+        $mform->addElement('text', 'name', get_string('name'), array('size'=>'64'));
+        if (!empty($CFG->formatstringstriptags)) {
+            $mform->setType('name', PARAM_TEXT);
+        } else {
+            $mform->setType('name', PARAM_CLEANHTML);
+        }
+        $mform->addRule('name', null, 'required', null, 'client');
+        $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+
+        $this->standard_intro_elements();
 
         // $mform->addRule('summary', get_string('required'), 'required', null, 'client');
         $modeoptions['bugtracker'] = get_string('mode_bugtracker', 'tracker');
@@ -124,10 +130,6 @@ class mod_tracker_mod_form extends moodleform_mod {
             $mform->addHelpButton('networkable', 'networkable', 'tracker');
             $mform->setAdvanced('networkable');
         }
-
-        $mform->addElement('text', 'failovertrackerurl', get_string('failovertrackerurl', 'tracker'), array('size' => 80));
-        $mform->setType('failovertrackerurl', PARAM_URL);
-        $mform->setAdvanced('failovertrackerurl');
 
         $options['idnumber'] = true;
         $options['groups'] = false;
