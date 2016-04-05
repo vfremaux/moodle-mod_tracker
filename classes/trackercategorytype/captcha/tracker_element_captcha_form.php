@@ -21,13 +21,18 @@ defined('MOODLE_INTERNAL') || die();
  * @category mod
  * @author Valery Fremaux / 1.8
  * @date 06/08/2015
+ *
+ * A class implementing a captcha element for non connected or special forms
  */
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/tracker_element_form.php');
 
-class tracker_element_textarea_form extends tracker_moodle_form {
+class tracker_element_captcha_form extends tracker_moodle_form {
 
     function definition() {
         $this->start_form();
+
+        $mform = $this->_form;
+
         $this->end_form();
     }
 

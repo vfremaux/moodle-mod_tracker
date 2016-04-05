@@ -105,11 +105,11 @@ elseif ($action == 'updateanissue') {
         $stc->statusfrom = $oldrecord->status;
         $stc->statusto = $issue->status;
         $DB->insert_record('tracker_state_change', $stc);
-    }
 
-    if ($stc->statusto == RESOLVED || $stc->statusto == PUBLISHED) {
-        // Check if was cascaded and needs backreported then backreport
-        // TODO : backreport to original
+        if ($stc->statusto == RESOLVED || $stc->statusto == PUBLISHED) {
+            // Check if was cascaded and needs backreported then backreport
+            // TODO : backreport to original
+        }
     }
 
     tracker_clearelements($issue->id);
@@ -347,8 +347,8 @@ elseif ($action == 'cascade') {
         foreach ($comments as $comment) {
             $useridsarray[] = $comment->userid;
         }
-        $idlist = implode("','", $useridsarray);
-        $users = $DB->get_records_select('user', "id IN ('$idlist')", '', 'id, firstname, lastname');
+        list($insql, $inparam) = $DB->get_in_or_equal($useridsarray);
+        $users = $DB->get_records_select('user', "id $insql", array($inparams), 'lastname, firstname', 'id, firstname, lastname');
 
         // make backtrack
         foreach ($comments as $comment) {
@@ -436,7 +436,7 @@ elseif ($action == 'cascade') {
             print_error('errorremote', 'tracker', '', implode('<br/>', $response->error));
         }
     } else {
-        print_error('errorremotesendingcascade', 'tracker');
+        print_error('errorremotesendingcascade', 'tracker', $tracker->parent);
     }
 }
 /******************************* move an issue to a subtracker *****************************/

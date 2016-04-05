@@ -1,19 +1,34 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * This view allows checking deck states
  *
- * @package mod-tracker
+ * @package mod_tracker
  * @category mod
  * @author Valery Fremaux
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
-
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
 /**
-* overrides moodleform for test setup
-*/
+ * overrides moodleform for test setup
+ */
 class mod_tracker_mod_form extends moodleform_mod {
 
     function definition() {
@@ -109,6 +124,10 @@ class mod_tracker_mod_form extends moodleform_mod {
             $mform->addHelpButton('networkable', 'networkable', 'tracker');
             $mform->setAdvanced('networkable');
         }
+
+        $mform->addElement('text', 'failovertrackerurl', get_string('failovertrackerurl', 'tracker'), array('size' => 80));
+        $mform->setType('failovertrackerurl', PARAM_URL);
+        $mform->setAdvanced('failovertrackerurl');
 
         $options['idnumber'] = true;
         $options['groups'] = false;

@@ -39,6 +39,7 @@ if ($action == 'createelement') {
 /************************************* add an element *****************************/
 elseif ($action == 'doaddelement') {
     $form->name = required_param('name', PARAM_ALPHANUM);
+    $form->name = preg_replace('/\s+|-|\\\'|\"/', '', $form->name); // Remove all spaces
     $form->description = required_param('description', PARAM_CLEANHTML);
     $form->type = required_param('type', PARAM_ALPHA);
     $form->shared = optional_param('shared', 0, PARAM_INT);
@@ -91,6 +92,7 @@ elseif ($action == 'editelement') {
 if ($action == 'doupdateelement') {
     $form->elementid = required_param('elementid', PARAM_INT);
     $form->name = required_param('name', PARAM_ALPHANUM);
+    $form->name = preg_replace('/\s+|-|\\\'|\"/', '', $form->name); // Remove all spaces
     $form->description = required_param('description', PARAM_CLEANHTML);
     $form->format = optional_param('format', '', PARAM_INT);
     $form->type = required_param('type', PARAM_ALPHA);

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package mod-tracker
+ * @package mod_tracker
  * @category mod
  * @author Clifford Tham, Valery Fremaux from Moodle 1.8 ahead
  * @copyright  2007 MyLearningFactory (http://www.mylearningfactory.com)
@@ -24,10 +24,10 @@
  * This page prints a particular instance of a tracker and handles
  * top level interactions
  */
-
 require('../../config.php');
 require_once($CFG->dirroot.'/mod/tracker/lib.php');
 require_once($CFG->dirroot.'/mod/tracker/locallib.php');
+
 $PAGE->requires->js('/mod/tracker/js/trackerview.js');
 
 // Check for required parameters.
@@ -292,4 +292,16 @@ if ($view == 'view') {
 }
 
 echo $OUTPUT->box_end();
+
+if ($course->format == 'page') {
+    include_once($CFG->dirroot.'/course/format/page/xlib.php');
+    page_print_page_format_navigation($cm, $backtocourse = false);
+} else {
+    if ($COURSE->format != 'singleactivity') {
+        echo '<div style="text-align:center;margin:8px">';
+        echo $OUTPUT->single_button(new moodle_url('/course/view.php', array('id' => $course->id)), get_string('backtocourse', 'tracker'), 'post', array('class' => 'backtocourse'));
+        echo '</div>';
+    }
+}
+
 echo $OUTPUT->footer();

@@ -14,16 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
- * @package mod-tracker
+ * @package mod_tracker
  * @category mod
  * @author Clifford Tham, Valery Fremaux > 1.8
  * @date 02/12/2007
  *
  * Library of internal functions and constants for module tracker
  */
-
-require_once($CFG->dirroot.'/mod/tracker/filesystemlib.php');
 require_once($CFG->dirroot.'/lib/uploadlib.php');
 require_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
 
@@ -934,9 +934,10 @@ function tracker_recordelements(&$issue, &$data) {
     $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
     $usedelements = $DB->get_records('tracker_elementused', array('trackerid' => $issue->trackerid), 'id', 'id,elementid');
     foreach ($usedelements as $ueid => $ue) {
-        $ueinstance = trackerelement::find_instance_by_usedid($tracker, $ueid);
-        $ueinstance->setcontext($PAGE->context);
-        $ueinstance->formprocess($data);
+        if ($ueinstance = trackerelement::find_instance_by_usedid($tracker, $ueid)) {
+            $ueinstance->setcontext($PAGE->context);
+            $ueinstance->formprocess($data);
+        }
     }
 }
 
@@ -1104,7 +1105,9 @@ function tracker_printchilds(&$tracker, $issueid, $return=false, $indent='') {
     $res = $DB->get_records_sql($sql);
     if ($res) {
         foreach ($res as $aSub) {
-            $str .= "<span style=\"position : relative; left : {$indent}px\"><a href=\"view.php?a={$tracker->id}&amp;what=viewanissue&amp;issueid={$aSub->childid}\">".$tracker->ticketprefix.$aSub->childid.' - '.format_string($aSub->summary)."</a>";
+            $params = array('t' => $tracker->id, 'what' => 'viewanissue', 'issueid' => $aSub->childid);
+            $issueurl = new moodle_url('/mod/tracker/view.php', $params);
+            $str .= '<span style="position : relative; left : '.$indent.'px"><a href="'.$issueurl.'">'.$tracker->ticketprefix.$aSub->childid.' - '.format_string($aSub->summary).'</a>';
             $str .= "&nbsp;<span class=\"status_".$STATUSCODES[$aSub->status]."\">".$STATUSKEYS[$aSub->status]."</span></span><br/>\n";
             $indent = $indent + 20;
             $str .= tracker_printchilds($tracker, $aSub->childid, true, $indent);
@@ -1147,7 +1150,9 @@ function tracker_printparents(&$tracker, $issueid, $return=false, $indent='') {
             $indent = $indent - 20;
             $str .= tracker_printparents($tracker, $aSub->parentid, true, $indent);
             $indent = $indent + 20;
-            $str .= "<span style=\"position : relative; left : {$indent}px\"><a href=\"view.php?a={$tracker->id}&amp;what=viewanissue&amp;issueid={$aSub->parentid}\">".$tracker->ticketprefix.$aSub->parentid.' - '.format_string($aSub->summary)."</a>";
+            $params = array('t' => $tracker->id, 'what' => 'viewanissue', 'issueid' => $aSub->parentid);
+            $issueurl = new moodle_url('/mod/tracker/view.php', $params);
+            $str .= '<span style="position : relative; left : '.$indent.'px"><a href="'.$issueurl.'">'.$tracker->ticketprefix.$aSub->parentid.' - '.format_string($aSub->summary)."</a>";
             $str .= "&nbsp;<span class=\"status_".$STATUSCODES[$aSub->status]."\">".$STATUSKEYS[$aSub->status]."</span></span><br/>\n";
         }
     }
@@ -1220,7 +1225,7 @@ function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = 
                   'URGENT' => $urgentrequest,
                   'BY' => fullname($by),
                   'REQUESTEDBY' => fullname($USER),
-                  'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}",
+                  'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}",
                   );
 
     include_once($CFG->dirroot."/mod/tracker/mailtemplatelib.php");
@@ -1277,8 +1282,8 @@ function tracker_notify_submission($issue, &$cm, $tracker = null) {
                       'SUMMARY' => format_string($issue->summary),
                       'DESCRIPTION' => format_string(stripslashes($issue->description)),
                       'BY' => fullname($by),
-                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}",
-                      'CCURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;issueid={$issue->id}&amp;what=register"
+                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}",
+                      'CCURL' => $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;issueid={$issue->id}&amp;what=register"
                       );
         include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
 
@@ -1318,14 +1323,14 @@ function tracker_notifyccs_changeownership($issueid, $tracker = null) {
                       'SUMMARY' => format_string($issue->summary),
                       'ASSIGNEDTO' => fullname($assignee),
                       'BY' => fullname($USER),
-                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}",
+                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}",
                       );
         include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
 
         foreach ($issueccs as $cc) {
             $ccuser = $DB->get_record('user', array('id' => $cc->userid));
-            $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
-            $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
+            $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
+            $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
             $notification = tracker_compile_mail_template('ownershipchanged', $vars, 'tracker', $ccuser->lang);
             $notification_html = tracker_compile_mail_template('ownershipchanged_html', $vars, 'tracker', $ccuser->lang);
             if ($CFG->debugsmtp) echo "Sending Ownership Change Mail Notification to " . fullname($ccuser) . '<br/>'.$notification_html;
@@ -1364,12 +1369,12 @@ function tracker_notifyccs_moveissue($issueid, $tracker, $newtracker = null) {
                       'ISSUE' => $newtracker->ticketprefix.$issue->id,
                       'SUMMARY' => format_string($issue->summary),
                       'ASSIGNEDTO' => fullname($assignee),
-                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$newtracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}",
+                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?t={$newtracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}",
                       );
         foreach ($issueccs as $cc) {
             $ccuser = $DB->get_record('user', array('id' => $cc->userid));
-            $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
-            $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
+            $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
+            $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
             $notification = tracker_compile_mail_template('issuemoved', $vars, 'tracker', $ccuser->lang);
             $notification_html = tracker_compile_mail_template('issuemoved_html', $vars, 'tracker', $ccuser->lang);
             if ($CFG->debugsmtp) echo "Sending Issue Moving Mail Notification to " . fullname($ccuser) . '<br/>'.$notification_html;
@@ -1400,14 +1405,14 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
                       'ISSUE' => $tracker->ticketprefix.$issueid,
                       'SUMMARY' => format_string($issue->summary),
                       'BY' => fullname($USER),
-                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issueid}");
+                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issueid}");
         include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
         foreach ($issueccs as $cc) {
             unset($notification);
             unset($notification_html);
             $ccuser = $DB->get_record('user', array('id' => $cc->userid));
-            $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
-            $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
+            $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
+            $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
             switch ($issue->status) {
                 case OPEN :
                     if ($cc->events & EVENT_OPEN) {
@@ -1504,15 +1509,15 @@ function tracker_notifyccs_comment($issueid, $comment, $tracker = null) {
                       'ISSUE' => $tracker->ticketprefix.$issue->id,
                       'SUMMARY' => $issue->summary,
                       'COMMENT' => format_string(stripslashes($comment)),
-                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}",
+                      'ISSUEURL' => $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}",
                       );
         include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
         foreach ($issueccs as $cc) {
             $ccuser = $DB->get_record('user', array('id' => $cc->userid));
             if ($cc->events & ON_COMMENT) {
                 $vars['CONTRIBUTOR'] = fullname($USER);
-                $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
-                $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?a={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
+                $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
+                $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
                 $notification = tracker_compile_mail_template('addcomment', $vars, 'tracker', $ccuser->lang);
                 $notification_html = tracker_compile_mail_template('addcomment_html', $vars, 'tracker', $ccuser->lang);
                 if ($CFG->debugsmtp) echo "Sending Comment Notification to " . fullname($ccuser) . '<br/>'.$notification_html;
@@ -1560,7 +1565,7 @@ function tracker_print_transfer_link(&$tracker, &$issue) {
     } else {
         list($parentid, $hostroot) = explode('@', $tracker->parent);
         $mnet_host = $DB->get_record('mnet_host', array('wwwroot' => $hostroot));
-        $remoteurl = urlencode("/mod/tracker/view.php?view=view&amp;screen=viewanissue&amp;a={$parentid}&amp;issueid={$issue->id}");
+        $remoteurl = urlencode("/mod/tracker/view.php?view=view&amp;screen=viewanissue&amp;t={$parentid}&amp;issueid={$issue->id}");
         $linkurl = new moodle_url('/auth/mnet/jump.php', array('hostid' => $mnet_host->id, 'wantsurl' => $remoteurl));
         $href = '<a href="'.$linkurl.'">'.get_string('follow', 'tracker').'</a>';
     }

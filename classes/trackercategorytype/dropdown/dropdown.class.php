@@ -14,16 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
-* @package tracker
-* @author Clifford Tham
-* @review Valery Fremaux / 1.8
-* @date 02/12/2007
-*
-* A class implementing a dropdown element
-*/
+defined('MOODLE_INTERNAL') || die();
 
-require_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php';
+/**
+ * @package tracker
+ * @author Clifford Tham
+ * @review Valery Fremaux / 1.8
+ * @date 02/12/2007
+ *
+ * A class implementing a dropdown element
+ */
+require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 
 class dropdownelement extends trackerelement {
 
@@ -46,8 +47,9 @@ class dropdownelement extends trackerelement {
                     }
                 }
             }
-            echo implode(', ', $optionstrs);
+            return implode(', ', $optionstrs);
         }
+        return '';
     }
 
     function edit($issueid = 0) {
@@ -60,7 +62,7 @@ class dropdownelement extends trackerelement {
             foreach ($this->options as $optionobj) {
                 $selectoptions[$optionobj->name] = $optionobj->description;
             }
-            echo html_writer::select($selectoptions, $this->name, $values, array('' => 'choosedots'));
+            echo html_writer::select($selectoptions, 'element'.$this->name, $values, array('' => 'choosedots'));
             echo html_writer::empty_tag('br');
         }
     }
@@ -74,7 +76,7 @@ class dropdownelement extends trackerelement {
                 $optionsmenu[$option->id] = format_string($option->description);
             }
 
-            $mform->addElement('select', $this->name, format_string($this->description), $optionsmenu);
+            $mform->addElement('select', 'element'.$this->name, format_string($this->description), $optionsmenu);
             if (!empty($this->mandatory)) {
                 $mform->addRule($this->name, null, 'required', null, 'client');
             }
@@ -84,7 +86,7 @@ class dropdownelement extends trackerelement {
     function set_data(&$defaults, $issueid = 0) {
         if ($issueid) {
 
-            $elementname = $this->name;
+            $elementname = 'element'.$this->name;
 
             if (!empty($this->options)) {
                 $values = $this->getvalue($issueid);
@@ -120,7 +122,7 @@ class dropdownelement extends trackerelement {
             $attribute->elementid = $this->id;
         }
 
-        $elmname = $this->name;
+        $elmname = 'element'.$this->name;
 
         if (!$this->multiple) {
             $value = optional_param($elmname, '', PARAM_TEXT);

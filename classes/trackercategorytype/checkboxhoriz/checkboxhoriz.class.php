@@ -14,16 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
-* @package tracker
-* @author Clifford Tham
-* @review Valery Fremaux / 1.8
-* @date 02/12/2007
-*
-* A class implementing a checkbox element
-*/
+defined('MOODLE_INTERNAL') || die();
 
-include_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php';
+/**
+ * @package tracker
+ * @author Clifford Tham
+ * @review Valery Fremaux / 1.8
+ * @date 02/12/2007
+ *
+ * A class implementing a checkbox element
+ */
+require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 
 class checkboxhorizelement extends trackerelement {
 
@@ -53,6 +54,8 @@ class checkboxhorizelement extends trackerelement {
     }
 
     function view($issueid = 0) {
+        $str = '';
+
         $this->getvalue($issueid); // loads $this->value with current value for this issue
         if (!empty($this->value)) {
             $values = explode(',',$this->value);
@@ -60,8 +63,9 @@ class checkboxhorizelement extends trackerelement {
             foreach ($values as $selected) {
                 $choices[] = format_string($this->options[$selected]->description);
             }
-            echo(implode(', ', $choices));
+            $str = implode(', ', $choices);
         }
+        return $str;
     }
 
     function add_form_element(&$mform) {
@@ -70,8 +74,8 @@ class checkboxhorizelement extends trackerelement {
             $mform->addElement('header', "head{$this->name}", format_string($this->description));
             $mform->setExpanded("head{$this->name}");
             foreach ($this->options as $option) {
-                $group[] = &$form->createElement('checkbox', "element{$this->name}{$option->id}", '', format_string($option->description));
-                $mform->setType("element{$this->name}{$option->id}", PARAM_TEXT);
+                $group[] = &$mform->createElement('checkbox', "element{$this->name}{$option->id}", '', format_string($option->description));
+                $mform->setType("element{$this->name}{$option->id}", PARAM_INT);
             }
 
             $mform->addGroup($group, 'element' . $this->name.'_set');

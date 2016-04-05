@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * @package tracker
  * @author Clifford Tham
@@ -22,8 +24,7 @@
  *
  * A class implementing a checkbox element
  */
-
-require_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php';
+require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 
 class checkboxelement extends trackerelement {
 
@@ -53,13 +54,16 @@ class checkboxelement extends trackerelement {
     }
 
     function view($issueid = 0) {
+        $str = '';
+
         $this->getvalue($issueid); // loads $this->value with current value for this issue
         if (!empty($this->value)) {
             $values = explode(',',$this->value);
             foreach ($values as $selected) {
-                echo format_string($this->options[$selected]->description) . "<br/>\n";
+                $str .= format_string($this->options[$selected]->description) . "<br/>\n";
             }
         }
+        return $str;
     }
 
     function add_form_element(&$mform) {
@@ -68,7 +72,7 @@ class checkboxelement extends trackerelement {
             $mform->setExpanded("head{$this->name}");
             foreach ($this->options as $option) {
                 $mform->addElement('checkbox', "element{$this->name}{$option->id}", format_string($option->description));
-                $mform->setType("element{$this->name}{$option->id}", PARAM_TEXT);
+                $mform->setType("element{$this->name}{$option->id}", PARAM_INT);
             }
         }
     }

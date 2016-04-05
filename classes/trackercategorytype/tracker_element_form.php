@@ -14,7 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-include_once $CFG->libdir.'/formslib.php';
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * @package mod_tracker
+ * @category mod
+ * @author Clifford Tham, Valery Fremaux > 1.8
+ * @date 02/12/2007
+ */
+require_once($CFG->libdir.'/formslib.php');
 
 abstract class tracker_moodle_form extends moodleform {
 
@@ -31,7 +39,7 @@ abstract class tracker_moodle_form extends moodleform {
         $mform->setType('elementid', PARAM_INT);
 
         $mform->addElement('text', 'name', get_string('name'), '');
-        $mform->setType('name', PARAM_CLEANHTML);
+        $mform->setType('name', PARAM_ALPHANUM);
         $mform->addRule('name', null, 'required', null, 'client');
 
         $mform->addElement('textarea', 'description', get_string('description'));

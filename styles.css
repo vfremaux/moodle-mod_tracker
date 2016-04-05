@@ -184,65 +184,79 @@
 }
 
 .nullclass{
-	color:#D0D0D0;
+    color:#D0D0D0;
 }
 
 .redtext{
-	color:#800000;
+    color:#800000;
 }
 
 .tracker-printtable{
-	border:1px #808080 solid;
-	margin-top:10px;
+    border:1px #808080 solid;
+    margin-top:10px;
 }
 
 .tracker-printtable.title,
 .tracker-printtable.ticketid{
-	background-color:#E0E0E0;
-	border:1px #808080 solid
+    background-color:#E0E0E0;
+    border:1px #808080 solid
 }
 
 .tracker-printtable.ticketid{
-	font-weight:bolder;
+    font-weight:bolder;
 }
 
 .tracker-printtable.summary{
-	border:1px #808080 solid
+    border:1px #808080 solid
 }
 
 .tracker-issue-editor {
-	width:100%;
+    width:100%;
 }
 
 .tracker-issue-editor td{
-	border:1px solid #D0D0D0;
+    border:1px solid #D0D0D0;
 }
 
 .tracker-issue-param{
-	background-color:#D0D0D0;
-	border:1px solid #F0F0F0;
+    background-color:#D0D0D0;
+    border:1px solid #F0F0F0;
+    padding:4px 15px 4px 4px;
 }
 
 .tracker-issue-summary{
-	background-color:#fcfcfc;
-	border:1px solid #f0f0f0;
-	font-size:1.9em;
-	padding:5px;
+    background-color:#fcfcfc;
+    border:1px solid #f0f0f0;
+    font-size:1.9em;
+    padding:10px;
+}
+
+.tracker-issue-value{
+    padding:4px 4px 4px 15px;
+    border-bottom:1px solid #f0f0f0;
 }
 
 .tracker-issue-description{
-	background-color:#F0F0F0;
-	border:1px solid #D0D0D0;
-	padding:5px;
+    background-color:#F0F0F0;
+    border:1px solid #D0D0D0;
+    padding:5px;
 }
 
 .tracker-file-item-notice{
-	font-style:italic;
+    font-style:italic;
 }
 
 #tracker-acknowledge{
-	margin:50px;
-	border:1px #c0c0c0 solid;
-	padding:30px;
-	font-size:1.2em;
+    margin:50px;
+    border:1px #c0c0c0 solid;
+    padding:30px;
+    font-size:1.2em;
+}
+
+.tracker-issue-value {
+    padding: 3px 3px 3px 15px;
+}
+
+.tracker-issue-param {
+    padding: 3px 15px 3px 3px;
 }

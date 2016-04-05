@@ -14,16 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
-* @package tracker
-* @author Clifford Tham
-* @review Valery Fremaux / 1.8
-* @date 17/12/2007
-*
-* A class implementing a textfield element
-*/
+defined('MOODLE_INTERNAL') || die();
 
-include_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php';
+/**
+ * @package tracker
+ * @author Clifford Tham
+ * @review Valery Fremaux / 1.8
+ * @date 17/12/2007
+ *
+ * A class implementing a textfield element
+ */
+require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 
 class textelement extends trackerelement {
 
@@ -33,7 +34,7 @@ class textelement extends trackerelement {
 
     function view($issueid = 0) {
         $this->getvalue($issueid);
-        echo format_text(format_string($this->value), $this->format);
+        return format_text(format_string($this->value), $this->format);
     }
 
     function edit($issueid = 0) {
@@ -74,7 +75,11 @@ class textelement extends trackerelement {
         }
 
         $elmname = 'element'.$this->name;
-        $data->$elmname = required_param($elmname, PARAM_TEXT);
+        if ($this->private) {
+            $data->$elmname = optional_param($elmname, '', PARAM_TEXT);
+        } else {
+            $data->$elmname = required_param($elmname, PARAM_TEXT);
+        }
         $attribute->elementitemid = $data->$elmname; // in this case true value in element id
         $attribute->timemodified = time();
 

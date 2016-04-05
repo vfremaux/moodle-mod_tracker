@@ -55,6 +55,7 @@ $string['assignedto'] = 'Assigned to';
 $string['assignee'] = 'Assignee';
 $string['attributes'] = 'Attributes';
 $string['autourl'] = 'Automatic Url Recollection';
+$string['backtocourse'] = 'Back to course';
 $string['browse'] = 'Browse';
 $string['browser'] = 'Browser';
 $string['build'] = 'Version';
@@ -71,6 +72,7 @@ $string['chooseremoteparent'] = 'Choose a remote instance';
 $string['choosetarget'] = 'Choose target';
 $string['clearsearch'] = 'Clear search criteria';
 $string['comment'] = 'Comment';
+$string['commentedby'] = 'Commented by';
 $string['comments'] = 'Comments';
 $string['component'] = 'Component';
 $string['count'] = 'Count';
@@ -188,6 +190,7 @@ $string['event_tracker_issue_commented'] = 'Tracker Issue commented';
 $string['event_tracker_issue_reported'] = 'Tracker Issue reported';
 $string['evolution'] = 'Trends';
 $string['evolutionbymonth'] = 'Issue state evolution';
+$string['failovertrackerurl'] = 'Fail over tracker url';
 $string['file'] = 'Attached file';
 $string['follow'] = 'Follow';
 $string['generaltrend'] = 'Trend';
@@ -280,6 +283,7 @@ $string['notrackeradmins'] = 'No admins';
 $string['nowatches'] = 'No watches';
 $string['numberofissues'] = 'Ticket count';
 $string['observers'] = 'Observers';
+$string['on'] = 'on';
 $string['open'] = 'Open';
 $string['option'] = 'Option ';
 $string['optionisused'] = 'This options id already in use for this element.';
@@ -520,3 +524,14 @@ When enabled, each specific internal role in tracker (reporter, developer, resol
 
 $string['networkable_help'] = 'If enabled, this tracker will be openly exposed to remote site. Users from remote site will be able to post even if they have no local account. 
 a Mnet account will be created on the fly. This will though only be possible if tracker Mnet services are properly configurated each side.';
+
+$string['failovertrackerurl_help'] = '
+Using tracker inside Moodle may not address situation where moodle itself is down or working improperly. When giving a failover tracker url, 
+you provide users with an information about an alternate URL they can use in case of major desease. Users will be invited to bookmark the URL in their
+own data to get it when needed.
+';
+
+$string['failovertrackerurl_tpl'] = '
+In case this tracker is not reachable or not available, you may post a signal into the <a href="{$a}">emergency tracker</a>. You should bookmark this URL
+to get the link available even if Moodle is down or not operable properly. 
+';

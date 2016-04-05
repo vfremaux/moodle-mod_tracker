@@ -36,10 +36,10 @@
         <FIELD NAME="name" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" PREVIOUS="course" NEXT="description"/>
         <FIELD NAME="description" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="name" NEXT="type"/>
         <FIELD NAME="type" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" PREVIOUS="description" NEXT="paramint1"/>
-        <FIELD NAME="paramint1" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="type" NEWT="paramint2" />
-        <FIELD NAME="paramint2" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="paramint1" NEXT="paramchar1" />
-        <FIELD NAME="paramchar1" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" PREVIOUS="paramint2" NEXT="paramchar2"/>
-        <FIELD NAME="paramchar2" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" PREVIOUS="paramchar1"/>
+        <FIELD NAME="paramint1" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="type" NEWT="paramint2" />
+        <FIELD NAME="paramint2" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="paramint1" NEXT="paramchar1" />
+        <FIELD NAME="paramchar1" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" PREVIOUS="paramint2" NEXT="paramchar2"/>
+        <FIELD NAME="paramchar2" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" PREVIOUS="paramchar1"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_element"/>

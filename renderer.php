@@ -1,5 +1,31 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * @package mod_tracker
+ * @category mod
+ * @author Clifford Tham, Valery Fremaux > 1.8
+ * @date 02/12/2007
+ */
+
+/**
+ * the master renderer
+ */
 class mod_tracker_renderer extends plugin_renderer_base {
 
     function core_issue($issue, $tracker) {
@@ -39,7 +65,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 // This is optional, in case useing block User_Mnet_Host based access restrictions.
                 if (file_exists($CFG->dirroot.'/blocks/user_mnet_hosts/xlib.php')) {
                     include_once($CFG->dirroot.'/blocks/user_mnet_hosts/xlib.php');
-                    $access = user_mnet_host_read_access($USER, $host->wwwroot);
+                    $access = user_mnet_hosts_read_access($USER, $host->wwwroot);
                 }
 
                 if ($access) {
@@ -92,7 +118,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
                 if (file_exists($CFG->dirroot.'/blocks/user_mnet_hosts/xlib.php')) {
                     include_once($CFG->dirroot.'/blocks/user_mnet_hosts/xlib.php');
-                    $access = user_mnet_host_read_access($USER, $host->wwwroot);
+                    $access = user_mnet_hosts_read_access($USER, $host->wwwroot);
                 }
                 if ($access) {
                     $params = array('t' => $instanceid, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issueid);
@@ -118,13 +144,13 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= '<td align="right" width="25%" class="tracker-issue-param">';
         $str .= '<b>'.get_string('issuenumber', 'tracker').'</b><br />';
         $str .= '</td>';
-        $str .= '<td width="25%">';
+        $str .= '<td width="25%" class="tracker-issue-value">';
         $str .= $tracker->ticketprefix.$issue->id;
         $str .= '</td>';
         $str .= '<td align="right" width="25%" class="tracker-issue-param" >';
         $str .= '<b>'.get_string('status', 'tracker').':</b>';
         $str .= '</td>';
-        $str .= '<td width="25%" class="status_'.$STATUSCODES[$issue->status].'">';
+        $str .= '<td width="25%" class="status_'.$STATUSCODES[$issue->status].' tracker-issue-value">';
         $str .= '<b>'.$STATUSKEYS[$issue->status].'</b>';
         $str .= '</td>';
         $str .= '</tr>';
@@ -133,14 +159,14 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= '<td align="right" width="25%" class="tracker-issue-param">';
         $str .= '<b>'.get_string('reportedby', 'tracker').':</b>';
         $str .= '</td>';
-        $str .= '<td width="25%">';
+        $str .= '<td width="25%" class="tracker-issue-value">';
         $str .= $OUTPUT->user_picture($issue->reporter);
         $str .= '&nbsp;'.fullname($issue->reporter);
         $str .= '</td>';
         $str .= '<td align="right" width="25%" class="tracker-issue-param" >';
         $str .= '<b>'.get_string('datereported', 'tracker').':</b>';
         $str .= '</td>';
-        $str .= '<td width="25%">';
+        $str .= '<td width="25%" class="tracker-issue-value">';
         $str .= userdate($issue->datereported);
         $str .= '</td>';
         $str .= '</tr>';
@@ -149,7 +175,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= '<td align="right" width="25%" class="tracker-issue-param">';
         $str .= '<b>'.get_string('assignedto', 'tracker').':</b>';
         $str .= '</td>';
-        $str .= '<td width="25%">';
+        $str .= '<td width="25%" class="tracker-issue-value">';
         if (!$issue->owner){
             $str .= get_string('unassigned', 'tracker');
         } else {
@@ -160,7 +186,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= '<td align="right" width="25%" class="tracker-issue-param">';
         $str .= '<b>'.get_string('cced', 'tracker').':</b>';
         $str .= '</td>';
-        $str .= '<td width="25%">';
+        $str .= '<td width="25%" class="tracker-issue-value">';
         $str .= (empty($ccs) || count(array_keys($ccs)) == 0) ? 0 : count($ccs);
         $str .= '</td>';
         $str .= '</tr>';
@@ -169,7 +195,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= '<td align="right" width="25%" class="tracker-issue-param">';
         $str .= '<b>'.get_string('description').':</b>';
         $str .= '</td>';
-        $str .= '<td align="left" colspan="3" width="75%">';
+        $str .= '<td align="left" colspan="3" width="75%" class="tracker-issue-value">';
         $str .= format_text($issue->description);
         $str .= '</td>';
         $str .= '</tr>';
@@ -244,7 +270,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         return $str;
     }
 
-    function distribution_form($tracker) {
+    function distribution_form($tracker, $issue, $cm) {
         global $DB;
 
         $str = '';

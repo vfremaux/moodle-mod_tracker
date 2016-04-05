@@ -14,16 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
-* @package tracker
-* @author Clifford Tham
-* @review Valery Fremaux / 1.8
-* @date 02/12/2007
-*
-* A class implementing a radio button (exclusive choice) element
-*/
+defined('MOODLE_INTERNAL') || die();
 
-include_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php';
+/**
+ * @package tracker
+ * @author Clifford Tham
+ * @review Valery Fremaux / 1.8
+ * @date 02/12/2007
+ *
+ * A class implementing a radio button (exclusive choice) element
+ */
+require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 
 class radioelement extends trackerelement {
 
@@ -33,6 +34,8 @@ class radioelement extends trackerelement {
     }
 
     function view($issueid = 0) {
+        $str = '';
+
         $this->getvalue($issueid);
 
         $optbynames = array();
@@ -41,8 +44,9 @@ class radioelement extends trackerelement {
         }
 
         if (!empty($this->options) && !empty($this->value) && array_key_exists($this->value, $optbynames)) {
-            echo $optbynames[$this->value];
+            $str = $optbynames[$this->value];
         }
+        return $str;
     }
 
     function edit($issueid = 0) {

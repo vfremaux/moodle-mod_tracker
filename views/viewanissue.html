@@ -134,7 +134,7 @@ if ($tracker->parent && $issue->status != TRANSFERED && (has_capability('mod/tra
 
 $distribute = '';
 if ($tracker->subtrackers && $issue->status != TRANSFERED && (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context) || has_capability('mod/tracker:develop', $context))) {
-    $distribute = $renderer->distribution_form($tracker);
+    $distribute = $renderer->distribution_form($tracker, $issue, $cm);
 }
 
 ?>

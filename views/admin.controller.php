@@ -189,7 +189,7 @@ if ($action == 'viewelementoptions') {
         $out = $OUTPUT->heading(get_string('editoptions', 'tracker'));
         $out .= '<center>';
         $element = trackerelement::find_instance_by_id($tracker, $form->elementid);
-        $element->optionlistview($cm);
+        $out .= $element->optionlistview($cm);
         $out .= $OUTPUT->heading(get_string('addanoption', 'tracker'));
         ob_start();
         include $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editoptionform.html';

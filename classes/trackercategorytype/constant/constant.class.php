@@ -12,21 +12,21 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * @package mod_tracker
- * @category mod
+ * @package tracker
  * @author Valery Fremaux / 1.8
  * @date 06/08/2015
  *
- * A class implementing a hidden/labelled element that captures the referer url
+ * A class implementing a constant element from an internal configuration value or
+ * an instance setting value
  */
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 
-class autourlelement extends trackerelement {
+class constantelement extends trackerelement {
 
     function __construct(&$tracker, $id = null, $used = false) {
         parent::__construct($tracker, $id, $used);
@@ -38,7 +38,7 @@ class autourlelement extends trackerelement {
 
     function view($issueid = 0) {
         $this->getvalue($issueid);
-        return '<a href="'.$this->value.'">'.$this->value.'</a>';
+        return $this->value;
     }
 
     function edit($issueid = 0) {
@@ -52,13 +52,15 @@ class autourlelement extends trackerelement {
     function add_form_element(&$mform) {
         $mform->addElement('header', "header{$this->name}", '');
         $mform->setExpanded("header{$this->name}");
+
         $mform->addElement('hidden', "element{$this->name}");
-        $mform->setDefault("element{$this->name}", $_SERVER['HTTP_REFERER']);
+        $mform->setDefault("element{$this->name}", 'name');
+        $mform->setType("element{$this->name}", PARAM_URL);
+
         $mform->addElement('text', "element{$this->name}shadow", get_string('autourl', 'tracker'));
         $mform->setType("element{$this->name}shadow", PARAM_URL);
         $mform->disabledIf("element{$this->name}shadow", "element{$this->name}");
         $mform->setDefault("element{$this->name}shadow", $_SERVER['HTTP_REFERER']);
-        $mform->setType("element{$this->name}", PARAM_URL);
     }
 
     function set_data(&$defaults, $issueid = 0) {

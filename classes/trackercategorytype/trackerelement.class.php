@@ -14,14 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
-* @package tracker
-* @review Valery Fremaux
-* @version Moodle > 2.2
-* @date 02/12/2012
-*
-* A generic class for collecting all that is common to all elements
-*/
+ * @package mod_tracker
+ * @category mod
+ * @author Clifford Tham, Valery Fremaux > 1.8
+ * @date 02/12/2007
+ */
+
+/**
+ * A generic class for collecting all that is common to all elements
+ */
 
 abstract class trackerelement {
     var $id;
@@ -71,26 +75,47 @@ abstract class trackerelement {
         $this->tracker = $tracker;
     }
 
+    /**
+     * If true, element is like a select or a radio box array
+     * and has suboptions to define
+     */
     function type_has_options() {
         return false;
     }
 
+    /**
+     * Tells if options are defined for thsi instance
+     */
     function hasoptions() {
         return $this->options !== null;
     }
 
+    /** 
+     * Get an option value
+     */
     function getoption($optionid) {
         return $this->options[$optionid];
     }
 
+    /** 
+     * Sets the option list
+     */
     function setoptions($options) {
         $this->options = $options;
     }
 
+    /**
+     * If true, this element can be told to be mandatory.
+     */
     function has_mandatory_option() {
         return true;
     }
 
+    /**
+     * If true, this element can be told to be private.
+     * A private element can be edited by the ticket operators,
+     * but is not seen by ticket owners.
+     */
     function has_private_option() {
         return true;
     }
@@ -102,7 +127,6 @@ abstract class trackerelement {
     /**
      * in case we have options (such as checkboxes or radio lists, get options from db.
      * this is backcalled by specific type constructors after core construction.
-     *
      */
     function setoptionsfromdb() {
         global $DB;
@@ -122,13 +146,16 @@ abstract class trackerelement {
     }
 
     /**
-     *
-     *
+     * Gets the current value for this element instance
+     * in an issue
      */
     function getvalue($issueid) {
         global $CFG, $DB;
 
-        if (!$issueid) return '';
+        if (!$issueid) {
+            return '';
+        }
+
         $sql = "
             SELECT
                 elementitemid
@@ -222,6 +249,19 @@ abstract class trackerelement {
         return null;
     }
 
+    /**
+     * Get the element view when the ticket is being edited
+     */
+    abstract function edit($issueid = 0);
+
+    /**
+     * Get the element view when the ticket is being displayed
+     */
+    abstract function view($issueid = 0);
+
+    /**
+     * Provides the form element when building a new element instance
+     */
     abstract function add_form_element(&$mform);
 
     abstract function formprocess(&$data);

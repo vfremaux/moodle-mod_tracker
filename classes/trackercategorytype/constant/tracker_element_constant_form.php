@@ -24,10 +24,25 @@ defined('MOODLE_INTERNAL') || die();
  */
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/tracker_element_form.php');
 
-class tracker_element_textarea_form extends tracker_moodle_form {
+class tracker_element_constant_form extends tracker_moodle_form {
 
     function definition() {
         $this->start_form();
+
+        $mform = $this->_form;
+
+        $options = array(
+            0 => get_string('constantsiteshortname', 'tracker'),
+            1 => get_string('constantsitefullname', 'tracker'),
+            2 => get_string('constantcurrentidnumber', 'tracker'),
+            3 => get_string('constantcurrentcourseidnumber', 'tracker'),
+            4 => get_string('constantcurrentcourseshortname', 'tracker'),
+            5 => get_string('constantcurrentcoursefullname', 'tracker'),
+        );
+
+        $mform->addElement('select', 'paramint1', get_string('constantinfosource', 'tracker'), $options);
+        $mform->addElement('text', 'paramchar2', get_string('customconstant', 'tracker'));
+
         $this->end_form();
     }
 
