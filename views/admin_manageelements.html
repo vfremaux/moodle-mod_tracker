@@ -1,13 +1,13 @@
 <?php
 
 /**
-* @package mod-tracker
-* @category mod
-* @author Clifford Tham, Valery Fremaux > 1.8
-* @date 02/12/2007
-*
-* A view that layouts the element administration
-*/
+ * @package mod-tracker
+ * @category mod
+ * @author Clifford Tham, Valery Fremaux > 1.8
+ * @date 02/12/2007
+ *
+ * A view that layouts the element administration
+ */
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
@@ -16,18 +16,18 @@ if (!defined('MOODLE_INTERNAL')) {
 ?>
 
 <table width="100%">
-	<tr valign="top" width="50%">
-		<td align="center">
-			<?php
-				include $CFG->dirroot.'/mod/tracker/views/admin_elements_used.php'; 
-			?>
-		</td>
-		<td align="center" width="50%">
-			<?php
-				include $CFG->dirroot.'/mod/tracker/views/admin_elements.php'; 
-			?>
-		</td>
-	</tr>
+    <tr valign="top" width="50%">
+        <td align="center">
+            <?php
+                include $CFG->dirroot.'/mod/tracker/views/admin_elements_used.php'; 
+            ?>
+        </td>
+        <td align="center" width="50%">
+            <?php
+                include $CFG->dirroot.'/mod/tracker/views/admin_elements.php'; 
+            ?>
+        </td>
+    </tr>
 </table>
 <?php
 ?>

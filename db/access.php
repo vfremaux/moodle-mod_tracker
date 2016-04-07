@@ -98,7 +98,7 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         )
     ),
-    
+
     'mod/tracker:canbecced' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -151,7 +151,7 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         )
     ),
-    
+
     'mod/tracker:configure' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
