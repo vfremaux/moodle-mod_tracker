@@ -1,8 +1,20 @@
 <?php
-// tracker.php - created with Moodle 1.2 development (2003111400)
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 // Capabilities
-
 $string['tracker:addinstance'] = 'Ajouter un gestionnaire de tickets';
 $string['tracker:canbecced'] = 'Peut être observateur';
 $string['tracker:comment'] = 'Commenter les tickets';
@@ -38,10 +50,13 @@ $string['askraise'] = 'Demander à augmenter la priorité';
 $string['assignedto'] = 'Assigné à';
 $string['assignee'] = 'Assigné';
 $string['attributes'] = 'Attributs';
+$string['autourl'] = 'Collecte d\'Url';
+$string['backtocourse'] = 'Revenir au cours';
 $string['browse'] = 'Exploration';
 $string['browser'] = 'Navigateur';
 $string['build'] = 'Version';
 $string['by'] = '<i>assigné par</i>';
+$string['captcha'] = 'Captcha';
 $string['cascade'] = 'Remonter au niveau supérieur';
 $string['cascadedticket'] = 'Ticket transmis';
 $string['categories'] = 'Catégories';
@@ -55,8 +70,18 @@ $string['chooseremoteparent'] = 'Choisir une instance distante ';
 $string['choosetarget'] = 'Choisir un sous-gestionnaire';
 $string['clearsearch'] = 'Effacer les critères de recherche';
 $string['comment'] = 'Commentaire';
+$string['commentedby'] = 'Commenté par';
 $string['comments'] = 'Commentaires';
 $string['component'] = 'Composant';
+$string['constant'] = 'Constante';
+$string['constantinfosource'] = 'Source de la constante';
+$string['customconstant'] = 'Valeur spécifique';
+$string['constantsiteshortname'] = 'Nom court du site';
+$string['constantsitefullname'] = 'Nom complet du site';
+$string['constantcurrentidnumber'] = 'Numéro d\'identification de l\'utilisateur';
+$string['constantcurrentcourseidnumber'] = 'Numéro d\'identification du cours courant';
+$string['constantcurrentcourseshortname'] = 'Nom court du cours courant';
+$string['constantcurrentcoursefullname'] = 'Nom long du cours courant';
 $string['count'] = 'Nombre';
 $string['countbyassignee'] = 'Par assigné';
 $string['countbymonth'] = 'Rapport par date de création';
@@ -72,9 +97,9 @@ $string['defaultassignee'] = 'Assigné par défaut';
 $string['deleteattachedfile'] = 'Supprimer l\'attachement';
 $string['dependancies'] = 'Dépendances';
 $string['dependson'] = 'Dépends de ';
-$string['evolution'] = 'Tendances';
 $string['descriptionisempty'] = 'La description ne peut pas être laissée vide.';
 $string['distribute'] = 'Déplacer le ticket';
+$string['doaddelementautourl'] = 'Ajouter une collecte d\'url'; // @DYNA
 $string['doaddelementcheckbox'] = 'Ajouter des cases à cocher'; // @DYNA
 $string['doaddelementcheckboxhoriz'] = 'Ajouter des cases à cocher'; // @DYNA
 $string['doaddelementdropdown'] = 'Ajouter une liste déroulante'; // @DYNA
@@ -83,6 +108,7 @@ $string['doaddelementradio'] = 'Ajouter un bouton radio'; // @DYNA
 $string['doaddelementradiohoriz'] = 'Ajouter un bouton radio'; // @DYNA
 $string['doaddelementtext'] = 'Ajouter un champ de texte'; // @DYNA
 $string['doaddelementtextarea'] = 'Ajouter une zone de texte'; // @DYNA
+$string['doupdateelementautourl'] = 'Modifier une collecte d\'url'; // @DYNA
 $string['doupdateelementcheckbox'] = 'Modifier des cases à cocher'; // @DYNA
 $string['doupdateelementcheckboxhoriz'] = 'Modifier des cases à cocher'; // @DYNA
 $string['doupdateelementdropdown'] = 'Modifier une liste de choix';// @DYNA
@@ -92,6 +118,7 @@ $string['doupdateelementradiohoriz'] = 'Modifier un bouton radio'; // @DYNA
 $string['doupdateelementtext'] = 'Modifier un champ de texte'; // @DYNA
 $string['doupdateelementtextarea'] = 'Modifier une zone de texte'; // @DYNA
 $string['dropdown'] = 'Menu déroulant';
+$string['editelement'] = 'Modifier un élément de formulaire';
 $string['editoptions'] = 'Editer les options';
 $string['editproperties'] = 'Editer les propriétés';
 $string['editquery'] = 'Modifier une requête mémorisée';
@@ -103,6 +130,7 @@ $string['emailoptions'] = 'Options de courriel';
 $string['emergency'] = 'Avis d\'urgence';
 $string['emptydefinition'] = 'La définition du gestionnaire cible est vide.';
 $string['enablecomments'] = 'Autoriser les commentaires';
+$string['errorcaptcha'] = 'Vous n\'avez pas fourni la bonne réponse. Ou peut être êtes vous un robot ?';
 $string['errorcoursemisconfigured'] = 'Ce cours est mal configuré';
 $string['errorcoursemodid'] = 'L\'ID de module de cours est incrorrect';
 $string['errorfindingaction'] = 'Erreur : L\'action {$a} ne peut être identifiée. ';
@@ -111,13 +139,18 @@ $string['errornoaccessallissues'] = 'Vous n\'avez pas l\'autorisation de voir to
 $string['errornoaccessissue'] = 'Vous n\'avez pas l\'autorisation de voir ce ticket.';
 $string['errornoeditissue'] = 'Vous n\'avez pas l\'autorisaton de modifier ce ticket.';
 $string['errorremote'] = 'Erreur distante: {$a}';
-$string['evolutionbymonth'] = 'Evolution par mois';
 $string['eventcourse_module_edited'] = 'Gestionnaire modifié';
 $string['eventcourse_module_list_viewed'] = 'Liste des Gestionnaires visitée';
 $string['eventcourse_module_viewed'] = 'Gestionnaire visité';
+$string['event_tracker_issue_commented'] = 'Ticket commenté';
+$string['event_tracker_issue_reported'] = 'Ticket réassigné';
+$string['evolution'] = 'Tendances';
+$string['evolutionbymonth'] = 'Evolution par mois';
 $string['file'] = 'Fichier attaché';
 $string['follow'] = 'Suivre';
 $string['generaltrend'] = 'Tendance';
+$string['gotooriginal'] = 'Voir le ticket original';
+$string['gototransfered'] = 'Voir le ticket transféré';
 $string['hassolution'] = 'Ce bug a une solution publiée';
 $string['hideccs'] = 'Cacher les observateurs';
 $string['hidecomments'] = 'Cacher les commentaires';
@@ -151,28 +184,28 @@ $string['managenetwork'] = 'Fonctions cascade et réseau';
 $string['manager'] = 'Mes ressources ';
 $string['me'] = 'Mon profil';
 $string['message_bugtracker'] = 'Merci pour votre contribution à l\'amélioration générale du service.';
+$string['message_taskspread'] = 'Vous venez de définir une tâche. Pour finaliser votre action, n\'oubliez pas de l\'assigner à un destinataire.';
 $string['message_ticketting'] = 'Nous avons bien enregistré votre demande. Elle a été assignée à {$a}.';
 $string['message_ticketting_preassigned'] = 'Nous avons bien enregistré votre demande. Elle sera traitée très prochainement.';
-$string['message_taskspread'] = 'Vous venez de définir une tâche. Pour finaliser votre action, n\'oubliez pas de l\'assigner à un destinataire.';
 $string['mode_bugtracker'] = 'Traqueur de défauts ';
-$string['mode_ticketting'] = 'Service support utilisateur ';
-$string['mode_taskspread'] = 'Distribution de tâches individuelles';
 $string['mode_customized'] = 'Gestionnaire customisé';
+$string['mode_taskspread'] = 'Distribution de tâches individuelles';
+$string['mode_ticketting'] = 'Service support utilisateur ';
 $string['modulename'] = 'Gestionnaire de tickets';
 $string['modulenameplural'] = 'Gestionnaires de tickets';
-$string['nofileloaded'] = 'Pas de fichier chargé.';
 $string['month'] = 'Mois';
 $string['myassignees'] = 'Les personnes que j\'ai assignées';
 $string['myissues'] = 'Les tickets que je gère ';
 $string['mypreferences'] = 'Mes préférences';
 $string['myprofile'] = 'Mon profil';
 $string['myqueries'] = 'Mes recherches';
-$string['mytickets'] = 'Mon support ';
 $string['mytasks'] = 'Mes demandes';
+$string['mytickets'] = 'Mon support ';
 $string['mywatches'] = 'Mes abonnements';
 $string['mywork'] = 'Mon travail';
 $string['name'] = 'Nom';
 $string['namecannotbeblank'] = 'Le nom ne peut pas être laissé vide.';
+$string['networkable'] = 'Ouvert au réseau';
 $string['newissue'] = 'Nouveau ticket';
 $string['noassignedtickets'] = 'Aucun travail en cours';
 $string['noassignees'] = 'Pas de responsable attribué';
@@ -183,6 +216,7 @@ $string['nodevelopers'] = 'Pas de développeurs';
 $string['noelements'] = 'Aucun élément';
 $string['noelementscreated'] = 'Aucun élément créé';
 $string['nofile'] = 'Pas de fichier attaché';
+$string['nofileloaded'] = 'Pas de fichier chargé.';
 $string['noissuesreported'] = 'Aucun ticket relevé';
 $string['noissuesresolved'] = 'Aucun ticket résolu';
 $string['nolocalcandidate'] = 'Aucun tracker local disponible';
@@ -197,15 +231,17 @@ $string['noresolvingissue'] = 'Pas de ticket attribué';
 $string['notickets'] = 'Aucun ticket personnel';
 $string['noticketsorassignation'] = 'Pas de tickets ou d\'assignations';
 $string['notifications'] = 'Notifications';
-$string['notrackers'] = 'Pas de gestionnaire dans ce cours.';
 $string['notrackeradmins'] = 'Pas d\'administrateurs';
+$string['notrackers'] = 'Pas de gestionnaire dans ce cours.';
 $string['nowatches'] = 'Pas d\'abonnements';
 $string['numberofissues'] = 'Nombre de tickets';
 $string['observers'] = 'Observateurs';
 $string['open'] = 'Ouvert';
+$string['on'] = ' le ';
 $string['option'] = 'Option ';
 $string['optionisused'] = 'Ce nom d\'option est déjà utilisé pour cet élément.';
 $string['order'] = 'Ordre';
+$string['originalticketnoaccess'] = 'Ce ticket est transféré à partir d\'un ticket original qui ne vous est pas accessible.';
 $string['pages'] = 'Pages';
 $string['posted'] = 'Posté';
 $string['potentialresolvers'] = 'Responsables potentiels';
@@ -249,7 +285,13 @@ $string['searchresults'] = 'Résultats de recherche';
 $string['searchwiththat'] = 'Relancer cette recherche';
 $string['selectparent'] = 'Choix de la cible';
 $string['sendrequest'] = 'Envoyer la demande';
+$string['setactive'] = 'Activer sur le formulaire de collecte ';
+$string['setinactive'] = 'Ne pas montrer sur le formulaire de collecte ';
+$string['setmandatory'] = 'Rendre la donnée obligatoire ';
+$string['setnotmandatory'] = 'Rendre la donnée non obligatoire ';
 $string['setoncomment'] = 'Les commentaires déposés ne me sont pas envoyés';
+$string['setprivate'] = 'Rendre la donnée privée ';
+$string['setpublic'] = 'Rendre la donnée visible ';
 $string['setwhenopens'] = 'L\'avis d\'ouverture ne m\'est pas envoyé';
 $string['setwhenpublished'] = 'Les avis de publication (production) ne me sont pas envoyés';
 $string['setwhenresolves'] = 'L\'avis à la conclusion ne m\'est pas envoyé';
@@ -288,10 +330,6 @@ $string['thanksmessage'] = 'Feedback après dépôt';
 $string['ticketprefix'] = 'Préfixe du ticket';
 $string['tickets'] = 'Tickets';
 $string['tracker-levelaccess'] = 'Mes possibilités dans ce traqueur ';
-$string['tracker_description'] = '<p>La publication de ce service permet à des trackers du site {$a} de cascader leur collecte vers l\'un de vos trackeurs.</p>
-<ul><li><i>Dépendance</i> : Vous devez abonner le serveur {$a} à ce service.</li></ul>
-<p>L\'abonement à ce service permet à des trackeurs de cascader des tickets de support vers les trackeurs du site {$a}.</p>
-<ul><li><i>Dépendance</i> : Le site {$a} doit publier le service de cascade de trackeurs.</li></ul>';
 $string['tracker_name'] = 'Services du gestionnaire de tickets';
 $string['tracker_service_name'] = 'Services du gestionnaire de tickets';
 $string['trackerelements'] = 'Définition du trackeur ';
@@ -300,6 +338,7 @@ $string['trackerhost'] = 'Hôte du trackeur parent ';
 $string['trackername'] = 'Nom du gestionnaire ';
 $string['transfer'] = 'Transféré';
 $string['transfered'] = 'Transféré';
+$string['transferedticketnoaccess'] = 'Ce ticket est transféré vers un ticket qui ne vous est pas accessible.';
 $string['transferservice'] = 'Transfert des tickets en cascade';
 $string['turneditingoff'] = 'Désactiver l\'édition';
 $string['turneditingon'] = 'Activer l\'édition';
@@ -318,15 +357,20 @@ $string['unsetwhenwaits'] = 'Les avis de mise en sommeil me sont envoyés';
 $string['unsetwhenworks'] = 'Les avis de prise en charge me sont envoyés';
 $string['urgentraiserequestcaption'] = 'Un utilisateur demande une priorité d\'urgence';
 $string['urgentsignal'] = 'DEMANDE URGENTE';
+$string['validated'] = 'Validé';
 $string['view'] = 'Tickets';
 $string['vieworiginal'] = 'Voir l\'orginal';
-$string['validated'] = 'Validé';
 $string['voter'] = 'Votes';
 $string['waiting'] = 'Bloqué';
 $string['watches'] = 'Obs.';
 $string['youneedanaccount'] = 'Vous devez posséder un compte dans cet espace pour pouvoir poster';
 
 // help strings
+
+$string['tracker_description'] = '<p>La publication de ce service permet à des trackers du site {$a} de cascader leur collecte vers l\'un de vos trackeurs.</p>
+<ul><li><i>Dépendance</i> : Vous devez abonner le serveur {$a} à ce service.</li></ul>
+<p>L\'abonement à ce service permet à des trackeurs de cascader des tickets de support vers les trackeurs du site {$a}.</p>
+<ul><li><i>Dépendance</i> : Le site {$a} doit publier le service de cascade de trackeurs.</li></ul>';
 
 $string['modulename_help'] = 'Le gestionnaire de tickets permet la gestion de tickets d\'aide, de rapport de défaut, ou de toute activité ou tâche qui nécessite un suivi d\'état dans un cours.
 
@@ -448,3 +492,7 @@ la notification aux gestionnaires de tickets.
 $string['strictworkflow_help'] = '
 Lorsqu\'activé, chaque rôle (interne au regard du gestionnaire, rapporteur, développeur, résolveur ou responsable) n\'aura accès qu\'aux états correspondant à ce rôle.
 ';
+
+$string['networkable_help'] = 'Si activé, ce gestionnaire sera libremant accessible du réseau Mnet. Les utilisateurs distants pourront cascader dans ce gestionnaire même s\'ils ne disposent pas de compte
+local dans la plate-forme. Un compte réseau sera alors automatiquement créé pour eux. Cette possibilité reste néanmoins réservée aux pairs qui ont convenablement configuré les services
+d\'échange de données entre gestionnaires de tickets.';

@@ -1,17 +1,32 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
-* @package tracker
-* @author Clifford Tham
-* @review Valery Fremaux / 1.8
-* @date 02/12/2007
-*
-* A class implementing a checkbox element
-*/
+ * @package tracker
+ * @author Clifford Tham
+ * @review Valery Fremaux / 1.8
+ * @date 02/12/2007
+ *
+ * A class implementing a checkbox element
+ */
+require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 
-require_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php';
-
-class checkboxelement extends trackerelement{
+class checkboxelement extends trackerelement {
 
     function __construct(&$tracker, $id = null, $used = false) {
         parent::__construct($tracker, $id, $used);
@@ -19,8 +34,11 @@ class checkboxelement extends trackerelement{
     }
 
     function edit($issueid = 0) {
+
         $this->getvalue($issueid);
+
         $values = explode(',', $this->value); // whatever the form ... revert to an array.
+
         if (isset($this->options)) {
             $optionsstrs = array();
             foreach ($this->options as $option) {
@@ -36,21 +54,25 @@ class checkboxelement extends trackerelement{
     }
 
     function view($issueid = 0) {
+        $str = '';
+
         $this->getvalue($issueid); // loads $this->value with current value for this issue
         if (!empty($this->value)) {
             $values = explode(',',$this->value);
             foreach ($values as $selected) {
-                echo format_string($this->options[$selected]->description) . "<br/>\n";
+                $str .= format_string($this->options[$selected]->description) . "<br/>\n";
             }
         }
+        return $str;
     }
 
-    function add_form_element(&$form) {
+    function add_form_element(&$mform) {
         if (isset($this->options)) {
-            $form->addElement('header', "head{$this->name}", $this->description);
+            $mform->addElement('header', "head{$this->name}", format_string($this->description));
+            $mform->setExpanded("head{$this->name}");
             foreach ($this->options as $option) {
-                $form->addElement('checkbox', "element{$this->name}{$option->id}", $option->description);
-                $form->setType("element{$this->name}{$option->id}", PARAM_TEXT);
+                $mform->addElement('checkbox', "element{$this->name}{$option->id}", format_string($option->description));
+                $mform->setType("element{$this->name}{$option->id}", PARAM_INT);
             }
         }
     }
@@ -62,7 +84,8 @@ class checkboxelement extends trackerelement{
                 $values = explode(',', $elmvalues);
                 if (!empty($values)) {
                     foreach ($values as $v) {
-                        if (array_key_exists($v, $this->options)) { // check option still exists
+                        if (array_key_exists($v, $this->options)) {
+                            // Check option still exists.
                             $elementname = "element{$this->name}{$option->id}";
                             $defaults->$elementname = 1;
                         }
@@ -104,6 +127,10 @@ class checkboxelement extends trackerelement{
         } else {
             $DB->update_record('tracker_issueattribute', $attribute);
         }
+    }
+
+    function type_has_options() {
+        return true;
     }
 }
 

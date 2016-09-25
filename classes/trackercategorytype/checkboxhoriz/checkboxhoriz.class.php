@@ -1,17 +1,32 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
-* @package tracker
-* @author Clifford Tham
-* @review Valery Fremaux / 1.8
-* @date 02/12/2007
-*
-* A class implementing a checkbox element
-*/
+ * @package tracker
+ * @author Clifford Tham
+ * @review Valery Fremaux / 1.8
+ * @date 02/12/2007
+ *
+ * A class implementing a checkbox element
+ */
+require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 
-include_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php';
-
-class checkboxhorizelement extends trackerelement{
+class checkboxhorizelement extends trackerelement {
 
     function __construct(&$tracker, $id = null, $used = false) {
 
@@ -39,6 +54,8 @@ class checkboxhorizelement extends trackerelement{
     }
 
     function view($issueid = 0) {
+        $str = '';
+
         $this->getvalue($issueid); // loads $this->value with current value for this issue
         if (!empty($this->value)) {
             $values = explode(',',$this->value);
@@ -46,20 +63,22 @@ class checkboxhorizelement extends trackerelement{
             foreach ($values as $selected) {
                 $choices[] = format_string($this->options[$selected]->description);
             }
-            echo(implode(', ', $choices));
+            $str = implode(', ', $choices);
         }
+        return $str;
     }
 
-    function add_form_element(&$form) {
+    function add_form_element(&$mform) {
         if (isset($this->options)) {
             $group = array();
-            $form->addElement('header', "head{$this->name}", $this->description);
+            $mform->addElement('header', "head{$this->name}", format_string($this->description));
+            $mform->setExpanded("head{$this->name}");
             foreach ($this->options as $option) {
-                $group[] = &$form->createElement('checkbox', "element{$this->name}{$option->id}", '', $option->description);
-                $form->setType("element{$this->name}{$option->id}", PARAM_TEXT);
+                $group[] = &$mform->createElement('checkbox', "element{$this->name}{$option->id}", '', format_string($option->description));
+                $mform->setType("element{$this->name}{$option->id}", PARAM_INT);
             }
 
-            $form->addGroup($group, 'element' . $this->name.'_set');
+            $mform->addGroup($group, 'element' . $this->name.'_set');
         }
     }
 
@@ -69,14 +88,16 @@ class checkboxhorizelement extends trackerelement{
                 $values = $this->getvalue($issueid);
                 if (is_array($values)) {
                     foreach ($values as $v) {
-                        if (array_key_exists($v, $this->options)) { // check option still exists
+                        if (array_key_exists($v, $this->options)) {
+                            // Check option still exists.
                             $elementname = "element{$this->name}{$option->id}";
                             $defaults->$elementname = 1;
                         }
                     }
                 } else {
                     $v = $values; // single value
-                    if (array_key_exists($v, $this->options)) { // check option still exists
+                    if (array_key_exists($v, $this->options)) {
+                        // Check option still exists.
                         $elementname = "element{$this->name}{$option->id}";
                         $defaults->$elementname = 1;
                     }
@@ -106,7 +127,8 @@ class checkboxhorizelement extends trackerelement{
             }
         }
 
-        $attribute->elementitemid = implode(',', $elmvalues); // in this case we have elementitem id or idlist
+        $attribute->elementitemid = implode(',', $elmvalues);
+        // In this case we have elementitem id or idlist.
         $attribute->timemodified = time();
 
         if (!isset($attribute->id)) {
@@ -118,5 +140,8 @@ class checkboxhorizelement extends trackerelement{
             $DB->update_record('tracker_issueattribute', $attribute);
         }
     }
-}
 
+    function type_has_options() {
+        return true;
+    }
+}

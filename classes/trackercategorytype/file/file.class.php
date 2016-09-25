@@ -1,18 +1,33 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
-* @package tracker
-* @author Clifford Tham
-* @review Valery Fremaux / 1.8
-* @date 17/12/2007
-*
-* A class implementing a textfield element
-*/
+ * @package tracker
+ * @author Clifford Tham
+ * @review Valery Fremaux / 1.8
+ * @date 17/12/2007
+ *
+ * A class implementing a textfield element
+ */
+require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
+require_once($CFG->libdir.'/uploadlib.php');
 
-include_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php';
-require_once $CFG->libdir.'/uploadlib.php';
-
-class fileelement extends trackerelement{
+class fileelement extends trackerelement {
 
     var $filemanageroptions;
 
@@ -112,11 +127,15 @@ class fileelement extends trackerelement{
         echo $html;
     }
 
-    function add_form_element(&$form) {
+    function add_form_element(&$mform) {
         global $COURSE;
 
-        $form->addElement('header', "head{$this->name}", $this->description);
-        $form->addElement('filepicker', 'element'.$this->name, '', null, $this->options);
+        $mform->addElement('header', "head{$this->name}", format_string($this->description));
+        $mform->setExpanded("head{$this->name}");
+        $mform->addElement('filepicker', 'element'.$this->name, '', null, $this->options);
+        if (!empty($this->mandatory)) {
+            $mform->addRule('element'.$this->name, null, 'required', null, 'client');
+        }
     }
 
     function set_data($defaults) {
@@ -130,8 +149,8 @@ class fileelement extends trackerelement{
     }
 
     /**
-    * used for post processing form values, or attached files management
-    */
+     * used for post processing form values, or attached files management
+     */
     function formprocess(&$data) {
         global $COURSE, $USER, $DB;
 
@@ -162,3 +181,4 @@ class fileelement extends trackerelement{
         }
     }
 }
+

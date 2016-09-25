@@ -21,7 +21,7 @@
  *
  */
 
-require_once($CFG->dirroot.'/mod/tracker/rpclib.php';
+require_once($CFG->dirroot.'/mod/tracker/rpclib.php');
 
 class mod_tracker_external {
 

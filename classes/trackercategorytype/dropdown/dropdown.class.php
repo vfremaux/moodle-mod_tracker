@@ -1,121 +1,99 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
-* @package tracker
-* @author Clifford Tham
-* @review Valery Fremaux / 1.8
-* @date 02/12/2007
-*
-* A class implementing a dropdown element
-*/
-
-require_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php';
+ * @package tracker
+ * @author Clifford Tham
+ * @review Valery Fremaux / 1.8
+ * @date 02/12/2007
+ *
+ * A class implementing a dropdown element
+ */
+require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 
 class dropdownelement extends trackerelement {
 
-    var $options;
     var $multiple;
-
-    // Alex                                   vvvv          vvvvv
-    function dropdownelement(&$tracker, $id = NULL, $used = FALSE ) {
+    
+    function dropdownelement(&$tracker, $id = null, $used = false) {
         parent::__construct($tracker, $id, $used);
         $this->setoptionsfromdb();
     }
 
     function view($issueid = 0) {
+
         $this->getvalue($issueid); // loads $this->value with current value for this issue
         if (isset($this->options)) {
             $optionstrs = array();
             foreach ($this->options as $option) {
                 if ($this->value != null) {
-                    if ($this->value == $option->id) {
+                    if ($this->value == $option->name) {
                         $optionstrs[] = format_string($option->description);
                     }
                 }
             }
-            echo implode(', ', $optionstrs);
+            return implode(', ', $optionstrs);
         }
+        return '';
     }
-
-    // function edit($issueid = 0) {
-    //     $this->getvalue($issueid); // loads $this->value with current value for this issue
-    //     if (isset($this->options)) {
-    //         $optionstrs = array();
-    //         foreach ($this->options as $option) {
-    //             if ($this->value != null) {
-    //                 if ($this->value == $option->id) {
-    //                     $optionstrs[] = format_string($option->description);
-    //                 }
-    //             }
-    //         }
-    //         echo implode(', ', $optionstrs);
-    //     }
-    // }
 
     function edit($issueid = 0) {
+
         $this->getvalue($issueid);
-        $elmname = 'element'.$this->name;
-        // Alex   vvvvvvv
+
         $values = explode(',', $this->value); // whatever the form ... revert to an array.
+
         if (isset($this->options)) {
-            // Alex . comments x2  vvv     vvvv
-            // $optionsstrs = array();
-            // echo html_writer::empty_tag('imput', array('type' => 'checkbox', 'id' => 'element'.$elmname.$option->id, 'value' => 1, 'checked' => 'checked'));
-            $options = "";
-            foreach ($this->options as $option) {
-                if (is_array($values) AND in_array($option->id, $values)) {
-                    $options .= html_writer::tag('option', $option->description, array('type' => 'checkbox', 'id' => $elmname.$option->id, 'value' => $option->id, 'selected' => 'selected'));
-                } else {
-                    $options .= html_writer::tag('option', $option->description, array('type' => 'checkbox', 'id' => $elmname.$option->id, 'value' => $option->id));
-                }
-                // echo format_string($option->description);
-                // echo html_writer::empty_tag('br');
+            foreach ($this->options as $optionobj) {
+                $selectoptions[$optionobj->name] = $optionobj->description;
             }
-            echo html_writer::tag( 'select', $options, array( 'id' => $elmname, 'name' => $elmname ) );
+            echo html_writer::select($selectoptions, 'element'.$this->name, $values, array('' => 'choosedots'));
+            echo html_writer::empty_tag('br');
         }
     }
 
-    // function edit($issueid = 0) {
-    //     $this->getvalue($issueid);
-    //     $elmname = 'element'.$this->name;
-    //     // Alex   vvvvvvv
-    //     $values = explode(',', $this->value); // whatever the form ... revert to an array.
-    //     if (isset($this->options)) {
-    //         // Alex . comments x2  vvv     vvvv
-    //         // $optionsstrs = array();
-    //         // echo html_writer::empty_tag('imput', array('type' => 'checkbox', 'id' => 'element'.$elmname.$option->id, 'value' => 1, 'checked' => 'checked'));
-    //         foreach ($this->options as $option) {
-    //             if (is_array($values) AND in_array($option->id, $values)) {
-    //                 echo html_writer::empty_tag('input', array('type' => 'checkbox', 'id' => 'element'.$elmname.$option->id, 'value' => 1, 'checked' => 'checked'));
-    //             } else {
-    //                 echo html_writer::empty_tag('input', array('type' => 'checkbox', 'id' => 'element'.$elmname.$option->id, 'value' => 1));
-    //             }
-    //             echo format_string($option->description);
-    //             echo html_writer::empty_tag('br');
-    //         }
-    //     }
-    // }
+    function add_form_element(&$mform) {
 
-    function add_form_element(&$form) {
-
+        $mform->addElement('header', "head{$this->name}", format_string($this->description));
+        $mform->setExpanded("head{$this->name}");
         if (isset($this->options)) {
             foreach ($this->options as $option) {
                 $optionsmenu[$option->id] = format_string($option->description);
             }
-            $form->addElement('select', "element$this->name", format_string($this->description), $optionsmenu);
+
+            $mform->addElement('select', 'element'.$this->name, format_string($this->description), $optionsmenu);
+            if (!empty($this->mandatory)) {
+                $mform->addRule($this->name, null, 'required', null, 'client');
+            }
         }
     }
 
     function set_data(&$defaults, $issueid = 0) {
         if ($issueid) {
 
-            $elementname = "element{$this->name}";
+            $elementname = 'element'.$this->name;
 
             if (!empty($this->options)) {
                 $values = $this->getvalue($issueid);
                 if ($multiple && is_array($values)) {
                     foreach ($values as $v) {
-                        if (array_key_exists($v, $this->options)) { // check option still exists
+                        if (array_key_exists($v, $this->options)) {
+                            // Check option still exists.
                             $choice[] = $v;
                         }
                         if (!empty($choice)) {
@@ -124,7 +102,8 @@ class dropdownelement extends trackerelement {
                     }
                 } else {
                     $v = $values; // single value
-                    if (array_key_exists($v, $this->options)) { // check option still exists
+                    if (array_key_exists($v, $this->options)) {
+                        // Check option still exists.
                         $defaults->$elementname = $v;
                     }
                 }
@@ -144,29 +123,30 @@ class dropdownelement extends trackerelement {
         }
 
         $elmname = 'element'.$this->name;
-        $elementitemid = optional_param( $elmname, 0, PARAM_INT);
-        $attribute->elementitemid = $elementitemid;
 
-        // if (!$this->multiple) {
-        //     $attribute->elementitemid = $elementitemid;
-        // } else {
-        //     if (is_array($data->$elmname)) {
-        //         $attribute->elementitemid = implode(',', $data->$elmname);
-        //     } else {
-        //         $attribute->elementitemid = $data->$elmname;
-        //     }
-        // }
+        if (!$this->multiple) {
+            $value = optional_param($elmname, '', PARAM_TEXT);
+            $attribute->elementitemid = $value;
+        } else {
+            $valuearr = optional_param_array($elmname, '', PARAM_TEXT);
+            if (is_array($data->$elmname)) {
+                $attribute->elementitemid = implode(',', $valuearr);
+            } else {
+                $attribute->elementitemid = $data->$elmname;
+            }
+        }
 
         $attribute->timemodified = time();
 
         if (!isset($attribute->id)) {
-            $attribute->id = $DB->insert_record('tracker_issueattribute', $attribute);
-            if (empty($attribute->id)) {
-                print_error('erroraddissueattribute', 'tracker', '', 2);
-            }
+            $DB->insert_record('tracker_issueattribute', $attribute);
         } else {
             $DB->update_record('tracker_issueattribute', $attribute);
         }
+    }
+
+    function type_has_options() {
+        return true;
     }
 }
 

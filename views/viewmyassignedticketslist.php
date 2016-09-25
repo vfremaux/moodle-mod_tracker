@@ -1,4 +1,18 @@
-<?PHP
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * A view of owned issues
@@ -11,9 +25,7 @@
  * Print Bug List
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');
-}
+defined('MOODLE_INTERNAL') || die();
 
 include_once $CFG->libdir.'/tablelib.php';
 
@@ -156,7 +168,7 @@ $table = new flexible_table('mod-tracker-issuelist');
 $table->define_columns($tablecolumns);
 $table->define_headers($tableheaders);
 
-$table->define_baseurl($CFG->wwwroot.'/mod/tracker/view.php?id='.$cm->id.'&view='.$view.'&screen='.$screen.'&alltracks='.$alltracks);
+$table->define_baseurl(new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => $view, 'screen' => $screen, 'alltracks' => $alltracks)));
 
 $table->sortable(true, 'datereported', SORT_DESC); //sorted by datereported by default
 $table->collapsible(true);
@@ -218,16 +230,16 @@ if (!empty($issues)) {
     foreach ($issues as $issue) {
         $issuenumber = "<a href=\"view.php?id={$cm->id}&amp;issueid={$issue->id}\">{$issue->ticketprefix}{$issue->id}</a>";
         $summary = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}\">".format_string($issue->summary).'</a>';
-        $datereported = date('Y/m/d h:i', $issue->datereported);
+        $datereported = date('Y/m/d H:i', $issue->datereported);
         if (has_capability('mod/tracker:manage', $context)) { // managers can assign bugs
             $status = html_writer::select($STATUSKEYS, "status{$issue->id}", $issue->status, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
-            $developers = get_users_by_capability($context, 'mod/tracker:develop', 'u.id,lastname,firstname', 'lastname');
+            $developers = get_users_by_capability($context, 'mod/tracker:develop', 'u.id,'.get_all_user_name_fields(true, 'u'), 'lastname');
             foreach ($developers as $developer) {
                 $developersmenu[$developer->id] = fullname($developer);
             }
         } elseif (has_capability('mod/tracker:resolve', $context)) { // resolvers can give a bug back to managers
             $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
-            $managers = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,lastname,firstname', 'lastname');
+            $managers = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,'.get_all_user_name_fields(true, 'u'), 'lastname');
             foreach ($managers as $manager) {
                 $managersmenu[$manager->id] = fullname($manager);
             }
@@ -236,8 +248,8 @@ if (!empty($issues)) {
             $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
         } else {
             $status = $FULLSTATUSKEYS[0 + $issue->status];
-            $status = '<div class="status_'.$STATUSCODES[$issue->status].'" style="width: 110%; height: 105%; text-align:center">'.$status.'</div>';
         }
+        $status = '<div class="status_'.$STATUSCODES[$issue->status].'" style="width: 105%; height: 102%; text-align:center">'.$status.'</div>';
         $reporteruser = $DB->get_record('user', array('id' => $issue->reportedby));
         $reporter = fullname($reporteruser);
         $hassolution = $issue->status == RESOLVED && !empty($issue->resolution);

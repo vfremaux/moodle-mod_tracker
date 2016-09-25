@@ -14,7 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-require_once('../../config.php');
+/**
+ * @package mod_tracker
+ * @category mod
+ * @author Clifford Tham, Valery Fremaux > 1.8
+ * @date 02/12/2007
+ */
+require('../../config.php');
 require_once($CFG->dirroot."/mod/tracker/lib.php");
 require_once($CFG->dirroot."/mod/tracker/locallib.php");
 require_once $CFG->dirroot.'/mod/tracker/forms/reportissue_form.php';
@@ -51,8 +57,9 @@ if ($id) {
 $screen = tracker_resolve_screen($tracker, $cm);
 $view = tracker_resolve_view($tracker, $cm);
 
-$context = context_module::instance($cm->id);
+// Security.
 
+$context = context_module::instance($cm->id);
 require_course_login($course->id, false, $cm);
 require_capability('mod/tracker:report', $context);
 
@@ -63,11 +70,8 @@ $PAGE->set_context($context);
 $PAGE->set_title(format_string($tracker->name));
 $PAGE->set_heading(format_string($tracker->name));
 $PAGE->set_button($OUTPUT->update_module_button($cm->id, 'tracker'));
-$PAGE->requires->js( new moodle_url('/mod/tracker/js/reportissue.js') );
 
 $form = new TrackerIssueForm(new moodle_url('/mod/tracker/reportissue.php'), array('trackerid' => $tracker->id, 'cmid' => $id));
-
-echo $OUTPUT->header();
 
 if (!$form->is_cancelled()) {
     if ($data = $form->get_data()) {
@@ -94,6 +98,13 @@ if (!$form->is_cancelled()) {
         $stc->statusfrom = POSTED;
         $stc->statusto = POSTED;
         $DB->insert_record('tracker_state_change', $stc);
+        echo $OUTPUT->header();
+        echo $OUTPUT->box_start('generalbox', 'tracker-acknowledge');
+        echo (empty($tracker->thanksmessage)) ? get_string('thanksdefault', 'tracker') : format_string($tracker->thanksmessage) ;
+        echo $OUTPUT->box_end();
+        echo $OUTPUT->continue_button(new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => 'view', 'screen' => 'browse')));
+        echo $OUTPUT->footer();
+
         // notify all admins
         if ($tracker->allownotifications) {
             tracker_notify_submission($issue, $cm, $tracker);
@@ -101,34 +112,14 @@ if (!$form->is_cancelled()) {
                 tracker_notifyccs_changeownership($issue->id, $tracker);
             }
         }
-
-        if( is_object( $issue ) AND $issue->assignedto AND is_integer( $issue->assignedto ) )
-        {
-            $assignedtouser = $DB->get_record( 'user', array( 'id' => $issue->assignedto ) );
-            $assignedto = fullname( $assignedtouser );
-        }
-        elseif ( array_key_exists( 'assignedto', $data ) AND is_integer( $data->assignedto )  ) 
-        {
-            $assignedtouser = $DB->get_record( 'user', array( 'id' => $data->assignedto ) );
-            $assignedto = fullname( $assignedtouser );   
-        }
-        else
-        {
-            $assignedto = "------";
-        }
-
-        echo $OUTPUT->box_start('generalbox', 'tracker-acknowledge');
-        // echo (empty($tracker->thanksmessage)) ? get_string('thanksdefault', 'tracker') : format_string($tracker->thanksmessage) ;
-        echo get_string( 'thanksdefault', 'tracker', $assignedto );
-        echo $OUTPUT->box_end();
-        echo $OUTPUT->continue_button(new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => 'view', 'screen' => 'browse')));
-        echo $OUTPUT->footer();
-        die();
+        die;
     }
 }
 
+echo $OUTPUT->header();
+
 $view = 'reportanissue';
-include_once 'menus.php';
+include_once($CFG->dirroot.'/mod/tracker/menus.php');
 
 $form->display();
 

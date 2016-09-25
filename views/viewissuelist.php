@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
 * @package mod-tracker
@@ -74,12 +88,15 @@ if (isset($searchqueries)) {
             u.lastname lastname,
             COUNT(ic.issueid) watches
         FROM
-            {user} u,
             {tracker_issue} i
         LEFT JOIN
             {tracker_issuecc} ic
         ON
             ic.issueid = i.id
+        LEFT JOIN
+            {user} u
+        ON
+            i.reportedby = u.id
         WHERE
             i.reportedby = u.id AND
             i.trackerid = {$tracker->id}
@@ -110,7 +127,7 @@ if (isset($searchqueries)) {
     $numrecords = $DB->count_records_sql($sqlcount);
 }
 
-// display list of issues
+// Display list of issues.
 ?>
 <center>
 <table border="1" width="100%">
@@ -137,7 +154,7 @@ if (isset($searchqueries)) {
 <input type="hidden" name="screen" value="browse" />
 <?php
 
-// define table object
+// Define table object.
 $prioritystr = get_string('priority', 'tracker');
 $issuenumberstr = get_string('issuenumber', 'tracker');
 $summarystr = get_string('summary', 'tracker');
@@ -171,7 +188,7 @@ $table = new flexible_table('mod-tracker-issuelist');
 $table->define_columns($tablecolumns);
 $table->define_headers($tableheaders);
 
-$table->define_baseurl($CFG->wwwroot.'/mod/tracker/view.php?id='.$cm->id.'&view='.$view.'&screen='.$screen);
+$table->define_baseurl(new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => $view, 'screen' => $screen)));
 
 $table->sortable(true, 'resolutionpriority', SORT_ASC); //sorted by priority by default
 $table->collapsible(true);
@@ -195,13 +212,14 @@ $table->column_class('assignedto', 'list_assignedto');
 $table->column_class('watches', 'list_watches');
 $table->column_class('status', 'list_status');
 $table->column_class('action', 'list_action');
+
 if (!empty($tracker->parent)) {
     $table->column_class('transfered', 'list_transfered');
 }
 
 $table->setup();
 
-// get extra query parameters from flexible_table behaviour
+// Get extra query parameters from flexible_table behaviour.
 $where = $table->get_sql_where();
 $sort = $table->get_sql_sort();
 $table->pagesize($limit, $numrecords);
@@ -212,7 +230,7 @@ if (!empty($sort)) {
     $sql .= " ORDER BY resolutionpriority ASC";
 }
 
-// set list length limits
+// Set list length limits.
 /*
 if ($limit > $numrecords) {
     $offset = 0;
@@ -221,18 +239,21 @@ if ($limit > $numrecords) {
 }
 $sql = $sql . ' LIMIT ' . $limit . ',' . $offset;
 */
+//
+
 $issues = $DB->get_records_sql($sql, null, $table->get_page_start(), $table->get_page_size());
 
 $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', " trackerid = $tracker->id GROUP BY trackerid ");
 
 if (!empty($issues)) {
-    // product data for table
+    // Product data for table.
     foreach ($issues as $issue) {
         $issuenumber = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;issueid={$issue->id}\">{$tracker->ticketprefix}{$issue->id}</a>";
         $summary = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}\">".format_string($issue->summary).'</a>';
-        $datereported = date('Y/m/d h:i', $issue->datereported);
+        $datereported = date('Y/m/d H:i', $issue->datereported);
         $user = $DB->get_record('user', array('id' => $issue->reportedby));
         $reportedby = fullname($user);
+        $assignedto = '';
         $user = $DB->get_record('user', array('id' => $issue->assignedto));
         if (has_capability('mod/tracker:manage', $context)) { // managers can assign bugs
             $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array('' => 'choose'), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")). "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
@@ -244,7 +265,8 @@ if (!empty($issues)) {
                 }
                 $assignedto = html_writer::select($developersmenu, "assignedto{$issue->id}", $issue->assignedto, array('' => get_string('unassigned', 'tracker')), array('onchange' => "document.forms['manageform'].changed{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"changed{$issue->id}\" value=\"0\" />";
             }
-        } elseif (has_capability('mod/tracker:resolve', $context)) { // resolvers can give a bug back to managers
+        } elseif (has_capability('mod/tracker:resolve', $context)) {
+            // Resolvers can give a bug back to managers.
             $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array('' => 'choose'), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
             $managers = tracker_getadministrators($context);
             if (!empty($managers)) {

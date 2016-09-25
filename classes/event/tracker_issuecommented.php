@@ -24,7 +24,6 @@
  */
 
 namespace mod_tracker\event;
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -42,7 +41,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2013 Ankit Agarwal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class tracker_issuecommented {
+class tracker_issuecommented extends \core\event\base {
     
     var $issueid;
 
@@ -56,7 +55,7 @@ class tracker_issuecommented {
     }
 
     public static function get_name() {
-        return get_string('eventtrackerissuecommented', 'tracker');
+        return get_string('event_tracker_issue_commented', 'tracker');
     }
 
     /**
@@ -144,7 +143,7 @@ class tracker_issuecommented {
         }
 
         // Create event object for course module update action.
-        $event = \core\event\course_module_updated::create(array(
+        $event = static::create(array(
             'context'  => $modcontext,
             'objectid' => $cm->id,
             'userid' => $USER->id,

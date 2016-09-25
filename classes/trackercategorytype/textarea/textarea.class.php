@@ -1,15 +1,30 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
-* @package tracker
-* @author Clifford Tham
-* @review Valery Fremaux / 1.8
-* @date 02/12/2007
-*
-* A class implementing a textarea element and all its representations
-*/
-
-require_once $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php';
+ * @package tracker
+ * @author Clifford Tham
+ * @review Valery Fremaux / 1.8
+ * @date 02/12/2007
+ *
+ * A class implementing a textarea element and all its representations
+ */
+require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 
 class textareaelement extends trackerelement{
 
@@ -30,17 +45,21 @@ class textareaelement extends trackerelement{
     }
 
     function viewsearch() {
-        echo "<input type=\"text\" name=\"element{$this->name}\" style=\"width:100%\" />";
+        echo '<input type="text" name="element'.$this->name.'" style="width:100%" />';
     }
 
     function viewquery() {
-        echo "<input type=\"text\" name=\"element{$this->name}\" style=\"width:100%\" />";
+       echo '<input type="text" name="element'.$this->name.'" style="width:100%" />';
     }
 
     function add_form_element(&$mform) {
-        $mform->addElement('header', "header{$this->name}", $this->description);
+        $mform->addElement('header', "header{$this->name}", format_string($this->description));
+        $mform->setExpanded("header{$this->name}");
         $mform->addElement('textarea', "element{$this->name}", '', array('cols' => 60, 'rows' => 15));
         $mform->setType("element{$this->name}", PARAM_TEXT);
+        if (!empty($this->mandatory)) {
+            $mform->addRule('element'.$this->name, null, 'required', null, 'client');
+        }
     }
 
     function set_data(&$defaults, $issueid = 0) {

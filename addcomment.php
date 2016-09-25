@@ -13,6 +13,7 @@
 // 
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 require('../../config.php');
 require_once($CFG->dirroot.'/mod/tracker/lib.php');
 require_once($CFG->dirroot.'/mod/tracker/locallib.php');
@@ -48,8 +49,9 @@ if ($id) {
     }
 }
 
-$context = context_module::instance($cm->id);
+// Security.
 
+$context = context_module::instance($cm->id);
 require_course_login($course->id, false, $cm);
 require_capability('mod/tracker:comment', $context);
 
@@ -65,7 +67,6 @@ $PAGE->set_context($context);
 $PAGE->set_title(format_string($tracker->name));
 $PAGE->set_heading(format_string($tracker->name));
 $PAGE->set_button($OUTPUT->update_module_button($cm->id, 'tracker'));
-// $PAGE->set_headingmenu(navmenu($course, $cm));
 
 // add_to_log($course->id, 'tracker', "commentissue", "view.php?id={$cm->id}", "$tracker->id", $cm->id);
 $event = \mod_tracker\event\tracker_issuecommented::create_from_issue($tracker, $issueid);
@@ -97,7 +98,7 @@ if (!$form->is_cancelled()) {
 
         // Update back reencoded field text content.
         $DB->set_field('tracker_issuecomment', 'comment', $data->comment, array('id' => $comment->id));
-        redirect( new moodle_url( '/mod/tracker/view.php', array( 'id' => $id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issueid)));
+        redirect(new moodle_url('/mod/tracker/view.php', array('id' => $id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issueid)));
     }
 } else {
     redirect(new moodle_url('/mod/tracker/view.php', array('id' => $id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issueid)));

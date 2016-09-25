@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * A view of owned issues
@@ -218,22 +232,18 @@ if (!empty($issues)) {
     foreach ($issues as $issue) {
         $issuenumber = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;issueid={$issue->id}\">{$tracker->ticketprefix}{$issue->id}</a>";
         $summary = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}\">".format_string($issue->summary).'</a>';
-        $datereported = date('Y/m/d h:i', $issue->datereported);
+        $datereported = date('Y/m/d H:i', $issue->datereported);
         $user = $DB->get_record('user', array('id' => $issue->assignedto));
         if (has_capability('mod/tracker:manage', $context)) { // managers can assign bugs
-            // $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;"));
-            $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array(), array('onchange' => "document.getElementById('schanged{$issue->id}').value = 1;"));
-            // Alex                                                               vvvv
-            $developers = get_users_by_capability($context, 'mod/tracker:develop', '', 'lastname');
+            $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;"));
+            $developers = get_users_by_capability($context, 'mod/tracker:develop', 'u.id,'.get_all_user_name_fields(true, 'u'), 'lastname');
             foreach ($developers as $developer) {
                 $developersmenu[$developer->id] = fullname($developer);
             }
             $assignedto = html_writer::select($developersmenu, "assignedto{$issue->id}", $issue->assignedto, array('' => get_string('unassigned', 'tracker')), array('onchange' => "document.forms['manageform'].changed{$issue->id}.value = 1;"));
         } elseif (has_capability('mod/tracker:resolve', $context)) { // resolvers can give a bug back to managers
-            // $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;"));
-            $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array(), array('onchange' => "document.getElementById('schanged{$issue->id}').value = 1;"));
-            // Alex                                                             vvvv
-            $managers = get_users_by_capability($context, 'mod/tracker:manage', '', 'lastname');
+            $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;"));
+            $managers = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,'.get_all_user_name_fields(true, 'u'), 'lastname');
             foreach ($managers as $manager) {
                 $managersmenu[$manager->id] = fullname($manager);
             }
@@ -245,7 +255,7 @@ if (!empty($issues)) {
         }
         $status = '<div class="status_'.$STATUSCODES[$issue->status].'" style="width: 110%; height: 105%; text-align:center">'.$status.'</div>';
         $hassolution = $issue->status == RESOLVED && !empty($issue->resolution);
-        $solution = ($hassolution) ? "<img src=\"{$CFG->wwwroot}/mod/tracker/pix/solution.gif\" height=\"15\" alt=\"".get_string('hassolution','tracker')."\" />" : '' ;
+        $solution = ($hassolution) ? '<img src="'.$OUTPUT->pix_url('solution', 'tracker').'" height="15" alt="'.get_string('hassolution','tracker').'" />' : '' ;
         $actions = '';
         if (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context)) {
             $actions = "<a href=\"view.php?id={$cm->id}&amp;view=resolved&amp;issueid={$issue->id}&screen=editanissue\" title=\"".get_string('update')."\" ><img src=\"".$OUTPUT->pix_url('t/edit', 'core')."\" border=\"0\" /></a>";
@@ -258,7 +268,6 @@ if (!empty($issues)) {
         if ($issue->resolutionpriority < $maxpriority && has_capability('mod/tracker:viewpriority', $context) && !has_capability('mod/tracker:managepriority', $context)) {
             $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=resolved&amp;issueid={$issue->id}&amp;what=askraise\" title=\"".get_string('askraise', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('askraise', 'mod_tracker')."\" border=\"0\" /></a>";
         }
-        $actions .= "<input type='hidden' id='schanged{$issue->id}' name='schanged{$issue->id}' value='0' />";
         if (!empty($tracker->parent)) {
             $transfer = ($issue->status == TRANSFERED) ? tracker_print_transfer_link($tracker, $issue) : '' ;
             if (has_capability('mod/tracker:viewpriority', $context) && !$resolved) {

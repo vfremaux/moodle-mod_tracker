@@ -1,6 +1,18 @@
 <?php
-
-// tracker.php - created with Moodle 2.2
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 $string['pluginname'] = 'Ticket Tracker/User support';
 $string['pluginadministration'] = 'Tracker administration';
@@ -27,6 +39,7 @@ $string['AND'] = 'AND';
 $string['IN'] = 'IN';
 $string['abandonned'] = 'Abandonned';
 $string['action'] = 'Action';
+$string['active'] = 'Active in form';
 $string['activeplural'] = 'Actives';
 $string['addacomment'] = 'Add a comment';
 $string['addanoption'] = 'Add an option';
@@ -41,11 +54,14 @@ $string['askraise'] = 'Ask resolvers to raise priority';
 $string['assignedto'] = 'Assigned to';
 $string['assignee'] = 'Assignee';
 $string['attributes'] = 'Attributes';
+$string['autourl'] = 'Automatic Url Recollection';
+$string['backtocourse'] = 'Back to course';
 $string['browse'] = 'Browse';
 $string['browser'] = 'Browser';
 $string['build'] = 'Version';
 $string['by'] = '<i>assigned by</i>';
 $string['cascade'] = 'Send upper level';
+$string['captcha'] = 'Captcha';
 $string['cascadedticket'] = 'Transferred from: ';
 $string['cced'] = 'Cced';
 $string['ccs'] = 'Ccs';
@@ -54,8 +70,10 @@ $string['checkboxhoriz'] = 'Checkbox horizontal'; // @DYNA
 $string['chooselocal'] = 'Choose a local tracker as parent';
 $string['chooseremote'] = 'Choose a remote host';
 $string['chooseremoteparent'] = 'Choose a remote instance';
+$string['choosetarget'] = 'Choose target';
 $string['clearsearch'] = 'Clear search criteria';
 $string['comment'] = 'Comment';
+$string['commentedby'] = 'Commented by';
 $string['comments'] = 'Comments';
 $string['component'] = 'Component';
 $string['count'] = 'Count';
@@ -63,6 +81,15 @@ $string['countbyassignee'] = 'By assignee';
 $string['countbymonth'] = 'By monthly creation report';
 $string['countbyreporter'] = 'By reporter';
 $string['countbystate'] = 'Report by status';
+$string['constant'] = 'Constant';
+$string['constantinfosource'] = 'Constant info source';
+$string['customconstant'] = 'Custom value';
+$string['constantsiteshortname'] = 'Site shortname';
+$string['constantsitefullname'] = 'Site fullname';
+$string['constantcurrentidnumber'] = 'Current user ID Number';
+$string['constantcurrentcourseidnumber'] = 'Current course ID number';
+$string['constantcurrentcourseshortname'] = 'Current ocurse shortname';
+$string['constantcurrentcoursefullname'] = 'Current course fullname';
 $string['createdinmonth'] = 'Created in current month';
 $string['createnewelement'] = 'Create a new element';
 $string['currentbinding'] = 'Current cascade';
@@ -73,6 +100,8 @@ $string['deleteattachedfile'] = 'Delete attachement';
 $string['dependancies'] = 'Dependencies';
 $string['dependson'] = 'Depends on ';
 $string['descriptionisempty'] = 'Description is empty';
+$string['distribute'] = 'Move the ticket to another tracker';
+$string['doaddelementautourl'] = 'Add an url collector'; // @DYNA
 $string['doaddelementcheckbox'] = 'Add a checkbox element'; // @DYNA
 $string['doaddelementcheckboxhoriz'] = 'Add a checkbox element'; // @DYNA
 $string['doaddelementdropdown'] = 'Add a dropdown element'; // @DYNA
@@ -81,6 +110,7 @@ $string['doaddelementradio'] = 'Add a radio element'; // @DYNA
 $string['doaddelementradiohoriz'] = 'Add a radio element'; // @DYNA
 $string['doaddelementtext'] = 'Add a text field'; // @DYNA
 $string['doaddelementtextarea'] = 'Add a text area'; // @DYNA
+$string['doupdateelementautourl'] = 'Update an auto url'; // @DYNA
 $string['doupdateelementcheckbox'] = 'Update a checkbox element'; // @DYNA
 $string['doupdateelementcheckboxhoriz'] = 'Update a checkbox element'; // @DYNA
 $string['doupdateelementdropdown'] = 'Update a dropdown element';// @DYNA
@@ -90,6 +120,7 @@ $string['doupdateelementradiohoriz'] = 'Update a radio button element'; // @DYNA
 $string['doupdateelementtext'] = 'Update a text field'; // @DYNA
 $string['doupdateelementtextarea'] = 'Update a text area'; // @DYNA
 $string['dropdown'] = 'Dropdown';
+$string['editelement'] = 'Update Form Element';
 $string['editoptions'] = 'Update options';
 $string['editproperties'] = 'Update properties';
 $string['editquery'] = 'Change a stored query';
@@ -97,14 +128,12 @@ $string['editwatch'] = 'Change a cc registering';
 $string['elements'] = 'Available elements';
 $string['elementsused'] = 'Used elements';
 $string['elucidationratio'] = 'Elucidation ratio';
-$string['eventcourse_module_edited'] = 'Tracker edited';
-$string['eventcourse_module_list_viewed'] = 'Trackers listed';
-$string['eventcourse_module_viewed'] = 'Tracker entered';
 $string['emailoptions'] = 'Mail options';
 $string['emergency'] = 'Urgent query';
 $string['emptydefinition'] = 'Target tracker has no definition.';
 $string['enablecomments'] = 'Allow comments';
 $string['enablecomments_help'] = 'When this option is enabled, readers of issue records can add comments in the tracker.';
+$string['errorcaptcha'] = 'You failed givieng back the captcha. Or maybe are you a robot?';
 $string['erroraddissueattribute'] = 'Could not submit issue(s) attribute(s). Case {$a} ';
 $string['erroralreadyinuse'] = 'Element already in use';
 $string['errorannotdeletecarboncopies'] = 'Cannot delete carbon copies for user : {$a}';
@@ -156,11 +185,19 @@ $string['errorremotesendingcascade'] = 'Error on sending cascade :<br/> {$a}';
 $string['errorunabletosabequery'] = 'Unable to save query as query';
 $string['errorunabletosavequeryid'] = 'Unable to update query id {$a}';
 $string['errorupdateelement'] = 'Could not update element';
+$string['eventcourse_module_edited'] = 'Tracker edited';
+$string['eventcourse_module_list_viewed'] = 'Trackers listed';
+$string['eventcourse_module_viewed'] = 'Tracker entered';
+$string['event_tracker_issue_commented'] = 'Tracker Issue commented';
+$string['event_tracker_issue_reported'] = 'Tracker Issue reported';
 $string['evolution'] = 'Trends';
 $string['evolutionbymonth'] = 'Issue state evolution';
+$string['failovertrackerurl'] = 'Fail over tracker url';
 $string['file'] = 'Attached file';
 $string['follow'] = 'Follow';
 $string['generaltrend'] = 'Trend';
+$string['gotooriginal'] = 'Go to original ticket';
+$string['gototransfered'] = 'Go to transfered ticket';
 $string['hassolution'] = 'A solution is published for this issue';
 $string['hideccs'] = 'Hide watchers';
 $string['hidecomments'] = 'Hide comments';
@@ -193,22 +230,17 @@ $string['lowertobottom'] = 'Lower to basement';
 $string['manageelements'] = 'Manage elements';
 $string['managenetwork'] = 'Cascade and network setup';
 $string['manager'] = 'Manager';
+$string['mandatory'] = 'Mandatory answer';
 $string['me'] = 'My profile';
-$string['mode_bugtracker'] = 'Team bug tracker';
-$string['mode_ticketting'] = 'User support ticketting';
-$string['mode_taskspread'] = 'Task distributor';
-$string['mode_customized'] = 'Customized tracker';
-$string['modulename'] = 'User support - Tracker';
-$string['nofileloaded'] = 'No file loaded here.';
-$string['notrackers'] = 'No trackers in this course.';
-$string['options'] = 'Options';
-$string['print'] = 'Print';
-$string['reports'] = 'Reports';
-$string['resolvedplural'] = 'Resolved';
 $string['message_bugtracker'] = 'Thanks for your contribution and helping making this service more reliable.';
+$string['message_taskspread'] = 'You just defined a task. Don\'t foget assigning it to some recepient in the nxt screns to distribute it.';
 $string['message_ticketting'] = 'We have registered your query. I has been assigned to {$a}.';
 $string['message_ticketting_preassigned'] = 'We have registered your query. It will be assigned and handled as soon as possible.';
-$string['message_taskspread'] = 'You just defined a task. Don\'t foget assigning it to some recepient in the nxt screns to distribute it.';
+$string['mode_bugtracker'] = 'Team bug tracker';
+$string['mode_customized'] = 'Customized tracker';
+$string['mode_taskspread'] = 'Task distributor';
+$string['mode_ticketting'] = 'User support ticketting';
+$string['modulename'] = 'User support - Tracker';
 $string['modulenameplural'] = 'User support - trackers';
 $string['month'] = 'Month';
 $string['myassignees'] = 'Resolver I assigned';
@@ -216,27 +248,29 @@ $string['myissues'] = 'Tickets I resolve';
 $string['mypreferences'] = 'My preferences';
 $string['myprofile'] = 'My profile';
 $string['myqueries'] = 'My queries';
-$string['mytickets'] = 'My tickets';
 $string['mytasks'] = 'My tickets';
+$string['mytickets'] = 'My tickets';
 $string['mywatches'] = 'My watches';
 $string['mywork'] = 'My work';
 $string['name'] = 'Name';
 $string['namecannotbeblank'] = 'Name cannot be empty';
+$string['networkable'] = 'Network open';
 $string['newissue'] = 'New ticket';
 $string['noassignedtickets'] = 'No assigned tickets';
 $string['noassignees'] = 'No assignee';
-$string['nocomments'] = 'No comments';
 $string['nochange'] = 'Leave unchanged';
-$string['nodevelopers'] = 'No developpers';
+$string['nocomments'] = 'No comments';
 $string['nodata'] = 'No data to show.';
+$string['nodevelopers'] = 'No developpers';
 $string['noelements'] = 'No element';
 $string['noelementscreated'] = 'No element created';
 $string['nofile'] = 'No uploaded file';
+$string['nofileloaded'] = 'No file loaded here.';
 $string['noissuesreported'] = 'No ticket here';
 $string['noissuesresolved'] = 'No resolved ticket';
 $string['nolocalcandidate'] = 'No local candidate for cascading';
-$string['nooptions'] = 'No option';
 $string['nomnet'] = 'Moodle network seems disabled';
+$string['nooptions'] = 'No option';
 $string['noqueryssaved'] = 'No stored query';
 $string['noremotehosts'] = 'No network host available';
 $string['noremotetrackers'] = 'No remote tracker available';
@@ -251,17 +285,22 @@ $string['notrackeradmins'] = 'No admins';
 $string['nowatches'] = 'No watches';
 $string['numberofissues'] = 'Ticket count';
 $string['observers'] = 'Observers';
+$string['on'] = 'on';
 $string['open'] = 'Open';
 $string['option'] = 'Option ';
 $string['optionisused'] = 'This options id already in use for this element.';
+$string['options'] = 'Options';
 $string['order'] = 'Order';
+$string['originalticketnoaccess'] = 'This ticket is transfered from another ticket you do not have read access on.';
 $string['pages'] = 'Pages';
 $string['posted'] = 'Posted';
 $string['potentialresolvers'] = 'Potential resolvers';
 $string['preferences'] = 'Preferences';
 $string['prefsnote'] = 'Preferences setups which default notifications you may receive when creating a new entry or when you register a watch for an existing issue';
-$string['priorityid'] = 'Priority';
+$string['print'] = 'Print';
 $string['priority'] = 'Attributed Priority';
+$string['priorityid'] = 'Priority';
+$string['private'] = 'Private info';
 $string['profile'] = 'User settings';
 $string['published'] = 'Published';
 $string['queries'] = 'Queries';
@@ -278,8 +317,10 @@ $string['register'] = 'Watch this ticket';
 $string['reportanissue'] = 'Post a ticket';
 $string['reportedby'] = 'Reported by';
 $string['reporter'] = 'Reporter';
+$string['reports'] = 'Reports';
 $string['resolution'] = 'Solution';
 $string['resolved'] = 'Resolved';
+$string['resolvedplural'] = 'Resolved';
 $string['resolvedplural'] = 'Resolved';
 $string['resolvedplural2'] = 'Resolved';
 $string['resolver'] = 'My issues';
@@ -289,20 +330,27 @@ $string['runninginmonth'] = 'Running in current month';
 $string['saveasquery'] = 'Save a query';
 $string['savequery'] = 'Save the query';
 $string['search'] = 'Search';
-$string['searchresults'] = 'Search results';
 $string['searchbyid'] = 'Search by ID';
 $string['searchcriteria'] = 'Search criteria';
+$string['searchresults'] = 'Search results';
 $string['searchwiththat'] = 'Launch this query again';
 $string['selectparent'] = 'Parent selection';
 $string['sendrequest'] = 'Send request';
+$string['setactive'] = 'Turn active ';
+$string['setinactive'] = 'Do not show on form ';
+$string['setinactive'] = 'Show on form ';
+$string['setmandatory'] = 'Set data required ';
+$string['setnotmandatory'] = 'Set data not required ';
+$string['setoncomment'] = 'Send me the coments';
+$string['setprivate'] = 'Set info private to developers ';
+$string['setpublic'] = 'Set info public ';
 $string['setwhenopens'] = 'Don\'t advise me when opens';
-$string['setwhenresolves'] = 'Don\'t advise me when resolves';
 $string['setwhenpublished'] = 'Don\'t advise me when solution is published';
+$string['setwhenresolves'] = 'Don\'t advise me when resolves';
 $string['setwhentesting'] = 'Don\'t advise me when a solution is tested';
 $string['setwhenthrown'] = 'Don\'t advise me when is abandonned';
 $string['setwhenwaits'] = 'Don\'t advise me when waits';
 $string['setwhenworks'] = 'Don\'t advise me when on work';
-$string['setoncomment'] = 'Send me the coments';
 $string['sharethiselement'] = 'Turn this element sitewide';
 $string['sharing'] = 'Sharing';
 $string['showccs'] = 'Show watchers';
@@ -313,6 +361,7 @@ $string['site'] = 'Site';
 $string['solution'] = 'Solution';
 $string['sortorder'] = 'Order';
 $string['standalone'] = 'Standalone tracker (top level support).';
+$string['statehistory'] = 'States';
 $string['stateprofile'] = 'Ticket states';
 $string['status'] = 'Status';
 $string['strictworkflow'] = 'Strict workflow';
@@ -333,10 +382,6 @@ $string['thanksmessage'] = 'Thanks message.';
 $string['ticketprefix'] = 'Ticket prefix';
 $string['tickets'] = 'Tickets';
 $string['tracker-levelaccess'] = 'My capabilities in this tracker';
-$string['tracker_description'] = '<p>When publishing this service, you allow trackers from {$a} to cascade the support tickets to a local tracker.</p>
-<ul><li><i>Depends on</i>: You have to suscribe {$a} to this service.</li></ul>
-<p>Suscribing to this service allows local trackers to send support tickets to some tracker in {$a}.</p>
-<ul><li><i>Depends on</i>: You have to publish this service on {$a}.</li></ul>';
 $string['tracker_name'] = 'Tracker module services';
 $string['tracker_service_name'] = 'Tracker module services';
 $string['trackerelements'] = 'Tracker\'s definition';
@@ -345,6 +390,7 @@ $string['trackerhost'] = 'Parent host for tracker';
 $string['trackername'] = 'Tracker name';
 $string['transfer'] = 'Transfered';
 $string['transfered'] = 'Transfered';
+$string['transferedticketnoaccess'] = 'This ticket is transfered to another ticket you do not have read access on.';
 $string['transferservice'] = 'Support ticket cascading';
 $string['turneditingoff'] = 'Turn editing off';
 $string['turneditingon'] = 'Turn editing on';
@@ -355,26 +401,28 @@ $string['unmatchingelements'] = 'Both tracker definition do not match. This may 
 $string['unregisterall'] = 'Unregister from all' ;
 $string['unsetoncomment'] = 'Advise me when posting comments';
 $string['unsetwhenopens'] = 'Advise me when opens';
-$string['unsetwhenresolves'] = 'Advise me when resolves';
 $string['unsetwhenpublished'] = 'Advise me when solution is published';
+$string['unsetwhenresolves'] = 'Advise me when resolves';
 $string['unsetwhentesting'] = 'Advise me when a solution is tested';
 $string['unsetwhenthrown'] = 'Advise me when is thrown';
 $string['unsetwhenwaits'] = 'Advise me when waits';
 $string['unsetwhenworks'] = 'Advise me when got working';
 $string['urgentraiserequestcaption'] = 'A user has requested an urgent priority demand';
 $string['urgentsignal'] = 'URGENT QUERY';
+$string['validated'] = 'Validated';
 $string['view'] = 'Views';
 $string['vieworiginal'] = 'See original';
 $string['voter'] = 'Vote';
-$string['validated'] = 'Validated';
 $string['waiting'] = 'Waiting';
 $string['watches'] = 'Watches';
 $string['youneedanaccount'] = 'You need an authorized account here to report a ticket';
-$string['statehistory'] = 'States';
-$string['eventtrackerissuereported'] = 'eventtrackerissuereported';
-
 
 // help strings
+
+$string['tracker_description'] = '<p>When publishing this service, you allow trackers from {$a} to cascade the support tickets to a local tracker.</p>
+<ul><li><i>Depends on</i>: You have to suscribe {$a} to this service.</li></ul>
+<p>Suscribing to this service allows local trackers to send support tickets to some tracker in {$a}.</p>
+<ul><li><i>Depends on</i>: You have to publish this service on {$a}.</li></ul>';
 
 $string['supportmode_help'] = 'Support mode applies some predefined settings and role overides on the tracker to achieved a preset behaviour.
 
@@ -476,3 +524,16 @@ $string['strictworkflow_help'] = '
 When enabled, each specific internal role in tracker (reporter, developer, resolvers, manager) will only have access to his accessible states against his role.
 ';
 
+$string['networkable_help'] = 'If enabled, this tracker will be openly exposed to remote site. Users from remote site will be able to post even if they have no local account. 
+a Mnet account will be created on the fly. This will though only be possible if tracker Mnet services are properly configurated each side.';
+
+$string['failovertrackerurl_help'] = '
+Using tracker inside Moodle may not address situation where moodle itself is down or working improperly. When giving a failover tracker url, 
+you provide users with an information about an alternate URL they can use in case of major desease. Users will be invited to bookmark the URL in their
+own data to get it when needed.
+';
+
+$string['failovertrackerurl_tpl'] = '
+In case this tracker is not reachable or not available, you may post a signal into the <a href="{$a}">emergency tracker</a>. You should bookmark this URL
+to get the link available even if Moodle is down or not operable properly. 
+';

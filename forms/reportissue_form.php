@@ -38,51 +38,13 @@ class TrackerIssueForm extends moodleform{
 
         $mform->addElement('editor', 'description_editor', get_string('description'), $this->editoroptions);
 
-        if( has_capability('mod/tracker:manage', $this->context) )
-        {
-
-            global $STATUSCODES;
-            $choices = array();
-            foreach ($STATUSCODES as $key => $value) {
-                $choices[ $key ] = get_string( $value, 'tracker' );
-            }
-
-            $mform->addElement('select', 'status', get_string('status', 'tracker'), $choices);
-            $mform->setDefault('status', POSTED);
-
-            // 
-            if (has_capability('mod/tracker:manage', $this->context)) { // managers can assign bugs
-                // $asigners = tracker_getdevelopers($context);
-                $asigners = get_users_by_capability($this->context, 'mod/tracker:develop', '', 'lastname');
-            } elseif (has_capability('mod/tracker:resolve', $this->context)) { // resolvers can give a bug back to managers
-                $asigners = tracker_getadministrators($this->context);
-                $asigners = get_users_by_capability($this->context, 'mod/tracker:manage', '', 'lastname');
-            } else {
-                $asigners = array( $user->id, $user );
-            }
-
-            $asignedto = array();
-            foreach ($asigners as $userid => $register) {
-                $asignedto[ $userid ] = fullname( $register );
-            }
-
-            $mform->addElement('select', 'assignedto', get_string('assignedto', 'tracker'), $asignedto);
-            $mform->setDefault('assignedto', $tracker->defaultassignee );
-        }
-        else
-        {
-            $mform->addElement('hidden', 'status', POSTED );
-            $mform->setType('status', PARAM_INT);
-
-            $mform->addElement('hidden', 'assignedto', $tracker->defaultassignee );
-            $mform->setType('assignedto', PARAM_INT);
-        }
-
         tracker_loadelementsused($tracker, $this->elements);
 
-        if (!empty($this->elements) AND !is_null($this->elements)) {
+        if (!empty($this->elements)) {
             foreach ($this->elements as $element) {
-                $element->add_form_element($mform);
+                if ($element->active && !$element->private) {
+                    $element->add_form_element($mform);
+                }
             }
         }
 

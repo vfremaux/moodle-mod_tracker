@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
 * @package mod-tracker
@@ -31,78 +45,24 @@
 */
 
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    // It must be included from view.php in mod/tracker
+    die('Direct access to this script is forbidden.');
+    // It must be included from view.php in mod/tracker.
 }
 
 /************************************* Create element form *****************************/
 if ($action == 'createelement') {
-    $form = new StdClass;
-    $form->type = required_param('type', PARAM_ALPHA);
-    // $elementid = optional_param('elementid', null, PARAM_INT);
-    $form->action = 'doaddelement';
-    include $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editelement.html';
-    return -1;
-}
-/************************************* add an element *****************************/
-elseif ($action == 'doaddelement') {
-    $form = new StdClass;
-    $form->name = required_param('name', PARAM_ALPHANUM);
-    $form->description = required_param('description', PARAM_CLEANHTML);
-    $form->type = required_param('type', PARAM_ALPHA);
-    $form->shared = optional_param('shared', 0, PARAM_INT);
-    $errors = array();
-    if (empty($form->name)) {
-        $error = new StdClass;
-        $error->message = get_string('namecannotbeblank', 'tracker');
-        $error->on = 'name';
-        $errors[] = $error;
-    }
-
-    if (!count($errors)) {
-        $element = new StdClass;
-        $element->name = $form->name;
-        $element->description = $form->description;
-        $form->type = $element->type = $form->type;
-        $element->course = ($form->shared) ? 0 : $COURSE->id;
-        if (!$form->elementid = $DB->insert_record('tracker_element', $element)) {
-            print_error('errorcannotcreateelement', 'tracker', $url);
-        }
-
-        $elementobj = trackerelement::find_instance_by_id($tracker, $form->elementid);
-        if ($elementobj->hasoptions()) {  // Bounces to the option editor
-            $form->name = '';
-            $form->description = '';
-
-            // prepare use case bounce to further code (later in controller).
-            $bounce_elementid = $form->elementid;
-            $action = 'viewelementoptions';
-        }
-    } else {
-        $form->name = '';
-        $form->description = '';
-        include $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editelement.html';
-    }
+    $type = required_param('type', PARAM_TEXT);
+    redirect(new moodle_url('/mod/tracker/editelement.php', array('id' => $id, 'type' => $type, 'elementid' => 0)));
 }
 /************************************* Edit an element form *****************************/
 elseif ($action == 'editelement') {
-    $form = new StdClass;
-    $form->elementid = required_param('elementid', PARAM_INT);
-    if ($form->elementid != null) {
-        $element = trackerelement::find_instance_by_id($tracker, $form->elementid);
-        $form->type = $element->type;
-        $form->name = $element->name;
-        $form->description = addslashes($element->description);
-        $form->format = $element->format;
-        $form->shared = ($element->course == 0) ;
-        $form->action = 'doupdateelement';
-        include $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editelement.html';
-    } else {
-        print_error ('errorinvalidelementid', 'tracker', $url);
-    }
-    return -1;
+    $elementid = required_param('elementid', PARAM_INT);
+    $type = required_param('type', PARAM_TEXT);
+    redirect(new moodle_url('/mod/tracker/editelement.php', array('id' => $id, 'type' => $type, 'elementid' => $elementid)));
 }
 /************************************* Update an element *****************************/
 if ($action == 'doupdateelement') {
+    $out = '';
     $form = new StdClass;
     $form->elementid = required_param('elementid', PARAM_INT);
     $form->name = required_param('name', PARAM_ALPHANUM);
@@ -130,13 +90,15 @@ if ($action == 'doupdateelement') {
         $element->type = $form->type;
         $element->description = $form->description;
         $element->format = $form->format;
-        $element->course = ($form->shared) ? 0 : $COURSE->id ;
+        $element->course = ($form->shared) ? 0 : $COURSE->id;
         if (!$DB->update_record('tracker_element', $element)) {
             print_error('errorcannotupdateelement', 'tracker', $url);
         }
     } else {
         $form->action = 'doupdateelement';
+        ob_start();
         include $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editelement.html';
+        $out .= ob_get_clean();
     }
 }
 /************************************ delete an element from available **********************/
@@ -153,6 +115,7 @@ if ($action == 'deleteelement') {
 }
 /************************************* add an element option *****************************/
 if ($action == 'submitelementoption') {
+    $out = '';
     $form = new StdClass;
     $form->elementid = required_param('elementid', PARAM_INT);
     $form->name = required_param('name', PARAM_ALPHANUM);
@@ -183,6 +146,7 @@ if ($action == 'submitelementoption') {
         $error->on = 'description';
         $errors[] = $error;
     }
+
     if (!count($errors)) {
         $option = new StdClass;
         $option->name = strtolower($form->name);
@@ -196,19 +160,23 @@ if ($action == 'submitelementoption') {
         $form->name = '';
         $form->description = '';
     } else {
-        // print errors
+        // Print errors.
         $errorstr = '';
         foreach ($errors as $anError) {
             $errorstrs[] = $anError->message;
         }
-        echo $OUTPUT->box(implode('<br/>', $errorstrs), 'center', '70%', '', 5, 'errorbox');
+        $out .= $OUTPUT->box(implode('<br/>', $errorstrs), 'center', '70%', '', 5, 'errorbox');
     }
-    echo $OUTPUT->heading(get_string('editoptions', 'tracker'));
+    $out .= $OUTPUT->heading(get_string('editoptions', 'tracker'));
     $element = trackerelement::find_instance_by_id($tracker, $form->elementid);
-    $element->optionlistview($cm);
+    $out .= $element->optionlistview($cm);
     $caption = get_string('addanoption', 'tracker');
-    echo $OUTPUT->heading($caption . $OUTPUT->help_icon('options', 'tracker', false));
-    include $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editoptionform.html';
+    $out .= $OUTPUT->heading($caption . $OUTPUT->help_icon('options', 'tracker', false));
+
+    ob_start();
+    include($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editoptionform.html');
+    $out .= ob_get_clean();
+
     return -1;
 }
 /************************************* edit an element option *****************************/
@@ -218,13 +186,15 @@ if ($action == 'viewelementoptions') {
     if ($form->elementid) {
         $element = trackerelement::find_instance_by_id($tracker, $form->elementid);
         $form->type = $element->type;
-        echo $OUTPUT->heading(get_string('editoptions', 'tracker'));
-        echo '<center>';
+        $out = $OUTPUT->heading(get_string('editoptions', 'tracker'));
+        $out .= '<center>';
         $element = trackerelement::find_instance_by_id($tracker, $form->elementid);
-        $element->optionlistview($cm);
-        echo $OUTPUT->heading(get_string('addanoption', 'tracker'));
+        $out .= $element->optionlistview($cm);
+        $out .= $OUTPUT->heading(get_string('addanoption', 'tracker'));
+        ob_start();
         include $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editoptionform.html';
-        echo '</center>';
+        $out .= ob_get_clean();
+        $out .= '</center>';
     } else {
         print_error('errorcannotviewelementoption', 'tracker', $url);
     }
@@ -245,7 +215,8 @@ if ($action == 'deleteelementoption') {
     if (!$DB->delete_records('tracker_elementitem', array('id' => $form->optionid))) {
         print_error('errorcannotdeleteoption', 'tracker');
     }
-    // renumber higher records
+
+    // Renumber higher records.
     $sql = "
         UPDATE
             {tracker_elementitem}
@@ -256,12 +227,14 @@ if ($action == 'deleteelementoption') {
             sortorder > ?
     ";
     $DB->execute($sql, array($form->elementid, $deletedoption->sortorder));
-    echo $OUTPUT->heading(get_string('editoptions', 'tracker'));
+    $out = $OUTPUT->heading(get_string('editoptions', 'tracker'));
     $element = trackerelement::find_instance_by_id($tracker, $form->elementid);
     $element->optionlistview($cm);
     $caption = get_string('addanoption', 'tracker');
-    echo $OUTPUT->heading($caption . $OUTPUT->help_icon('options', 'tracker', false));
+    $out .= $OUTPUT->heading($caption . $OUTPUT->help_icon('options', 'tracker', false));
+    ob_start();
     include $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editoptionform.html';
+    $out .= ob_get_clean();
     return -1;
 }
 /************************************* edit an element option *****************************/
@@ -274,7 +247,11 @@ if ($action == 'editelementoption') {
     $form->type = $element->type;
     $form->name = $option->name;
     $form->description = $option->description;
+
+    ob_start();
     include $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/updateoptionform.html';
+    $out = ob_get_clean();
+
     return -1;
 }
 /************************************* edit an element option *****************************/
@@ -320,22 +297,26 @@ if ($action == 'updateelementoption') {
         $update->description = $form->description;
         $update->format = $form->format;
         if ($DB->update_record('tracker_elementitem', $update)) {
-            echo $OUTPUT->heading(get_string('editoptions', 'tracker'));
+            $out = $OUTPUT->heading(get_string('editoptions', 'tracker'));
             $element = trackerelement::find_instance_by_id($tracker, $form->elementid);
             $element->optionlistview($cm);
-            echo $OUTPUT->heading(get_string('addanoption', 'tracker'));
+            $out .= $OUTPUT->heading(get_string('addanoption', 'tracker'));
+            ob_start();
             include $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editoptionform.html';
+            $out .= ob_get_clean();
         } else {
             print_error('errorcannotupdateoptionbecauseused', 'tracker', $url);
         }
     } else {
-        // print errors
+        // Print errors.
         $errorstr = '';
         foreach ($errors as $anError) {
             $errorstrs[] = $anError->message;
         }
-        echo $OUTPUT->box(implode("<br/>", $errorstrs), 'center', '70%', '', 5, 'errorbox');
+        $out = $OUTPUT->box(implode("<br/>", $errorstrs), 'center', '70%', '', 5, 'errorbox');
+        ob_start();
         include $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/updateoptionform.html';
+        $out .= ob_get_clean();
     }
     return -1;
 }
@@ -363,12 +344,14 @@ if ($action == 'moveelementoptionup') {
             print_error('errordbupdate', 'tracker', $url);
         }
     }
-    echo $OUTPUT->heading(get_string('editoptions', 'tracker'));
+    $out = $OUTPUT->heading(get_string('editoptions', 'tracker'));
     $element = trackerelement::find_instance_by_id($tracker, $form->elementid);
     $element->optionlistview($cm);
     $caption = get_string('addanoption', 'tracker');
-    echo $OUTPUT->heading($caption . $OUTPUT->help_icon('options', 'tracker', false));
+    $out .=  $OUTPUT->heading($caption . $OUTPUT->help_icon('options', 'tracker', false));
+    ob_start();
     include $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editoptionform.html';
+    $out .= ob_get_clean();
     return -1;
 }
 /********************************** move an option down in list ***************************/
@@ -388,19 +371,21 @@ if ($action == 'moveelementoptiondown') {
         $nextoption->id = $DB->get_field('tracker_elementitem', 'id', array('elementid' => $form->elementid, 'sortorder' => $sortorder + 1));
         $nextoption->sortorder = $sortorder;
         // swap options in database
-        if (!$DB->update_record('tracker_elementitem', addslashes_recursive($option))) {
+        if (!$DB->update_record('tracker_elementitem', $option)) {
             print_error('errordbupdate', 'tracker', $url);
         }
-        if (!$DB->update_record('tracker_elementitem', addslashes_recursive($nextoption))) {
+        if (!$DB->update_record('tracker_elementitem', $nextoption)) {
             print_error('errordbupdate', 'tracker', $url);
         }
     }
-    echo $OUTPUT->heading(get_string('editoptions', 'tracker'));
+    $out = $OUTPUT->heading(get_string('editoptions', 'tracker'));
     $element = trackerelement::find_instance_by_id($tracker, $form->elementid);
     $element->optionlistview($cm);
     $caption = get_string('addanoption', 'tracker');
-    echo $OUTPUT->heading($caption . $OUTPUT->help_icon('options', 'tracker', false));
+    $out .= $OUTPUT->heading($caption . $OUTPUT->help_icon('options', 'tracker', false));
+    ob_start();
     include $CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editoptionform.html';
+    $out .= ob_get_clean();
     return -1;
 }
 /********************************** add an element to be used ***************************/
@@ -408,12 +393,12 @@ if ($action == 'addelement') {
     $elementid = required_param('elementid', PARAM_INT);
 
     if (!tracker_iselementused($tracker->id, $elementid)) {
-        // Add element to element used table;
+        // Add element to element used table.
         $used = new StdClass;
         $used->elementid = $elementid;
         $used->trackerid = $tracker->id;
         $used->canbemodifiedby = $USER->id;
-        // get last sort order
+        // Get last sort order.
         $sortorder = 0 + $DB->get_field_select('tracker_elementused', 'MAX(sortorder)', "trackerid = {$tracker->id} GROUP BY trackerid");
         $used->sortorder = $sortorder + 1;
         if (!$DB->insert_record ('tracker_elementused', $used)) {
@@ -464,20 +449,21 @@ if ($action == 'localparent') {
 if ($action == 'remoteparent') {
     $step = optional_param('step', 0, PARAM_INT);
     switch ($step) {
-        case 1 : { // we choose the host
+        case 1 :
+            // We choose the host.
             $parenthost = optional_param('remotehost', null, PARAM_RAW);
-        }
-        break;
-        case 2 : { // we choose the tracker
+            break;
+
+        case 2 :
+            // We choose the tracker.
             $remoteparent = optional_param('remotetracker', null, PARAM_RAW);
 
             if (!$DB->set_field('tracker', 'parent', $remoteparent, array('id' => $tracker->id))) {
                 print_error('errorcannotsetparent', 'tracker');
             }
-        $tracker->parent = $remoteparent;
-        $step = 0;
-        break;
-        }
+            $tracker->parent = $remoteparent;
+            $step = 0;
+            break;
     }
 }
 /*************************** unbinds any cascade  *******************************/
@@ -490,14 +476,56 @@ if ($action == 'unbind') {
 /****************************** set a used element inactive for form **********************/
 if ($action == 'setinactive') {
     $usedid = required_param('usedid', PARAM_INT);
-    if (!$DB->set_field_select('tracker_elementused', 'active', 0, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id))) {
+    try {
+        $DB->set_field_select('tracker_elementused', 'active', 0, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id));
+    } catch(Exception $e) {
         print_error('errorcannothideelement', 'tracker', $url);
     }
 }
 /****************************** set a used element active for form **********************/
 if ($action == 'setactive') {
     $usedid = required_param('usedid', PARAM_INT);
-    if (!$DB->set_field_select('tracker_elementused', 'active', 1, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id))) {
+    try {
+        $DB->set_field_select('tracker_elementused', 'active', 1, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id));
+    } catch(Exception $e) {
+        print_error('errorcannotshowelement', 'tracker', $url);
+    }
+}
+/****************************** set a used element not mandatory for form **********************/
+if ($action == 'setnotmandatory') {
+    $usedid = required_param('usedid', PARAM_INT);
+    try {
+        $DB->set_field_select('tracker_elementused', 'mandatory', 0, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id));
+    } catch(Exception $e) {
+        print_error('errorcannothideelement', 'tracker', $url);
+    }
+}
+/****************************** set a used element mandatory for form **********************/
+if ($action == 'setmandatory') {
+    $usedid = required_param('usedid', PARAM_INT);
+    try {
+        $DB->set_field_select('tracker_elementused', 'mandatory', 1, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id));
+        $DB->set_field_select('tracker_elementused', 'active', 1, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id));
+        $DB->set_field_select('tracker_elementused', 'private', 0, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id));
+    } catch(Exception $e) {
+        print_error('errorcannotshowelement', 'tracker', $url);
+    }
+}
+/****************************** set a used element public for form **********************/
+if ($action == 'setpublic') {
+    $usedid = required_param('usedid', PARAM_INT);
+    try {
+        $DB->set_field_select('tracker_elementused', 'private', 0, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id));
+    } catch(Exception $e) {
+        print_error('errorcannothideelement', 'tracker', $url);
+    }
+}
+/****************************** set a used element private for form **********************/
+if ($action == 'setprivate') {
+    $usedid = required_param('usedid', PARAM_INT);
+    try {
+        $DB->set_field_select('tracker_elementused', 'private', 1, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id));
+    } catch(Exception $e) {
         print_error('errorcannotshowelement', 'tracker', $url);
     }
 }

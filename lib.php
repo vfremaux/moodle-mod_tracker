@@ -1,28 +1,29 @@
 <?php
 // This file is part of Moodle - http://moodle.org/
-// 
+//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
- * @package mod-tracker
+ * @package mod_tracker
+ * @category mod
  * @author Clifford Tham, Valery Fremaux > 1.8
  * @date 02/12/2007
- * @version Moodle 2.0
  *
  * Library of functions and constants for module tracker
  */
-
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 
@@ -102,6 +103,8 @@ function tracker_update_instance($tracker, $mform) {
 
     if (is_array(@$tracker->subtrackers)) {
         $tracker->subtrackers = implode(',', $tracker->subtrackers);
+    } else {
+        $tracker->subtrackers = '';
     }
 
     $context = context_module::instance($tracker->coursemodule);
@@ -211,7 +214,9 @@ function tracker_print_recent_activity($course, $isteacher, $timestart) {
         foreach ($newstuff as $anissue) {
             echo "<span style=\"font-size:0.8em\">";
             echo get_string('modulename', 'tracker').': '.format_string($anissue->name).':<br/>';
-            echo "<a href=\"{$CFG->wwwroot}/mod/tracker/view.php?a={$anissue->trackerid}&amp;view=view&amp;page=viewanissue&amp;issueid={$anissue->id}\">".shorten_text(format_string($anissue->summary), 20).'</a><br/>';
+            $params = array('t' => $anissue->trackerid, 'view' => 'view', 'page' => 'viewanissue', 'issueid' => $anissue->id);
+            $issueurl = new moodle_url('/mod/tracker/view.php', $params);
+            echo '<a href="'.$issueurl.'">'.shorten_text(format_string($anissue->summary), 20).'</a><br/>';
             echo '&nbsp&nbsp&nbsp<span class="trackersmalldate">'.userdate($anissue->datereported).'</span><br/>';
             echo "</span><br/>";
         }
@@ -249,6 +254,8 @@ function tracker_print_overview($courses, &$htmlarray) {
                'title="'.$strtracker.'" href="'.$CFG->wwwroot.
                '/mod/tracker/view.php?id='.$tracker->coursemodule.'">'.
                format_string($tracker->name).'</a></div>';
+
+        $str .= '<div class="info">';
 
         $context = context_module::instance($tracker->coursemodule);
         if (has_capability('mod/tracker:develop', $context)) {
@@ -290,11 +297,14 @@ function tracker_print_overview($courses, &$htmlarray) {
             }
         }
         $str .= '</div>';
+        $str .= '</div>';
 
-        if (empty($htmlarray[$tracker->course]['tracker'])) {
-            $htmlarray[$tracker->course]['tracker'] = $str;
-        } else {
-            $htmlarray[$tracker->course]['tracker'] .= $str;
+        if (@$yours || @$unassigned) {
+            if (empty($htmlarray[$tracker->course]['tracker'])) {
+                $htmlarray[$tracker->course]['tracker'] = $str;
+            } else {
+                $htmlarray[$tracker->course]['tracker'] .= $str;
+            }
         }
     }
 }
@@ -362,10 +372,10 @@ function tracker_get_participants($trackerid) {
         $commenters = array();
     }
     $participants = array_merge(array_keys($resolvers), array_keys($developers), array_keys($reporters), array_keys($admins));
-    $participantlist = array_unique( $participants );
+    $participantlist = implode(',', array_unique($participants));
 
     if (!empty($participantlist)) {
-        return $DB->get_records_list( 'user', 'id', participantlist, 'lastname' );
+        return $DB->get_records_list('user', array('id' => $participantlist));
     }
     return array();
 }
@@ -380,7 +390,7 @@ function tracker_scale_used ($trackerid, $scaleid) {
     $return = false;
 
     //$rec = get_record("tracker","id","$trackerid","scale","-$scaleid");
-    // 
+    //
 	//if (!empty($rec)  && !empty($scaleid)) {
     // $return = true;
     //}
@@ -908,10 +918,53 @@ function tracker_preset_params(&$tracker) {
         $tracker->thanksmessage = get_string('message_bugtracker', 'tracker');
     } elseif ($tracker->supportmode == 'ticketting') {
         if ($tracker->defaultassignee) {
-            $defaultassignee = $DB->get_record('user', array('id' => $tracker->defaultassignee), 'id, firstname, lastname');
+            $defaultassignee = $DB->get_record('user', array('id' => $tracker->defaultassignee), 'id,'.get_all_user_name_fields(true, ''));
             $tracker->thanksmessage = get_string('message_ticketting_preassigned', 'tracker', fullname($defaultassignee));
         } else {
             $tracker->thanksmessage = get_string('message_ticketting', 'tracker');
         }
     }
+}
+
+/**
+ * This function allows the tool_dbcleaner to register integrity checks
+ */
+function tracker_dbcleaner_add_keys() {
+    global $DB;
+
+    $trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
+
+    $keys = array(
+        array('tracker', 'course', 'course', 'id', ''),
+        array('tracker', 'id', 'course_modules', 'instance', ' module = '.$trackermoduleid.' '),
+        array('tracker_elementitem', 'elementid', 'tracker_element', 'id', ''),
+        array('tracker_elementused', 'trackerid', 'tracker', 'id', ''),
+        array('tracker_elementused', 'elementid', 'tracker_element', 'id', ''),
+        array('tracker_issue', 'trackerid', 'tracker', 'id', ''),
+        array('tracker_issueattribute', 'trackerid', 'tracker', 'id', ''),
+        array('tracker_issueattribute', 'issueid', 'tracker_issue', 'id', ''),
+        array('tracker_issueattribute', 'elementid', 'tracker_element', 'id', ''),
+        array('tracker_issueattribute', 'elementitemid', 'tracker_elementitem', 'id', ''),
+        array('tracker_issuecc', 'trackerid', 'tracker', 'id', ''),
+        array('tracker_issuecc', 'issueid', 'tracker_issue', 'id', ''),
+        array('tracker_issuecc', 'userid', 'user', 'id', ''),
+        array('tracker_issuecomment', 'trackerid', 'tracker', 'id', ''),
+        array('tracker_issuecomment', 'issueid', 'tracker_issue', 'id', ''),
+        array('tracker_issuecomment', 'userid', 'user', 'id', ''),
+        array('tracker_issuedependancy', 'trackerid', 'tracker', 'id', ''),
+        array('tracker_issuedependancy', 'parentid', 'tracker_issue', 'id', ''),
+        array('tracker_issuedependancy', 'childid', 'tracker_issue', 'id', ''),
+        array('tracker_issueownership', 'trackerid', 'tracker', 'id', ''),
+        array('tracker_issueownership', 'issueid', 'tracker_issue', 'id', ''),
+        array('tracker_issueownership', 'userid', 'user', 'id', ''),
+        array('tracker_preferences', 'trackerid', 'tracker', 'id', ''),
+        array('tracker_preferences', 'userid', 'user', 'id', ''),
+        array('tracker_query', 'trackerid', 'tracker', 'id', ''),
+        array('tracker_query', 'userid', 'user', 'id', ''),
+        array('tracker_state_change', 'trackerid', 'tracker', 'id', ''),
+        array('tracker_state_change', 'issueid', 'tracker_issue', 'id', ''),
+        array('tracker_state_change', 'userid', 'user', 'id', ''),
+    );
+
+    return $keys;
 }

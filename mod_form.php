@@ -1,44 +1,65 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
-* This view allows checking deck states
-*
-* @package mod-tracker
-* @category mod
-* @author Valery Fremaux
-* @license http://www.gnu.org/copyleft/gpl.html GNU Public License
-*/
-
+ * This view allows checking deck states
+ *
+ * @package mod_tracker
+ * @category mod
+ * @author Valery Fremaux
+ * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+ */
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
 /**
-* overrides moodleform for test setup
-*/
+ * overrides moodleform for test setup
+ */
 class mod_tracker_mod_form extends moodleform_mod {
 
     function definition() {
-         global $CFG, $COURSE, $DB;
+        global $CFG, $COURSE, $DB;
 
-         $mform    =& $this->_form;
-          //-------------------------------------------------------------------------------
-          $mform->addElement('header', 'general', get_string('general', 'form'));
-          $mform->addElement('text', 'name', get_string('name'), array('size'=>'64'));
-          $mform->setType('name', PARAM_CLEANHTML);
-          $mform->addRule('name', null, 'required', null, 'client');
+        $mform    =& $this->_form;
+        //-------------------------------------------------------------------------------
+        $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        $this->add_intro_editor(true, get_string('intro', 'tracker'));
+        $mform->addElement('text', 'name', get_string('name'), array('size'=>'64'));
+        if (!empty($CFG->formatstringstriptags)) {
+            $mform->setType('name', PARAM_TEXT);
+        } else {
+            $mform->setType('name', PARAM_CLEANHTML);
+        }
+        $mform->addRule('name', null, 'required', null, 'client');
+        $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
-          // $mform->addRule('summary', get_string('required'), 'required', null, 'client');
-          $modeoptions['bugtracker'] = get_string('mode_bugtracker', 'tracker');
-          $modeoptions['ticketting'] = get_string('mode_ticketting', 'tracker');
-          $modeoptions['taskspread'] = get_string('mode_taskspread', 'tracker');
-          $modeoptions['customized'] = get_string('mode_customized', 'tracker');
-          $mform->addElement('select', 'supportmode', get_string('supportmode', 'tracker'), $modeoptions);
-          $mform->addHelpButton('supportmode', 'supportmode', 'tracker');
+        $this->standard_intro_elements();
 
-          $mform->addElement('text', 'ticketprefix', get_string('ticketprefix', 'tracker'), array('size' => 5));
-          $mform->setType('ticketprefix', PARAM_TEXT);
-          $mform->setAdvanced('ticketprefix');
+        // $mform->addRule('summary', get_string('required'), 'required', null, 'client');
+        $modeoptions['bugtracker'] = get_string('mode_bugtracker', 'tracker');
+        $modeoptions['ticketting'] = get_string('mode_ticketting', 'tracker');
+        $modeoptions['taskspread'] = get_string('mode_taskspread', 'tracker');
+        $modeoptions['customized'] = get_string('mode_customized', 'tracker');
+        $mform->addElement('select', 'supportmode', get_string('supportmode', 'tracker'), $modeoptions);
+        $mform->addHelpButton('supportmode', 'supportmode', 'tracker');
+
+        $mform->addElement('text', 'ticketprefix', get_string('ticketprefix', 'tracker'), array('size' => 5));
+        $mform->setType('ticketprefix', PARAM_TEXT);
+        $mform->setAdvanced('ticketprefix');
 
         $stateprofileopts = array(
             ENABLED_OPEN => get_string('open', 'tracker'),
@@ -50,44 +71,44 @@ class mod_tracker_mod_form extends moodleform_mod {
             ENABLED_PUBLISHED => get_string('published', 'tracker'),
             ENABLED_VALIDATED => get_string('validated', 'tracker'),
         );
-          $select = &$mform->addElement('select', 'stateprofile', get_string('stateprofile', 'tracker'), $stateprofileopts);
-          $mform->setType('stateprofile', PARAM_INT);
-          $mform->disabledIf('stateprofile', 'supportmode', 'neq', 'customized');
-          $select->setMultiple(true);
-          $mform->setAdvanced('stateprofile');
+        $select = &$mform->addElement('select', 'stateprofile', get_string('stateprofile', 'tracker'), $stateprofileopts);
+        $mform->setType('stateprofile', PARAM_INT);
+        $mform->disabledIf('stateprofile', 'supportmode', 'neq', 'customized');
+        $select->setMultiple(true);
+        $mform->setAdvanced('stateprofile');
 
-          $mform->addElement('textarea', 'thanksmessage', get_string('thanksmessage', 'tracker'), array('cols' => 60, 'rows' => 10));
-          $mform->disabledIf('thanksmessage', 'supportmode', 'neq', 'customized');
-          $mform->setType('thanksmessage', PARAM_TEXT);
-          $mform->setAdvanced('thanksmessage');
+        $mform->addElement('textarea', 'thanksmessage', get_string('thanksmessage', 'tracker'), array('cols' => 60, 'rows' => 10));
+        $mform->disabledIf('thanksmessage', 'supportmode', 'neq', 'customized');
+        $mform->setType('thanksmessage', PARAM_TEXT);
+        $mform->setAdvanced('thanksmessage');
 
-          $mform->addElement('checkbox', 'enablecomments', get_string('enablecomments', 'tracker'));
-          $mform->addHelpButton('enablecomments', 'enablecomments', 'tracker');
+        $mform->addElement('checkbox', 'enablecomments', get_string('enablecomments', 'tracker'));
+        $mform->addHelpButton('enablecomments', 'enablecomments', 'tracker');
 
-          $mform->addElement('checkbox', 'allownotifications', get_string('notifications', 'tracker'));
-          $mform->addHelpButton('allownotifications', 'notifications', 'tracker');
+        $mform->addElement('checkbox', 'allownotifications', get_string('notifications', 'tracker'));
+        $mform->addHelpButton('allownotifications', 'notifications', 'tracker');
 
-          $mform->addElement('checkbox', 'strictworkflow', get_string('strictworkflow', 'tracker'));
-          $mform->addHelpButton('strictworkflow', 'strictworkflow', 'tracker');
+        $mform->addElement('checkbox', 'strictworkflow', get_string('strictworkflow', 'tracker'));
+        $mform->addHelpButton('strictworkflow', 'strictworkflow', 'tracker');
 
-          if (isset($this->_cm->id) && $assignableusers = get_users_by_capability(context_module::instance($this->_cm->id), 'mod/tracker:resolve', '*, u.id', 'lastname,firstname')) {
-              $useropts[0] = get_string('none');
-              foreach ($assignableusers as $assignable) {
-                    $useropts[$assignable->id] = fullname($assignable);
-              }
+        if (isset($this->_cm->id) && $assignableusers = get_users_by_capability(context_module::instance($this->_cm->id), 'mod/tracker:resolve', 'u.id,'.get_all_user_name_fields(true, 'u'), 'lastname,firstname')) {
+            $useropts[0] = get_string('none');
+            foreach ($assignableusers as $assignable) {
+                $useropts[$assignable->id] = fullname($assignable);
+            }
             $mform->addElement('select', 'defaultassignee', get_string('defaultassignee', 'tracker'), $useropts);
             $mform->addHelpButton('defaultassignee', 'defaultassignee', 'tracker');
-              $mform->disabledIf('defaultassignee', 'supportmode', 'eq', 'taskspread');
-              $mform->setAdvanced('defaultassignee');
-          } else {
+            $mform->disabledIf('defaultassignee', 'supportmode', 'eq', 'taskspread');
+            $mform->setAdvanced('defaultassignee');
+        } else {
             $mform->addElement('hidden', 'defaultassignee', 0);
-          }
+        }
         $mform->setType('defaultassignee', PARAM_INT);
 
-          if ($subtrackers = $DB->get_records_select('tracker', " id != 0 " )) {
+        if ($subtrackers = $DB->get_records_select('tracker', " id != 0 " )) {
             $trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
-              $subtrackersopts = array();
-              foreach ($subtrackers as $st) {
+            $subtrackersopts = array();
+            foreach ($subtrackers as $st) {
                 if ($targetcm = $DB->get_record('course_modules', array('instance' => $st->id, 'module' => $trackermoduleid))) {
                     $targetcontext = context_module::instance($targetcm->id);
                     if (has_any_capability(array('mod/tracker:manage', 'mod/tracker:develop', 'mod/tracker:resolve'), $targetcontext)) {
@@ -95,20 +116,27 @@ class mod_tracker_mod_form extends moodleform_mod {
                         $subtrackersopts[$st->id] = $trackercourseshort.' - '.$st->name;
                     }
                 }
-              }
-            if (!empty($subtrackersopts)) {
-                  $select = &$mform->addElement('select', 'subtrackers', get_string('subtrackers', 'tracker'), $subtrackersopts);
-                  $mform->setType('subtrackers', PARAM_INT);
-                  $mform->setAdvanced('subtrackers');
-                  $select->setMultiple(true);
             }
-          }
-          $options['idnumber'] = true;
-          $options['groups'] = false;
-          $options['groupings'] = false;
-          $options['gradecat'] = false;
-          $this->standard_coursemodule_elements($options);
-          $this->add_action_buttons();
+            if (!empty($subtrackersopts)) {
+                $select = &$mform->addElement('select', 'subtrackers', get_string('subtrackers', 'tracker'), $subtrackersopts);
+                $mform->setType('subtrackers', PARAM_INT);
+                $mform->setAdvanced('subtrackers');
+                $select->setMultiple(true);
+            }
+        }
+
+        if ($CFG->mnet_dispatcher_mode == 'strict') {
+            $mform->addElement('checkbox', 'networkable', get_string('networkable', 'tracker'), get_string('yes'), 0);
+            $mform->addHelpButton('networkable', 'networkable', 'tracker');
+            $mform->setAdvanced('networkable');
+        }
+
+        $options['idnumber'] = true;
+        $options['groups'] = false;
+        $options['groupings'] = false;
+        $options['gradecat'] = false;
+        $this->standard_coursemodule_elements($options);
+        $this->add_action_buttons();
     }
 
     function set_data($defaults) {

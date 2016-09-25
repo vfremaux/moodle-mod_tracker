@@ -47,7 +47,7 @@
             } 
             else {
                 echo '<p align="right">';
-                // $OUTPUT->help_icon('textformat', );
+                $OUTPUT->help_icon('textformat', );
                 print_string('formattexttype');
                 echo ':&nbsp;';
                 if (empty($form->format)) {
@@ -62,7 +62,7 @@
     <tr>
         <td colspan="2">
 		    <?php
-		    $onsubmitcall = ($usehtmleditor) ? "document.forms['addqueryform'].onsubmit();" : "";
+		    $onsubmitcall = ($usehtmleditor) ? "document.forms['addqueryform'].onsubmit();" : '' ;
 		    ?>
 			<input type="submit" name="save" value="<?php print_string('continue') ?>" />
 			<input type="button" name="cancel_btn" value="<?php print_string('cancel') ?>" onclick="document.forms['addqueryform'].what.value = '';document.forms['addqueryform'].screen.value = 'search';<?php p($onsubmitcall) ?>document.forms['addqueryform'].submit();" />
