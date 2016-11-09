@@ -103,6 +103,9 @@ class mod_tracker_mod_form extends moodleform_mod {
             $trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
             $subtrackersopts = array();
             foreach ($subtrackers as $st) {
+                if ($st->id == @$this->current->id) {
+                    continue;
+                }
                 if ($targetcm = $DB->get_record('course_modules', array('instance' => $st->id, 'module' => $trackermoduleid))) {
                     $targetcontext = context_module::instance($targetcm->id);
                     if (has_any_capability(array('mod/tracker:manage', 'mod/tracker:develop', 'mod/tracker:resolve'), $targetcontext)) {

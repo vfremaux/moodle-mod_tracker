@@ -125,9 +125,16 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         $data->trackerid = $this->get_new_parentid('tracker');
         $data->canbemodifiedby = $this->get_mappingid('user', $data->canbemodifiedby);
 
-        // The data is actually inserted into the database later in inform_new_usage_id.
-        $newitemid = $DB->insert_record('tracker_elementused', $data);
-        $this->set_mapping('tracker_elementused', $oldid, $newitemid, false); // Has no related files
+        // If the used element addresses a local element backuped in the tracker, 
+        // remap the element and store it. Otherwise forget it.
+        $newlocalelementid = $this->get_mappingid('tracker_element', $data->elementid);
+        if ($newlocalelementid) {
+            $data->elementid = $newlocalelementid;
+
+            // The data is actually inserted into the database later in inform_new_usage_id.
+            $newitemid = $DB->insert_record('tracker_elementused', $data);
+            $this->set_mapping('tracker_elementused', $oldid, $newitemid, false); // Has no related files
+        }
     }
 
     protected function process_tracker_issue($data) {
@@ -163,15 +170,19 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         $data->issueid = $this->get_new_parentid('issue');
 
         $data->elementid = $this->get_mappingid('tracker_element', $data->elementid);
-        $data->elementitemid = $this->get_mappingid('tracker_elementitem', $data->elementitemid);
-        $data->timemodified = $this->apply_date_offset($data->timemodified);
 
-        // The data is actually inserted into the database later in inform_new_usage_id.
-        $newitemid = $DB->insert_record('tracker_issueattribute', $data);
-        // needs no mapping as terminal record
-        $this->set_mapping('tracker_issueattribute', $oldid, $newitemid, false); // Has no related files
-
-        $this->add_related_files('mod_tracker', 'issueattribute', 'tracker_issueattribute', null, $oldid);
+        // Discard all attributes related to non local elements.
+        if ($data->elementid) {
+            $data->elementitemid = $this->get_mappingid('tracker_elementitem', $data->elementitemid);
+            $data->timemodified = $this->apply_date_offset($data->timemodified);
+    
+            // The data is actually inserted into the database later in inform_new_usage_id.
+            $newitemid = $DB->insert_record('tracker_issueattribute', $data);
+            // needs no mapping as terminal record
+            $this->set_mapping('tracker_issueattribute', $oldid, $newitemid, false); // Has no related files
+    
+            $this->add_related_files('mod_tracker', 'issueattribute', 'tracker_issueattribute', null, $oldid);
+        }
     }
 
     protected function process_tracker_issuecc($data) {
