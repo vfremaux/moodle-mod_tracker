@@ -236,6 +236,11 @@ function tracker_print_recent_activity($course, $isteacher, $timestart) {
 function tracker_print_overview($courses, &$htmlarray) {
     global $USER, $CFG, $DB;
 
+    // Check if really installed
+    if (!$DB->record_exists('modules', array('name' => 'tracker'))) {
+        return array();
+    }
+
     if (empty($courses) || !is_array($courses) || count($courses) == 0) {
         return array();
     }
@@ -924,47 +929,4 @@ function tracker_preset_params(&$tracker) {
             $tracker->thanksmessage = get_string('message_ticketting', 'tracker');
         }
     }
-}
-
-/**
- * This function allows the tool_dbcleaner to register integrity checks
- */
-function tracker_dbcleaner_add_keys() {
-    global $DB;
-
-    $trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
-
-    $keys = array(
-        array('tracker', 'course', 'course', 'id', ''),
-        array('tracker', 'id', 'course_modules', 'instance', ' module = '.$trackermoduleid.' '),
-        array('tracker_elementitem', 'elementid', 'tracker_element', 'id', ''),
-        array('tracker_elementused', 'trackerid', 'tracker', 'id', ''),
-        array('tracker_elementused', 'elementid', 'tracker_element', 'id', ''),
-        array('tracker_issue', 'trackerid', 'tracker', 'id', ''),
-        array('tracker_issueattribute', 'trackerid', 'tracker', 'id', ''),
-        array('tracker_issueattribute', 'issueid', 'tracker_issue', 'id', ''),
-        array('tracker_issueattribute', 'elementid', 'tracker_element', 'id', ''),
-        array('tracker_issueattribute', 'elementitemid', 'tracker_elementitem', 'id', ''),
-        array('tracker_issuecc', 'trackerid', 'tracker', 'id', ''),
-        array('tracker_issuecc', 'issueid', 'tracker_issue', 'id', ''),
-        array('tracker_issuecc', 'userid', 'user', 'id', ''),
-        array('tracker_issuecomment', 'trackerid', 'tracker', 'id', ''),
-        array('tracker_issuecomment', 'issueid', 'tracker_issue', 'id', ''),
-        array('tracker_issuecomment', 'userid', 'user', 'id', ''),
-        array('tracker_issuedependancy', 'trackerid', 'tracker', 'id', ''),
-        array('tracker_issuedependancy', 'parentid', 'tracker_issue', 'id', ''),
-        array('tracker_issuedependancy', 'childid', 'tracker_issue', 'id', ''),
-        array('tracker_issueownership', 'trackerid', 'tracker', 'id', ''),
-        array('tracker_issueownership', 'issueid', 'tracker_issue', 'id', ''),
-        array('tracker_issueownership', 'userid', 'user', 'id', ''),
-        array('tracker_preferences', 'trackerid', 'tracker', 'id', ''),
-        array('tracker_preferences', 'userid', 'user', 'id', ''),
-        array('tracker_query', 'trackerid', 'tracker', 'id', ''),
-        array('tracker_query', 'userid', 'user', 'id', ''),
-        array('tracker_state_change', 'trackerid', 'tracker', 'id', ''),
-        array('tracker_state_change', 'issueid', 'tracker_issue', 'id', ''),
-        array('tracker_state_change', 'userid', 'user', 'id', ''),
-    );
-
-    return $keys;
 }

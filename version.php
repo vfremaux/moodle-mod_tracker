@@ -17,20 +17,19 @@
 /**
  * Version information
  *
- * @package    mod_tracker
- * @category   mod
- * @author Clifford Tham, Valery Fremaux from Moodle 1.8 ahead
- * @copyright  2009 onwards Valery Fremaux (valery.fremaux@gmail.com)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_tracker
+ * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2015091300;  // The current module version (Date: YYYYMMDDXX)
-$plugin->requires = 2016052300;
+$plugin->version  = 2015080600;  // The current module version (Date: YYYYMMDDXX)
+$plugin->requires = 2014041100;
 $plugin->component = 'mod_tracker';   // Full name of the plugin (used for diagnostics)
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.1.0 (Build 2015091300)';
+$plugin->cron     = 0;           // Period for cron to check this module (secs)
+$plugin->maturity = MATURITY_RC;
+$plugin->release = '2.7.0 (Build 2015080600)';
 
-// Non Moodle attributes.
-$plugin->codeincrement = '3.1.0001';
+// Non moodle attributes
+$plugin->codeincrement = '2.7.0000';
