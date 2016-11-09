@@ -237,9 +237,11 @@ function tracker_rpc_post_issue($remoteuser, $trackerid, $remote_issue, $islocal
     $newissue->uplink = '';
 
     try {
+        /*
         ob_start();
         print_object($newissue);
         debug_trace(ob_get_clean());
+        */
         $followid = $DB->insert_record('tracker_issue', $newissue);
     } catch(Exception $e) {
         $response->status = RPC_FAILURE;
