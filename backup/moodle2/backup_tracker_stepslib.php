@@ -59,7 +59,7 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
         $issues = new backup_nested_element('issues');
 
         $issue = new backup_nested_element('issue', array('id'), array(
-            'trackerid', 'summary', 'description', 'format', 'datereported', 'reportedby', 'status', 'assignedto', 'bywhomid', 'timeassigned', 'resolution', 'resolutionformat', 'resolutionpriority', 'downlink', 'uplink'));
+            'trackerid', 'summary', 'description', 'descriptionformat', 'datereported', 'reportedby', 'status', 'assignedto', 'bywhomid', 'timeassigned', 'resolution', 'resolutionformat', 'resolutionpriority', 'downlink', 'uplink'));
 
         $attribs = new backup_nested_element('issueattributes');
 
