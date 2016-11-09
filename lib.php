@@ -236,11 +236,6 @@ function tracker_print_recent_activity($course, $isteacher, $timestart) {
 function tracker_print_overview($courses, &$htmlarray) {
     global $USER, $CFG, $DB;
 
-    // Check if really installed
-    if (!$DB->record_exists('modules', array('name' => 'tracker'))) {
-        return array();
-    }
-
     if (empty($courses) || !is_array($courses) || count($courses) == 0) {
         return array();
     }

@@ -62,7 +62,6 @@ $string['build'] = 'Version';
 $string['by'] = '<i>assigned by</i>';
 $string['cascade'] = 'Send upper level';
 $string['cascadedticket'] = 'Transferred from: ';
-$string['captcha'] = 'Captcha';
 $string['cced'] = 'Cced';
 $string['ccs'] = 'Ccs';
 $string['checkbox'] = 'Checkbox'; // @DYNA
