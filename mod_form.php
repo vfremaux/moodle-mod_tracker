@@ -131,10 +131,6 @@ class mod_tracker_mod_form extends moodleform_mod {
             $mform->setAdvanced('networkable');
         }
 
-        $mform->addElement('text', 'failovertrackerurl', get_string('failovertrackerurl', 'tracker'), array('size' => 80));
-        $mform->setType('failovertrackerurl', PARAM_URL);
-        $mform->setAdvanced('failovertrackerurl');
-
         $options['idnumber'] = true;
         $options['groups'] = false;
         $options['groupings'] = false;
