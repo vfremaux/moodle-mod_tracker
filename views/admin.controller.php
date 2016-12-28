@@ -235,11 +235,11 @@ if ($action == 'deleteelementoption') {
     $form = new StdClass;
     $form->elementid = optional_param('elementid', null, PARAM_INT);
     $form->optionid = required_param('optionid', PARAM_INT);
-    $element = trackerelement::getelement($tracker, $form->elementid);
+    $sql = "select * from {tracker_issueattribute} where ". $DB->sql_compare_text('elementitemid') . " = ? " ;
+    $element = trackerelement::find_instance_by_id($tracker, $form->elementid);
     $deletedoption = $element->getoption($form->optionid);
     $form->type = $element->type;
-
-    if ($DB->get_records('tracker_issueattribute', array('elementitemid' => $form->optionid))) {
+    if ($DB->get_record_sql($sql,array( $form->optionid))){ 
         print_error('errorcannotdeleteoption', 'tracker');
     }
     if (!$DB->delete_records('tracker_elementitem', array('id' => $form->optionid))) {
@@ -388,10 +388,10 @@ if ($action == 'moveelementoptiondown') {
         $nextoption->id = $DB->get_field('tracker_elementitem', 'id', array('elementid' => $form->elementid, 'sortorder' => $sortorder + 1));
         $nextoption->sortorder = $sortorder;
         // swap options in database
-        if (!$DB->update_record('tracker_elementitem', addslashes_recursive($option))) {
+        if (!$DB->update_record('tracker_elementitem', $option)) {
             print_error('errordbupdate', 'tracker', $url);
         }
-        if (!$DB->update_record('tracker_elementitem', addslashes_recursive($nextoption))) {
+        if (!$DB->update_record('tracker_elementitem', $nextoption)) {
             print_error('errordbupdate', 'tracker', $url);
         }
     }
