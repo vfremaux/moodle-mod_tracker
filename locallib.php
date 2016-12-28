@@ -1888,7 +1888,7 @@ class date_iterator{
     var $year;
     var $month;
 
-    function date_iterator($year, $month) {
+    function __construct($year, $month) {
         $this->year = $year;
         $this->month = $month;
         $this->inityear = $year;
