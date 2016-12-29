@@ -17,7 +17,7 @@ class dropdownelement extends trackerelement {
     var $multiple;
 
     // Alex                                   vvvv          vvvvv
-    function dropdownelement(&$tracker, $id = NULL, $used = FALSE ) {
+    function __construct(&$tracker, $id = NULL, $used = FALSE ) {
         parent::__construct($tracker, $id, $used);
         $this->setoptionsfromdb();
     }
