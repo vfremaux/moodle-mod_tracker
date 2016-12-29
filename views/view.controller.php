@@ -151,8 +151,8 @@ elseif ($action == 'delete') {
     // clear all associated fileareas
 
     $fs = get_file_storage();
-    $fs->delete_area_files($context->id, 'mod_tracker', 'issuedescription', $issue->id);
-    $fs->delete_area_files($context->id, 'mod_tracker', 'issueresolution', $issue->id);
+    $fs->delete_area_files($context->id, 'mod_tracker', 'issuedescription', $issueid);
+    $fs->delete_area_files($context->id, 'mod_tracker', 'issueresolution', $issueid);
 
     if ($attributeids) {
         foreach ($attributeids as $attributeid => $void) {
@@ -213,7 +213,7 @@ elseif ($action == 'updatelist') {
                 $ownership->issueid = $issueid;
                 $ownership->userid = $oldassign->assignedto;
                 $ownership->bywhomid = $oldassign->bywhomid;
-                $ownership->timeassigned = $oldassign->timeassigned;
+                $ownership->timeassigned = time();
                 if (!$DB->insert_record('tracker_issueownership', $ownership)) {
                     notice ("Error saving ownership for issue $issueid");
                 }
