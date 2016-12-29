@@ -2137,7 +2137,7 @@ function tracker_get_statuskeys($tracker, $cm = null) {
         if (!($tracker->enabledstates & ENABLED_ABANDONNED)) {
             unset($FULLSTATUSKEYS[ABANDONNED]);
         }
-        if (empty($tracker->parent)) {
+       if (!($tracker->enabledstates & ENABLED_TRANSFERED)) {
             unset($FULLSTATUSKEYS[TRANSFERED]);
         }
     }
