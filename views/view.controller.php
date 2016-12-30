@@ -465,8 +465,8 @@ elseif ($action == 'raisepriority') {
     if ($nextissue) {
         $issue->resolutionpriority++;
         $nextissue->resolutionpriority--;
-        $DB->update_record('tracker_issue', addslashes_recursive($issue));
-        $DB->update_record('tracker_issue', addslashes_recursive($nextissue));
+        $DB->update_record('tracker_issue', $issue);
+        $DB->update_record('tracker_issue', $nextissue);
     }
     tracker_update_priority_stack($tracker);
 }
@@ -490,7 +490,7 @@ elseif ($action == 'raisetotop') {
         $DB->execute($sql, array($tracker->id, $issue->resolutionpriority));
         // update to max priority
         $issue->resolutionpriority = $maxpriority;
-        $DB->update_record('tracker_issue', addslashes_recursive($issue));
+        $DB->update_record('tracker_issue', $issue);
     }
     tracker_update_priority_stack($tracker);
 }
@@ -502,8 +502,8 @@ elseif ($action == 'lowerpriority') {
         $nextissue = $DB->get_record('tracker_issue', array('trackerid' => $tracker->id, 'resolutionpriority' => $issue->resolutionpriority - 1));
         $issue->resolutionpriority--;
         $nextissue->resolutionpriority++;
-        $DB->update_record('tracker_issue', addslashes_recursive($issue));
-        $DB->update_record('tracker_issue', addslashes_recursive($nextissue));
+        $DB->update_record('tracker_issue',$issue);
+        $DB->update_record('tracker_issue', $nextissue);
     }
     tracker_update_priority_stack($tracker);
 }
@@ -526,7 +526,7 @@ elseif ($action == 'lowertobottom') {
         $DB->execute($sql, array($tracker->id, $issue->resolutionpriority));
         // update to min priority
         $issue->resolutionpriority = 0;
-        $DB->update_record('tracker_issue', addslashes_recursive($issue));
+        $DB->update_record('tracker_issue', $issue);
     }
     tracker_update_priority_stack($tracker);
 }
