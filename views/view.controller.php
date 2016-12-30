@@ -474,13 +474,14 @@ elseif ($action == 'raisepriority') {
 elseif ($action == 'raisetotop') {
     $issueid = required_param('issueid', PARAM_INT);
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
-    $maxpriority = $DB->get_field('tracker_issue', 'resolutionpriority', array('id' => $issueid));
+    $sql = "select max(resolutionpriority) from {tracker_issue}";
+    $maxpriority = $DB->get_field_sql($sql, null);
 
     if ($issue->resolutionpriority != $maxpriority) {
         // lower everyone above
         $sql = "
             UPDATE
-                {$CFG->dbprefix}tracker_issue
+                {tracker_issue}
             SET
                 resolutionpriority = resolutionpriority - 1
             WHERE
@@ -516,7 +517,7 @@ elseif ($action == 'lowertobottom') {
         // raise everyone beneath
         $sql = "
             UPDATE
-                {$CFG->dbprefix}tracker_issue
+                {tracker_issue}
             SET
                 resolutionpriority = resolutionpriority + 1
             WHERE
