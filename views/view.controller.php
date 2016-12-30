@@ -446,7 +446,7 @@ elseif ($action == 'distribute') {
         }
     }
     // move the issue
-    $DB->update_record('tracker_issue', addslashes_recursive($issue));
+    $DB->update_record('tracker_issue', $issue);
     $DB->set_field_select('tracker_issueattribute', 'trackerid', $newtracker->id, " issueid = $issue->id ");
     $DB->set_field_select('tracker_state_change', 'trackerid', $newtracker->id, " issueid = $issue->id ");
     $DB->set_field_select('tracker_issueownership', 'trackerid', $newtracker->id, " issueid = $issue->id ");
