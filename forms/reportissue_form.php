@@ -1,7 +1,7 @@
 <?php
 
 require_once $CFG->libdir.'/formslib.php';
-
+require_once $CFG->libdir.'/tablelib.php';
 class TrackerIssueForm extends moodleform{
 
     var $elements;
@@ -41,10 +41,10 @@ class TrackerIssueForm extends moodleform{
         if( has_capability('mod/tracker:manage', $this->context) )
         {
 
-            global $STATUSCODES;
+            $FULLSTATUSKEYS = tracker_get_statuskeys($tracker);
             $choices = array();
-            foreach ($STATUSCODES as $key => $value) {
-                $choices[ $key ] = get_string( $value, 'tracker' );
+            foreach ($FULLSTATUSKEYS  as $key => $value) {
+                $choices[ $key ] = $value;
             }
 
             $mform->addElement('select', 'status', get_string('status', 'tracker'), $choices);
