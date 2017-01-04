@@ -114,7 +114,7 @@ elseif ($action == 'unregister') {
 /******************************** unregister all my watches **************************/
 elseif ($action == 'unregisterall') {
     $userid = required_param('userid', PARAM_INT);
-    if (! $DB->delete_records ('tracker_issuecc', 'trackerid', $tracker->id, 'userid', $userid)) {
+     if (! $DB->delete_records ('tracker_issuecc',array( 'trackerid'=> $tracker->id, 'userid'=> $userid))) {
         print_error('errorcannotdeletecarboncopies', 'tracker', $userid);
     }
 }
