@@ -221,13 +221,15 @@ if (!empty($issues)) {
         $datereported = date('Y/m/d h:i', $issue->datereported);
         if (has_capability('mod/tracker:manage', $context)) { // managers can assign bugs
             $status = html_writer::select($STATUSKEYS, "status{$issue->id}", $issue->status, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
-            $developers = get_users_by_capability($context, 'mod/tracker:develop', 'u.id,lastname,firstname', 'lastname');
+            $allnames = get_all_user_name_fields(true,'u');
+            $developers = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,'.$allnames, 'lastname','','','','',false);
             foreach ($developers as $developer) {
                 $developersmenu[$developer->id] = fullname($developer);
             }
         } elseif (has_capability('mod/tracker:resolve', $context)) { // resolvers can give a bug back to managers
             $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;")) . "<input type=\"hidden\" name=\"schanged{$issue->id}\" value=\"0\" />";
-            $managers = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,lastname,firstname', 'lastname');
+            $allnames = get_all_user_name_fields(true,'u');
+            $managers = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,'.$allnames, 'lastname','','','','',false);
             foreach ($managers as $manager) {
                 $managersmenu[$manager->id] = fullname($manager);
             }
