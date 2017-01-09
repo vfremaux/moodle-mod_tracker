@@ -121,12 +121,17 @@ elseif ($action == 'unregisterall') {
 /************************** ask for editing the watchers configuration **************************/
 elseif ($action == 'editwatch') {
     $ccid = optional_param('ccid', '', PARAM_INT);
+    $issueid = optional_param('issueid','',PARAM_INT);
     if (!$form = $DB->get_record('tracker_issuecc', array('id' => $ccid))) {
         print_error('errorcannoteditwatch', 'tracker');
     }
-    $issue = $DB->get_record('tracker_issue', array('id' => $form->issueid));
+    $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
+    $events = $DB->get_field('tracker_issuecc','events',array('id'=>$ccid));
+    $form = new stdClass();
     $form->summary = $issue->summary;
-
+    $form->id = $ccid; 
+    $form->issueid  = $issueid;
+    $form->events = $events;
     include "views/editwatch.html";
     return -1;
 }
