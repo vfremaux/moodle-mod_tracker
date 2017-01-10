@@ -342,13 +342,14 @@ elseif ($action == 'cascade') {
     // to loose usefull information the previous track collected.
     $comments = $DB->get_records('tracker_issuecomment', array('issueid' => $issue->id));
     $track = '';
+
     if (!empty($comments)) {
         // collect userids
         foreach ($comments as $comment) {
             $useridsarray[] = $comment->userid;
         }
         list($insql, $inparam) = $DB->get_in_or_equal($useridsarray);
-        $users = $DB->get_records_select('user', "id $insql", array($inparams), 'lastname, firstname', 'id, firstname, lastname');
+        $users = $DB->get_records_select('user', "id $insql", $inparam, 'lastname, firstname', 'id, firstname, lastname');
 
         // make backtrack
         foreach ($comments as $comment) {
@@ -358,6 +359,7 @@ elseif ($action == 'cascade') {
             $track .= '<hr width="60%"/>';
         }
     }
+
     $issue->comment = $track;
 
     // Save it for further reference.
@@ -367,6 +369,7 @@ elseif ($action == 'cascade') {
     $issue->downlink = $issue->trackerid.':'.$issue->id;
 
     include_once($CFG->dirroot.'/mod/tracker/rpclib.php');
+
 
     $islocal = false;
     if (strpos($tracker->parent, '@') === false) {
@@ -405,6 +408,7 @@ elseif ($action == 'cascade') {
             $result = null;
         }
     }
+
     if (!empty($result)) {
         $response = (object)json_decode($result);
         if ($response->status == RPC_SUCCESS) {
@@ -525,13 +529,16 @@ elseif ($action == 'raisepriority') {
 elseif ($action == 'raisetotop') {
     $issueid = required_param('issueid', PARAM_INT);
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
-    $maxpriority = $DB->get_field('tracker_issue', 'resolutionpriority', array('id' => $issueid));
+    $sql = "select max(resolutionpriority)
+            from {tracker_issue}
+            where trackerid = ?";
+    $maxpriority = $DB->get_field_sql($sql, array('trackerid' => $issue->trackerid));
 
     if ($issue->resolutionpriority != $maxpriority) {
         // lower everyone above
         $sql = "
             UPDATE
-                {$CFG->dbprefix}tracker_issue
+                {tracker_issue}
             SET
                 resolutionpriority = resolutionpriority - 1
             WHERE
@@ -540,7 +547,7 @@ elseif ($action == 'raisetotop') {
         ";
         $DB->execute($sql, array($tracker->id, $issue->resolutionpriority));
         // update to max priority
-        $issue->resolutionpriority = $maxpriority;
+        $issue->resolutionpriority = $maxpriority + 1;
         $DB->update_record('tracker_issue', $issue);
     }
     tracker_update_priority_stack($tracker);
@@ -562,12 +569,17 @@ elseif ($action == 'lowerpriority') {
 elseif ($action == 'lowertobottom') {
     $issueid = required_param('issueid', PARAM_INT);
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
+    $sql = "select min(resolutionpriority)
+            from {tracker_issue}
+            where trackerid = ?";
+    $minpriority = $DB->get_field_sql($sql, array('trackerid' => $issue->trackerid));
+    if ($minpriority > 1) $minpriority--;
 
     if ($issue->resolutionpriority > 0) {
         // raise everyone beneath
         $sql = "
             UPDATE
-                {$CFG->dbprefix}tracker_issue
+                {tracker_issue}
             SET
                 resolutionpriority = resolutionpriority + 1
             WHERE
@@ -576,7 +588,7 @@ elseif ($action == 'lowertobottom') {
         ";
         $DB->execute($sql, array($tracker->id, $issue->resolutionpriority));
         // update to min priority
-        $issue->resolutionpriority = 0;
+        $issue->resolutionpriority = $minpriority;
         $DB->update_record('tracker_issue', $issue);
     }
     tracker_update_priority_stack($tracker);
