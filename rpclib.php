@@ -61,7 +61,7 @@ function tracker_rpc_check($remoteuser, &$localuser, $createmissing = false) {
     }
     if (!$localuser = $DB->get_record_select('user', "username = ? AND mnethostid = ? AND deleted = 0", array($remoteuser->username, $remotehost->id))) {
         if ($createmissing) {
-            debug_trace('Needs create');
+            debug_backtrace('Needs create');
             // We create a minimalistic mnet user. Profile might be completed later.
             $localuser = new StdClass();
             $localuser->username = $remoteuser->username;
@@ -77,7 +77,7 @@ function tracker_rpc_check($remoteuser, &$localuser, $createmissing = false) {
             $localuser->email = $remoteuser->email;
             $localuser->mnethostid = $remotehost->id;
 
-            debug_trace('will create '.serialize($localuser));
+            debug_backtrace('will create '.serialize($localuser));
 
             try {
                 $localuser->id = $DB->insert_record('user', $localuser);
@@ -177,7 +177,6 @@ function tracker_rpc_get_instances($username, $remotehostroot) {
  */
 function tracker_rpc_post_issue($remoteuser, $trackerid, $remote_issue, $islocalcall = false) {
     global $DB, $USER;
-
     $tracker = $DB->get_record('tracker', array('id' => $trackerid));
     if (!$tracker) {
         $response = new StdClass;
@@ -186,31 +185,34 @@ function tracker_rpc_post_issue($remoteuser, $trackerid, $remote_issue, $islocal
         return json_encode($response);
     }
 
+
     // Objectify received arrays
     $remoteuser = (object)$remoteuser;
     // Cline is important here to unbind instances
     $newissue = clone((object)$remote_issue);
 
+
     if (!$islocalcall) {
         if ($tracker->networkable) {
             // If tracker is networkable, we consider service binding is enough to accept
             // local user creation if missing.
-            debug_trace('Checking for addition : '.serialize($remoteuser));
+            debug_backtrace('Checking for addition : '.serialize($remoteuser));
             if ($failedcheck = tracker_rpc_check($remoteuser, $localuser, CREATE_IF_MISSING)) {
-                debug_trace('Failed : '.serialize($failedcheck));
+                debug_backtrace('Failed : '.serialize($failedcheck));
                 return $failedcheck;
             }
-            debug_trace('Created or existing user : '.serialize($localuser));
+            debug_backtrace('Created or existing user : '.serialize($localuser));
         } else {
             // Simply checks user and returns $localuser record
             if ($failedcheck = tracker_rpc_check($remoteuser, $localuser)) return $failedcheck;
-            debug_trace('Checked existing user : '.serialize($localuser));
+            debug_backtrace('Checked existing user : '.serialize($localuser));
         }
         $originhostid = $DB->get_field('mnet_host', 'id', array('wwwroot' => $remoteuser->hostwwwroot));
     } else {
         $localuser = $USER;
         $originhostid = 0;
     }
+
 
     $response = new StdClass;
     $response->status = RPC_SUCCESS;
@@ -236,12 +238,11 @@ function tracker_rpc_post_issue($remoteuser, $trackerid, $remote_issue, $islocal
     $newissue->downlink = $originhostid.':'.$newissue->downlink;
     $newissue->uplink = '';
 
+
     try {
-        /*
         ob_start();
         print_object($newissue);
-        debug_trace(ob_get_clean());
-        */
+        debug_backtrace(ob_get_clean());
         $followid = $DB->insert_record('tracker_issue', $newissue);
     } catch(Exception $e) {
         $response->status = RPC_FAILURE;
