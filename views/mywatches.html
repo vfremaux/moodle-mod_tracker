@@ -39,7 +39,7 @@ else{
     $table->align = array('left', 'left', 'center', 'center', 'center');
     foreach($mywatches as $awatch){
         $actions = "<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;what=unregister&amp;issueid={$awatch->issueid}&amp;ccid={$awatch->userid}\" title=\"".get_string('delete')."\"><img src=\"".$OUTPUT->pix_url('t/delete','core')."\" border=\"0\" /></a>";
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;what=editwatch&amp;ccid={$awatch->userid}\" title=\"".get_string('update')."\"><img src=\"".$OUTPUT->pix_url('t/edit', 'core')."\" border=\"0\" /></a>";
+         $actions .= "&nbsp;  <a href=\"view.php?id={$cm->id}&amp;view=profile&amp;what=editwatch&amp;ccid={$awatch->id}&amp;issueid={$awatch->issueid}\" title=\"".get_string('update')."\"><img src=\"".$OUTPUT->pix_url('t/edit', 'core')."\" border=\"0\" /></a>";
         if ($tracker->enabledstates & ENABLED_OPEN){
 	        if ($awatch->events & EVENT_OPEN){
 	            $notifications = "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;what=updatewatch&amp;ccid={$awatch->id}&amp;open=0\" title=\"".get_string('unsetwhenopens','tracker')."\"><img src=\"".$OUTPUT->pix_url('open','mod_tracker')."\" border=\"0\" /></a>";

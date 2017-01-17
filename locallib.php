@@ -596,7 +596,7 @@ function tracker_printsearchfields($fields) {
                 $strs[] =  "('".implode("','", $value) ."') ".get_string('IN', 'tracker').' '.get_string('description');
                 break;
             case 'reportedby' :
-                $users = $DB->get_records_list('user', array('id' => implode(',',$value)), 'lastname', 'id,firstname,lastname');
+               $users = $DB->get_records('user', array('id' => implode(',',$value)),'lastname',  'id,firstname,lastname,lastnamephonetic,firstnamephonetic,middlename,alternatename');
                 $reporters = array();
                 if ($users) {
                     foreach ($users as $user) {
@@ -607,7 +607,7 @@ function tracker_printsearchfields($fields) {
                 $strs[] = get_string('reportedby', 'tracker').' '.get_string('IN', 'tracker')." ('".$reporterlist."')";
                 break;
             case 'assignedto' :
-                $users = $DB->get_records_list('user', array('id' => implode(',',$value)), 'lastname', 'id,firstname,lastname');
+              $users = $DB->get_records('user', array('id' => implode(',',$value)), 'lastname', 'id,firstname,lastname,lastnamephonetic,firstnamephonetic,middlename,alternatename');
                 $assignees = array();
                 if ($users) {
                     foreach ($users as $user) {
@@ -640,8 +640,11 @@ function tracker_extractsearchparametersfromdb($queryid = null) {
     if (!empty($query_record)) {
         $fieldnames = explode(',', $query_record->fieldnames);
         $fieldvalues = explode(',', $query_record->fieldvalues);
+          for ($i = 0; $i < count($fieldnames);$i++ ){
+      	 $fields[$fieldnames[$i]][] = $fieldvalues[$i];
 
-	$fields = array_combine( $fieldnames, $fieldvalues );
+	}
+	
     } else {
         error ("Invalid query id: " . $queryid);
     }
@@ -1888,7 +1891,7 @@ class date_iterator{
     var $year;
     var $month;
 
-    function date_iterator($year, $month) {
+    function __construct($year, $month) {
         $this->year = $year;
         $this->month = $month;
         $this->inityear = $year;
@@ -2137,7 +2140,7 @@ function tracker_get_statuskeys($tracker, $cm = null) {
         if (!($tracker->enabledstates & ENABLED_ABANDONNED)) {
             unset($FULLSTATUSKEYS[ABANDONNED]);
         }
-        if (empty($tracker->parent)) {
+       if (!($tracker->enabledstates & ENABLED_TRANSFERED)) {
             unset($FULLSTATUSKEYS[TRANSFERED]);
         }
     }

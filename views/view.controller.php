@@ -151,8 +151,8 @@ elseif ($action == 'delete') {
     // clear all associated fileareas
 
     $fs = get_file_storage();
-    $fs->delete_area_files($context->id, 'mod_tracker', 'issuedescription', $issue->id);
-    $fs->delete_area_files($context->id, 'mod_tracker', 'issueresolution', $issue->id);
+    $fs->delete_area_files($context->id, 'mod_tracker', 'issuedescription', $issueid);
+    $fs->delete_area_files($context->id, 'mod_tracker', 'issueresolution', $issueid);
 
     if ($attributeids) {
         foreach ($attributeids as $attributeid => $void) {
@@ -213,7 +213,7 @@ elseif ($action == 'updatelist') {
                 $ownership->issueid = $issueid;
                 $ownership->userid = $oldassign->assignedto;
                 $ownership->bywhomid = $oldassign->bywhomid;
-                $ownership->timeassigned = $oldassign->timeassigned;
+                $ownership->timeassigned = time();
                 if (!$DB->insert_record('tracker_issueownership', $ownership)) {
                     notice ("Error saving ownership for issue $issueid");
                 }
@@ -446,7 +446,7 @@ elseif ($action == 'distribute') {
         }
     }
     // move the issue
-    $DB->update_record('tracker_issue', addslashes_recursive($issue));
+    $DB->update_record('tracker_issue', $issue);
     $DB->set_field_select('tracker_issueattribute', 'trackerid', $newtracker->id, " issueid = $issue->id ");
     $DB->set_field_select('tracker_state_change', 'trackerid', $newtracker->id, " issueid = $issue->id ");
     $DB->set_field_select('tracker_issueownership', 'trackerid', $newtracker->id, " issueid = $issue->id ");
@@ -465,8 +465,8 @@ elseif ($action == 'raisepriority') {
     if ($nextissue) {
         $issue->resolutionpriority++;
         $nextissue->resolutionpriority--;
-        $DB->update_record('tracker_issue', addslashes_recursive($issue));
-        $DB->update_record('tracker_issue', addslashes_recursive($nextissue));
+        $DB->update_record('tracker_issue', $issue);
+        $DB->update_record('tracker_issue', $nextissue);
     }
     tracker_update_priority_stack($tracker);
 }
@@ -474,13 +474,14 @@ elseif ($action == 'raisepriority') {
 elseif ($action == 'raisetotop') {
     $issueid = required_param('issueid', PARAM_INT);
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
-    $maxpriority = $DB->get_field('tracker_issue', 'resolutionpriority', array('id' => $issueid));
+    $sql = "select max(resolutionpriority) from {tracker_issue}";
+    $maxpriority = $DB->get_field_sql($sql, null);
 
     if ($issue->resolutionpriority != $maxpriority) {
         // lower everyone above
         $sql = "
             UPDATE
-                {$CFG->dbprefix}tracker_issue
+                {tracker_issue}
             SET
                 resolutionpriority = resolutionpriority - 1
             WHERE
@@ -490,7 +491,7 @@ elseif ($action == 'raisetotop') {
         $DB->execute($sql, array($tracker->id, $issue->resolutionpriority));
         // update to max priority
         $issue->resolutionpriority = $maxpriority;
-        $DB->update_record('tracker_issue', addslashes_recursive($issue));
+        $DB->update_record('tracker_issue', $issue);
     }
     tracker_update_priority_stack($tracker);
 }
@@ -502,8 +503,8 @@ elseif ($action == 'lowerpriority') {
         $nextissue = $DB->get_record('tracker_issue', array('trackerid' => $tracker->id, 'resolutionpriority' => $issue->resolutionpriority - 1));
         $issue->resolutionpriority--;
         $nextissue->resolutionpriority++;
-        $DB->update_record('tracker_issue', addslashes_recursive($issue));
-        $DB->update_record('tracker_issue', addslashes_recursive($nextissue));
+        $DB->update_record('tracker_issue',$issue);
+        $DB->update_record('tracker_issue', $nextissue);
     }
     tracker_update_priority_stack($tracker);
 }
@@ -516,7 +517,7 @@ elseif ($action == 'lowertobottom') {
         // raise everyone beneath
         $sql = "
             UPDATE
-                {$CFG->dbprefix}tracker_issue
+                {tracker_issue}
             SET
                 resolutionpriority = resolutionpriority + 1
             WHERE
@@ -526,7 +527,7 @@ elseif ($action == 'lowertobottom') {
         $DB->execute($sql, array($tracker->id, $issue->resolutionpriority));
         // update to min priority
         $issue->resolutionpriority = 0;
-        $DB->update_record('tracker_issue', addslashes_recursive($issue));
+        $DB->update_record('tracker_issue', $issue);
     }
     tracker_update_priority_stack($tracker);
 }
