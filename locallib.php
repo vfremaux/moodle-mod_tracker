@@ -596,7 +596,7 @@ function tracker_printsearchfields($fields) {
                 $strs[] =  "('".implode("','", $value) ."') ".get_string('IN', 'tracker').' '.get_string('description');
                 break;
             case 'reportedby' :
-                $users = $DB->get_records_list('user', array('id' => implode(',',$value)), 'lastname', 'id,firstname,lastname');
+               $users = $DB->get_records('user', array('id' => implode(',',$value)),'lastname',  'id,firstname,lastname,lastnamephonetic,firstnamephonetic,middlename,alternatename');
                 $reporters = array();
                 if ($users) {
                     foreach ($users as $user) {
@@ -607,7 +607,7 @@ function tracker_printsearchfields($fields) {
                 $strs[] = get_string('reportedby', 'tracker').' '.get_string('IN', 'tracker')." ('".$reporterlist."')";
                 break;
             case 'assignedto' :
-                $users = $DB->get_records_list('user', array('id' => implode(',',$value)), 'lastname', 'id,firstname,lastname');
+              $users = $DB->get_records('user', array('id' => implode(',',$value)), 'lastname', 'id,firstname,lastname,lastnamephonetic,firstnamephonetic,middlename,alternatename');
                 $assignees = array();
                 if ($users) {
                     foreach ($users as $user) {
