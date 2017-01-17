@@ -28,6 +28,7 @@ if (!defined('MOODLE_INTERNAL')) {
 /******************************** ask for a new search query **************************/
 if ($action == 'savequery') { // collects name and description on the way
     $fields = tracker_extractsearchparametersfrompost();
+    $form = new stdClass();
     $form->fields = serialize($fields); // serialize for passthru
     $form->action = 'dosaveasquery';
     $form->description = tracker_printsearchfields($fields);
@@ -36,6 +37,7 @@ if ($action == 'savequery') { // collects name and description on the way
 }
 /******************************** saves a new search query **************************/
 elseif ($action == 'dosaveasquery') {
+    $query = new stdClass();
     $query->format = required_param('format', PARAM_INT);
     $query->name = required_param('name', PARAM_TEXT);
     $query->description = str_replace("'", "''", required_param('description', PARAM_CLEANHTML));
@@ -62,6 +64,7 @@ elseif ($action == 'viewquery') {
 }
 /******************************** ask for editing a personal search query **************************/
 elseif ($action == 'editquery') {
+    $form = new stdClass();
     $form->queryid = required_param('queryid', PARAM_INT);
     $query = $DB->get_record('tracker_query', array('id' => $form->queryid));
     $fields = tracker_extractsearchparametersfromdb($form->queryid);
@@ -76,6 +79,7 @@ elseif ($action == 'editquery') {
 }
 /******************************** updates a personal search query **************************/
 elseif ($action == 'updatequery') {
+    $query = new stdClass();
     $query->id = required_param('queryid', PARAM_INT);
     $fields = tracker_extractsearchparametersfrompost();
     $query->trackerid = $tracker->id;
@@ -86,7 +90,7 @@ elseif ($action == 'updatequery') {
 /******************************** deletes a personal search query **************************/
 elseif ($action == 'deletequery') {
     $queryid = optional_param('queryid', '', PARAM_INT);
-    if (! $DB->delete_records ('tracker_query', 'id', $queryid, 'trackerid', $tracker->id, 'userid', $USER->id)) {
+    if (!$DB->delete_records ('tracker_query',array( 'id'=> $queryid, 'trackerid'=> $tracker->id, 'userid'=> $USER->id))) {
         print_error('errorcannotdeletequeryid', 'tracker',  $url.'&amp;view=profile', $queryid);
     }
 }
