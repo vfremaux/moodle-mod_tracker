@@ -640,8 +640,11 @@ function tracker_extractsearchparametersfromdb($queryid = null) {
     if (!empty($query_record)) {
         $fieldnames = explode(',', $query_record->fieldnames);
         $fieldvalues = explode(',', $query_record->fieldvalues);
+          for ($i = 0; $i < count($fieldnames);$i++ ){
+      	 $fields[$fieldnames[$i]][] = $fieldvalues[$i];
 
-	$fields = array_combine( $fieldnames, $fieldvalues );
+	}
+	
     } else {
         error ("Invalid query id: " . $queryid);
     }
