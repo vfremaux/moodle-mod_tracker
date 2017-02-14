@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @package mod_tracker
  * @category mod
@@ -24,6 +22,8 @@ defined('MOODLE_INTERNAL') || die();
  *
  * A class implementing a hidden/labelled element that captures the referer url
  */
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 
 class autourlelement extends trackerelement {
@@ -50,7 +50,7 @@ class autourlelement extends trackerelement {
     }
 
     function add_form_element(&$mform) {
-        $mform->addElement('header', "header{$this->name}", '');
+        $mform->addElement('header', "header{$this->name}", format_string($this->description));
         $mform->setExpanded("header{$this->name}");
         $mform->addElement('hidden', "element{$this->name}");
         $mform->setDefault("element{$this->name}", $_SERVER['HTTP_REFERER']);

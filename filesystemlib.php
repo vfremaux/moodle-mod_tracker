@@ -27,7 +27,7 @@
  * @todo Check if not obsolete. Eliminate when possible.
  */
 
-//avoids reloading the lib when keeped in third party plugin
+// Avoids reloading the lib when keeped in third party plugin.
 if (!function_exists('filesystem_create_dir')) {
 
 define('FS_RECURSIVE', true);
@@ -49,7 +49,7 @@ define('FS_CLEAR_CONTENT', false);
  * @param boolean $recursive if true, creates recursively all path elements
  * @param string $pathbase the base path
  */
-function filesystem_create_dir($path, $recursive = 0, $pathbase=null) {
+function filesystem_create_dir($path, $recursive = 0, $pathbase = null) {
     global $CFG;
 
     if (is_null($pathbase)) {
@@ -62,11 +62,15 @@ function filesystem_create_dir($path, $recursive = 0, $pathbase=null) {
 
     $result = true;
     if (!$recursive) {
-       if (@$CFG->filedebug) mtrace("creating dir <i>{$path}</i><br/>");
-       $oldMask = umask(0);
-       if (!filesystem_is_dir($path, $pathbase)) $result = @mkdir($pathbase . $path, 0777);
-       umask($oldMask);
-       return $result;
+        if (@$CFG->filedebug) {
+            mtrace("creating dir <i>{$path}</i><br/>");
+        }
+        $oldMask = umask(0);
+        if (!filesystem_is_dir($path, $pathbase)) {
+            $result = @mkdir($pathbase . $path, 0777);
+        }
+        umask($oldMask);
+        return $result;
     } else {
        $parts = explode('/', $path);
        $pathTo = '';
@@ -88,7 +92,7 @@ function filesystem_is_dir($relativepath, $pathbase = null) {
 
     if (is_null($pathbase)) {
         $pathbase = $CFG->dataroot . '/';
-    } elseif ($pathbase === '') {
+    } else if ($pathbase === '') {
         $pathbase = '';
     } else {
         $pathbase = $pathbase . '/';
@@ -110,7 +114,7 @@ function filesystem_file_exists($relativepath, $pathbase=null) {
 
     if (is_null($pathbase)) {
         $pathbase = $CFG->dataroot . '/';
-    } elseif ($pathbase === '') {
+    } else if ($pathbase === '') {
         $pathbase = '';
     } else {
         $pathbase = $pathbase . '/';
@@ -135,7 +139,7 @@ function filesystem_scan_dir($relativepath, $hiddens = 0, $what = 0, $pathbase =
 
     if (is_null($pathbase)) {
         $pathbase = $CFG->dataroot . '/';
-    } elseif ($pathbase === '') {
+    } else if ($pathbase === '') {
         $pathbase = '';
     } else {
         $pathbase = $pathbase . '/';
@@ -150,12 +154,16 @@ function filesystem_scan_dir($relativepath, $hiddens = 0, $what = 0, $pathbase =
         if ($what == FS_ONLY_DIRS) {
             $subpath = $relativepath . '/' . $anEntry;
             $subpath = preg_replace("/^\//", "", $subpath);
-            if (!filesystem_is_dir($subpath, $pathbase)) continue ;
+            if (!filesystem_is_dir($subpath, $pathbase)) {
+                continue;
+            }
         }
         if ($what == FS_NO_DIRS) {
             $subpath = $relativepath . '/' . $anEntry;
             $subpath = preg_replace("/^\//", "", $subpath);
-            if (filesystem_is_dir($subpath, $pathbase)) continue ;
+            if (filesystem_is_dir($subpath, $pathbase)) {
+                continue;
+            }
         }
         if ($hiddens) {
             if (($anEntry != '.') && ($anEntry != '..')) $entries[] = $anEntry;
@@ -179,7 +187,7 @@ function filesystem_clear_dir($relativepath, $fullDelete = false, $pathbase = nu
 
     if (is_null($pathbase)) {
         $pathbase = $CFG->dataroot . '/';
-    } elseif ($pathbase === '') {
+    } else if ($pathbase === '') {
         $pathbase = '';
     } else {
         $pathbase = $pathbase . '/';
@@ -225,7 +233,7 @@ function filesystem_copy_tree($source, $dest, $pathbase=null) {
 
     if (is_null($pathbase)) {
         $pathbase = $CFG->dataroot . '/';
-    } elseif ($pathbase === '') {
+    } else if ($pathbase === '') {
         $pathbase = '';
     } else {
         $pathbase = $pathbase . '/';

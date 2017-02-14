@@ -14,17 +14,25 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
 }
 
-// set initial view mode for additional pannels
-$initialviewmode = ($action == 'doaddcomment') ? 'visiblediv' : 'hiddendiv' ;
-$initialviewmodeforccs = ($action == 'register' || $action == 'unregister') ? 'visiblediv' : 'hiddendiv' ;
+$config = get_config('mod_tracker');
+
+// Set initial view mode for additional pannels.
+$commentscondition = ($action == 'doaddcomment') || ($config->initialviewcomments == 'open');
+$initialcommentsviewmode = ($commentscondition) ? 'visiblediv' : 'hiddendiv';
+$ccscondition = ($action == 'register' || $action == 'unregister') || ($config->initialviewccs == 'open');
+$initialccsviewmode = ($ccscondition) ? 'visiblediv' : 'hiddendiv';
+$initialdepsviewmode = ($config->initialviewdeps == 'open') ? 'visiblediv' : 'hiddendiv';
+$initialhistoryviewmode = ($config->initialviewhistory == 'open') ? 'visiblediv' : 'hiddendiv';
 
 $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
 
-if (!$issue){
-    if ($tracker->supportmode == 'bugtrack'){
-        redirect("view.php?view=view&amp;screen=browse&amp;a=$tracker->id");
+if (!$issue) {
+    if ($tracker->supportmode == 'bugtrack') {
+        $trackerurl = new moodle_url('/mod/tracker/viex.php', array('view' => 'view', 'screen' => 'browse', 'a' => $tracker->id));
+        redirect($trackerurl);
     } else {
-        redirect("view.php?view=view&amp;screen=mytickets&amp;a=$tracker->id");
+        $trackerurl = new moodle_url('/mod/tracker/viex.php', array('view' => 'view', 'screen' => 'mytickets', 'a' => $tracker->id));
+        redirect($trackerurl);
     }
 }
 
@@ -42,8 +50,8 @@ $cced = array();
 $history = $DB->get_records_select('tracker_issueownership', " trackerid = ? AND issueid = ? ", array($tracker->id, $issue->id), 'timeassigned DESC');
 $statehistory = $DB->get_records_select('tracker_state_change', " trackerid = ? AND issueid = ? ", array($tracker->id, $issue->id),'timechange ASC');
 $showdependancieslink = (!empty($childtree) || !empty($parenttree)) ? "<a id=\"toggledependancieslink\" href=\"javascript:toggledependancies()\">".get_string(($initialviewmode == 'visiblediv') ? 'hidedependancies' : 'showdependancies', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
-$showccslink = (!empty($ccs)) ? "<a id=\"toggleccslink\" href=\"javascript:toggleccs()\">".get_string(($initialviewmodeforccs == 'visiblediv') ? 'hideccs' : 'showccs', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
-$showhistorylink = (!empty($history) || !empty($statehistory)) ? "<a id=\"togglehistorylink\" href=\"javascript:togglehistory()\">".get_string(($initialviewmode == 'visiblediv') ? 'hidehistory' : 'showhistory', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
+$showccslink = (!empty($ccs)) ? "<a id=\"toggleccslink\" href=\"javascript:toggleccs()\">".get_string(($initialccsviewmode == 'visiblediv') ? 'hideccs' : 'showccs', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
+$showhistorylink = (!empty($history) || !empty($statehistory)) ? "<a id=\"togglehistorylink\" href=\"javascript:togglehistory()\">".get_string(($initialhistoryviewmode == 'visiblediv') ? 'hidehistory' : 'showhistory', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
 
 // fixing embeded files URLS
 
@@ -128,12 +136,20 @@ if ($tracker->enablecomments) {
 }
 
 $transferlink = '';
-if ($tracker->parent && $issue->status != TRANSFERED && (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context) || has_capability('mod/tracker:develop', $context))) {
+if ($tracker->parent &&
+        ($issue->status != TRANSFERED) &&
+                (has_capability('mod/tracker:manage', $context) ||
+                        has_capability('mod/tracker:resolve', $context) ||
+                                has_capability('mod/tracker:develop', $context))) {
     $transferlink = " - <a href=\"view.php?id={$cm->id}&amp;view=view&amp;what=cascade&amp;issueid={$issueid}\">".get_string('cascade','tracker')."</a>";
 }
 
 $distribute = '';
-if ($tracker->subtrackers && $issue->status != TRANSFERED && (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context) || has_capability('mod/tracker:develop', $context))) {
+if ($tracker->subtrackers &&
+        ($issue->status != TRANSFERED) &&
+                (has_capability('mod/tracker:manage', $context) ||
+                        has_capability('mod/tracker:resolve', $context) ||
+                                has_capability('mod/tracker:develop', $context))) {
     $distribute = $renderer->distribution_form($tracker, $issue, $cm);
 }
 
@@ -149,7 +165,7 @@ if ($tracker->enablecomments) {
 ?>
     <tr>
         <td colspan="4">
-            <div id="issuecomments" class="<?php echo $initialviewmode ?> comments">
+            <div id="issuecomments" class="<?php echo $initialcommentsviewmode ?> comments">
             <table width="100%">
                 <?php echo $renderer->comments($issue->id); ?>
             </table>
@@ -162,7 +178,7 @@ if ($tracker->enablecomments) {
 ?>
     <tr>
         <td colspan="4" align="center" width="100%">
-            <table id="issuedependancytrees" class="<?php echo $initialviewmode ?>">
+            <table id="issuedependancytrees" class="<?php echo $initialdepsviewmode ?>">
                 <tr>
                     <td>&nbsp;</td>
                     <td align="left" style="white-space : nowrap">
@@ -179,13 +195,13 @@ if ($tracker->enablecomments) {
     </tr>
 <?php
 if ($showccslink) {
-    echo $renderer->ccs($ccs, $issue, $cm, $cced, $initialviewmodeforccs);
+    echo $renderer->ccs($ccs, $issue, $cm, $cced, $initialccsviewmode);
 }
 if (has_capability('mod/tracker:managewatches', $context)) {
     echo $renderer->watches_form($issue, $cm, $cced);
 }
 if ($showhistorylink) {
-    echo $renderer->history($history, $statehistory, $initialviewmode);
+    echo $renderer->history($history, $statehistory, $initialhistoryviewmode);
 }
 ?>
 </table>

@@ -15,20 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package mod_tracker
- * @category mod
- * @author Clifford Tham, Valery Fremaux > 1.8
- * @date 02/12/2007
+ * @package     mod_tracker
+ * @category    mod
+ * @author      Clifford Tham, Valery Fremaux > 1.8
  */
 require('../../config.php');
 require_once($CFG->dirroot."/mod/tracker/lib.php");
 require_once($CFG->dirroot."/mod/tracker/locallib.php");
 require_once $CFG->dirroot.'/mod/tracker/forms/editelement_form.php';
 
-$id = optional_param('id', 0, PARAM_INT); // Course Module ID, or
-$t  = optional_param('t', 0, PARAM_INT);  // tracker ID
-$type = required_param('type', PARAM_TEXT);  // Element class name
-$elementid = optional_param('elementid', 0, PARAM_INT);  // Element instance id
+$id = optional_param('id', 0, PARAM_INT); // Course Module ID, or.
+$t  = optional_param('t', 0, PARAM_INT);  // Tracker ID.
+$type = required_param('type', PARAM_TEXT);  // Element class name.
+$elementid = optional_param('elementid', 0, PARAM_INT);  // Element instance id.
 
 if ($id) {
     if (! $cm = get_coursemodule_from_id('tracker', $id)) {
@@ -51,6 +50,7 @@ if ($id) {
     if (! $course = $DB->get_record('course', array('id' => $tracker->course))) {
         print_error('errorcoursemisconfigured', 'tracker');
     }
+
     if (! $cm = get_coursemodule_from_instance("tracker", $tracker->id, $course->id)) {
         print_error('errorcoursemodid', 'tracker');
     }
@@ -59,13 +59,13 @@ if ($id) {
 $screen = tracker_resolve_screen($tracker, $cm);
 $view = tracker_resolve_view($tracker, $cm);
 
-// Security. 
+// Security.
 
 $context = context_module::instance($cm->id);
 require_course_login($course->id, false, $cm);
 require_capability('mod/tracker:report', $context);
 
-// setting page
+// Setting page.
 $url = new moodle_url('/mod/tracker/editelement.php', array('id' => $id));
 $PAGE->set_url($url);
 $PAGE->set_context($context);

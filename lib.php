@@ -14,16 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
- * @package mod_tracker
- * @category mod
- * @author Clifford Tham, Valery Fremaux > 1.8
- * @date 02/12/2007
+ * @package     mod_tracker
+ * @category    mod
+ * @author      Clifford Tham, Valery Fremaux > 1.8
  *
  * Library of functions and constants for module tracker
  */
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 
@@ -34,18 +33,29 @@ require_once($CFG->dirroot.'/mod/tracker/locallib.php');
  */
 function tracker_supports($feature) {
     switch ($feature) {
-        case FEATURE_MOD_ARCHETYPE:           return MOD_ARCHETYPE_OTHER;
-        case FEATURE_GROUPS:                  return false;
-        case FEATURE_GROUPINGS:               return false;
-        case FEATURE_GROUPMEMBERSONLY:        return false;
-        case FEATURE_MOD_INTRO:               return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS: return false;
-        case FEATURE_GRADE_HAS_GRADE:         return false;
-        case FEATURE_GRADE_OUTCOMES:          return false;
-        case FEATURE_BACKUP_MOODLE2:          return true;
-        case FEATURE_SHOW_DESCRIPTION:        return true;
+        case FEATURE_MOD_ARCHETYPE:
+            return MOD_ARCHETYPE_OTHER;
+        case FEATURE_GROUPS:
+            return false;
+        case FEATURE_GROUPINGS:
+            return false;
+        case FEATURE_GROUPMEMBERSONLY:
+            return false;
+        case FEATURE_MOD_INTRO:
+            return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+            return false;
+        case FEATURE_GRADE_HAS_GRADE:
+            return false;
+        case FEATURE_GRADE_OUTCOMES:
+            return false;
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
+        case FEATURE_SHOW_DESCRIPTION:
+            return true;
 
-        default: return null;
+        default:
+            return null;
     }
 }
 
@@ -172,7 +182,7 @@ function tracker_delete_instance($id) {
  */
 function tracker_user_outline($course, $user, $mod, $tracker) {
 
-    return NULL;
+    return null;
 }
 
 /**
@@ -181,7 +191,7 @@ function tracker_user_outline($course, $user, $mod, $tracker) {
  */
 function tracker_user_complete($course, $user, $mod, $tracker) {
 
-    return NULL;
+    return null;
 }
 
 /**
@@ -212,7 +222,7 @@ function tracker_print_recent_activity($course, $isteacher, $timestart) {
     $newstuff = $DB->get_records_sql($sql);
     if ($newstuff) {
         foreach ($newstuff as $anissue) {
-            echo "<span style=\"font-size:0.8em\">";
+            echo '<span style="font-size:0.8em">';
             echo get_string('modulename', 'tracker').': '.format_string($anissue->name).':<br/>';
             $params = array('t' => $anissue->trackerid, 'view' => 'view', 'page' => 'viewanissue', 'issueid' => $anissue->id);
             $issueurl = new moodle_url('/mod/tracker/view.php', $params);
@@ -223,7 +233,7 @@ function tracker_print_recent_activity($course, $isteacher, $timestart) {
         return true;
     }
 
-    return false;  // True if anything was printed, otherwise false
+    return false;  // True if anything was printed, otherwise false.
 }
 
 /**
@@ -236,7 +246,7 @@ function tracker_print_recent_activity($course, $isteacher, $timestart) {
 function tracker_print_overview($courses, &$htmlarray) {
     global $USER, $CFG, $DB;
 
-    // Check if really installed
+    // Check if really installed.
     if (!$DB->record_exists('modules', array('name' => 'tracker'))) {
         return array();
     }
@@ -320,7 +330,6 @@ function tracker_print_overview($courses, &$htmlarray) {
  * as sending out mail, toggling flags etc ...
  */
 function tracker_cron () {
-
     global $CFG;
 
     return true;
@@ -336,8 +345,7 @@ function tracker_cron () {
  *    return $return;
  */
 function tracker_grades($trackerid) {
-
-   return NULL;
+   return null;
 }
 
 /**
@@ -393,12 +401,6 @@ function tracker_get_participants($trackerid) {
  */
 function tracker_scale_used ($trackerid, $scaleid) {
     $return = false;
-
-    //$rec = get_record("tracker","id","$trackerid","scale","-$scaleid");
-    //
-	//if (!empty($rec)  && !empty($scaleid)) {
-    // $return = true;
-    //}
 
     return $return;
 }
@@ -511,12 +513,12 @@ function tracker_pluginfile($course, $cm, $context, $filearea, $args, $forcedown
     $fs = get_file_storage();
     $relativepath = implode('/', $args);
     $fullpath = "/$context->id/mod_tracker/$filearea/$itemid/$relativepath";
-    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
+    if ((!$file = $fs->get_file_by_hash(sha1($fullpath))) || $file->is_directory()) {
         return false;
     }
 
     // Finally send the file.
-    send_stored_file($file, 0, 0, false); // download MUST be forced - security!
+    send_stored_file($file, 0, 0, false); // Download MUST be forced - security!
 }
 
 /**
@@ -643,7 +645,7 @@ function tracker_setup_role_overrides(&$tracker, $context) {
                 'permission' => CAP_PREVENT,
             ),
         );
-    } elseif ($tracker->supportmode == 'bugtracker') {
+    } else if ($tracker->supportmode == 'bugtracker') {
         $overrides = array(
             array(
                 'contextid' => $context->id,
@@ -754,7 +756,7 @@ function tracker_setup_role_overrides(&$tracker, $context) {
                 'permission' => CAP_ALLOW,
             ),
         );
-    } elseif ($tracker->supportmode == 'ticketting') { // User individual support
+    } else if ($tracker->supportmode == 'ticketting') { // User individual support.
         $overrides = array(
             array(
                 'contextid' => $context->id,
@@ -902,9 +904,9 @@ function tracker_preset_states(&$tracker) {
 
     if ($tracker->supportmode == 'taskspread') {
         $tracker->enabledstates = ENABLED_OPEN | ENABLED_RESOLVED | ENABLED_WAITING | ENABLED_ABANDONNED;
-    } elseif ($tracker->supportmode == 'bugtracker') {
+    } else if ($tracker->supportmode == 'bugtracker') {
         $tracker->enabledstates = ENABLED_ALL;
-    } elseif ($tracker->supportmode == 'ticketting') {
+    } else if ($tracker->supportmode == 'ticketting') {
         $tracker->enabledstates = ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_RESOLVED | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_VALIDATED;
     } else {
         if (is_array(@$tracker->stateprofile)) {
@@ -919,11 +921,12 @@ function tracker_preset_params(&$tracker) {
     if ($tracker->supportmode == 'taskspread') {
         $tracker->thanksmessage = get_string('message_taskspread', 'tracker');
         $tracker->defaultassignee = 0;
-    } elseif ($tracker->supportmode == 'bugtracker') {
+    } else if ($tracker->supportmode == 'bugtracker') {
         $tracker->thanksmessage = get_string('message_bugtracker', 'tracker');
-    } elseif ($tracker->supportmode == 'ticketting') {
+    } else if ($tracker->supportmode == 'ticketting') {
         if ($tracker->defaultassignee) {
-            $defaultassignee = $DB->get_record('user', array('id' => $tracker->defaultassignee), 'id,'.get_all_user_name_fields(true, ''));
+            $fields = 'id,'.get_all_user_name_fields(true, '');
+            $defaultassignee = $DB->get_record('user', array('id' => $tracker->defaultassignee), $fields);
             $tracker->thanksmessage = get_string('message_ticketting_preassigned', 'tracker', fullname($defaultassignee));
         } else {
             $tracker->thanksmessage = get_string('message_ticketting', 'tracker');

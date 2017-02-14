@@ -43,6 +43,13 @@ if (!defined('RPC_SUCCESS')) {
 
 define('CREATE_IF_MISSING', true);
 
+if (!function_exists('debug_trace')) {
+    function debug_trace($str) {
+        // Empty fake function if missing.
+        assert(1);
+    }
+}
+
 /**
  * checks an user has local identity and comes from a known host
  * @param string $username the user's login

@@ -72,6 +72,16 @@ $string['comment'] = 'Commentaire';
 $string['commentedby'] = 'Commenté par';
 $string['comments'] = 'Commentaires';
 $string['component'] = 'Composant';
+$string['configinitialviewccs'] = 'Panneau des observateurs';
+$string['configinitialviewccs_desc'] = 'Définit l\'état initial du panneau observateurs, lorsqu\'un ticket est ouvert.';
+$string['configinitialviewcomments'] = 'Panneau des commentaires';
+$string['configinitialviewcomments_desc'] = 'Définit l\'état initial du panneau observateurs, lorsqu\'un ticket est ouvert.';
+$string['configinitialviewdeps'] = 'Panneau des dépendances';
+$string['configinitialviewdeps_desc'] = 'Définit l\'état initial du panneau des dépendances, lorsqu\'un ticket est ouvert.';
+$string['configinitialviewhistory'] = 'Panneau des historiques';
+$string['configinitialviewhistory_desc'] = 'Définit l\'état initial du panneau d\'historique, lorsqu\'un ticket est ouvert.';
+$string['open'] = 'Open';
+$string['closed'] = 'Closed';
 $string['constant'] = 'Constante';
 $string['constantinfosource'] = 'Source de la constante';
 $string['customconstant'] = 'Valeur spécifique';
@@ -494,3 +504,202 @@ Lorsqu\'activé, chaque rôle (interne au regard du gestionnaire, rapporteur, d�
 $string['networkable_help'] = 'Si activé, ce gestionnaire sera libremant accessible du réseau Mnet. Les utilisateurs distants pourront cascader dans ce gestionnaire même s\'ils ne disposent pas de compte
 local dans la plate-forme. Un compte réseau sera alors automatiquement créé pour eux. Cette possibilité reste néanmoins réservée aux pairs qui ont convenablement configuré les services
 d\'échange de données entre gestionnaires de tickets.';
+
+$string['addcomment_tpl'] = '
+Cours : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+Tracker : <%%TRACKERNAME%%>
+--------------------------------------
+<%%CONTRIBUTOR%%> a ajouté un commentaire 
+pour le ticket posté : <%%ISSUE%%> / <%%SUMMARY%%>
+------------------------------------------
+<%%COMMENT%%>
+------------------------------------------
+Pour voir la fiche défaut : <%%ISSUEURL%%>
+Pour se désabonner des événements de cette fiche : <%%UNCCURL%%>
+Pour se désabonner de ce tracker : <%%ALLUNCCURL%%>
+';
+
+$string['addcomment_html_tpl'] = '
+<b>Cours :</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br/>
+<b>Tracker :</b> <%%TRACKERNAME%%><br/>
+<hr/>
+<p><%%CONTRIBUTOR%%> a ajouté un commentaire<br/> 
+pour le ticket posté : <%%ISSUE%%> / <%%SUMMARY%%></p>
+<hr/>
+<p><%%COMMENT%%></p>
+<hr/>
+<p><a href="<%%ISSUEURL%%>">Voir le défaut dans son contexte</a><br/>
+<a href="<%%UNCCURL%%>">Se désabonner du défaut</a><br/>
+<a href="<%%ALLUNCCURL%%>">Se désabonner de ce tracker</a></p>
+';
+
+$string['issuemoved_tpl'] = '
+Le ticket suivant :
+--------------------------------------
+Ticket : <%%ISSUE%%> / <%%SUMMARY%%>
+
+a été déplacé du tracker :
+--------------------------------------
+Cours : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+Tracker : <%%TRACKERNAME%%>
+
+au tracker :
+--------------------------------------
+Cours : [<%%NEWCOURSE_SHORT%%>] <%%NEWCOURSENAME%%>
+Tracker : <%%NEWTRACKERNAME%%>
+
+Le responsable est maintenant :
+-------------------------------------
+<%%ASSIGNEDTO%%> 
+
+-------------------------------------
+URL pour voir le ticket : <%%ISSUEURL%%>
+URL pour se désabonner de ce ticket : <%%UNCCURL%%>
+URL pour ce désabonner de tous les tickets de ce tracker (départ) : <%%ALLUNCCURL%%>
+';
+
+$string['issuemoved_html_tpl'] = '
+<p>Le ticket suivant :<br/>
+<hr/><br/>
+<b>Ticket :</b> <%%ISSUE%%> / <%%SUMMARY%%>
+</p>
+<p>a été déplacé du tracker :<br/>
+<hr/><br/>
+<p>Cours :</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br/>
+<b>Tracker :</b> <%%TRACKERNAME%%></p>
+
+<p>au tracker:<br/>
+<hr/><br/>
+<b>Cours :</b> [<%%NEWCOURSE_SHORT%%>] <%%NEWCOURSENAME%%><br/>
+<b>Tracker :</b> <%%NEWTRACKERNAME%%>
+</p>
+
+<p>Le responsable est maintenant:<br/>
+<hr/><br/>
+<%%ASSIGNEDTO%%> 
+</p>
+
+<p>
+<hr/><br/>
+URL pour voir le ticket : <%%ISSUEURL%%><br/>
+URL pour se désabonner de ce ticket : <%%UNCCURL%%><br/>
+URL pour ce désabonner de tous les tickets de ce tracker (départ) : <%%ALLUNCCURL%%>
+</p>
+';
+
+$string['ownershipchanged_tpl'] = '
+Cours : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+Tracker : <%%TRACKERNAME%%>
+--------------------------------------
+Le défaut : <%%ISSUE%%> : <%%SUMMARY%%>
+est réassigné à : <%%ASSIGNEDTO%%> 
+par : <%%BY%%>
+
+Pour voir la fiche défaut : <%%ISSUEURL%%>
+Pour se désabonner des événements de cette fiche : <%%UNCCURL%%>
+Pour se désabonner de ce tracker : <%%ALLUNCCURL%%>
+';
+
+$string['ownershipchanged_html_tpl'] = '
+<b>Cours :</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br />
+<b>Tracker :</b> <%%TRACKERNAME%%><br/>
+<hr/>
+<p><b>Le défaut :</b> <%%ISSUE%%> : <%%SUMMARY%%><br />
+<b>est réassigné à :</b> <%%ASSIGNEDTO%%> <br />
+<b>par :</b> <%%BY%%></p>
+<hr/>
+<p><a href="<%%ISSUEURL%%>">Voir la fiche défaut</a><br/>
+<a href="<%%UNCCURL%%>">Se désabonner des événements de cette fiche</a><br/>
+<a href="<%%ALLUNCCURL%%>">Se désabonner de ce tracker</a></p>
+';
+
+$string['raiserequest_tpl'] = '
+Cours : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+Tracker : <%%TRACKERNAME%%>
+--------------------------------------
+Une demande de priorité a été soumise par : 
+<%%REQUESTEDBY%%>
+
+pour le ticket : 
+<%%ISSUE%%> : <%%SUMMARY%%>
+émis par : 
+<%%BY%%>
+
+la raison donnée est : 
+<%%REASON%%>
+
+------------------------------------------
+<%%URGENT%%>
+------------------------------------------
+Pour voir la fiche défaut : <%%ISSUEURL%%>
+';
+
+$string['raiserequest_html_tpl'] = '
+<b>Cours :</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br/>
+<b>Tracker :</b> <%%TRACKERNAME%%><br/>
+<hr/>
+<p><b>Une demande de priorité a été soumise par :</b><br/>
+<%%REQUESTEDBY%%><br/> 
+<b>pour le ticket :</b><br/> 
+<%%ISSUE%%> : <%%SUMMARY%%><br/>
+<b>posté par :</b><br/>
+<%%BY%%></p>
+<p><b>La raison donnée est la suivante :</b><br/>
+<%%REASON%%>
+<hr/>
+<%%URGENT%%>
+<hr/>
+<p><a href="<%%ISSUEURL%%>">Voir la fiche défaut</a><br/></p>
+';
+
+$string['statechanged_tpl'] = '
+Cours : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+Tracker : <%%TRACKERNAME%%>
+--------------------------------------
+Le défaut : <%%ISSUE%%> : <%%SUMMARY%%>
+a été passé à l\'état <%%EVENT%%>
+par : <%%BY%%>
+
+Pour voir la fiche défaut : <%%ISSUEURL%%>
+Pour se désabonner des événements de cette fiche : <%%UNCCURL%%>
+Pour se désabonner de ce tracker : <%%ALLUNCCURL%%>
+';
+
+$string['statechanged_html_tpl'] = '
+<p><b>Cours :</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+<b>Tracker :</b> <%%TRACKERNAME%%>
+<hr/>
+<b>Le défaut :</b> <%%ISSUE%%> - <%%SUMMARY%%><br/>
+<b>a été passé à l\'état</b> : <%%EVENT%%><br/>
+<b>par :</b> <%%BY%%></p>
+<hr/>
+<p><a href="<%%ISSUEURL%%>">Voir le défaut dans son contexte</a><br/>
+<a href="<%%UNCCURL%%>">Se désabonner du défaut</a><br/>
+<a href="<%%ALLUNCCURL%%>">Se désabonner de ce tracker</a></p>
+';
+
+$string['submission'] = '
+Cours : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+Tracker : <%%TRACKERNAME%%>
+--------------------------------------
+Nouveau défaut posté : <%%ISSUE%%> : <%%SUMMARY%%>
+par : <%%BY%%>
+
+Description : <%%DESCRIPTION%%>
+
+Pour voir la fiche défaut : <%%ISSUEURL%%>
+Pour s\'abonner aux événements de cette fiche : <%%CCURL%%>
+';
+
+$string['submission_html_tpl'] = '
+<b>Cours :</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br/>
+<b>Tracker :</b> <%%TRACKERNAME%%><br/>
+<hr/>
+<p><b>Nouveau défaut posté :</b> <%%ISSUE%%> : <%%SUMMARY%%><br/>
+<b>par :</b> <%%BY%%></p>
+<hr/>
+<b>Description : </b><%%DESCRIPTION%%>
+<hr/>
+<p><a href="<%%ISSUEURL%%>">Voir la fiche défaut</a><br/>
+<a href="<%%CCURL%%>">S\'abonner aux événements de cette fiche</a></p>
+';
