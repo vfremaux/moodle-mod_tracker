@@ -14,16 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
- * @package mod_tracker
- * @category mod
- * @author Clifford Tham, Valery Fremaux > 1.8
- * @date 02/12/2007
+ * @package     mod_tracker
+ * @category    mod
+ * @author      Clifford Tham, Valery Fremaux > 1.8
  *
  * Library of internal functions and constants for module tracker
  */
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot.'/lib/uploadlib.php');
 require_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
 
@@ -60,15 +59,15 @@ function shop_get_role_definition(&$tracker, $role) {
         } else {
             return ENABLED_POSTED | ENABLED_RESOLVED| ENABLED_VALIDATED;
         }
-    } elseif ($role == 'develop') {
+    } else if ($role == 'develop') {
         if ($tracker->supportmode == 'bugtracker') {
             return ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED | ENABLED_VALIDATED;
         } else {
             return ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED;
         }
-    } elseif ($role == 'resolve') {
+    } else if ($role == 'resolve') {
         return ENABLED_RESOLVED | ENABLED_VALIDATED | ENABLED_ABANDONNED | ENABLED_TRANSFERED;
-    } elseif ($role == 'manage') {
+    } else if ($role == 'manage') {
         return ENABLED_POSTED | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED | ENABLED_VALIDATED;
     }
     return 0;
@@ -128,7 +127,7 @@ function tracker_loadelements(&$tracker, &$elementsobj) {
     // Make a set of element objet with records.
     if (!empty($elements)) {
         foreach ($elements as $element) {
-            // this get the options by the constructor
+            // This get the options by the constructor.
             include_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/'.$element->type.'/'.$element->type.'.class.php');
             $constructorfunction = "{$element->type}element";
             $elementsobj[$element->id] = new $constructorfunction($tracker, $element->id);
@@ -149,13 +148,20 @@ function tracker_getelementtypes() {
     global $CFG;
 
     $typedir = $CFG->dirroot.'/mod/tracker/classes/trackercategorytype';
-    $DIR = opendir($typedir);
-    while ($entry = readdir($DIR)) {
-        if (strpos($entry, '.') === 0) continue;
-        if ($entry == 'CVS') continue;
-        if (!is_dir("$typedir/$entry")) continue;
+    $dir = opendir($typedir);
+    while ($entry = readdir($dir)) {
+        if (strpos($entry, '.') === 0) {
+            continue;
+        }
+        if ($entry == 'CVS') {
+            continue;
+        }
+        if (!is_dir("$typedir/$entry")) {
+            continue;
+        }
         $types[] = $entry;
     }
+    closedir($dir);
     return $types;
 }
 
@@ -255,7 +261,7 @@ function tracker_getelementsused_by_name(&$tracker) {
 function tracker_iselementused($trackerid, $elementid) {
     global $DB;
 
-    $inusedelements = $DB->count_records_select('tracker_elementused', 'elementid = ' . $elementid . ' AND trackerid = ' . $trackerid);
+    $inusedelements = $DB->count_records_select('tracker_elementused', 'elementid = '.$elementid.' AND trackerid = '.$trackerid);
     return $inusedelements;
 }
 
@@ -292,7 +298,7 @@ function tracker_printelements(&$tracker, $fields = null, $dest = false) {
                     continue;
                 }
                 $element->viewsearch();
-            } elseif ($dest == 'query') {
+            } else if ($dest == 'query') {
                 if ($element->type == 'file') {
                     continue;
                 }
@@ -355,11 +361,11 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false) {
         }
 
         if ($key == 'reportedby') {
-            $elementsSearchConstraint .= ' AND i.reportedby = ' . $fields[$key][0];
+            $elementsSearchConstraint .= ' AND i.reportedby = '.$fields[$key][0];
         }
 
         if ($key == 'assignedto') {
-            $elementsSearchConstraint .= ' AND i.assignedto = ' . $fields[$key][0];
+            $elementsSearchConstraint .= ' AND i.assignedto = '.$fields[$key][0];
         }
 
         if ($key == 'summary') {
@@ -371,7 +377,16 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false) {
 
         if (is_numeric($key)) {
             foreach ($fields[$key] as $value) {
-                $elementsSearchConstraint .= ' AND i.id IN (SELECT issue FROM {tracker_issueattribute} WHERE elementdefinition=' . $key . ' AND elementitemid=' . $value . ')';
+                $elementsSearchConstraint .= '
+                    AND
+                    i.id IN (SELECT
+                                issue
+                             FROM
+                                {tracker_issueattribute}
+                             WHERE
+                             elementdefinition = '.$key.' AND
+                             elementitemid='.$value.')
+                ';
             }
         }
     }
@@ -513,8 +528,8 @@ function tracker_extractsearchparametersfrompost() {
             $fields['summary'][] = $summary;
         }
 
-        $keys = array_keys($_POST);                         // get the key value of all the fields submitted
-        $elementkeys = preg_grep('/element./' , $keys);     // filter out only the element keys
+        $keys = array_keys($_POST);                         // Get the key value of all the fields submitted;
+        $elementkeys = preg_grep('/element./' , $keys);     // Filter out only the element keys;
 
         foreach ($elementkeys as $elementkey) {
             preg_match('/element(.*)$/', $elementkey, $elementid);
@@ -584,7 +599,7 @@ function tracker_printsearchfields($fields) {
 
     foreach ($fields as $key => $value) {
         switch (trim($key)) {
-            case 'datereported' :
+            case 'datereported':
                 if (!function_exists('trk_userdate')) {
                     function trk_userdate(&$a) {
                         $a = userdate($a);
@@ -594,13 +609,13 @@ function tracker_printsearchfields($fields) {
                 array_walk($value, 'trk_userdate');
                 $strs[] = get_string($key, 'tracker') . ' '.get_string('IN', 'tracker')." ('".implode("','", $value) . "')";
                 break;
-            case 'summary' :
+            case 'summary':
                 $strs[] =  "('".implode("','", $value) ."') ".get_string('IN', 'tracker').' '.get_string('summary', 'tracker');
                 break;
-            case 'description' :
+            case 'description':
                 $strs[] =  "('".implode("','", $value) ."') ".get_string('IN', 'tracker').' '.get_string('description');
                 break;
-            case 'reportedby' :
+            case 'reportedby':
                 $users = $DB->get_records_list('user', array('id' => implode(',',$value)), 'lastname', 'id,firstname,lastname');
                 $reporters = array();
                 if ($users) {
@@ -611,7 +626,7 @@ function tracker_printsearchfields($fields) {
                 $reporterlist = implode ("', '", $reporters);
                 $strs[] = get_string('reportedby', 'tracker').' '.get_string('IN', 'tracker')." ('".$reporterlist."')";
                 break;
-            case 'assignedto' :
+            case 'assignedto':
                 $users = $DB->get_records_list('user', array('id' => implode(',',$value)), 'lastname', 'id,firstname,lastname');
                 $assignees = array();
                 if ($users) {
@@ -694,8 +709,8 @@ function tracker_setsearchcookies($fields) {
  */
 function tracker_extractsearchcookies() {
 
-    $keys = array_keys($_COOKIE);                                           // get the key value of all the cookies
-    $cookiekeys = preg_grep('/moodle_tracker_search./' , $keys);            // filter all search cookies
+    $keys = array_keys($_COOKIE);                                // Get the key value of all the cookies.
+    $cookiekeys = preg_grep('/moodle_tracker_search./' , $keys); // Filter all search cookies.
     $fields = null;
     foreach ($cookiekeys as $cookiekey) {
         preg_match('/moodle_tracker_search_(.*)$/', $cookiekey, $fieldname);
@@ -712,8 +727,8 @@ function tracker_extractsearchcookies() {
 function tracker_clearsearchcookies() {
 
     $success = true;
-    $keys = array_keys($_COOKIE); // get the key value of all the cookies
-    $cookiekeys = preg_grep('/moodle_tracker_search./' , $keys); // filter all search cookies
+    $keys = array_keys($_COOKIE); // Get the key value of all the cookies.
+    $cookiekeys = preg_grep('/moodle_tracker_search./' , $keys); // Filter all search cookies.
 
     foreach ($cookiekeys as $cookiekey) {
         $result = setcookie($cookiekey, '');
@@ -756,11 +771,11 @@ function tracker_searchforissues(&$tracker, $cmid) {
 function tracker_getnumissuesreported($trackerid, $status='*', $reporterid = '*', $resolverid='*', $developerids='', $adminid='*') {
     global $CFG, $DB;
 
-    $statusClause = ($status !== '*') ? " AND i.status = $status " : '' ;
-    $reporterClause = ($reporterid != '*') ? " AND i.reportedby = $reporterid " : '' ;
-    $resolverClause = ($resolverid != '*') ? " AND io.userid = $resolverid " : '' ;
-    $developerClause = ($developerids != '') ? " AND io.userid IN ($developerids) " : '' ;
-    $adminClause = ($adminid != '*') ? " AND io.bywhomid IN ($adminid) " : '' ;
+    $statusClause = ($status !== '*') ? " AND i.status = $status " : '';
+    $reporterClause = ($reporterid != '*') ? " AND i.reportedby = $reporterid " : '';
+    $resolverClause = ($resolverid != '*') ? " AND io.userid = $resolverid " : '';
+    $developerClause = ($developerids != '') ? " AND io.userid IN ($developerids) " : '';
+    $adminClause = ($adminid != '*') ? " AND io.bywhomid IN ($adminid) " : '';
 
     $sql = "
         SELECT
@@ -894,7 +909,8 @@ function tracker_submitanissue(&$tracker, &$data) {
     $issue->reportedby = $USER->id;
 
     // Fetch max actual priority.
-    $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', " trackerid = ? GROUP BY trackerid ", array($tracker->id));
+    $select = " trackerid = ? GROUP BY trackerid ";
+    $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', $select, array($tracker->id));
     $issue->resolutionpriority = $maxpriority + 1;
 
     if ($issue->id = $DB->insert_record('tracker_issue', $issue)) {
@@ -916,10 +932,13 @@ function tracker_submitanissue(&$tracker, &$data) {
  */
 function tracker_getownedissuesforresolve($trackerid, $userid = null) {
     global $USER, $DB;
+
     if (empty($userid)) {
         $userid = $USER->id;
     }
-    return $DB->get_records_select('tracker_issue', " trackerid = ? AND assignedto = ? ", array($trackerid, $userid));
+
+    $select = " trackerid = ? AND assignedto = ? ";
+    return $DB->get_records_select('tracker_issue', $select, array($trackerid, $userid));
 }
 
 /**
@@ -978,7 +997,9 @@ if (!function_exists('print_error_class')) {
     function print_error_class($errors, $errorkeylist) {
         if ($errors) {
             foreach ($errors as $anError) {
-                if ($anError->on == '') continue;
+                if ($anError->on == '') {
+                    continue;
+                }
                 if (preg_match("/\\b{$anError->on}\\b/" ,$errorkeylist)) {
                     echo " class=\"formerror\" ";
                     return;
@@ -997,11 +1018,13 @@ if (!function_exists('print_error_class')) {
 function tracker_register_cc(&$tracker, &$issue, $userid) {
     global $DB;
 
-    if ($userid && !$DB->get_record('tracker_issuecc', array('trackerid' => $tracker->id, 'issueid' => $issue->id, 'userid' => $userid))) {
+    $params = array('trackerid' => $tracker->id, 'issueid' => $issue->id, 'userid' => $userid);
+    if ($userid && !$DB->get_record('tracker_issuecc', $params)) {
         // Add new the assignee as new CC !!
-        // we do not discard the old one as he may be still concerned
+        // We do not discard the old one as he may be still concerned.
         $eventmask = 127;
-        if ($userprefs = $DB->get_record('tracker_preferences', array('trackerid' => $tracker->id, 'userid' => $userid, 'name' => 'eventmask'))) {
+        $params = array('trackerid' => $tracker->id, 'userid' => $userid, 'name' => 'eventmask');
+        if ($userprefs = $DB->get_record('tracker_preferences', $params)) {
             $eventmask = $userprefs->value;
         }
         $cc = new StdClass;
@@ -1049,7 +1072,6 @@ function tracker_getpotentialdependancies($trackerid, $issueid) {
           id.childid,
           summary
     ";
-    // echo $sql;
     return $DB->get_records_sql($sql);
 }
 
@@ -1085,7 +1107,7 @@ function tracker_get_subtree_list($trackerid, $id) {
  * @param int $indent the indent value
  * @return the HTML
  */
-function tracker_printchilds(&$tracker, $issueid, $return=false, $indent='') {
+function tracker_printchilds(&$tracker, $issueid, $return = false, $indent = '') {
     global $CFG, $STATUSCODES, $STATUSKEYS, $DB;
 
     $str = '';
@@ -1114,7 +1136,9 @@ function tracker_printchilds(&$tracker, $issueid, $return=false, $indent='') {
             $indent = $indent - 20;
         }
     }
-    if ($return) return $str;
+    if ($return) {
+        return $str;
+    }
     echo $str;
 }
 
@@ -1156,7 +1180,9 @@ function tracker_printparents(&$tracker, $issueid, $return=false, $indent='') {
             $str .= "&nbsp;<span class=\"status_".$STATUSCODES[$aSub->status]."\">".$STATUSKEYS[$aSub->status]."</span></span><br/>\n";
         }
     }
-    if ($return) return $str;
+    if ($return) {
+        return $str;
+    }
     echo $str;
 }
 
@@ -1232,10 +1258,11 @@ function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = 
 
     if (!empty($managers)) {
         foreach ($managers as $manager) {
-            $notification = tracker_compile_mail_template('raiserequest', $vars, 'tracker', $manager->lang);
-            $notification_html = tracker_compile_mail_template('raiserequest_html', $vars, 'tracker', $manager->lang);
+            $notification = tracker_compile_mail_template('raiserequest', $vars, $manager->lang);
+            $notification_html = tracker_compile_mail_template('raiserequest_html', $vars, $manager->lang);
             if ($CFG->debugsmtp) echo "Sending Raise Request Mail Notification to " . fullname($manager) . '<br/>'.$notification_html;
-            email_to_user($manager, $USER, get_string('raiserequestcaption', 'tracker', $SITE->shortname.':'.format_string($tracker->name)), $notification, $notification_html);
+            $subject = get_string('raiserequestcaption', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
+            email_to_user($manager, $USER, $subject, $notification, $notification_html);
         }
     }
 
@@ -1244,10 +1271,11 @@ function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = 
 
     if (!empty($admins)) {
         foreach ($admins as $admin) {
-            $notification = tracker_compile_mail_template('raiserequest', $vars, 'tracker', $admin->lang);
-            $notification_html = tracker_compile_mail_template('raiserequest_html', $vars, 'tracker', $admin->lang);
+            $notification = tracker_compile_mail_template('raiserequest', $vars, $admin->lang);
+            $notification_html = tracker_compile_mail_template('raiserequest_html', $vars, $admin->lang);
             if ($CFG->debugsmtp) echo "Sending Raise Request Mail Notification to " . fullname($admin) . '<br/>'.$notification_html;
-            email_to_user($admin, $USER, get_string('urgentraiserequestcaption', 'tracker', $SITE->shortname.':'.format_string($tracker->name)), $notification, $notification_html);
+            $subject = get_string('urgentraiserequestcaption', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
+            email_to_user($admin, $USER, $subject, $notification, $notification_html);
         }
     }
 
@@ -1288,12 +1316,13 @@ function tracker_notify_submission($issue, &$cm, $tracker = null) {
         include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
 
         foreach ($managers as $manager) {
-            $notification = tracker_compile_mail_template('submission', $vars, 'tracker', $manager->lang);
-            $notification_html = tracker_compile_mail_template('submission_html', $vars, 'tracker', $manager->lang);
+            $notification = tracker_compile_mail_template('submission', $vars, $manager->lang);
+            $notification_html = tracker_compile_mail_template('submission_html', $vars, $manager->lang);
             if ($CFG->debugsmtp) {
-                echo "Sending Submission Mail Notification to " . fullname($manager) . '<br/>'.$notification_html;
+                echo "Sending Submission Mail Notification to ".fullname($manager).'<br/>'.$notification_html;
             }
-            email_to_user($manager, $USER, get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name)), $notification, $notification_html);
+            $subject = get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
+            email_to_user($manager, $USER, $subject, $notification, $notification_html);
         }
     }
 }
@@ -1331,10 +1360,13 @@ function tracker_notifyccs_changeownership($issueid, $tracker = null) {
             $ccuser = $DB->get_record('user', array('id' => $cc->userid));
             $vars['UNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;ccid={$cc->userid}&amp;what=unregister";
             $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
-            $notification = tracker_compile_mail_template('ownershipchanged', $vars, 'tracker', $ccuser->lang);
-            $notification_html = tracker_compile_mail_template('ownershipchanged_html', $vars, 'tracker', $ccuser->lang);
-            if ($CFG->debugsmtp) echo "Sending Ownership Change Mail Notification to " . fullname($ccuser) . '<br/>'.$notification_html;
-            email_to_user($ccuser, $USER, get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name)), $notification, $notification_html);
+            $notification = tracker_compile_mail_template('ownershipchanged', $vars, $ccuser->lang);
+            $notification_html = tracker_compile_mail_template('ownershipchanged_html', $vars, $ccuser->lang);
+            if ($CFG->debugsmtp) {
+                echo "Sending Ownership Change Mail Notification to " . fullname($ccuser) . '<br/>'.$notification_html;
+            }
+            $subject = get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
+            email_to_user($ccuser, $USER, $subject, $notification, $notification_html);
         }
     }
 }
@@ -1350,7 +1382,8 @@ function tracker_notifyccs_moveissue($issueid, $tracker, $newtracker = null) {
     global $COURSE, $SITE, $CFG, $USER, $DB;
 
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
-    if (empty($tracker)) { // database access optimization in case we have a tracker from somewhere else
+    if (empty($tracker)) {
+        // Database access optimization in case we have a tracker from somewhere else.
         $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
     }
     $newcourse = $DB->get_record('course', array('id' => $newtracker->course));
@@ -1377,7 +1410,9 @@ function tracker_notifyccs_moveissue($issueid, $tracker, $newtracker = null) {
             $vars['ALLUNCCURL'] = $CFG->wwwroot."/mod/tracker/view.php?t={$tracker->id}&amp;view=profile&amp;screen=mywatches&amp;userid={$cc->userid}&amp;what=unregisterall";
             $notification = tracker_compile_mail_template('issuemoved', $vars, 'tracker', $ccuser->lang);
             $notification_html = tracker_compile_mail_template('issuemoved_html', $vars, 'tracker', $ccuser->lang);
-            if ($CFG->debugsmtp) echo "Sending Issue Moving Mail Notification to " . fullname($ccuser) . '<br/>'.$notification_html;
+            if ($CFG->debugsmtp) {
+                echo "Sending Issue Moving Mail Notification to " . fullname($ccuser) . '<br/>'.$notification_html;
+            }
             email_to_user($ccuser, $USER, get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name)), $notification, $notification_html);
         }
     }

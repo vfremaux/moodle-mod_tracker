@@ -21,8 +21,8 @@ class TrackerIssueForm extends moodleform{
         $tracker = $DB->get_record('tracker', array('id' => $trackerid));
 
         $this->context = context_module::instance($this->_customdata['cmid']);
-        $maxfiles = 99;                // TODO: add some setting
-        $maxbytes = $COURSE->maxbytes; // TODO: add some setting
+        $maxfiles = 99;                // TODO: add some setting.
+        $maxbytes = $COURSE->maxbytes; // TODO: add some setting.
         $this->editoroptions = array('trusttext' => true, 'subdirs' => false, 'maxfiles' => $maxfiles, 'maxbytes' => $maxbytes, 'context' => $this->context);
 
         $mform = $this->_form;
@@ -31,6 +31,8 @@ class TrackerIssueForm extends moodleform{
         $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'trackerid', $trackerid);
         $mform->setType('trackerid', PARAM_INT);
+
+        $mform->addElement('header', 'header0', get_string('description'));
 
         $mform->addElement('text', 'summary', get_string('summary', 'tracker'), array('size' => 80));
         $mform->setType('summary', PARAM_TEXT);

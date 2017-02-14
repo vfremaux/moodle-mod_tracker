@@ -15,10 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package mod_tracker
- * @category mod
- * @author Clifford Tham, Valery Fremaux > 1.8
- * @date 02/12/2007
+ * @package     mod_tracker
+ * @category    mod
+ * @author      Clifford Tham, Valery Fremaux > 1.8
  *
  * This page lists all the instances of tracker in a particular course
  * Replace tracker with the name of your module
@@ -26,7 +25,7 @@
 require('../../config.php');
 require_once($CFG->dirroot.'/mod/tracker/lib.php');
 
-$id = required_param('id', PARAM_INT);   // course
+$id = required_param('id', PARAM_INT); // Course.
 
 if (!$course = $DB->get_record('course', array('id' => $id))) {
     print_error('invalidcourseid');
@@ -41,7 +40,7 @@ $event = \mod_tracker\event\course_module_instance_list_viewed::create(array('co
 $event->add_record_snapshot('course', $course);
 $event->trigger();
 
-// Get all required strings
+// Get all required strings.
 
 $strtrackers = get_string('modulenameplural', 'tracker');
 $strtracker  = get_string('modulename', 'tracker');
@@ -74,7 +73,7 @@ $strtopic = get_string('topic');
 if ($course->format == 'weeks') {
     $table->head  = array ($strweek, $strname);
     $table->align = array ('center', 'left');
-} elseif ($course->format == 'topics') {
+} else if ($course->format == 'topics') {
     $table->head  = array ($strtopic, $strname);
     $table->align = array ('center', 'left', 'left', 'left');
 } else {
@@ -86,7 +85,7 @@ foreach ($trackers as $tracker) {
     $trackername = format_string($tracker->name);
     $linkurl = new moodle_url('/mod/tracker/view.php', array('id' => $tracker->coursemodule));
     if (!$tracker->visible) {
-        //Show dimmed if the mod is hidden
+        // Show dimmed if the mod is hidden.
         $link = '<a class="dimmed" href="'.$linkurl.'">'.$trackername.'</a>';
     } else {
         // Show normal if the mod is visible.
