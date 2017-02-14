@@ -27,6 +27,13 @@ defined('MOODLE_INTERNAL') || die();
  */
 require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 
+if (!function_exists('debug_trace')) {
+    function debug_trace($str) {
+        // Empty fake function if missing.
+        assert(1);
+    }
+}
+
 /**
  * Constants
  *
@@ -237,9 +244,6 @@ function tracker_rpc_post_issue($remoteuser, $trackerid, $remote_issue, $islocal
     $newissue->uplink = '';
 
     try {
-        ob_start();
-        print_object($newissue);
-        debug_trace(ob_get_clean());
         $followid = $DB->insert_record('tracker_issue', $newissue);
     } catch(Exception $e) {
         $response->status = RPC_FAILURE;
