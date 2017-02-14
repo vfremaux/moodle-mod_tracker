@@ -267,7 +267,9 @@ if ($action == 'updateelementoption') {
     $form->type = $element->type;
     // check validity
     $errors = array();
-    if ($DB->count_records_select('tracker_elementitem', "elementid = $form->elementid AND name = '$form->name' AND id != $form->optionid ")) {
+    $select = " elementid = ? AND name = ? AND id != ? ";
+        $params = array($form->elementid, $form->name, $form->optionid);
+    if ($DB->count_records_select('tracker_elementitem', $select, $params)) {
         $error = new StdClass;
         $error->message = get_string('optionisused', 'tracker');
         $error->on = 'name';
@@ -330,13 +332,15 @@ if ($action == 'moveelementoptionup') {
     $element = trackerelement::find_instance_by_id($tracker, $form->elementid);
     $form->type = $element->type;
     $option->id = $form->optionid;
-    $sortorder = $DB->get_field('tracker_elementitem', 'sortorder', array('elementid' => $form->elementid, 'id' => $form->optionid));
+    $params = array('elementid' => $form->elementid, 'id' => $form->optionid);
+    $sortorder = $DB->get_field('tracker_elementitem', 'sortorder', $params);
     if ($sortorder > 1) {
         $option->sortorder = $sortorder - 1;
         $previousoption = new StdClass();
-        $previousoption->id = $DB->get_field('tracker_elementitem', 'id', array('elementid' => $form->elementid, 'sortorder' => $sortorder - 1));
+        $params = array('elementid' => $form->elementid, 'sortorder' => $sortorder - 1);
+        $previousoption->id = $DB->get_field('tracker_elementitem', 'id', $params);
         $previousoption->sortorder = $sortorder;
-        // swap options in database
+        // Swap options in database.
         if (!$DB->update_record('tracker_elementitem', $option)) {
             print_error('errordbupdate', 'tracker', $url);
         }
@@ -360,15 +364,18 @@ if ($action == 'moveelementoptiondown') {
     $form->elementid = required_param('elementid', PARAM_INT);
     $form->optionid = required_param('optionid', PARAM_INT);
 
-    $option = $DB->get_record('tracker_elementitem', array('elementid' => $form->elementid, 'id' => $form->optionid));
+    $params = array('elementid' => $form->elementid, 'id' => $form->optionid);
+    $option = $DB->get_record('tracker_elementitem', $params);
     $element = trackerelement::find_instance_by_id($tracker, $form->elementid);
     $form->type = $element->type;
     $option->id = $form->optionid;
-    $sortorder = $DB->get_field('tracker_elementitem', 'sortorder', array('elementid' => $form->elementid, 'id' => $form->optionid));
+    $params = array('elementid' => $form->elementid, 'id' => $form->optionid);
+    $sortorder = $DB->get_field('tracker_elementitem', 'sortorder', $params);
     if ($sortorder < $element->maxorder) {
         $option->sortorder = $sortorder + 1;
         $nextoption = new StdClass;
-        $nextoption->id = $DB->get_field('tracker_elementitem', 'id', array('elementid' => $form->elementid, 'sortorder' => $sortorder + 1));
+        $params = array('elementid' => $form->elementid, 'sortorder' => $sortorder + 1);
+        $nextoption->id = $DB->get_field('tracker_elementitem', 'id', $params);
         $nextoption->sortorder = $sortorder;
         // swap options in database
         if (!$DB->update_record('tracker_elementitem', $option)) {
@@ -399,7 +406,9 @@ if ($action == 'addelement') {
         $used->trackerid = $tracker->id;
         $used->canbemodifiedby = $USER->id;
         // Get last sort order.
-        $sortorder = 0 + $DB->get_field_select('tracker_elementused', 'MAX(sortorder)', "trackerid = {$tracker->id} GROUP BY trackerid");
+        $select = "trackerid = ? GROUP BY trackerid";
+        $params = array($tracker->id);
+        $sortorder = 0 + $DB->get_field_select('tracker_elementused', 'MAX(sortorder)', $select, $params);
         $used->sortorder = $sortorder + 1;
         if (!$DB->insert_record ('tracker_elementused', $used)) {
             print_error('errorcannotaddelementtouse', 'tracker', $url.'&amp;view=admin');
@@ -412,15 +421,18 @@ if ($action == 'addelement') {
 /****************************** remove an element from usable list **********************/
 if ($action == 'removeelement') {
     $usedid = required_param('usedid', PARAM_INT);
-    if (!$DB->delete_records ('tracker_elementused', array('elementid' => $usedid, 'trackerid' => $tracker->id))) {
+    $params = array('elementid' => $usedid, 'trackerid' => $tracker->id);
+    if (!$DB->delete_records ('tracker_elementused', $params)) {
         print_error('errorcannotdeleteelement', 'tracker', $url);
     }
 }
 /****************************** raise element pos in usable list **********************/
 if ($action == 'raiseelement') {
     $usedid = required_param('elementid', PARAM_INT);
-    $used = $DB->get_record('tracker_elementused', array('elementid' => $usedid, 'trackerid' => $tracker->id));
-    $previous = $DB->get_record('tracker_elementused', array('sortorder' => $used->sortorder - 1, 'trackerid' => $tracker->id));
+    $params = array('elementid' => $usedid, 'trackerid' => $tracker->id);
+    $used = $DB->get_record('tracker_elementused', $params);
+    $params = array('sortorder' => $used->sortorder - 1, 'trackerid' => $tracker->id);
+    $previous = $DB->get_record('tracker_elementused', $params);
     $used->sortorder--;
     $previous->sortorder++;
     $DB->update_record('tracker_elementused', $used);
@@ -429,8 +441,10 @@ if ($action == 'raiseelement') {
 /****************************** lower element pos in usable list **********************/
 if ($action == 'lowerelement') {
     $usedid = required_param('elementid', PARAM_INT);
-    $used = $DB->get_record('tracker_elementused', array('elementid' => $usedid, 'trackerid' => $tracker->id));
-    $next = $DB->get_record('tracker_elementused', array('sortorder' => $used->sortorder + 1, 'trackerid' => $tracker->id));
+    $params = array('elementid' => $usedid, 'trackerid' => $tracker->id);
+    $used = $DB->get_record('tracker_elementused', $params);
+    $params = array('sortorder' => $used->sortorder + 1, 'trackerid' => $tracker->id);
+    $next = $DB->get_record('tracker_elementused', $params);
     $used->sortorder++;
     $next->sortorder--;
     $DB->update_record('tracker_elementused', $used);
@@ -440,7 +454,8 @@ if ($action == 'lowerelement') {
 if ($action == 'localparent') {
     $parent = optional_param('localtracker', null, PARAM_INT);
 
-    if (!$DB->set_field('tracker', 'parent', $parent, array('id' => $tracker->id))) {
+    $params = array('id' => $tracker->id);
+    if (!$DB->set_field('tracker', 'parent', $parent, $params)) {
         print_error('errorcannotsetparent', 'tracker', $url);
     }
     $tracker->parent = $parent;
@@ -458,7 +473,8 @@ if ($action == 'remoteparent') {
             // We choose the tracker.
             $remoteparent = optional_param('remotetracker', null, PARAM_RAW);
 
-            if (!$DB->set_field('tracker', 'parent', $remoteparent, array('id' => $tracker->id))) {
+            $params = array('id' => $tracker->id);
+            if (!$DB->set_field('tracker', 'parent', $remoteparent, $params)) {
                 print_error('errorcannotsetparent', 'tracker');
             }
             $tracker->parent = $remoteparent;
@@ -466,28 +482,32 @@ if ($action == 'remoteparent') {
             break;
     }
 }
-/*************************** unbinds any cascade  *******************************/
+// Unbinds any cascade  *******************************.
 if ($action == 'unbind') {
     if (!$DB->set_field('tracker', 'parent', '', array('id' => $tracker->id))) {
         print_error('errorcannotunbindparent', 'tracker', $url);
     }
     $tracker->parent = '';
 }
-/****************************** set a used element inactive for form **********************/
+// Set a used element inactive for form **********************.
 if ($action == 'setinactive') {
     $usedid = required_param('usedid', PARAM_INT);
     try {
-        $DB->set_field_select('tracker_elementused', 'active', 0, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id));
-    } catch(Exception $e) {
+        $select = " elementid = ? AND trackerid = ? ";
+        $params = array($usedid, $tracker->id);
+        $DB->set_field_select('tracker_elementused', 'active', 0, $select, $params);
+    } catch (Exception $e) {
         print_error('errorcannothideelement', 'tracker', $url);
     }
 }
-/****************************** set a used element active for form **********************/
+// Set a used element active for form **********************.
 if ($action == 'setactive') {
     $usedid = required_param('usedid', PARAM_INT);
     try {
-        $DB->set_field_select('tracker_elementused', 'active', 1, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id));
-    } catch(Exception $e) {
+        $select = " elementid = ? AND trackerid = ? ";
+        $params = array($usedid, $tracker->id);
+        $DB->set_field_select('tracker_elementused', 'active', 1, $select, $params);
+    } catch (Exception $e) {
         print_error('errorcannotshowelement', 'tracker', $url);
     }
 }
@@ -495,36 +515,41 @@ if ($action == 'setactive') {
 if ($action == 'setnotmandatory') {
     $usedid = required_param('usedid', PARAM_INT);
     try {
-        $DB->set_field_select('tracker_elementused', 'mandatory', 0, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id));
+        $select = " elementid = ? AND trackerid = ? ";
+        $params = array($usedid, $tracker->id);
+        $DB->set_field_select('tracker_elementused', 'mandatory', 0, $select, $params);
     } catch(Exception $e) {
         print_error('errorcannothideelement', 'tracker', $url);
     }
 }
-/****************************** set a used element mandatory for form **********************/
+// Set a used element mandatory for form **********************.
 if ($action == 'setmandatory') {
     $usedid = required_param('usedid', PARAM_INT);
     try {
-        $DB->set_field_select('tracker_elementused', 'mandatory', 1, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id));
-        $DB->set_field_select('tracker_elementused', 'active', 1, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id));
-        $DB->set_field_select('tracker_elementused', 'private', 0, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id));
+        $params = array($usedid, $tracker->id);
+        $DB->set_field_select('tracker_elementused', 'mandatory', 1, " elementid = ? AND trackerid = ? ", $params);
+        $DB->set_field_select('tracker_elementused', 'active', 1, " elementid = ? AND trackerid = ? ", $params);
+        $DB->set_field_select('tracker_elementused', 'private', 0, " elementid = ? AND trackerid = ? ", $params);
     } catch(Exception $e) {
         print_error('errorcannotshowelement', 'tracker', $url);
     }
 }
-/****************************** set a used element public for form **********************/
+// Set a used element public for form **********************.
 if ($action == 'setpublic') {
     $usedid = required_param('usedid', PARAM_INT);
     try {
-        $DB->set_field_select('tracker_elementused', 'private', 0, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id));
+        $params = array($usedid, $tracker->id);
+        $DB->set_field_select('tracker_elementused', 'private', 0, " elementid = ? AND trackerid = ? ", $params);
     } catch(Exception $e) {
         print_error('errorcannothideelement', 'tracker', $url);
     }
 }
-/****************************** set a used element private for form **********************/
+// Set a used element private for form **********************.
 if ($action == 'setprivate') {
     $usedid = required_param('usedid', PARAM_INT);
     try {
-        $DB->set_field_select('tracker_elementused', 'private', 1, " elementid = ? && trackerid = ? ", array($usedid, $tracker->id));
+        $params = array($usedid, $tracker->id);
+        $DB->set_field_select('tracker_elementused', 'private', 1, " elementid = ? AND trackerid = ? ", $params);
     } catch(Exception $e) {
         print_error('errorcannotshowelement', 'tracker', $url);
     }
