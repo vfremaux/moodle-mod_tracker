@@ -54,6 +54,7 @@ class captchaelement extends trackerelement {
         $mform->setExpanded("header{$this->name}");
 
         $group[] = &$mform->createElement('text', "element{$this->name}");
+        $mform->setType("element{$this->name}", PARAM_TEXT);
 
         $SESSION->tracker[$this->tracker->id] = new StdClass;
         $captcharec = new StdClass;

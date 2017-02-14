@@ -69,12 +69,13 @@ class radiohorizelement extends trackerelement {
     }
 
     function add_form_element(&$mform) {
+
         if (isset($this->options)) {
             $group = array();
             $mform->addElement('header', "head{$this->name}", format_string($this->description));
             $mform->setExpanded("head{$this->name}");
             foreach ($this->options as $option) {
-                $group[] = &$form->createElement('radio', 'element'.$this->name, '', format_string($option->description), $option->name);
+                $group[] = &$mform->createElement('radio', 'element'.$this->name, '', format_string($option->description), $option->name);
                 $mform->setType('element'.$this->name, PARAM_TEXT);
             }
 
