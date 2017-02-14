@@ -28,16 +28,16 @@ require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelem
 
 class dropdownelement extends trackerelement {
 
-    var $multiple;
-    
-    function dropdownelement(&$tracker, $id = null, $used = false) {
+    public $multiple;
+
+    public function __construct(&$tracker, $id = null, $used = false) {
         parent::__construct($tracker, $id, $used);
         $this->setoptionsfromdb();
     }
 
-    function view($issueid = 0) {
+    public function view($issueid = 0) {
 
-        $this->getvalue($issueid); // loads $this->value with current value for this issue
+        $this->getvalue($issueid); // Loads $this->value with current value for this issue.
         if (isset($this->options)) {
             $optionstrs = array();
             foreach ($this->options as $option) {
@@ -52,11 +52,11 @@ class dropdownelement extends trackerelement {
         return '';
     }
 
-    function edit($issueid = 0) {
+    public function edit($issueid = 0) {
 
         $this->getvalue($issueid);
 
-        $values = explode(',', $this->value); // whatever the form ... revert to an array.
+        $values = explode(',', $this->value); // Whatever the form ... revert to an array.
 
         if (isset($this->options)) {
             foreach ($this->options as $optionobj) {
@@ -67,7 +67,7 @@ class dropdownelement extends trackerelement {
         }
     }
 
-    function add_form_element(&$mform) {
+    public function add_form_element(&$mform) {
 
         $mform->addElement('header', "head{$this->name}", format_string($this->description));
         $mform->setExpanded("head{$this->name}");
@@ -83,7 +83,7 @@ class dropdownelement extends trackerelement {
         }
     }
 
-    function set_data(&$defaults, $issueid = 0) {
+    public function set_data(&$defaults, $issueid = 0) {
         if ($issueid) {
 
             $elementname = 'element'.$this->name;
@@ -111,7 +111,7 @@ class dropdownelement extends trackerelement {
         }
     }
 
-    function formprocess(&$data) {
+    public function formprocess(&$data) {
         global $DB;
 
         $sqlparams = array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid);
@@ -145,7 +145,7 @@ class dropdownelement extends trackerelement {
         }
     }
 
-    function type_has_options() {
+    public function type_has_options() {
         return true;
     }
 }
