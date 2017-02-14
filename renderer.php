@@ -348,7 +348,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
             $userurl = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $COURSE->id));
             if ($CFG->messaging) {
                 $str .= '&nbsp;<a href="'.$userurl.'">'.fullname($user).'</a>';
-                $str .= '&nbsp;<a href="" onclick="this.target=\'message\'; return openpopup(\'/message/discussion.php?id={$user->id}\', \'message\', \'menubar=0,location=0,scrollbars,status,resizable,width=400,height=500\', 0);" ><img src="'.$OUTPUT->pix_url('t/message', 'core').'"></a>';
+                $str .= '&nbsp;<a href="" onclick="this.target=\'message\'; return openpopup(\'/message/discussion.php?id={$user->id}\', \'message\', \'menubar=0,location=0,scrollbars,status,resizable,width=400,height=500\', 0);" ><img src="'.$OUTPUT->pix_url('t/email').'"></a>';
             } elseif (!$user->emailstop && $user->maildisplay) {
                 $str .= '&nbsp;<a href="'.$userurl.'">'.fullname($user).'</a>';
                 $str .= '&nbsp;<a href="mailto:'.$user->email.'"><img src="'.$OUTPUT->pix_url('t/mail', 'core').'"></a>';
