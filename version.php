@@ -30,7 +30,7 @@ $plugin->version  = 2015091300;  // The current module version (Date: YYYYMMDDXX
 $plugin->requires = 2016052300;
 $plugin->component = 'mod_tracker';   // Full name of the plugin (used for diagnostics)
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.1.0 (Build 2015091300)';
+$plugin->release = '3.2.0 (Build 2015091300)';
 
 // Non Moodle attributes.
-$plugin->codeincrement = '3.1.0001';
+$plugin->codeincrement = '3.2.0001';

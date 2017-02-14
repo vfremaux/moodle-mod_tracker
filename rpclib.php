@@ -27,6 +27,13 @@ defined('MOODLE_INTERNAL') || die();
  */
 require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 
+if (!function_exists('debug_trace')) {
+    function debug_trace($str) {
+        // Empty fake function if missing.
+        assert(1);
+    }
+}
+
 /**
  * Constants
  *
