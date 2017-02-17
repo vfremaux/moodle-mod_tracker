@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Version details.
  *
  * @package    mod_tracker
  * @category   mod
@@ -26,9 +26,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2015091300;  // The current module version (Date: YYYYMMDDXX)
+$plugin->version  = 2015091300;  // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2016052300;
-$plugin->component = 'mod_tracker';   // Full name of the plugin (used for diagnostics)
+$plugin->component = 'mod_tracker';   // Full name of the plugin (used for diagnostics).
 $plugin->maturity = MATURITY_STABLE;
 $plugin->release = '3.2.0 (Build 2015091300)';
 
