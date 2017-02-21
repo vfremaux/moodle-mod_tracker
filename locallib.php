@@ -1460,7 +1460,7 @@ function tracker_notifyccs_moveissue($issueid, $tracker, $newtracker = null) {
     $assignee = $DB->get_record('user', array('id' => $issue->assignedto));
 
     if (!empty($issueccs)) {
-        $params = array('t' => $newtracker->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' = $issue->id);
+        $params = array('t' => $newtracker->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issue->id);
         $issueurl = new moodle_url('/mod/tracker/view.php', $params);
         $vars = array('COURSE_SHORT' => $COURSE->shortname,
                       'COURSENAME' => format_string($COURSE->fullname),
@@ -1504,7 +1504,7 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
     $issueccs = $DB->get_records('tracker_issuecc', array('issueid' => $issueid));
 
     if (!empty($issueccs)) {
-        $params = array('t' => $newtracker->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' = $issue->id);
+        $params = array('t' => $newtracker->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issue->id);
         $issueurl = new moodle_url('/mod/tracker/view.php', $params);
 
         $vars = array('COURSE_SHORT' => $COURSE->shortname,
@@ -1513,7 +1513,7 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
                       'ISSUE' => $tracker->ticketprefix.$issueid,
                       'SUMMARY' => format_string($issue->summary),
                       'BY' => fullname($USER),
-                      'ISSUEURL' => $issueurl;
+                      'ISSUEURL' => $issueurl);
 
         include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
 
@@ -1635,7 +1635,7 @@ function tracker_notifyccs_comment($issueid, $comment, $tracker = null) {
     $issueccs = $DB->get_records('tracker_issuecc', array('issueid' => $issue->id));
     if (!empty($issueccs)) {
 
-        $params = array('t' => $newtracker->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' = $issue->id);
+        $params = array('t' => $newtracker->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issue->id);
         $issueurl = new moodle_url('/mod/tracker/view.php', $params);
         $vars = array('COURSE_SHORT' => $COURSE->shortname,
                       'COURSENAME' => format_string($COURSE->fullname),
@@ -1678,7 +1678,7 @@ function tracker_get_unregister_urls(&$tracker, &$cc) {
     $params = array('t' => $tracker->id,
                     'view' => 'profile',
                     'screen' => 'mywatches',
-                    'userid' = $cc->userid,
+                    'userid' => $cc->userid,
                     'what' => 'unregisterall');
     $allunccurl = new moodle_url('/mod/tracker/view.php', $params);
 
@@ -1976,7 +1976,7 @@ function tracker_backtrack_stats_by_month(&$tracker) {
                 }
                 $stats[$current][$state] = @$stats[$current][$state] + 1;
                 $stats[$current]['sum'] = @$stats[$current]['sum'] + 1;
-                if (!in_array($state, array(RESOLVED, ABANDONNED, TRANSFERED)) {
+                if (!in_array($state, array(RESOLVED, ABANDONNED, TRANSFERED))) {
                     $stats[$current]['sumunres'] = @$stats[$current]['sumunres'] + 1;
                 }
             }

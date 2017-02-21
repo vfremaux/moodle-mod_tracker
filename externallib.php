@@ -138,7 +138,7 @@ class mod_tracker_external {
         return new external_value(PARAM_RAW, 'response object with status, errors or message');
     }
 
-    public static add_subtracker_parameters() {
+    public static function add_subtracker_parameters() {
         return new external_function_parameters (
             array(
                 'instance' => new external_single_structure(
@@ -157,14 +157,14 @@ class mod_tracker_external {
         );
     }
 
-    public static add_subtracker($instance, $subtracker) {
+    public static function add_subtracker($instance, $subtracker) {
     }
 
-    public static add_subtracker_returns() {
+    public static function add_subtracker_returns() {
         return new external_value(PARAM_BOOL, 'Operation status');
     }
 
-    public static remove_subtracker_parameters() {
+    public static function remove_subtracker_parameters() {
         return new external_function_parameters (
             array(
                 'instance' => new external_single_structure(
@@ -183,10 +183,10 @@ class mod_tracker_external {
         );
     }
 
-    public static remove_subtracker($instance, $subtracker) {
+    public static function remove_subtracker($instance, $subtracker) {
     }
 
-    public static remove_subtracker_returns() {
+    public static function remove_subtracker_returns() {
         return new external_value(PARAM_BOOL, 'Operation status');
     }
 }

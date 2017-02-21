@@ -97,7 +97,7 @@ if ($action == 'doupdateelement') {
     } else {
         $form->action = 'doupdateelement';
         ob_start();
-        $out = $renderer->edit_element(($cm, $form);
+        $out = $renderer->edit_element($cm, $form);
         $out .= ob_get_clean();
     }
 }

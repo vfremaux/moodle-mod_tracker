@@ -270,7 +270,7 @@ if ($view == 'view') {
             }
 
             case 'managenetwork': {
-                if (tracker_supports_feature('cascade/mnet') {
+                if (tracker_supports_feature('cascade/mnet')) {
                     include($CFG->dirroot.'/mod/tracker/pro/views/admin_mnetwork.html');
                 }
                 break;

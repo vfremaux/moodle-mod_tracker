@@ -235,8 +235,8 @@ if (!empty($issues)) {
             }
             $managersmenu[$USER->id] = fullname($USER);
             $attrs = array('onchange' => 'document.forms[\'manageform\'].changed'.$issue->id.'.value = 1;');
-            $nochoose = array('' => get_string('unassigned', 'tracker');
-            $assignedto = html_writer::select($developersmenu, 'assignedto'.$issue->id, $issue->assignedto, $nochoose), $attrs);
+            $nochoose = array('' => get_string('unassigned', 'tracker'));
+            $assignedto = html_writer::select($developersmenu, 'assignedto'.$issue->id, $issue->assignedto, $nochoose, $attrs);
         } else {
             $status = $FULLSTATUSKEYS[0 + $issue->status];
             $assignedto = fullname($user);

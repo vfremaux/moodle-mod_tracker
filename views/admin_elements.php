@@ -85,7 +85,7 @@ if (!empty($elements)) {
                         'elementid' => $element->id,
                         'type' => $element->type);
         $url = new moodle_url('/mod/tracker/view.php', $params);
-        $pix = <img src="'.$OUTPUT->pix_url('t/edit', 'core') .'" />;
+        $pix = '<img src="'.$OUTPUT->pix_url('t/edit', 'core') .'" />';
         $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('editproperties', 'tracker').'">'.$pix.'</a>';
 
         $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'deleteelement', 'elementid' => $element->id);

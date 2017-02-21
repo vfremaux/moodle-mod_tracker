@@ -101,7 +101,7 @@ if (!empty($used)) {
             if ($element->mandatory) {
                 $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'setnotmandatory', 'usedid' => $element->id);
                 $url = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = <img src="'.$OUTPUT->pix_url('notempty', 'tracker').'" />;
+                $pix = '<img src="'.$OUTPUT->pix_url('notempty', 'tracker').'" />';
                 $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setnotmandatory', 'tracker').'">'.$pix.'</a>';
             } else {
                 $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'setmandatory', 'usedid' => $element->id);
