@@ -17,7 +17,7 @@
 /**
  * @package     mod_tracker
  * @category    mod
- * @author Clifford Tham, Valery Fremaux > 1.8
+ * @author      Clifford Tham, Valery Fremaux > 1.8
  */
 
 require('../../config.php');

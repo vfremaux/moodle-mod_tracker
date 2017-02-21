@@ -52,4 +52,17 @@ if ($ADMIN->fulltree) {
     $desc = get_string('configinitialviewdeps_desc', 'mod_tracker');
     $settings->add(new admin_setting_configselect($key, $label, $desc, 'open', $options));
 
+    if (tracker_supports_feature('emulate/community')) {
+        // This will accept any.
+        $settings->add(new admin_setting_heading('plugindisthdr', get_string('plugindist', 'tracker'), ''));
+
+        $key = 'mod_tracker/emulatecommunity';
+        $label = get_string('emulatecommunity', 'tracker');
+        $desc = get_string('emulatecommunity_desc', 'tracker');
+        $settings->add(new admin_setting_configcheckbox($key, $label, $desc, 0));
+    } else {
+        $label = get_string('plugindist', 'tracker');
+        $desc = get_string('plugindist_desc', 'tracker');
+        $settings->add(new admin_setting_heading('plugindisthdr', $label, $desc));
+    }
 }

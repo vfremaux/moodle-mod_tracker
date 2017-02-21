@@ -15,21 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Version details.
  *
- * @package   mod_tracker
- * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     mod_tracker
+ * @category    mod
+ * @author      Clifford Tham till 1.8
+ * @author      Valery Fremaux (valery.fremaux@gmeil.com)
+ * @copyright   2009 onwards Valery Fremaux (valery.fremaux@gmeil.com)
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2015080600;  // The current module version (Date: YYYYMMDDXX)
+$plugin->version  = 2015091300;  // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2014041100;
-$plugin->component = 'mod_tracker';   // Full name of the plugin (used for diagnostics)
-$plugin->cron     = 0;           // Period for cron to check this module (secs)
-$plugin->maturity = MATURITY_RC;
-$plugin->release = '2.7.0 (Build 2015080600)';
+$plugin->component = 'mod_tracker';   // Full name of the plugin (used for diagnostics).
+$plugin->maturity = MATURITY_STABLE;
+$plugin->release = '2.7.0 (Build 2015091300)';
+$plugin->dependencies = array('local_vflibs' => 2016081100);
 
-// Non moodle attributes
-$plugin->codeincrement = '2.7.0000';
+// Non Moodle attributes.
+$plugin->codeincrement = '2.7.0001';

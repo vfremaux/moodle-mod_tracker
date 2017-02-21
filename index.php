@@ -41,12 +41,10 @@ $event->add_record_snapshot('course', $course);
 $event->trigger();
 
 // Get all required strings.
-
 $strtrackers = get_string('modulenameplural', 'tracker');
 $strtracker  = get_string('modulename', 'tracker');
 
 // Print the header.
-
 $navigation = build_navigation($strtrackers);
 $PAGE->set_title($strtrackers);
 $PAGE->set_heading($strtrackers);
@@ -57,14 +55,12 @@ $PAGE->set_headingmenu(navmenu($course));
 echo $OUTPUT->header();
 
 // Get all the appropriate data.
-
 if (! $trackers = get_all_instances_in_course('tracker', $course)) {
     echo $OUTPUT->notification(get_string('notrackers', 'tracker'), new moodle_url('course/view.php', array('id' => $course->id)));
     die;
 }
 
 // Print the list of instances (your module will probably extend this).
-
 $timenow = time();
 $strname = get_string('name');
 $strweek = get_string('week');

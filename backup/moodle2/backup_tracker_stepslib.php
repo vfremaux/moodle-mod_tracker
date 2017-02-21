@@ -15,15 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    mod
- * @subpackage tracker
- * @copyright  2010 onwards Valery Fremaux {valery.fremaux@club-internet.fr}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
-/**
  * Define all the backup steps that will be used by the backup_vodclic_activity_task
+ *
+ * @package     mod_tracker
+ * @subpackage  tracker
+ * @copyright   2010 onwards Valery Fremaux {valery.fremaux@club-internet.fr}
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Define the complete label structure for backup, with file and id annotations
@@ -32,10 +31,10 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
 
     protected function define_structure() {
 
-        // To know if we are including userinfo
+        // To know if we are including userinfo.
         $userinfo = $this->get_setting_value('userinfo');
 
-        // Define each element separated
+        // Define each element separated.
         $tracker = new backup_nested_element('tracker', array('id'), array(
             'name', 'intro', 'introformat', 'requirelogin', 'allownotifications', 'enablecomments', 'ticketprefix',
             'timemodified', 'parent', 'supportmode', 'defaultassignee', 'subtrackers', 'enablestates',
@@ -59,7 +58,9 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
         $issues = new backup_nested_element('issues');
 
         $issue = new backup_nested_element('issue', array('id'), array(
-            'trackerid', 'summary', 'description', 'descriptionformat', 'datereported', 'reportedby', 'status', 'assignedto', 'bywhomid', 'timeassigned', 'resolution', 'resolutionformat', 'resolutionpriority', 'downlink', 'uplink'));
+            'trackerid', 'summary', 'description', 'descriptionformat', 'datereported', 'reportedby', 'status',
+            'assignedto', 'bywhomid', 'timeassigned', 'resolution', 'resolutionformat', 'resolutionpriority',
+            'downlink', 'uplink'));
 
         $attribs = new backup_nested_element('issueattributes');
 
@@ -101,8 +102,7 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
         $state = new backup_nested_element('change', array('id'), array(
             'trackerid', 'issueid', 'userid', 'timechange', 'statusfrom', 'statusto'));
 
-        // Build the tree
-        // (love this)
+        // Build the tree.
         $tracker->add_child($elements);
         $elements->add_child($element);
         $element->add_child($elementitems);
@@ -134,7 +134,7 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
         $tracker->add_child($preferences);
         $preferences->add_child($preference);
 
-        // Define sources
+        // Define sources.
         $tracker->set_source_table('tracker', array('id' => backup::VAR_ACTIVITYID));
         $element->set_source_table('tracker_element', array('course' => backup::VAR_COURSEID));
         $item->set_source_table('tracker_elementitem', array('elementid' => backup::VAR_PARENTID));
@@ -152,8 +152,7 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
             $preference->set_source_table('tracker_preferences', array('trackerid' => backup::VAR_ACTIVITYID));
         }
 
-        // Define id annotations
-        // (none)
+        // Define id annotations.
         $issue->annotate_ids('user', 'reportedby');
         $issue->annotate_ids('user', 'assignedto');
         $issue->annotate_ids('user', 'bywhomid');
@@ -165,14 +164,14 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
         $query->annotate_ids('user', 'userid');
         $state->annotate_ids('user', 'userid');
 
-        // Define file annotations
-        $tracker->annotate_files('mod_tracker', 'intro', null); // This file area hasn't itemid
+        // Define file annotations.
+        $tracker->annotate_files('mod_tracker', 'intro', null); // This file area hasn't itemid.
         $comment->annotate_files('mod_tracker', 'issuecomment', 'id');
         $issue->annotate_files('mod_tracker', 'issuedescription', 'id');
         $issue->annotate_files('mod_tracker', 'issueresolution', 'id');
         $attrib->annotate_files('mod_tracker', 'issueattribute', 'id');
 
-        // Return the root element (tracker), wrapped into standard activity structure
+        // Return the root element (tracker), wrapped into standard activity structure.
         return $this->prepare_activity_structure($tracker);
     }
 }

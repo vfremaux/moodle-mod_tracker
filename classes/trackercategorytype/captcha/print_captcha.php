@@ -24,17 +24,37 @@ defined('MOODLE_INTERNAL') || die();
  *
  * A class implementing a hidden/labelled element that captures the referer url
  */
-require_once('../../config.php');
+require_once('../../../../../config.php');
 
-$id = required_param('id', PARAM_INT); // id of the contact_form block instance
+$id = required_param('id', PARAM_INT); // Id of the tracker module id.
 
 if ($id) {
-    if (!$instance = get_record('block_instance', 'id', $id)){
-        error("Bad block id");
+    if (! $cm = get_coursemodule_from_id('tracker', $id)) {
+        print_error('errorcoursemodid', 'tracker');
+    }
+
+    if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
+        print_error('errorcoursemisconfigured', 'tracker');
+    }
+
+    if (! $tracker = $DB->get_record('tracker', array('id' => $cm->instance))) {
+        print_error('errormoduleincorrect', 'tracker');
+    }
+} else {
+
+    if (! $tracker = $DB->get_record('tracker', array('id' => $t))) {
+        print_error('errormoduleincorrect', 'tracker');
+    }
+
+    if (! $course = $DB->get_record('course', array('id' => $tracker->course))) {
+        print_error('errorcoursemisconfigured', 'tracker');
+    }
+    if (! $cm = get_coursemodule_from_instance("tracker", $tracker->id, $course->id)) {
+        print_error('errorcoursemodid', 'tracker');
     }
 }
 
-if (!isset($SESSION->contact_form[$id]->captcha->length)) {
+if (!isset($SESSION->tracker[$id]->captcha->length)) {
     error('not allowed');
 }
 
@@ -42,7 +62,7 @@ $height = 40;
 $charcount = $SESSION->contact_form[$id]->captcha->length;
 $fontfile = $CFG->libdir.'/default.ttf';
 
-$ttfbox = imagettfbbox ( 30, 0, $fontfile, 'H' );//the text to measure
+$ttfbox = imagettfbbox( 30, 0, $fontfile, 'H' );//the text to measure
 $charwidth = $ttfbox[2];
 
 $width = $charcount * $charwidth;

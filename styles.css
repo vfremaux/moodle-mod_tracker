@@ -3,10 +3,10 @@
 }
 
 .timelabel{
+    color: #808080;
+    font-size : 0.9em;
     text-align: left;
     vertical-align: bottom;
-    font-size : 0.9em;
-    color: #808080;
     width: 15%;
 }
 
@@ -87,8 +87,8 @@
 
 .comments{
     background-color: #E0E0E0;
-    padding: 2px;
     border: 1px solid #ACACAC;
+    padding: 2px;
 }
 
 .comment{
@@ -96,48 +96,48 @@
 }
 
 .visiblediv{
-    visibility: visible; 
     display: block;
+    visibility: visible; 
 }
 
 .hiddendiv{
-    visibility: hidden; 
     display: none;
+    visibility: hidden; 
 }
 
 .list_priority{
+    font-size: 0.9em;
     text-align: center;
     vertical-align: bottom;
-    font-size: 0.9em;
 }
 
 .list_issuenumber{
+    font-size: 0.9em;
     text-align: left;
     vertical-align: bottom;
-    font-size: 0.9em;
 }
 
 .list_summary{
+    font-size: 0.9em;
+    padding: 2px;
     text-align: left ;
     vertical-align: bottom;
-    font-size: 0.9em;
     width: 40%;
-    padding: 2px;
 }
 
 .list_reportedby{
+    color: #4D4D4D;
+    font-size: 0.9em ;
     text-align: left;
     vertical-align: bottom;
-    font-size: 0.9em ;
-    color: #4D4D4D;
     width:10%;
 }
 
 .list_assignedto{
+    color: #4D4D4D;
+    font-size: 0.9em;
     text-align: left;
     vertical-align: bottom;
-    font-size: 0.9em;
-    color: #4D4D4D;
     width: 10%;
 }
 
@@ -172,15 +172,15 @@
 }
 
 .tracker-image-attachment{
-     max-width:570px;
+    max-width:570px;
 }
 
 .flexible .r0{
-   background-color:#F0F0F0;
+    background-color:#F0F0F0;
 }
 
 .flexible .r1{
-   background-color:#F8F8F8;
+    background-color:#F8F8F8;
 }
 
 .nullclass{
@@ -232,8 +232,8 @@
 }
 
 .tracker-issue-value{
-    padding:4px 4px 4px 15px;
     border-bottom:1px solid #f0f0f0;
+    padding:4px 4px 4px 15px;
 }
 
 .tracker-issue-description{
@@ -247,10 +247,10 @@
 }
 
 #tracker-acknowledge{
-    margin:50px;
     border:1px #c0c0c0 solid;
-    padding:30px;
     font-size:1.2em;
+    margin:50px;
+    padding:30px;
 }
 
 .tracker-issue-value {
@@ -259,4 +259,10 @@
 
 .tracker-issue-param {
     padding: 3px 15px 3px 3px;
+}
+
+tracker-status {
+    height: 102%;
+    text-align:center;
+    width: 105%;
 }

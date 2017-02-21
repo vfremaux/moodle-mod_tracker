@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @package tracker
  * @author Clifford Tham, Valery Fremaux from Moodle 1.8
@@ -23,6 +21,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * Form for editing an elements
  */
+defined('MOODLE_INTERNAL') || die();
 
 echo $OUTPUT->heading(get_string("{$form->action}{$form->type}", 'tracker'));
 ?>

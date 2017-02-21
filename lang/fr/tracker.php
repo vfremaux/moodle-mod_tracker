@@ -56,6 +56,7 @@ $string['browse'] = 'Exploration';
 $string['browser'] = 'Navigateur';
 $string['build'] = 'Version';
 $string['by'] = '<i>assigné par</i>';
+$string['captcha'] = 'Captcha';
 $string['cascade'] = 'Remonter au niveau supérieur';
 $string['cascadedticket'] = 'Ticket transmis';
 $string['categories'] = 'Catégories';
@@ -138,7 +139,10 @@ $string['elucidationratio'] = 'Taux d\'élucidation';
 $string['emailoptions'] = 'Options de courriel';
 $string['emergency'] = 'Avis d\'urgence';
 $string['emptydefinition'] = 'La définition du gestionnaire cible est vide.';
+$string['emulatecommunity'] = 'Emuler la version communautaire';
+$string['emulatecommunity_desc'] = 'Si elle est activée, cette option force le composant à fonctionner en version communautaire. Certaines fonctionnalités ne seront plus disponibles.';
 $string['enablecomments'] = 'Autoriser les commentaires';
+$string['errorcaptcha'] = 'Vous n\'avez pas fourni la bonne réponse. Ou peut être êtes vous un robot ?';
 $string['errorcoursemisconfigured'] = 'Ce cours est mal configuré';
 $string['errorcoursemodid'] = 'L\'ID de module de cours est incrorrect';
 $string['errorfindingaction'] = 'Erreur : L\'action {$a} ne peut être identifiée. ';
@@ -251,6 +255,7 @@ $string['optionisused'] = 'Ce nom d\'option est déjà utilisé pour cet éléme
 $string['order'] = 'Ordre';
 $string['originalticketnoaccess'] = 'Ce ticket est transféré à partir d\'un ticket original qui ne vous est pas accessible.';
 $string['pages'] = 'Pages';
+$string['plugindist'] = 'Distribution du plugin';
 $string['posted'] = 'Posté';
 $string['potentialresolvers'] = 'Responsables potentiels';
 $string['preferences'] = 'Préférences';
@@ -372,6 +377,15 @@ $string['voter'] = 'Votes';
 $string['waiting'] = 'Bloqué';
 $string['watches'] = 'Obs.';
 $string['youneedanaccount'] = 'Vous devez posséder un compte dans cet espace pour pouvoir poster';
+
+$string['plugindist_desc'] = '
+<p>Ce plugin est distribué dans la communauté Moodle pour l\'évaluation de ses fonctions centrales
+correspondant à une utilisation courante du plugin. Une version "professionnelle" de ce plugn existe et est distribuée
+sous certaines conditions, afin de soutenir l\'effort de développement, amélioration; documentation et suivi des versions.</p>
+<p>Contactez un distributeur pour obtenir la version "Pro" et son support.</p>
+<ul><li><a href="http://www.activeprolearn.com/plugin.php?plugin=mod_tracker">ActiveProLearn SAS</a></li>
+<li><a href="http://www.edunao.com">Edunao SAS</a></li></ul>
+';
 
 // help strings
 

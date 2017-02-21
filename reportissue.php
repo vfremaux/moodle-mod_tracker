@@ -15,18 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package mod_tracker
- * @category mod
- * @author Clifford Tham, Valery Fremaux > 1.8
- * @date 02/12/2007
+ * @package     mod_tracker
+ * @category    mod
+ * @author      Clifford Tham, Valery Fremaux > 1.8
  */
 require('../../config.php');
 require_once($CFG->dirroot."/mod/tracker/lib.php");
 require_once($CFG->dirroot."/mod/tracker/locallib.php");
 require_once $CFG->dirroot.'/mod/tracker/forms/reportissue_form.php';
 
-$id = optional_param('id', 0, PARAM_INT); // Course Module ID, or
-$a  = optional_param('a', 0, PARAM_INT);  // tracker ID
+$id = optional_param('id', 0, PARAM_INT); // Course Module ID, or.
+$a  = optional_param('a', 0, PARAM_INT);  // tracker ID.
 
 if ($id) {
     if (! $cm = get_coursemodule_from_id('tracker', $id)) {
@@ -58,18 +57,19 @@ $screen = tracker_resolve_screen($tracker, $cm);
 $view = tracker_resolve_view($tracker, $cm);
 
 // Security.
-
 $context = context_module::instance($cm->id);
 require_course_login($course->id, false, $cm);
 require_capability('mod/tracker:report', $context);
 
-// setting page
+// Setting page.
 $url = new moodle_url('/mod/tracker/reportissue.php', array('id' => $id));
 $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_title(format_string($tracker->name));
 $PAGE->set_heading(format_string($tracker->name));
 $PAGE->set_button($OUTPUT->update_module_button($cm->id, 'tracker'));
+
+$renderer = $PAGE->get_renderer('mod_tracker');
 
 $form = new TrackerIssueForm(new moodle_url('/mod/tracker/reportissue.php'), array('trackerid' => $tracker->id, 'cmid' => $id));
 
@@ -119,8 +119,7 @@ if (!$form->is_cancelled()) {
 echo $OUTPUT->header();
 
 $view = 'reportanissue';
-include_once($CFG->dirroot.'/mod/tracker/menus.php');
-
+echo $renderer->tabs();
 $form->display();
 
 echo $OUTPUT->footer();

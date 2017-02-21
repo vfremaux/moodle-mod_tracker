@@ -29,10 +29,6 @@ require_once($CFG->dirroot.'/mod/tracker/rpclib.php');
 
 class mod_tracker_external {
 
-    function get_instances($username, $remotehostroot) {
-        return tracker_rpc_get_instances($username, $remotehostroot);
-    }
-
     public static function get_instances_parameters() {
 
         return new external_function_parameters (
@@ -47,6 +43,15 @@ class mod_tracker_external {
         );
     }
 
+    function get_instances($user) {
+
+        $parameters = array(
+            'user' => $user
+        );
+        $params = validate_parameters(self::get_instances);
+        return tracker_rpc_get_instances($username, $remotehostroot);
+    }
+
     public static function get_instances_returns() {
         return new external_value(PARAM_RAW, 'serialized array of tracker records');
     }
@@ -55,6 +60,7 @@ class mod_tracker_external {
      *
      *
      */
+
     function get_infos($trackerid) {
         return json_decode(tracker_rpc_get_infos($trackerid, false));
     }
@@ -74,35 +80,113 @@ class mod_tracker_external {
         return new external_value(PARAM_RAW, 'a serialized array of tracker short infos');
     }
 
-    /**
-     *
-     *
-     */
-    function post_issue($username, $remoteuserhostroot, $trackerid, $remote_issue) {
-        return tracker_rpc_post_issue($username, $remoteuserhostroot, $trackerid, $remote_issue);
-    }
-
     public static function post_issue_parameters() {
 
         return new external_function_parameters (
             array(
-                'username' => new external_value(
-                        PARAM_ALPHANUMEXT,
-                        'primary identifier'),
-                'remoteuserhostroot' => new external_value(
-                        PARAM_TEXT,
-                        'remote host root'),
-                'trackerid' => new external_value(
-                        PARAM_INT,
-                        'remote tracker id where to post'),
-                'remoteissue' => new external_value(
-                        PARAM_RAW,
-                        'issue structure'),
+                'instance' => new external_single_structure(
+                    array(
+                        'type' => new external_value(PARAM_ALPHA, 'primary identifier field'),
+                        'instanceid' => new external_value(PARAM_TEXT, 'instance identifier value'),
+                    )
+                ),
+                'user' => new external_single_structure(
+                    array(
+                        'type' => new external_value(PARAM_ALPHA, 'primary identifier field'),
+                        'userid' => new external_value(PARAM_TEXT, 'user identifier value'),
+                        'userhostroot' => new external_value(PARAM_TEXT, 'remote host root', VALUE_OPTIONAL),
+                    )
+                ),
+                'issue' => new external_single_structure(
+                    array(
+                        'summary' => new external_value(PARAM_RAW, 'issue summary'),
+                        'description' => new external_value(PARAM_RAW, 'issue description'),
+                        'descriptionformat' => new external_value(PARAM_INT, 'description format'),
+                        'status' => new external_value(PARAM_INT, 'issue status', VALUE_OPTIONAL),
+                        'attributes' => new external_multiple_structure(
+                            new external_single_structure(
+                                array(
+                                    'elementname' => new external_value(PARAM_TEXT, 'tracker element name'),
+                                    'elementitemvalue' => new external_value(PARAM_TEXT, 'tracker element item name or value'),
+                                )
+                            ), VALUE_OPTIONAL
+                        ),
+                    )
+                ),
             )
         );
     }
 
+    /**
+     *
+     *
+     */
+    function post_issue($instance, $user, $issue) {
+
+        $parameters = array(
+            'instance' => $instance,
+            'user' => $user,
+            'issue' => $issue
+        );
+        
+        $params = validate_parameters(self::post_issue_parameters(), $parameters);
+
+        return tracker_rpc_post_issue($params['username'], $params['remoteuserhostroot'], $params['trackerid'], $issue);
+    }
+
     public static function post_issue_returns() {
         return new external_value(PARAM_RAW, 'response object with status, errors or message');
+    }
+
+    public static add_subtracker_parameters() {
+        return new external_function_parameters (
+            array(
+                'instance' => new external_single_structure(
+                    array(
+                        'type' => new external_value(PARAM_ALPHA, 'primary identifier field'),
+                        'instanceid' => new external_value(PARAM_TEXT, 'instance identifier value'),
+                    )
+                ),
+                'subtracker' => new external_single_structure(
+                    array(
+                        'type' => new external_value(PARAM_ALPHA, 'primary identifier field'),
+                        'instanceid' => new external_value(PARAM_TEXT, 'instance identifier value'),
+                    )
+                ),
+            )
+        );
+    }
+
+    public static add_subtracker($instance, $subtracker) {
+    }
+
+    public static add_subtracker_returns() {
+        return new external_value(PARAM_BOOL, 'Operation status');
+    }
+
+    public static remove_subtracker_parameters() {
+        return new external_function_parameters (
+            array(
+                'instance' => new external_single_structure(
+                    array(
+                        'type' => new external_value(PARAM_ALPHA, 'primary identifier field'),
+                        'instanceid' => new external_value(PARAM_TEXT, 'instance identifier value'),
+                    )
+                ),
+                'subtracker' => new external_single_structure(
+                    array(
+                        'type' => new external_value(PARAM_ALPHA, 'primary identifier field'),
+                        'instanceid' => new external_value(PARAM_TEXT, 'instance identifier value'),
+                    )
+                ),
+            )
+        );
+    }
+
+    public static remove_subtracker($instance, $subtracker) {
+    }
+
+    public static remove_subtracker_returns() {
+        return new external_value(PARAM_BOOL, 'Operation status');
     }
 }

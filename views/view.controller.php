@@ -41,12 +41,12 @@
  * @usecase doaskraise
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    // It must be included from view.php in mod/tracker
-}
+defined('MOODLE_INTERNAL') || die();
 
-/************************************* update an issue *****************************/
-elseif ($action == 'updateanissue') {
+// Update an issue ********************************************************************.
+
+if ($action == 'updateanissue') {
+
     $issue = new StdClass;
 
     $issue->id = required_param('issueid', PARAM_INT);
@@ -61,14 +61,19 @@ elseif ($action == 'updateanissue') {
     $issue->resolution_editor = required_param_array('resolution_editor', PARAM_CLEANHTML);
     $issue->resolutionformat = $issue->resolution_editor['format'];
 
-    $issue->description = file_save_draft_area_files($issue->description_editor['itemid'], $context->id, 'mod_tracker', 'issuedescription', $issue->id, $editoroptions, $issue->description_editor['text']);
-    $issue->resolution = file_save_draft_area_files($issue->resolution_editor['itemid'], $context->id, 'mod_tracker', 'issueresolution', $issue->id, $editoroptions, $issue->resolution_editor['text']);
+    $issue->description = file_save_draft_area_files($issue->description_editor['itemid'], $context->id, 'mod_tracker',
+                                                     'issuedescription', $issue->id, $editoroptions,
+                                                     $issue->description_editor['text']);
+    $issue->resolution = file_save_draft_area_files($issue->resolution_editor['itemid'], $context->id, 'mod_tracker',
+                                                    'issueresolution', $issue->id, $editoroptions,
+                                                    $issue->resolution_editor['text']);
 
     $issue->datereported = required_param('datereported', PARAM_INT);
 
     $issue->trackerid = $tracker->id;
 
-    // if ownership has changed, prepare logging
+    // If ownership has changed, prepare logging.
+
     $oldrecord = $DB->get_record('tracker_issue', array('id' => $issue->id));
     if ($oldrecord->assignedto != $issue->assignedto) {
         $ownership = new StdClass;
@@ -89,14 +94,14 @@ elseif ($action == 'updateanissue') {
         print_error('errorcannotupdateissue', 'tracker');
     }
 
-    // if not CCed, the assignee should be
+    // If not CCed, the assignee should be.
     tracker_register_cc($tracker, $issue, $issue->assignedto);
 
-    // send state change notification
+    // Send state change notification.
     if ($oldrecord->status != $issue->status) {
         tracker_notifyccs_changestate($issue->id, $tracker);
 
-        // log state change
+        // Log state change.
         $stc = new StdClass;
         $stc->userid = $USER->id;
         $stc->issueid = $issue->id;
@@ -107,21 +112,21 @@ elseif ($action == 'updateanissue') {
         $DB->insert_record('tracker_state_change', $stc);
 
         if ($stc->statusto == RESOLVED || $stc->statusto == PUBLISHED) {
-            // Check if was cascaded and needs backreported then backreport
-            // TODO : backreport to original
+            // Check if was cascaded and needs backreported then backreport.
+            // TODO : backreport to original.
         }
     }
 
     tracker_clearelements($issue->id);
     tracker_recordelements($issue, $issue);
-    // TODO : process dependancies
+    // TODO : process dependancies.
     $dependancies = optional_param_array('dependancies', null, PARAM_INT);
     if (is_array($dependancies)) {
-        // cleanup previous depdendancies
+        // Cleanup previous depdendancies.
         if (!$DB->delete_records('tracker_issuedependancy', array('childid' => $issue->id))) {
             print_error('errorcannotdeleteolddependancy', 'tracker');
         }
-        // install back new one
+        // Install back new one.
         foreach ($dependancies as $dependancy) {
             $dependancyrec = new StdClass;
             $dependancyrec->trackerid = $tracker->id;
@@ -133,9 +138,10 @@ elseif ($action == 'updateanissue') {
             }
         }
     }
-}
-/************************************* delete an issue record *****************************/
-elseif ($action == 'delete') {
+} else if ($action == 'delete') {
+
+    // Delete an issue record ***************************************************************.
+
     $issueid = required_param('issueid', PARAM_INT);
 
     $maxpriority = $DB->get_field('tracker_issue', 'resolutionpriority', array('id' => $issueid));
@@ -150,7 +156,7 @@ elseif ($action == 'delete') {
     $DB->delete_records('tracker_issueownership', array('issueid' => $issueid));
     $DB->delete_records('tracker_state_change', array('issueid' => $issueid));
 
-    // lower priority of every issue above
+    // Lower priority of every issue above.
     $sql = "
         UPDATE
             {tracker_issue}
@@ -163,11 +169,11 @@ elseif ($action == 'delete') {
 
     $DB->execute($sql, array($tracker->id, $maxpriority));
 
-    // todo : send notification to all cced
+    // TODO : send notification to all cced.
 
     $DB->delete_records('tracker_issuecc', array('issueid' => $issueid));
 
-    // clear all associated fileareas
+    // Clear all associated fileareas.
 
     $fs = get_file_storage();
     $fs->delete_area_files($context->id, 'mod_tracker', 'issuedescription', $issueid);
@@ -184,13 +190,14 @@ elseif ($action == 'delete') {
             $fs->delete_area_files($context->id, 'mod_tracker', 'issuecomment', $commentid);
         }
     }
-}
-/************************************* updating list and status *****************************/
-elseif ($action == 'updatelist') {
-    $keys = array_keys($_POST);                                // get the key value of all the fields submitted
-    $statuskeys = preg_grep('/status./' , $keys);              // filter out only the status
-    $assignedtokeys = preg_grep('/assignedto./' , $keys);      // filter out only the assigned updating
-    $newassignedtokeys = preg_grep('/assignedtoi./' , $keys);  // filter out only the new assigned
+} else if ($action == 'updatelist') {
+
+    // Updating list and status ******************************************************************.
+
+    $keys = array_keys($_POST);                                // get the key value of all the fields submitted.
+    $statuskeys = preg_grep('/status./' , $keys);              // filter out only the status.
+    $assignedtokeys = preg_grep('/assignedto./' , $keys);      // filter out only the assigned updating.
+    $newassignedtokeys = preg_grep('/assignedtoi./' , $keys);  // filter out only the new assigned.
     foreach ($statuskeys as $akey) {
         $issueid = str_replace('status', '', $akey);
         $haschanged = optional_param('schanged'.$issueid, 0, PARAM_INT);
@@ -200,12 +207,12 @@ elseif ($action == 'updatelist') {
             $issue->status = required_param($akey, PARAM_INT);
             $oldstatus = $DB->get_field('tracker_issue', 'status', array('id' => $issue->id));
             $DB->update_record('tracker_issue', $issue);
-            // check status changing and send notifications
+            // Check status changing and send notifications.
             if ($oldstatus != $issue->status) {
                 if ($tracker->allownotifications) {
                     tracker_notifyccs_changestate($issue->id, $tracker);
                 }
-                // log state change
+                // Log state change.
                 $stc = new StdClass;
                 $stc->userid = $USER->id;
                 $stc->issueid = $issue->id;
@@ -218,13 +225,13 @@ elseif ($action == 'updatelist') {
         }
     }
 
-    // always add a record for history
+    // Always add a record for history.
     foreach ($assignedtokeys as $akey) {
         $issueid = str_replace('assignedto', '', $akey);
-        // new ownership is triggered only when a change occured
+        // New ownership is triggered only when a change occured.
         $haschanged = optional_param('changed'.$issueid, 0, PARAM_INT);
         if ($haschanged) {
-            // save old assignement in history
+            // Save old assignement in history.
             $oldassign = $DB->get_record('tracker_issue', array('id' => $issueid));
             if ($oldassign->assignedto != 0) {
                 $ownership = new StdClass;
@@ -233,9 +240,7 @@ elseif ($action == 'updatelist') {
                 $ownership->userid = $oldassign->assignedto;
                 $ownership->bywhomid = $oldassign->bywhomid;
                 $ownership->timeassigned = 0 + @$oldassign->timeassigned;
-                if (!$DB->insert_record('tracker_issueownership', $ownership)) {
-                    notice ("Error saving ownership for issue $issueid");
-                }
+                $DB->insert_record('tracker_issueownership', $ownership);
             }
 
             // update actual ticket
@@ -245,9 +250,7 @@ elseif ($action == 'updatelist') {
             $issue->timeassigned = time();
             $issue->assignedto = required_param($akey, PARAM_INT);
             tracker_register_cc($tracker, $issue, $issue->assignedto);
-            if (!$DB->update_record('tracker_issue', $issue)) {
-                notice ("Error updating assignation for issue $issueid");
-            }
+            $DB->update_record('tracker_issue', $issue);
 
             if ($tracker->allownotifications) {
                 tracker_notifyccs_changeownership($issue->id, $tracker);
@@ -255,64 +258,34 @@ elseif ($action == 'updatelist') {
         }
     }
 
-    // reorder priority field and discard newly resolved or abandonned
+    // Reorder priority field and discard newly resolved or abandonned.
     tracker_update_priority_stack($tracker);
-}
-/********************************* requires the add a comment form **************************/
-// gone away
-/*
-elseif ($action == 'addacomment') {
-    $form = new StdClass();
-    $form->issueid = required_param('issueid', PARAM_INT);
-    include "views/addacomment.html";
-    return -1;
-}
-*/
-/***************************************** add a comment ***********************************/
-// gone away
-/*
-elseif ($action == 'doaddcomment') {
-    $issueid = required_param('issueid', PARAM_INT);
-    $comment = new StdClass;
-    $comment->comment = required_param('comment', PARAM_CLEANHTML);
-    $comment->commentformat = required_param('commentformat', PARAM_INT);
-    $comment->userid = $USER->id;
-    $comment->trackerid = $tracker->id;
-    $comment->issueid = $issueid;
-    $comment->datecreated = time();
-    if (!$DB->insert_record('tracker_issuecomment', $comment)) {
-        print_error('cannotwritecomment', 'tracker');
-    }
 
-    if ($tracker->allownotifications) {
-        tracker_notifyccs_comment($issueid, $comment->comment, $tracker);
-    }
-    $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
-    tracker_register_cc($tracker, $issue, $USER->id);
-}
-*/
-/************************************ reactivates a stored search *****************************/
-elseif ($action == 'usequery') {
+} elseif ($action == 'usequery') {
+
+    // Reactivates a stored search *************************************************************.
+
     $queryid = required_param('queryid', PARAM_INT);
     $fields = tracker_extractsearchparametersfromdb($queryid);
-}
-/******************************* unregister administratively a user *****************************/
-elseif ($action == 'unregister') {
+} else if ($action == 'unregister') {
+
+    // Unregister administratively a user ******************************************************.
+
     $issueid = required_param('issueid', PARAM_INT);
     $ccid = optional_param('ccid', $USER->id, PARAM_INT);
-    if (!$DB->delete_records ('tracker_issuecc', array('trackerid' => $tracker->id, 'issueid' => $issueid, 'userid' => $ccid))) {
+    $params = array('trackerid' => $tracker->id, 'issueid' => $issueid, 'userid' => $ccid);
+    if (!$DB->delete_records ('tracker_issuecc', $params)) {
         print_error('errorcannotdeletecc', 'tracker');
     }
-}
-elseif ($action == 'register') {
+} else if ($action == 'register') {
     $issueid = required_param('issueid', PARAM_INT);
     $ccid = optional_param('ccid', $USER->id, PARAM_INT);
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
     tracker_register_cc($tracker, $issue, $ccid);
-}
-/******************************* copy an issue to a parent tracker *****************************/
-elseif ($action == 'cascade') {
+} elseif ($action == 'cascade') {
     global $USER;
+
+    // Copy an issue to a parent tracker *********************************************************.
 
     $fs = get_file_storage();
 
@@ -320,13 +293,13 @@ elseif ($action == 'cascade') {
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
     $attributes = $DB->get_records('tracker_issueattribute', array('issueid' => $issue->id));
 
-    // remaps elementid to elementname for
+    // Remaps elementid to elementname for.
     tracker_loadelementsused($tracker, $used);
     if (!empty($attributes)) {
         foreach ($attributes as $attkey => $attribute) {
             $attributes[$attkey]->elementname = @$used[$attributes[$attkey]->id]->name;
             if ($attribute->type == 'file') {
-                // get file content, encode it
+                // Get file content, encode it.
                 $files = $fs->get_area_files($context->id, 'mod_tracker', 'issueattribute', $attribute->id);
                 if ($files) {
                     $file = array_pop($files);
@@ -337,9 +310,11 @@ elseif ($action == 'cascade') {
     }
     $issue->attributes = $attributes;
 
-    // We get comments and make a single backtrack. There should not
-    // be usefull to bring along full user profile. We just want not
-    // to loose usefull information the previous track collected.
+    /*
+     * We get comments and make a single backtrack. There should not
+     * be usefull to bring along full user profile. We just want not
+     * to loose usefull information the previous track collected.
+     */
     $comments = $DB->get_records('tracker_issuecomment', array('issueid' => $issue->id));
     $track = '';
     if (!empty($comments)) {
@@ -350,9 +325,12 @@ elseif ($action == 'cascade') {
         list($insql, $inparam) = $DB->get_in_or_equal($useridsarray);
         $users = $DB->get_records_select('user', "id $insql", array($inparams), 'lastname, firstname', 'id, firstname, lastname');
 
-        // make backtrack
+        // Make backtrack.
         foreach ($comments as $comment) {
-            $track .= get_string('commentedby', 'tracker').fullname($users[$comment->userid]).get_string('on', 'tracker').userdate($comment->datecreated);
+            $track .= get_string('commentedby', 'tracker');
+            $track .= fullname($users[$comment->userid]);
+            $track .= get_string('on', 'tracker');
+            $track .= userdate($comment->datecreated);
             $track .= '<br/>';
             $track .= format_text($comment->comment, $comment->commentformat);
             $track .= '<hr width="60%"/>';
@@ -363,23 +341,25 @@ elseif ($action == 'cascade') {
     // Save it for further reference.
     $oldstatus = $issue->status;
 
-    // downlink might be appended remote side with the our remote mnet_host identity
+    // Downlink might be appended remote side with the our remote mnet_host identity.
     $issue->downlink = $issue->trackerid.':'.$issue->id;
 
     include_once($CFG->dirroot.'/mod/tracker/rpclib.php');
 
     $islocal = false;
     if (strpos($tracker->parent, '@') === false) {
-        // tracker is local, use the rpc entry point anyway
-        // emulate response
+        /*
+         * Tracker is local, use the rpc entry point anyway
+         * emulate response
+         */
         $islocal = true;
         $result = tracker_rpc_post_issue(null, $tracker->parent, $issue, $islocal);
     } else {
-        // tracker is remote, make an RPC call
+        // Tracker is remote, make an RPC call.
 
         list($remoteid, $mnethostroot) = explode('@', $tracker->parent);
 
-        // get network tracker properties
+        // Get network tracker properties.
         include_once $CFG->dirroot.'/mnet/xmlrpc/client.php';
         $userroot = $DB->get_field('mnet_host', 'wwwroot', array('id' => $USER->mnethostid));
         $rpcclient = new mnet_xmlrpc_client();
@@ -405,6 +385,7 @@ elseif ($action == 'cascade') {
             $result = null;
         }
     }
+
     if (!empty($result)) {
         $response = (object)json_decode($result);
         if ($response->status == RPC_SUCCESS) {
@@ -423,7 +404,8 @@ elseif ($action == 'cascade') {
             } catch (Exception $e) {
                 print_error('errorcannotupdateissuecascade', 'tracker');
             }
-            // log state change
+
+            // Log state change.
             $stc = new StdClass;
             $stc->userid = $USER->id;
             $stc->issueid = $issue->id;
@@ -438,49 +420,45 @@ elseif ($action == 'cascade') {
     } else {
         print_error('errorremotesendingcascade', 'tracker', $tracker->parent);
     }
-}
-/******************************* move an issue to a subtracker *****************************/
-/**
-* distribution only work with local subtrackers. Elements are not remapped
-*
-*/
+} else if ($action == 'distribute') {
 
-elseif ($action == 'distribute') {
-    global $USER;
+    /**
+     * distribution only work with local subtrackers. Elements are not remapped
+     *
+     */
+
+    // Move an issue to a subtracker **********************************************************.
+
     $issueid = required_param('issueid', PARAM_INT);
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
-    /*
-    // remaps elementid to elementname for
-    tracker_loadelementsused($tracker, $used);
-    if (!empty($attributes)) {
-        foreach (array_keys($attributes) as $attkey) {
-            $attributes[$attkey]->elementname = @$used[$attributes[$attkey]->id]->name;
-        }
-    }
-    $issue->attributes = $attributes;
-    */
-    // reassign tracker
+
+    // Reassign tracker.
+
     $newtrackerid = required_param('target', PARAM_INT);
     $issue->trackerid = $newtrackerid;
     $newtracker = $DB->get_record('tracker', array('id' => $newtrackerid));
 
-    // remap assigned to and notify new assignee if changed
+    // Remap assigned to and notify new assignee if changed.
+
     $trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
     $newcm = $DB->get_record('course_modules', array('instance' => $newtracker->id, 'module' => $trackermoduleid));
     $newcontext = context_module::instance($newcm->id);
 
-    // if assignee is in not this tracker remap assignee to default
+    // If assignee is in not this tracker remap assignee to default.
+
     if (!has_capability('mod/tracker:develop', $newcontext, $issue->assignedto)) {
         $oldassingedto = $issue->assignedto;
         $oldstatus = $issue->status;
         $issue->assignedto = $newtracker->defaultassignee;
-        $issue->status = 0; // reset status to posted so new assignee has to open it again
-        // only notify if real change
-        if ($tracker->allownotifications && ($oldassingedto != $issue->assignedto) && $newtracker->defaultassignee) {
+        $issue->status = 0; // Reset status to posted so new assignee has to open it again.
+        // Only notify if real change.
+        if ($tracker->allownotifications &&
+                ($oldassingedto != $issue->assignedto) &&
+                        $newtracker->defaultassignee) {
             tracker_notifyccs_changeownership($issue->id, $newtracker);
         }
 
-        // log state change
+        // log state change.
         if ($oldstatus != $issue->status) {
             $stc = new StdClass;
             $stc->userid = $USER->id;
@@ -496,23 +474,28 @@ elseif ($action == 'distribute') {
             tracker_notifyccs_moveissue($issue->id, $tracker, $newtracker);
         }
     }
-    // move the issue
+
+    // Move the issue.
     $DB->update_record('tracker_issue', $issue);
     $DB->set_field_select('tracker_issueattribute', 'trackerid', $newtracker->id, " issueid = $issue->id ");
     $DB->set_field_select('tracker_state_change', 'trackerid', $newtracker->id, " issueid = $issue->id ");
     $DB->set_field_select('tracker_issueownership', 'trackerid', $newtracker->id, " issueid = $issue->id ");
     $DB->set_field_select('tracker_issuecomment', 'trackerid', $newtracker->id, " issueid = $issue->id ");
     $DB->set_field_select('tracker_issuecc', 'trackerid', $newtracker->id, " issueid = $issue->id ");
-    // we must stay in our own tracker to continue distributing.
+
+    // We must stay in our own tracker to continue distributing.
     redirect($CFG->wwwroot."/mod/tracker/view.php?id={$cm->id}&view=view&screen=browse");
-    // check watchers :
-    // TODO : if watchers do not have capability in the new tracker, discard them
-}
-/********************************* raises the priority of the issue **************************/
-elseif ($action == 'raisepriority') {
+    // TODO : if watchers do not have capability in the new tracker, discard them.
+
+} else if ($action == 'raisepriority') {
+
+    // Raises the priority of the issue *****************************************************************************.
+
     $issueid = required_param('issueid', PARAM_INT);
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
-    $nextissue = $DB->get_record('tracker_issue', array('trackerid' => $tracker->id, 'resolutionpriority' => $issue->resolutionpriority + 1));
+    $params = array('trackerid' => $tracker->id,
+                    'resolutionpriority' => $issue->resolutionpriority + 1);
+    $nextissue = $DB->get_record('tracker_issue', $params);
     if ($nextissue) {
         $issue->resolutionpriority++;
         $nextissue->resolutionpriority--;
@@ -520,15 +503,17 @@ elseif ($action == 'raisepriority') {
         $DB->update_record('tracker_issue', $nextissue);
     }
     tracker_update_priority_stack($tracker);
-}
-/********************************* raises the priority at top of list **************************/
-elseif ($action == 'raisetotop') {
+
+} else if ($action == 'raisetotop') {
+
+    // Raises the priority at top of list ***********************************************************.
+
     $issueid = required_param('issueid', PARAM_INT);
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
     $maxpriority = $DB->get_field('tracker_issue', 'resolutionpriority', array('id' => $issueid));
 
     if ($issue->resolutionpriority != $maxpriority) {
-        // lower everyone above
+        // Lower everyone above.
         $sql = "
             UPDATE
                 {$CFG->dbprefix}tracker_issue
@@ -539,14 +524,17 @@ elseif ($action == 'raisetotop') {
                 resolutionpriority > ?
         ";
         $DB->execute($sql, array($tracker->id, $issue->resolutionpriority));
-        // update to max priority
+
+        // Update to max priority.
         $issue->resolutionpriority = $maxpriority;
         $DB->update_record('tracker_issue', $issue);
     }
     tracker_update_priority_stack($tracker);
-}
-/********************************* lowers the priority of the issue **************************/
-elseif ($action == 'lowerpriority') {
+
+} else if ($action == 'lowerpriority') {
+
+    // Lowers the priority of the issue ***************************************************************.
+
     $issueid = required_param('issueid', PARAM_INT);
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
     if ($issue->resolutionpriority > 0) {
@@ -557,14 +545,16 @@ elseif ($action == 'lowerpriority') {
         $DB->update_record('tracker_issue', $nextissue);
     }
     tracker_update_priority_stack($tracker);
-}
-/********************************* raises the priority at top of list **************************/
-elseif ($action == 'lowertobottom') {
+
+} else if ($action == 'lowertobottom') {
+
+    // Raises the priority at top of list **************************************************************.
+
     $issueid = required_param('issueid', PARAM_INT);
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
 
     if ($issue->resolutionpriority > 0) {
-        // raise everyone beneath
+        // Raise everyone beneath.
         $sql = "
             UPDATE
                 {$CFG->dbprefix}tracker_issue
@@ -575,25 +565,28 @@ elseif ($action == 'lowertobottom') {
                 resolutionpriority < ?
         ";
         $DB->execute($sql, array($tracker->id, $issue->resolutionpriority));
-        // update to min priority
+
+        // Update to min priority.
         $issue->resolutionpriority = 0;
         $DB->update_record('tracker_issue', $issue);
     }
     tracker_update_priority_stack($tracker);
-}
-/****************** get some context for sending raising request ******************/
-elseif ($action == 'askraise') {
-     $issueid = required_param('issueid', PARAM_INT);
 
-     include $CFG->dirroot.'/mod/tracker/views/raiserequest.html';
+} else if ($action == 'askraise') {
+
+    // get some context for sending raising request ***************************************************.
+    $issueid = required_param('issueid', PARAM_INT);
+
+     include($CFG->dirroot.'/mod/tracker/views/raiserequest.html');
      return -1;
-}
-/****************** get some context for sending raising request ******************/
-elseif ($action == 'doaskraise') {
-     $issueid = required_param('issueid', PARAM_INT);
-     $reason = required_param('reason', PARAM_TEXT);
-     $urgent = required_param('urgent', PARAM_INT);
-     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
 
-     tracker_notify_raiserequest($issue, $cm, $reason, $urgent, $tracker);
+} else if ($action == 'doaskraise') {
+
+    // Get some context for sending raising request *******************************************************.
+    $issueid = required_param('issueid', PARAM_INT);
+    $reason = required_param('reason', PARAM_TEXT);
+    $urgent = required_param('urgent', PARAM_INT);
+    $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
+
+    tracker_notify_raiserequest($issue, $cm, $reason, $urgent, $tracker);
 }

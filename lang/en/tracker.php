@@ -61,8 +61,8 @@ $string['browser'] = 'Browser';
 $string['build'] = 'Version';
 $string['by'] = '<i>assigned by</i>';
 $string['cascade'] = 'Send upper level';
-$string['cascadedticket'] = 'Transferred from: ';
 $string['captcha'] = 'Captcha';
+$string['cascadedticket'] = 'Transferred from: ';
 $string['cced'] = 'Cced';
 $string['ccs'] = 'Ccs';
 $string['checkbox'] = 'Checkbox'; // @DYNA
@@ -141,8 +141,11 @@ $string['elucidationratio'] = 'Elucidation ratio';
 $string['emailoptions'] = 'Mail options';
 $string['emergency'] = 'Urgent query';
 $string['emptydefinition'] = 'Target tracker has no definition.';
+$string['emulatecommunity'] = 'Emulate community version';
+$string['emulatecommunity_desc'] = 'If enabled, the plugin will behave as the public community version. This might loose features !';
 $string['enablecomments'] = 'Allow comments';
 $string['enablecomments_help'] = 'When this option is enabled, readers of issue records can add comments in the tracker.';
+$string['errorcaptcha'] = 'You failed givieng back the captcha. Or maybe are you a robot?';
 $string['erroraddissueattribute'] = 'Could not submit issue(s) attribute(s). Case {$a} ';
 $string['erroralreadyinuse'] = 'Element already in use';
 $string['errorannotdeletecarboncopies'] = 'Cannot delete carbon copies for user : {$a}';
@@ -302,6 +305,7 @@ $string['options'] = 'Options';
 $string['order'] = 'Order';
 $string['originalticketnoaccess'] = 'This ticket is transfered from another ticket you do not have read access on.';
 $string['pages'] = 'Pages';
+$string['plugindist'] = 'Plugin distribution';
 $string['posted'] = 'Posted';
 $string['potentialresolvers'] = 'Potential resolvers';
 $string['preferences'] = 'Preferences';
@@ -425,6 +429,15 @@ $string['voter'] = 'Vote';
 $string['waiting'] = 'Waiting';
 $string['watches'] = 'Watches';
 $string['youneedanaccount'] = 'You need an authorized account here to report a ticket';
+
+$string['plugindist_desc'] = '
+<p>This plugin is the community version and is published for anyone to use as is and check the plugin\'s
+core application. A "pro" version of this plugin exists and is distributed under conditions to feed the life cycle, upgrade, documentation
+and improvement effort.</p>
+<p>Please contact one of our distributors to get "Pro" version support.</p>
+<ul><li><a href="http://www.activeprolearn.com/plugin.php?plugin=mod_tracker">ActiveProLearn SAS</a></li>
+<li><a href="http://www.edunao.com">Edunao SAS</a></li></ul>
+';
 
 // help strings
 

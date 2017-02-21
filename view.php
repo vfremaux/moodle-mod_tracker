@@ -126,7 +126,7 @@ $strtrackers = get_string('modulenameplural', 'tracker');
 $strtracker  = get_string('modulename', 'tracker');
 
 if ($view == 'reports') {
-    require_once($CFG->dirroot.'/mod/tracker/js/jqplotlib.php');
+    require_once($CFG->dirroot.'/local/vflibs/jqplotlib.php');
     tracker_require_jqplot_libs();
 }
 
@@ -256,35 +256,49 @@ if ($view == 'view') {
                 break;
         }
     }
-} elseif ($view == 'admin') {
+} else if ($view == 'admin') {
     if ($result != -1) {
         switch ($screen) {
-            case 'summary':
+            case 'summary': {
                 include($CFG->dirroot.'/mod/tracker/views/admin_summary.html');
                 break;
-            case 'manageelements':
+            }
+
+            case 'manageelements': {
                 include($CFG->dirroot.'/mod/tracker/views/admin_manageelements.html');
                 break;
-            case 'managenetwork':
-                include($CFG->dirroot.'/mod/tracker/views/admin_mnetwork.html');
+            }
+
+            case 'managenetwork': {
+                if (tracker_supports_feature('cascade/mnet') {
+                    include($CFG->dirroot.'/mod/tracker/pro/views/admin_mnetwork.html');
+                }
                 break;
+            }
         }
     }
-} elseif ($view == 'profile') {
+} else if ($view == 'profile') {
     if ($result != -1) {
         switch ($screen) {
-            case 'myprofile' :
+            case 'myprofile': {
                 include($CFG->dirroot.'/mod/tracker/views/profile.html');
                 break;
-            case 'mypreferences' :
+            }
+
+            case 'mypreferences': {
                 include($CFG->dirroot.'/mod/tracker/views/mypreferences.html');
                 break;
-            case 'mywatches' :
+            }
+
+            case 'mywatches': {
                 include($CFG->dirroot.'/mod/tracker/views/mywatches.html');
                 break;
-            case 'myqueries':
+            }
+
+            case 'myqueries': {
                 include($CFG->dirroot.'/mod/tracker/views/myqueries.html');
                 break;
+            }
         }
     }
 } else {

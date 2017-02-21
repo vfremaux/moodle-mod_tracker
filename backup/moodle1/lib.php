@@ -194,27 +194,21 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
      * data available
      */
     public function process_tracker($data) {
-        // get the course module id and context id
+        // Get the course module id and context id.
         $instanceid = $data['id'];
         $cminfo     = $this->get_cminfo($instanceid);
         $moduleid   = $cminfo['id'];
         $contextid  = $this->converter->get_contextid(CONTEXT_MODULE, $moduleid);
 
-        // get a fresh new file manager for this instance
+        // Get a fresh new file manager for this instance.
         $this->fileman = $this->converter->get_file_manager($contextid, 'mod_tracker');
 
-        // convert course files embedded into the intro
+        // Convert course files embedded into the intro.
         $this->fileman->filearea = 'intro';
         $this->fileman->itemid   = 0;
-        /*
-        $data['intro'] = $data['description'];
-        $data['introformat'] = $data['format'];
-        unset($data['description']);
-        unset($data['format']);
-        */
         $data['intro'] = moodle1_converter::migrate_referenced_files($data['intro'], $this->fileman);
 
-        // write tracker.xml
+        // Write tracker.xml.
         $this->open_xml_writer("activities/tracker_{$moduleid}/tracker.xml");
         $this->xmlwriter->begin_tag('activity', array('id' => $instanceid, 'moduleid' => $moduleid,
             'modulename' => 'tracker', 'contextid' => $contextid));
@@ -235,15 +229,15 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
      */
     public function on_tracker_end() {
 
-        // flush last pending tmp structure (issues)
+        // Flush last pending tmp structure (issues).
         $this->flushtmp();
 
-        // finish writing tracker.xml
+        // Finish writing tracker.xml.
         $this->xmlwriter->end_tag('tracker');
         $this->xmlwriter->end_tag('activity');
         $this->close_xml_writer();
 
-        // write inforef.xml
+        // Write inforef.xml.
         $this->open_xml_writer("activities/tracker_{$this->moduleid}/inforef.xml");
         $this->xmlwriter->begin_tag('inforef');
         $this->xmlwriter->begin_tag('fileref');
@@ -256,23 +250,23 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
     }
 
     /* ELEMENT and elementitem subs */
-    // need wait for all elements an elements item collected into memory structure as nesting change structure occurs
+    // Need wait for all elements an elements item collected into memory structure as nesting change structure occurs.
     public function on_tracker_elements_start() {
         $this->tmp->subs['elements'] = array();
     }
 
     public function on_tracker_elements_end() {
-        // we should wait for elementitems processing
+        // We should wait for elementitems processing.
     }
 
-    // process element in one single write
+    // Process element in one single write.
     public function process_tracker_element($data) {
 
         $instanceid = $data['id'];
 
-        // process data
+        // Process data.
 
-        // store data within temp structure
+        // Store data within temp structure.
         $nestedelm = new StdClass;
         $nestedelm->nodename = 'element';
         $nestedelm->data = $data;
@@ -282,22 +276,22 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
 
     /* ELEMENT ITEM */
     public function on_tracker_elementitems_start() {
-        // nothing to do, will be post processed when all elements/elementitems scanned
+        // Nothing to do, will be post processed when all elements/elementitems scanned.
     }
 
     public function on_tracker_elementitems_end() {
-        // nothing to do, will be post processed when all elements/elementitems scanned
+        // Nothing to do, will be post processed when all elements/elementitems scanned.
     }
 
-    // process elementitem in one single write
+    // Process elementitem in one single write.
     public function process_tracker_elementitem($data) {
 
         $instanceid = $data['id'];
         $elementid = $data['elementid'];
 
-        // actually process record
+        // Actually process record.
 
-        // store elementitem in tmp
+        // Store elementitem in tmp.
         $nestedelm = new StdClass;
         $nestedelm->nodename = 'elementitem';
         $nestedelm->data = $data;
@@ -313,9 +307,15 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
         $this->xmlwriter->end_tag('usedelements');
     }
 
-    // process usedelement in one single write
+    // Process usedelement in one single write.
     public function process_tracker_usedelement($data) {
-        $this->write_xml('usedelement', array('id' => $data['id'], 'trackerid' => $data['trackerid'], 'elementid' => $data['elementid'], 'sortorder' => $data['sortorder'], 'canbemodifiedby' => $data['canbemodifiedby'], 'active' => $data['active']));
+        $elms = array('id' => $data['id'],
+                      'trackerid' => $data['trackerid'],
+                      'elementid' => $data['elementid'],
+                      'sortorder' => $data['sortorder'],
+                      'canbemodifiedby' => $data['canbemodifiedby'],
+                      'active' => $data['active']);
+        $this->write_xml('usedelement', $elms);
     }
 
     /* PREFERENCES */
@@ -327,7 +327,7 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
         $this->xmlwriter->end_tag('preferences');
     }
 
-    // process preference in one single write
+    // Process preference in one single write.
     public function process_tracker_preference($data) {
         $this->write_xml('preference', array('id' => $data['id']));
     }
@@ -341,7 +341,7 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
         $this->xmlwriter->end_tag('queries');
     }
 
-    // process query in one single write
+    // Process query in one single write.
     public function process_tracker_query($data) {
         $this->write_xml('query', array('id' => $data['id']));
     }
@@ -355,7 +355,7 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
         $this->xmlwriter->end_tag('dependancies');
     }
 
-    // process dependancy in one single write
+    // Process dependancy in one single write.
     public function process_tracker_dependancy($data) {
         $this->write_xml('dependancy', array('id' => $data['id']));
     }
@@ -369,14 +369,12 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
         // we should wait for all issue subs processed
     }
 
-    // process issue in one single write
+    // Process issue in one single write.
     public function process_tracker_issue($data) {
 
          $instanceid     = $data['id'];
 
-           // process data
-
-        // store data within temp structure
+        // Store data within temp structure.
         $nestedelm = new StdClass;
         $nestedelm->nodename = 'issue';
         $nestedelm->data = $data;
@@ -386,22 +384,20 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
 
     /* ATTRIBUTES */
     public function on_tracker_attributes_start() {
-        // nothing to do, will be post processed when all issues/subs scanned
+        // Nothing to do, will be post processed when all issues/subs scanned.
     }
 
     public function on_tracker_attributes_end() {
-        // nothing to do, will be post processed when all issues/subs scanned
+        // Nothing to do, will be post processed when all issues/subs scanned.
     }
 
-    // process attribute in one single write
+    // Process attribute in one single write.
     public function process_tracker_attribute($data) {
 
         $instanceid = $data['id'];
         $issueid = $data['issueid'];
 
-        // process data
-
-        // store data within temp structure
+        // Store data within temp structure.
         $nestedelm = new StdClass;
         $nestedelm->nodename = 'attribute';
         $nestedelm->data = $data;
@@ -411,22 +407,20 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
 
     /* CCS */
     public function on_tracker_ccs_start() {
-        // nothing to do, will be post processed when all issues/subs scanned
+        // Nothing to do, will be post processed when all issues/subs scanned.
     }
 
     public function on_tracker_ccs_end() {
-        // nothing to do, will be post processed when all issues/subs scanned
+        // Nothing to do, will be post processed when all issues/subs scanned.
     }
 
-    // process cc in one single write
+    // Process cc in one single write.
     public function process_tracker_cc($data) {
 
         $instanceid = $data['id'];
         $issueid = $data['issueid'];
 
-        // process data
-
-        // store data within temp structure
+        // Store data within temp structure.
         $nestedelm = new StdClass;
         $nestedelm->nodename = 'cc';
         $nestedelm->data = $data;
@@ -436,22 +430,20 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
 
     /* COMMENTS */
     public function on_tracker_comments_start() {
-        // nothing to do, will be post processed when all issues/subs scanned
+        // Nothing to do, will be post processed when all issues/subs scanned.
     }
 
     public function on_tracker_comments_end() {
-        // nothing to do, will be post processed when all issues/subs scanned
+        // Nothing to do, will be post processed when all issues/subs scanned.
     }
 
-    // process comment in one single write
+    // Process comment in one single write.
     public function process_tracker_comment($data) {
 
         $instanceid = $data['id'];
         $issueid = $data['issueid'];
 
-        // process data
-
-        // store data within temp structure
+        // Store data within temp structure.
         $nestedelm = new StdClass;
         $nestedelm->nodename = 'comment';
         $nestedelm->data = $data;
@@ -461,22 +453,20 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
 
     /* OWNERSHIPS */
     public function on_tracker_ownerships_start() {
-        // nothing to do, will be post processed when all issues/subs scanned
+        // Nothing to do, will be post processed when all issues/subs scanned.
     }
 
     public function on_tracker_ownerships_end() {
-        // nothing to do, will be post processed when all issues/subs scanned
+        // Nothing to do, will be post processed when all issues/subs scanned.
     }
 
-    // process ownership in one single write
+    // Process ownership in one single write.
     public function process_tracker_ownership($data) {
 
         $instanceid = $data['id'];
         $issueid = $data['issueid'];
 
-        // process data
-
-        // store data within temp structure
+        // Store data within temp structure.
         $nestedelm = new StdClass;
         $nestedelm->nodename = 'ownership';
         $nestedelm->data = $data;
@@ -486,22 +476,20 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
 
     /* CHANGESTATES */
     public function on_tracker_statechanges_start() {
-        // nothing to do, will be post processed when all issues/subs scanned
+        // Nothing to do, will be post processed when all issues/subs scanned.
     }
 
     public function on_tracker_statechanges_end() {
-        // nothing to do, will be post processed when all issues/subs scanned
+        // Nothing to do, will be post processed when all issues/subs scanned.
     }
 
-    // process statechange in one single write
+    // Process statechange in one single write.
     public function process_tracker_statechange($data) {
 
         $instanceid = $data['id'];
         $issueid = $data['issueid'];
 
-        // process data
-
-        // store data within temp structure
+        // Store data within temp structure.
         $nestedelm = new StdClass;
         $nestedelm->nodename = 'statechange';
         $nestedelm->data = $data;
@@ -515,22 +503,28 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
     */
     protected function flushtmp($node = null) {
 
-        if (is_null($node) && !isset($this->tmp)) return;
-        if (is_null($node)) $node = $this->tmp;
-        if (empty($node->subs)) return;
+        if (is_null($node) && !isset($this->tmp)) {
+            return;
+        }
+        if (is_null($node)) {
+            $node = $this->tmp;
+        }
+        if (empty($node->subs)) {
+            return;
+        }
 
         foreach ($node->subs as $subset => $subdata) {
-            // start element set
+            // Start element set.
             $this->xmlwriter->begin_tag($subset);
 
             foreach ($subdata as $sub) {
 
                 $instanceid = $sub->data['id'];
 
-                // start element
+                // Start element.
                 $this->xmlwriter->begin_tag($sub->nodename, array('id' => $instanceid));
 
-                // write fields
+                // Write fields.
                 if (isset($sub->data)) {
                     foreach ($sub->data as $field => $value) {
                         if ($field <> 'id') {
@@ -539,18 +533,18 @@ class moodle1_mod_tracker_handler extends moodle1_mod_handler {
                     }
                 }
 
-                // if has own subs, recurse
+                // If has own subs, recurse.
                 if (!empty($sub->subs)) $this->flushtmp($sub);
 
-                // end element
+                // End element.
                 $this->xmlwriter->end_tag($sub->nodename);
             }
 
-            // end element set
+            // End element set.
             $this->xmlwriter->end_tag($subset);
         }
 
-        // free some memory
+        // Free some memory.
         unset($node);
     }
 }

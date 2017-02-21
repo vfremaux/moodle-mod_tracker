@@ -14,25 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @package mod_tracker
  * @category mod
  * @author Clifford Tham, Valery Fremaux > 1.8
  * @date 02/12/2007
  */
+defined('MOODLE_INTERNAL') || die();
 
 /**
- * the master renderer
+ * The master renderer
  */
 class mod_tracker_renderer extends plugin_renderer_base {
 
-    function core_issue($issue, $tracker) {
-        global $CFG, $COURSE, $DB, $OUTPUT, $USER, $STATUSCODES, $STATUSKEYS;
+    public function core_issue(&$issue, &$tracker) {
+        global $CFG, $COURSE, $DB, $USER, $STATUSCODES, $STATUSKEYS;
 
         $str = '';
-    
+
         $str .= '<tr valign="top">';
         $str .= '<td colspan="4" align="left" class="tracker-issue-summary">';
         $str .= format_string($issue->summary);
@@ -107,8 +106,10 @@ class mod_tracker_renderer extends plugin_renderer_base {
                         $link = get_string('transferedticketnoaccess', 'tracker');
                     }
                 } else {
-                    // Either upstream tracker has been deleted or upstream issue has been deleted. 
-                    // Than revert uplink and go back to open state
+                    /*
+                     * Either upstream tracker has been deleted or upstream issue has been deleted.
+                     * then revert uplink and go back to open state.
+                     */
                     $issue->uplink = '';
                     $issue->status = OPEN;
                     $DB->update_record('tracker_issue', $issue);
@@ -179,7 +180,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         if (!$issue->owner){
             $str .= get_string('unassigned', 'tracker');
         } else {
-            $str .= $OUTPUT->user_picture($issue->owner, array('courseid' => $COURSE->id, 'size' => 35));
+            $str .= $this->output->user_picture($issue->owner, array('courseid' => $COURSE->id, 'size' => 35));
             $str .= '&nbsp;'.fullname($issue->owner); 
         }
         $str .= '</td>';
@@ -203,7 +204,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         return $str;
     }
 
-    function edit_link($issue, $cm) {
+    public function edit_link($issue, $cm) {
 
         $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'editanissue', 'issueid' => $issue->id);
 
@@ -222,7 +223,8 @@ class mod_tracker_renderer extends plugin_renderer_base {
         return $str;
     }
 
-    function issue_attributes($issue, $elementsused) {
+    public function issue_attributes($issue, $elementsused) {
+
         $str = '';
 
         $cm = get_coursemodule_from_instance('tracker', $issue->trackerid);
@@ -232,18 +234,21 @@ class mod_tracker_renderer extends plugin_renderer_base {
         if (!empty($keys)) {
             for ($i = 0; $i < count($keys);) {
                 $key = $keys[$i];
+
                 // Hide private fields if not power user.
-                if ($elementsused[$key]->private && !has_any_capability(array('mod/tracker:manage', 'mod/tracker:develop', 'mod/tracker:resolve'), $context)) {
+                $capabilities = array('mod/tracker:manage', 'mod/tracker:develop', 'mod/tracker:resolve');
+                if ($elementsused[$key]->private && !has_any_capability($capabilities, $context)) {
                     continue;
                 }
-                // Print first category in one column
+
+                // Print first category in one column.
                 $str .= '<tr valign="top">';
                 $str .= '<td colspan="1" class="tracker-issue-description">';
                 $str .= '<b>';
                 $str .= format_string($elementsused[$key]->description);
                 $str .= ':</b><br />';
                 $str .= '</td>';
-    
+
                 $str .= '<td colspan="3" class="tracker-issue-value">';
                 $str .= $elementsused[$key]->view($issue->id);
                 $str .= '</td>';
@@ -255,7 +260,8 @@ class mod_tracker_renderer extends plugin_renderer_base {
         return $str;
     }
 
-    function resolution($issue) {
+    public function resolution($issue) {
+
         $str = '';
 
         $str .= '<tr valign="top">';
@@ -270,7 +276,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         return $str;
     }
 
-    function distribution_form($tracker, $issue, $cm) {
+    public function distribution_form($tracker, $issue, $cm) {
         global $DB;
 
         $str = '';
@@ -289,7 +295,8 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 if ($targetcm = $DB->get_record('course_modules', array('instance' => $st->id, 'module' => $trackermoduleid))) {
                     $courseshort = $DB->get_field('course', 'shortname', array('id' => $st->course));
                     $targetcontext = context_module::instance($targetcm->id);
-                    if (has_any_capability(array('mod/tracker:manage', 'mod/tracker:develop', 'mod/tracker:resolve'), $targetcontext)) {
+                    $caps = array('mod/tracker:manage', 'mod/tracker:develop', 'mod/tracker:resolve');
+                    if (has_any_capability($caps, $targetcontext)) {
                         $str .= '<option value="'.$st->id.'">'.$courseshort.' - '.$st->name.'</option>';
                     }
                 }
@@ -304,11 +311,10 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
     /**
      * prints comments for the given issue
-     * @uses $CFG
      * @param int $issueid
      */
-    function comments($issueid) {
-        global $CFG, $DB;
+    public function comments($issueid) {
+        global $DB;
 
         $str = '';
 
@@ -338,20 +344,24 @@ class mod_tracker_renderer extends plugin_renderer_base {
     * @uses $CFG
     * @param object $user the user record
     */
-    function user($user) {
-        global $COURSE, $CFG, $OUTPUT;
-    
+    public function user($user) {
+        global $COURSE, $CFG;
+
         $str = '';
-    
+
         if ($user) {
-            $str .= $OUTPUT->user_picture ($user, array('courseid' => $COURSE->id, 'size' => 25));
+            $str .= $this->output->user_picture ($user, array('courseid' => $COURSE->id, 'size' => 25));
             $userurl = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $COURSE->id));
             if ($CFG->messaging) {
                 $str .= '&nbsp;<a href="'.$userurl.'">'.fullname($user).'</a>';
-                $str .= '&nbsp;<a href="" onclick="this.target=\'message\'; return openpopup(\'/message/discussion.php?id={$user->id}\', \'message\', \'menubar=0,location=0,scrollbars,status,resizable,width=400,height=500\', 0);" ><img src="'.$OUTPUT->pix_url('t/message', 'core').'"></a>';
-            } elseif (!$user->emailstop && $user->maildisplay) {
+                $jshandler = 'this.target=\'message\';';
+                $jshandler .= 'return openpopup(\'/message/discussion.php?id={$user->id}\', \'message\',';
+                $jshandler .= '\'menubar=0,location=0,scrollbars,status,resizable,width=400,height=500\', 0);';
+                $pix = '<img src="'.$this->output->pix_url('t/message', 'core').'">';
+                $str .= '&nbsp;<a href="" onclick="'.$jshandler.'" >'.$pix.'</a>';
+            } else if (!$user->emailstop && $user->maildisplay) {
                 $str .= '&nbsp;<a href="'.$userurl.'">'.fullname($user).'</a>';
-                $str .= '&nbsp;<a href="mailto:'.$user->email.'"><img src="'.$OUTPUT->pix_url('t/mail', 'core').'"></a>';
+                $str .= '&nbsp;<a href="mailto:'.$user->email.'"><img src="'.$this->output->pix_url('t/mail', 'core').'"></a>';
             } else {
                 $str .= '&nbsp;'.fullname($user);
             }
@@ -360,8 +370,8 @@ class mod_tracker_renderer extends plugin_renderer_base {
         return $str;
     }
 
-    function ccs(&$ccs, &$issue, &$cm, &$cced, $initialviewmode) {
-        global $OUTPUT, $DB;
+    public function ccs(&$ccs, &$issue, &$cm, &$cced, $initialviewmode) {
+        global $DB;
 
         $str = '';
 
@@ -370,7 +380,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= '<table id="issueccs" class="'.$initialviewmode.'" width="100%">';
         $str .= '<tr valign="top">';
         $str .= '<td colspan="3">';
-        $str .= $OUTPUT->heading(get_string('cced', 'tracker'));
+        $str .= $this->output->heading(get_string('cced', 'tracker'));
         $str .= '</td>';
         $str .= '</tr>';
 
@@ -384,9 +394,14 @@ class mod_tracker_renderer extends plugin_renderer_base {
             $str .= '</td>';
             $str .= '<td align="right">';
             if (has_capability('mod/tracker:managewatches', context_module::instance($cm->id))) {
-                $params = array('id' => $cm->id, 'view' => 'view', 'what' => 'unregister', 'issueid' => $issue->id, 'ccid' => $cc->userid);
+                $params = array('id' => $cm->id,
+                                'view' => 'view',
+                                'what' => 'unregister',
+                                'issueid' => $issue->id,
+                                'ccid' => $cc->userid);
                 $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
-                $str .= '&nbsp;<a href="'.$deleteurl.'" title="'.get_string('delete').'"><img src="'.$OUTPUT->pix_url('t/delete', 'core').'" /></a>';
+                $pix = '<img src="'.$this->output->pix_url('t/delete', 'core').'" />';
+                $str .= '&nbsp;<a href="'.$deleteurl.'" title="'.get_string('delete').'">'.$pix.'</a>';
             }
             $str .= '</td>';
             $str .= '</tr>';
@@ -398,7 +413,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         return $str;
     }
 
-    function watches_form(&$issue, &$cm, &$cced) {
+    public function watches_form(&$issue, &$cm, &$cced) {
 
         $str = '';
 
@@ -413,7 +428,8 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= '<input type="hidden" name="issueid" value="'.$issue->id.'" />';
         $str .= get_string('addawatcher', 'tracker').':&nbsp;';
         $contextmodule = context_module::instance($cm->id);
-        $potentials = get_users_by_capability($contextmodule, 'mod/tracker:canbecced', 'u.id,'.get_all_user_name_fields(true, 'u').',picture,imagealt');
+        $fields = 'u.id,'.get_all_user_name_fields(true, 'u');
+        $potentials = get_users_by_capability($contextmodule, 'mod/tracker:canbecced', $fields.',picture,imagealt');
         $potentialsmenu = array();
         if ($potentials) {
             foreach ($potentials as $potential) {
@@ -432,8 +448,8 @@ class mod_tracker_renderer extends plugin_renderer_base {
         return $str;
     }
 
-    function history($history, $statehistory, $initialviewmode) {
-        global $DB, $OUTPUT, $STATUSCODES, $STATUSKEYS;
+    public function history($history, $statehistory, $initialviewmode) {
+        global $DB, $STATUSCODES, $STATUSKEYS;
 
         $str = '';
 
@@ -442,10 +458,10 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= '<table id="issuehistory" class="'.$initialviewmode.'" width="100%">';
         $str .= '<tr valign="top">';
         $str .= '<td width="50%">';
-        $str .= $OUTPUT->heading(get_string('history', 'tracker'));
+        $str .= $this->output->heading(get_string('history', 'tracker'));
         $str .= '</td>';
         $str .= '<td width="50%">';
-        $str .= $OUTPUT->heading(get_string('statehistory', 'tracker'));
+        $str .= $this->output->heading(get_string('statehistory', 'tracker'));
         $str .= '</td>';
         $str .= '</tr>';
         $str .= '<tr>';
@@ -504,8 +520,8 @@ class mod_tracker_renderer extends plugin_renderer_base {
         return $str;
     }
 
-    function tabs($view, $screen, &$tracker, &$cm) {
-        global $DB, $USER, $OUTPUT;
+    public function tabs($view, $screen, &$tracker, &$cm) {
+        global $DB, $USER;
 
         $str = '';
         $context = context_module::instance($cm->id);
@@ -516,7 +532,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
             $select = "trackerid = ? AND (status = ".RESOLVED." OR status = ".ABANDONNED.") AND reportedby = ? ";
             $totalresolvedissues = $DB->count_records_select('tracker_issue', $select, array($tracker->id, $USER->id));
-        } elseif ($screen == 'mywork') {
+        } else if ($screen == 'mywork') {
             $select = "trackerid = ? AND status <> ".RESOLVED." AND status <> ".ABANDONNED." AND assignedto = ? ";
             $totalissues = $DB->count_records_select('tracker_issue', $select, array($tracker->id, $USER->id));
 
@@ -532,90 +548,313 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
         // Print tabs with options for user.
         if (has_capability('mod/tracker:report', $context)) {
-            $rows[0][] = new tabobject('reportanissue', "reportissue.php?id={$cm->id}", get_string('newissue', 'tracker'));
+            $taburl = new moodle_url('/mod/tracker/reportissue.php', array('id' => $cm->id));
+            $rows[0][] = new tabobject('reportanissue', $taburl, get_string('newissue', 'tracker'));
         }
 
-        $rows[0][] = new tabobject('view', "view.php?id={$cm->id}&amp;view=view", get_string('view', 'tracker').' ('.$totalissues.' '.get_string('issues','tracker').')');
+        $label = get_string('view', 'tracker').' ('.$totalissues.' '.get_string('issues','tracker').')';
+        $params = array('id' => $cm->id, 'view' => 'view');
+        $taburl = new moodle_url('/mod/tracker/view.php', $params);
+        $rows[0][] = new tabobject('view', $params, $label);
 
-        $rows[0][] = new tabobject('resolved', "view.php?id={$cm->id}&amp;view=resolved", get_string('resolvedplural', 'tracker').' ('.$totalresolvedissues.' '.get_string('issues','tracker').')');
+        $label = get_string('resolvedplural', 'tracker').' ('.$totalresolvedissues.' '.get_string('issues','tracker').')';
+        $params = array('id' => $cm->id, 'view' => 'resolved');
+        $taburl = new moodle_url('/mod/tracker/view.php', $params);
+        $rows[0][] = new tabobject('resolved', $taburl, $label);
 
-        $rows[0][] = new tabobject('profile', "view.php?id={$cm->id}&amp;view=profile", get_string('profile', 'tracker'));
+        $label = get_string('profile', 'tracker');
+        $rows[0][] = new tabobject('profile', "view.php?id={$cm->id}&amp;view=profile", $label);
 
         if (has_capability('mod/tracker:viewreports', $context)) {
-            $rows[0][] = new tabobject('reports', "view.php?id={$cm->id}&amp;view=reports", get_string('reports', 'tracker'));
+            $label = get_string('reports', 'tracker');
+            $params = array('id' => $cm->id, 'view' => 'reports');
+            $taburl = new moodle_url('/mod/tracker/view.php', $params);
+            $rows[0][] = new tabobject('reports', $taburl, $label);
         }
 
         if (has_capability('mod/tracker:configure', $context)) {
-            $rows[0][] = new tabobject('admin', "view.php?id={$cm->id}&amp;view=admin", get_string('administration', 'tracker'));
+            $label = get_string('administration', 'tracker');
+            $params = array('id' => $cm->id, 'view' => 'admin');
+            $taburl = new moodle_url('/mod/tracker/view.php', $params);
+            $rows[0][] = new tabobject('admin', $taburl, $label);
         }
 
-        $myticketsstr = ($tracker->supportmode != 'taskspread') ? get_string('mytickets', 'tracker') : get_string('mytasks', 'tracker');
+        if ($tracker->supportmode != 'taskspread') {
+            $myticketsstr = get_string('mytickets', 'tracker');
+        } else {
+            $myticketsstr = get_string('mytasks', 'tracker');
+        }
 
-        // submenus
+        // Submenus.
         $selected = null;
         $activated = null;
         switch ($view) {
-            case 'view' :
-                if (!preg_match("/mytickets|mywork|browse|search|viewanissue|editanissue/", $screen)) $screen = 'mytickets';
-                if (has_capability('mod/tracker:report', $context)) {
-                    $rows[1][] = new tabobject('mytickets', "view.php?id={$cm->id}&amp;view=view&amp;screen=mytickets", $myticketsstr);
+            case 'view': {
+                if (!preg_match("/mytickets|mywork|browse|search|viewanissue|editanissue/", $screen)) {
+                    $screen = 'mytickets';
                 }
+
+                if (has_capability('mod/tracker:report', $context)) {
+                    $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'mytickets');
+                    $taburl = new moodle_url('/mod/tracker/view.php', $params);
+                    $rows[1][] = new tabobject('mytickets', $taburl, $myticketsstr);
+                }
+
                 if (tracker_has_assigned($tracker, false)) {
-                    $rows[1][] = new tabobject('mywork', "view.php?id={$cm->id}&amp;view=view&amp;screen=mywork", get_string('mywork', 'tracker'));
+                    $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'mywork');
+                    $taburl = new moodle_url('/mod/trackeR/view.php', $params);
+                    $rows[1][] = new tabobject('mywork', $taburl, get_string('mywork', 'tracker'));
                 }
+
                 if (has_capability('mod/tracker:viewallissues', $context) || $tracker->supportmode == 'bugtracker') {
-                    $rows[1][] = new tabobject('browse', "view.php?id={$cm->id}&amp;view=view&amp;screen=browse", get_string('browse', 'tracker'));
+                    $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'browse');
+                    $taburl = new moodle_url('/mod/tracker/view.php', $params);
+                    $rows[1][] = new tabobject('browse', $taburl, get_string('browse', 'tracker'));
                 }
+
                 if ($tracker->supportmode == 'bugtracker') {
-                    $rows[1][] = new tabobject('search', "view.php?id={$cm->id}&amp;view=view&amp;screen=search", get_string('search', 'tracker'));
+                    $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'search');
+                    $taburl = new moodle_url('/mod/tracker/view.php', $params);
+                    $rows[1][] = new tabobject('search', $taburl, get_string('search', 'tracker'));
                 }
                 break;
-            case 'resolved' :
-                if (!preg_match("/mytickets|browse|mywork/", $screen)) $screen = 'mytickets';
+            }
+
+            case 'resolved':{
+                if (!preg_match("/mytickets|browse|mywork/", $screen)) {
+                    $screen = 'mytickets';
+                }
+
                 if (has_capability('mod/tracker:report', $context)) {
-                    $rows[1][] = new tabobject('mytickets', "view.php?id={$cm->id}&amp;view=resolved&amp;screen=mytickets", $myticketsstr);
+                    $params = array('id' => $cm->id, 'view' => 'resolved', 'screen' => 'mytickets');
+                    $taburl = new moodle_url('/mod/tracker/view.php', $params);
+                    $rows[1][] = new tabobject('mytickets', $taburl, $myticketsstr);
                 }
+
                 if (tracker_has_assigned($tracker, true)) {
-                    $rows[1][] = new tabobject('mywork', "view.php?id={$cm->id}&amp;view=view&amp;screen=mywork", get_string('mywork', 'tracker'));
+                    $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'mywork');
+                    $taburl = new moodle_url('/mod/tracker/view.php', $params);
+                    $rows[1][] = new tabobject('mywork', $taburl, get_string('mywork', 'tracker'));
                 }
+
                 if (has_capability('mod/tracker:viewallissues', $context) || $tracker->supportmode == 'bugtracker') {
-                    $rows[1][] = new tabobject('browse', "view.php?id={$cm->id}&amp;view=resolved&amp;screen=browse", get_string('browse', 'tracker'));
-                }
-            break;
-            case 'profile':
-                if (!preg_match("/myprofile|mypreferences|mywatches|myqueries/", $screen)) $screen = 'myprofile';
-                $rows[1][] = new tabobject('myprofile', "view.php?id={$cm->id}&amp;view=profile&amp;screen=myprofile", get_string('myprofile', 'tracker'));
-                $rows[1][] = new tabobject('mypreferences', "view.php?id={$cm->id}&amp;view=profile&amp;screen=mypreferences", get_string('mypreferences', 'tracker'));
-                $rows[1][] = new tabobject('mywatches', "view.php?id={$cm->id}&amp;view=profile&amp;screen=mywatches", get_string('mywatches', 'tracker'));
-                if ($tracker->supportmode == 'bugtracker') {
-                    $rows[1][] = new tabobject('myqueries', "view.php?id={$cm->id}&amp;view=profile&amp;screen=myqueries", get_string('myqueries', 'tracker'));
-                }
-            break;
-            case 'reports':
-                if (!preg_match("/status|evolution|print/", $screen)) $screen = 'status';
-                $rows[1][] = new tabobject('status', "view.php?id={$cm->id}&amp;view=reports&amp;screen=status", get_string('status', 'tracker'));
-                $rows[1][] = new tabobject('evolution', "view.php?id={$cm->id}&amp;view=reports&amp;screen=evolution", get_string('evolution', 'tracker'));
-                $rows[1][] = new tabobject('print', "view.php?id={$cm->id}&amp;view=reports&amp;screen=print", get_string('print', 'tracker'));
-            break;
-            case 'admin':
-                if (!preg_match("/summary|manageelements|managenetwork/", $screen)) $screen = 'summary';
-                $rows[1][] = new tabobject('summary', "view.php?id={$cm->id}&amp;view=admin&amp;screen=summary", get_string('summary', 'tracker'));
-                $rows[1][] = new tabobject('manageelements', "view.php?id={$cm->id}&amp;view=admin&amp;screen=manageelements", get_string('manageelements', 'tracker'));
-                if (has_capability('mod/tracker:configurenetwork', $context)) {
-                    $rows[1][] = new tabobject('managenetwork', "view.php?id={$cm->id}&amp;view=admin&amp;screen=managenetwork", get_string('managenetwork', 'tracker'));
+                    $params = array('id' => $cm->id, 'view' => 'resolved', 'screen' => 'browse');
+                    $taburl = new moodle_url('/mod/tracker/view.php', $params);
+                    $rows[1][] = new tabobject('browse', $taburl, get_string('browse', 'tracker'));
                 }
                 break;
+            }
+
+            case 'profile': {
+                if (!preg_match("/myprofile|mypreferences|mywatches|myqueries/", $screen)) {
+                    $screen = 'myprofile';
+                }
+
+                $params = array('id' => $cm->id, 'view' => 'profile', 'screen' => 'myprofile');
+                $taburl = new moodle_url('/mod/tracker/view.php', $params);
+                $rows[1][] = new tabobject('myprofile', $taburl, get_string('myprofile', 'tracker'));
+
+                $params = array('id' => $cm->id, 'view' => 'profile', 'screen' => 'mypreferences');
+                $taburl = new moodle_url('/mod/tracker/view.php', $params);
+                $rows[1][] = new tabobject('mypreferences', $taburl, get_string('mypreferences', 'tracker'));
+
+                $params = array('id' => $cm->id, 'view' => 'profile', 'screen' => 'mywatches');
+                $taburl = new moodle_url('/mod/tracker/view.php', $params);
+                $rows[1][] = new tabobject('mywatches', $taburl, get_string('mywatches', 'tracker'));
+
+                if ($tracker->supportmode == 'bugtracker') {
+                    $params = array('id' => $cm->id, 'view' => 'profile', 'screen' => 'myqueries');
+                    $taburl = new moodle_url('/mod/tracker/view.php', $params);
+                    $rows[1][] = new tabobject('myqueries', $taburl, get_string('myqueries', 'tracker'));
+                }
+                break;
+            }
+
+            case 'reports': {
+                if (!preg_match("/status|evolution|print/", $screen)) {
+                    $screen = 'status';
+                }
+
+                if (tracker_supports_feature('reports/status')) {
+                    $params = array('id' => $cm->id, 'view' => 'report', 'screen' => 'status');
+                    $taburl = new moodle_url('/mod/tracker/view.php', $params);
+                    $rows[1][] = new tabobject('status', $taburl, get_string('status', 'tracker'));
+                }
+
+                if (tracker_supports_feature('reports/evolution')) {
+                    $params = array('id' => $cm->id, 'view' => 'report', 'screen' => 'evolution');
+                    $taburl = new moodle_url('/mod/tracker/view.php', $params);
+                    $rows[1][] = new tabobject('evolution', $taburl, get_string('evolution', 'tracker'));
+                }
+
+                if (tracker_supports_feature('reports/print')) {
+                    $params = array('id' => $cm->id, 'view' => 'report', 'screen' => 'print');
+                    $taburl = new moodle_url('/mod/tracker/view.php', $params);
+                    $rows[1][] = new tabobject('print', $taburl, get_string('print', 'tracker'));
+                }
+                break;
+            }
+
+            case 'admin': {
+                if (!preg_match("/summary|manageelements|managenetwork/", $screen)) {
+                    $screen = 'summary';
+                }
+
+                $params = array('id' => $cm->id, 'view' => 'report', 'admin' => 'summary');
+                $taburl = new moodle_url('/mod/tracker/view.php', $params);
+                $rows[1][] = new tabobject('summary', $taburl, get_string('summary', 'tracker'));
+
+                $params = array('id' => $cm->id, 'view' => 'report', 'admin' => 'manageelements');
+                $taburl = new moodle_url('/mod/tracker/view.php', $params);
+                $rows[1][] = new tabobject('manageelements', $taburl, get_string('manageelements', 'tracker'));
+
+                if (tracker_supports_feature('cascade/mnet') {
+                    if (has_capability('mod/tracker:configurenetwork', $context)) {
+                        $params = array('id' => $cm->id, 'view' => 'report', 'admin' => 'managenetwork');
+                        $taburl = new moodle_url('/mod/tracker/view.php', $params);
+                        $rows[1][] = new tabobject('managenetwork', $taburl, get_string('managenetwork', 'tracker'));
+                    }
+                }
+                break;
+            }
+
             default:
         }
+
         if (!empty($screen)) {
             $selected = $screen;
             $activated = array($view);
         } else {
             $selected = $view;
         }
-        $str .= $OUTPUT->container_start('mod-header tracker-tabs');
+
+        $str .= $this->output->container_start('mod-header tracker-tabs');
         $str .= print_tabs($rows, $selected, '', $activated, true);
-        $str .= $OUTPUT->container_end();
+        $str .= $this->output->container_end();
+
+        return $str;
+    }
+
+    public function edit_element(&$cm, $form) {
+
+        $context = context_module::instance($cm->id);
+
+        $str = '';
+
+        $str .= $this->output->heading(get_string("{$form->action}{$form->type}", 'tracker'));
+
+        $str .= '<center>';
+        $formurl = new moodle_url('/mod/tracker/view.php');
+        $str .= '<form name="editelementform" method="post" action="'.$formurl.'">';
+        $str .= '<input type="hidden" name="id" value="'.$cm->id.'" />';
+        $str .= '<input type="hidden" name="view" value="admin" />';
+        $str .= '<input type="hidden" name="what" value="'.s($form->action).'" />';
+        $str .= '<input type="hidden" name="type" value="'.s($form->type).'" />';
+
+        if ($form->action == 'editelement') {
+            $str .= '<input type="hidden" name="elementid" value="'.$form->elementid.'" />';
+        }
+        if (!has_capability('mod/tracker:shareelements', $context)) {
+            $str .= '<input type="hidden" name="shared" value="0" />';
+        }
+
+        $str .= '<table width="100%" class="tracker-edit-element" cellpadding="5">';
+        $str .= '<tr valign="top" >';
+        $str .= '<td align="right"><b>'.get_string('name').':</b></td>';
+        $str .= '<td align="left">';
+        $str .= '<input type="text" name="name" value="'.@$form->name.'" size="32" maxlength="32" />';
+        $str .= $this->output->help_icon('elements', 'tracker');
+        $str .= '</td>';
+        $str .= '</tr>';
+        $str .= '<tr>';
+        $str .= '<td valign="top" align="right"><b>'.get_string('description').':</b></td>';
+        $str .= '<td colspan="3" align="left">';
+        $str .= '<input type="text" 
+                        name="description"
+                        value="'.htmlspecialchars(stripslashes(@$form->description)).'"
+                        size="80"
+                        maxlength="255" />';
+        $str .= $this->output->help_icon('elements', 'tracker');
+        $str .= '</td>';
+        $str .= '</tr>';
+
+        if (has_capability('mod/tracker:shareelements', $context)) {
+
+            $str .= '<tr>';
+            $str .= '<td valign="top" align="right">';
+            $str .= '<b><?php print_string('sharing', 'tracker') ?>:</b>';
+            $str .= '</td>';
+            $str .= '<td align="left">';
+            $checked = (@$form->shared) ? 'checked="checked"' : '';
+            $str .= '<input type="checkbox" name="shared" value="1" '.$checked.' /> '.get_string('sharethiselement', 'tracker');
+            $str .= '</td>';
+            $str .= '</tr>';
+
+        }
+
+        $str .= '<tr>';
+        $str .= '<td colspan="2" align="center">';
+        $str .= '<input type="submit" name="go_btn" value="'.get_string('submit').'" />&nbsp;';
+        $jshandler = 'document.forms[\'editelementform\'].what.value = \'\';document.forms[\'editelementform\'].submit();';
+        $str .= '<input type="button" name="cancel_btn" value="'.get_string('cancel').'" onclick="'.$jshandler.'" /><br/>';
+        $str .= '<br/>';
+        $str .= '</td>';
+        $str .= '</tr>';
+        $str .= '</table>';
+        $str .= '</form>';
+        $str .= '</center>';
+
+        return $str;
+    }
+
+    public function admin_elements_form(&$cm) {
+        $str = '';
+
+        $formurl = new moodle_url('/mod/tracker/view.php');
+        $str .= '<form name="addelement" method="post" action="'.$fromurl.'">';
+        $str .= '<table width="100%">';
+        $str .= '<tr>';
+        $str .= '<td valign="top">';
+        $str .= '<b>'.get_string('createnewelement', 'tracker').':</b>';
+        $str .= '</td>';
+        $str .= '<td valign="top">';
+        $str .= '<input type="hidden" name="view" value="admin" />';
+        $str .= '<input type="hidden" name="id" value="'.$cm->id.'" />';
+        $str .= '<input type="hidden" name="what" value="createelement" />';
+        $types = tracker_getelementtypes();
+        foreach ($types as $type) {
+            $elementtypesmenu[$type] = get_string($type, 'tracker');
+        }
+        $attrs = array('onchange' => 'document.forms[\'addelement\'].submit();');
+        $str .= html_writer::select($elementtypesmenu, 'type', '', array('' => 'choose'), $attrs);
+        $str .= '</td>';
+        $str .= '</tr>';
+        $str .= '</table>';
+        $str .= '</form>';
+
+        return $str;
+    }
+
+    public function search_queries(&$cm) {
+
+        $str = '';
+
+        $str .= '<center>';
+        $str .= '<table class="tracker-search-queries" width="100%">';
+        if (isset($searchqueries)) {
+            $str .= '<tr>';
+            $str .= '<td>';
+            $str .= get_string('searchresults', 'tracker').': '.$numrecords.' <br/>';
+            $str .= '</td>';
+            $str .= '<td align="right">';
+            $params = array('id' => $cm->id, 'what' => 'clearsearch');
+            $clearsearchurl = new moodle_url('/mod/tracker/view.php', $params);
+            $str .= '<a href="'.$clearsearchurl.'">'.get_string('clearsearch', 'tracker').'</a>';
+            $str .= '</td>';
+            $str .= '</tr>';
+        }
+        $str .= '</table>';
+        $str .= '</center>';
 
         return $str;
     }

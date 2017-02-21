@@ -1,49 +1,35 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package mod-tracker
- * @category mod
- * @author Clifford Tham, Valery Fremaux > 1.8
- * @date 02/12/2007
+ * @package     mod_tracker
+ * @category    mod
+ * @author      Clifford Tham, Valery Fremaux > 1.8
  *
  * From for showing element list
  */
+defined('MOODLE_INTERNAL') || die();
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    // It must be included from view.php in mod/tracker
-}
-
-$id = optional_param('id', 0, PARAM_INT); // Course Module ID, or
-$a  = optional_param('a', 0, PARAM_INT);  // course ID
+$id = optional_param('id', 0, PARAM_INT); // Course Module ID, or.
+$a = optional_param('a', 0, PARAM_INT);  // course ID.
 
 $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'description');
-
-?>
-<form name="addelement" method="post" action="<?php echo $CFG->wwwroot ?>/mod/tracker/view.php">
-<table border="0" width="100%">
-    <tr>
-        <td valign="top">
-            <b><?php print_string('createnewelement', 'tracker') ?>:</b>
-        </td>
-        <td valign="top">
-                <?php
-                    echo '<input type="hidden" name="view" value="admin" />';
-                    echo '<input type="hidden" name="id" value="'.$cm->id.'" />';
-                    echo '<input type="hidden" name="what" value="createelement" />';
-                    $types = tracker_getelementtypes();
-                    foreach ($types as $type) {
-                        $elementtypesmenu[$type] = get_string($type, 'tracker');
-                    }
-
-                    echo html_writer::select($elementtypesmenu, 'type', '', array('' => 'choose'), array('onchange' => 'document.forms[\'addelement\'].submit();'));
-                ?>
-        </td>
-    </tr>
-</table>
-</form>
-
-<?php
+echo $renderer->edmin_elements_form($cm);
 $OUTPUT->box_end();
+
 $OUTPUT->box_start('center', '100%', '', '', 'generalbox', 'description');
 
 tracker_loadelements($tracker, $elements);
@@ -63,7 +49,7 @@ $table->size = array(100, 250, 50, 50);
 $table->align = array('left', 'center', 'center', 'center');
 
 if (!empty($elements)) {
-    // clean list from used elements
+    // Clean list from used elements.
     foreach ($elements as $id => $element) {
         if (in_array($element->id, array_keys($used))) {
             unset($elements[$id]);
@@ -83,21 +69,29 @@ if (!empty($elements)) {
 
         $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'addelement', 'elementid' => $element->id);
         $url = new moodle_url('/mod/tracker/view.php', $params);
-        $actions = '&nbsp;<a href="'.$url.'" title="'.get_string('addtothetracker', 'tracker').'" ><img src="'.$OUTPUT->pix_url('t/moveleft', 'core') .'" /></a>';
+        $pix = '<img src="'.$OUTPUT->pix_url('t/moveleft', 'core') .'" />';
+        $actions = '&nbsp;<a href="'.$url.'" title="'.get_string('addtothetracker', 'tracker').'" >'.$pix.'</a>';
 
         if ($element->type_has_options()) {
             $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'viewelementoptions', 'elementid' => $element->id);
             $url = new moodle_url('/mod/tracker/view.php', $params);
-            $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('editoptions', 'tracker').'"><img src="'.$OUTPUT->pix_url('editoptions', 'mod_tracker').'" /></a>';
+            $pix = '<img src="'.$OUTPUT->pix_url('editoptions', 'mod_tracker').'" />';
+            $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('editoptions', 'tracker').'">'.$pix.'</a>';
         }
 
-        $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'editelement', 'elementid' => $element->id, 'type' => $element->type);
+        $params = array('id' => $cm->id,
+                        'view' => 'admin',
+                        'what' => 'editelement',
+                        'elementid' => $element->id,
+                        'type' => $element->type);
         $url = new moodle_url('/mod/tracker/view.php', $params);
-        $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('editproperties', 'tracker').'"><img src="'.$OUTPUT->pix_url('t/edit', 'core') .'" /></a>';
+        $pix = <img src="'.$OUTPUT->pix_url('t/edit', 'core') .'" />;
+        $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('editproperties', 'tracker').'">'.$pix.'</a>';
 
         $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'deleteelement', 'elementid' => $element->id);
         $url = new moodle_url('/mod/tracker/view.php', $params);
-        $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('delete').'"><img src="'.$OUTPUT->pix_url('t/delete', 'core') .'" /></a>';
+        $pix = '<img src="'.$OUTPUT->pix_url('t/delete', 'core') .'" />';
+        $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('delete').'">'.$pix.'</a>';
 
         $local = '';
         if ($element->course == $COURSE->id) {

@@ -33,26 +33,36 @@ require_once($CFG->dirroot.'/mod/tracker/locallib.php');
  */
 function tracker_supports($feature) {
     switch ($feature) {
-        case FEATURE_MOD_ARCHETYPE:
+        case FEATURE_MOD_ARCHETYPE: {
             return MOD_ARCHETYPE_OTHER;
-        case FEATURE_GROUPS:
+        }
+        case FEATURE_GROUPS: {
             return false;
-        case FEATURE_GROUPINGS:
+        }
+        case FEATURE_GROUPINGS: {
             return false;
-        case FEATURE_GROUPMEMBERSONLY:
+        }
+        case FEATURE_GROUPMEMBERSONLY: {
             return false;
-        case FEATURE_MOD_INTRO:
+        }
+        case FEATURE_MOD_INTRO: {
             return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS:
+        }
+        case FEATURE_COMPLETION_TRACKS_VIEWS: {
             return false;
-        case FEATURE_GRADE_HAS_GRADE:
+        }
+        case FEATURE_GRADE_HAS_GRADE: {
             return false;
-        case FEATURE_GRADE_OUTCOMES:
+        }
+        case FEATURE_GRADE_OUTCOMES: {
             return false;
-        case FEATURE_BACKUP_MOODLE2:
+        }
+        case FEATURE_BACKUP_MOODLE2: {
             return true;
-        case FEATURE_SHOW_DESCRIPTION:
+        }
+        case FEATURE_SHOW_DESCRIPTION: {
             return true;
+        }
 
         default:
             return null;

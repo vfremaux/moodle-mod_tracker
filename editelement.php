@@ -85,8 +85,8 @@ if ($form->is_cancelled()) {
     $params = array('id' => $id, 'view' => $view, 'screen' => $screen);
     redirect(new moodle_url('/mod/tracker/view.php', $params));
 }
-if ($data = $form->get_data()) {
 
+if ($data = $form->get_data()) {
     $element = new StdClass;
     $element->name = $data->name;
     $element->description = $data->description;
@@ -100,9 +100,10 @@ if ($data = $form->get_data()) {
     }
 
     $elementobj = trackerelement::find_instance_by_id($tracker, $element->id);
-    if (!$data->elementid && $elementobj->hasoptions()) {  // Bounces to the option editor
+    if (!$data->elementid && $elementobj->hasoptions()) {
+        // Bounces to the option editor.
 
-        // prepare use case bounce to further code (later in controller).
+        // Prepare use case bounce to further code (later in controller).
         $params = array('id' => $id, 'view' => 'admin', 'what' => 'viewelementoptions', 'elementid' => $element->id);
         $url = new moodle_url('/mod/tracker/view.php', $params);
         redirect($url);
