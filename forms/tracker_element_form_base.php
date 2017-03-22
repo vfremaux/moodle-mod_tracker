@@ -14,14 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * This is the base elements of any tracker form element edtion.
+ *
+ * @package     mod_tracker
+ * @category    mod
+ * @author      Clifford Tham, Valery Fremaux > 1.8
+ */
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * @package mod_tracker
- * @category mod
- * @author Clifford Tham, Valery Fremaux > 1.8
- * @date 02/12/2007
- */
 require_once($CFG->libdir.'/formslib.php');
 
 abstract class tracker_moodle_form extends moodleform {
@@ -38,17 +39,19 @@ abstract class tracker_moodle_form extends moodleform {
         $mform->addElement('hidden', 'elementid');
         $mform->setType('elementid', PARAM_INT);
 
-        $mform->addElement('text', 'name', get_string('name'), '');
+        $mform->addElement('text', 'name', get_string('elementcode', 'tracker'), array('size' => 30));
         $mform->setType('name', PARAM_ALPHANUM);
         $mform->addRule('name', null, 'required', null, 'client');
 
-        $mform->addElement('textarea', 'description', get_string('description'));
+        $mform->addElement('text', 'description', get_string('visiblename', 'tracker'), array('size' => 64));
+        $mform->setType('description', PARAM_CLEANHTML);
+        $mform->addRule('description', null, 'required', null, 'client');
     }
 
     function end_form() {
 
         $mform = $this->_form;
-        $mform->addElement('checkbox', 'shared', get_string('sharethiselement', 'tracker'));
+        $mform->addElement('advcheckbox', 'shared', get_string('sharethiselement', 'tracker'));
 
         $this->add_action_buttons();
     }

@@ -555,7 +555,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $label = get_string('view', 'tracker').' ('.$totalissues.' '.get_string('issues','tracker').')';
         $params = array('id' => $cm->id, 'view' => 'view');
         $taburl = new moodle_url('/mod/tracker/view.php', $params);
-        $rows[0][] = new tabobject('view', $params, $label);
+        $rows[0][] = new tabobject('view', $taburl, $label);
 
         $label = get_string('resolvedplural', 'tracker').' ('.$totalresolvedissues.' '.get_string('issues','tracker').')';
         $params = array('id' => $cm->id, 'view' => 'resolved');
@@ -563,7 +563,9 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $rows[0][] = new tabobject('resolved', $taburl, $label);
 
         $label = get_string('profile', 'tracker');
-        $rows[0][] = new tabobject('profile', "view.php?id={$cm->id}&amp;view=profile", $label);
+        $params = array('id' => $cm->id, 'view' => 'profile');
+        $taburl = new moodle_url('/mod/tracker/view.php', $params);
+        $rows[0][] = new tabobject('profile', $taburl, $label);
 
         if (has_capability('mod/tracker:viewreports', $context)) {
             $label = get_string('reports', 'tracker');
@@ -620,7 +622,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 break;
             }
 
-            case 'resolved':{
+            case 'resolved': {
                 if (!preg_match("/mytickets|browse|mywork/", $screen)) {
                     $screen = 'mytickets';
                 }
@@ -676,19 +678,19 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 }
 
                 if (tracker_supports_feature('reports/status')) {
-                    $params = array('id' => $cm->id, 'view' => 'report', 'screen' => 'status');
+                    $params = array('id' => $cm->id, 'view' => 'reports', 'screen' => 'status');
                     $taburl = new moodle_url('/mod/tracker/view.php', $params);
                     $rows[1][] = new tabobject('status', $taburl, get_string('status', 'tracker'));
                 }
 
                 if (tracker_supports_feature('reports/evolution')) {
-                    $params = array('id' => $cm->id, 'view' => 'report', 'screen' => 'evolution');
+                    $params = array('id' => $cm->id, 'view' => 'reports', 'screen' => 'evolution');
                     $taburl = new moodle_url('/mod/tracker/view.php', $params);
                     $rows[1][] = new tabobject('evolution', $taburl, get_string('evolution', 'tracker'));
                 }
 
                 if (tracker_supports_feature('reports/print')) {
-                    $params = array('id' => $cm->id, 'view' => 'report', 'screen' => 'print');
+                    $params = array('id' => $cm->id, 'view' => 'reports', 'screen' => 'print');
                     $taburl = new moodle_url('/mod/tracker/view.php', $params);
                     $rows[1][] = new tabobject('print', $taburl, get_string('print', 'tracker'));
                 }
@@ -700,17 +702,17 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     $screen = 'summary';
                 }
 
-                $params = array('id' => $cm->id, 'view' => 'report', 'admin' => 'summary');
+                $params = array('id' => $cm->id, 'view' => 'admin', 'screen' => 'summary');
                 $taburl = new moodle_url('/mod/tracker/view.php', $params);
                 $rows[1][] = new tabobject('summary', $taburl, get_string('summary', 'tracker'));
 
-                $params = array('id' => $cm->id, 'view' => 'report', 'admin' => 'manageelements');
+                $params = array('id' => $cm->id, 'view' => 'admin', 'screen' => 'manageelements');
                 $taburl = new moodle_url('/mod/tracker/view.php', $params);
                 $rows[1][] = new tabobject('manageelements', $taburl, get_string('manageelements', 'tracker'));
 
-                if (tracker_supports_feature('cascade/mnet') {
+                if (tracker_supports_feature('cascade/mnet')) {
                     if (has_capability('mod/tracker:configurenetwork', $context)) {
-                        $params = array('id' => $cm->id, 'view' => 'report', 'admin' => 'managenetwork');
+                        $params = array('id' => $cm->id, 'view' => 'admin', 'screen' => 'managenetwork');
                         $taburl = new moodle_url('/mod/tracker/view.php', $params);
                         $rows[1][] = new tabobject('managenetwork', $taburl, get_string('managenetwork', 'tracker'));
                     }
@@ -735,7 +737,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         return $str;
     }
 
-    public function edit_element(&$cm, $form) {
+    public function edit_element_obsolete(&$cm, $form) {
 
         $context = context_module::instance($cm->id);
 
@@ -769,7 +771,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= '<tr>';
         $str .= '<td valign="top" align="right"><b>'.get_string('description').':</b></td>';
         $str .= '<td colspan="3" align="left">';
-        $str .= '<input type="text" 
+        $str .= '<input type="text"
                         name="description"
                         value="'.htmlspecialchars(stripslashes(@$form->description)).'"
                         size="80"
@@ -782,7 +784,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
             $str .= '<tr>';
             $str .= '<td valign="top" align="right">';
-            $str .= '<b><?php print_string('sharing', 'tracker') ?>:</b>';
+            $str .= '<b>'.get_string('sharing', 'tracker').':</b>';
             $str .= '</td>';
             $str .= '<td align="left">';
             $checked = (@$form->shared) ? 'checked="checked"' : '';
@@ -803,34 +805,6 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= '</table>';
         $str .= '</form>';
         $str .= '</center>';
-
-        return $str;
-    }
-
-    public function admin_elements_form(&$cm) {
-        $str = '';
-
-        $formurl = new moodle_url('/mod/tracker/view.php');
-        $str .= '<form name="addelement" method="post" action="'.$fromurl.'">';
-        $str .= '<table width="100%">';
-        $str .= '<tr>';
-        $str .= '<td valign="top">';
-        $str .= '<b>'.get_string('createnewelement', 'tracker').':</b>';
-        $str .= '</td>';
-        $str .= '<td valign="top">';
-        $str .= '<input type="hidden" name="view" value="admin" />';
-        $str .= '<input type="hidden" name="id" value="'.$cm->id.'" />';
-        $str .= '<input type="hidden" name="what" value="createelement" />';
-        $types = tracker_getelementtypes();
-        foreach ($types as $type) {
-            $elementtypesmenu[$type] = get_string($type, 'tracker');
-        }
-        $attrs = array('onchange' => 'document.forms[\'addelement\'].submit();');
-        $str .= html_writer::select($elementtypesmenu, 'type', '', array('' => 'choose'), $attrs);
-        $str .= '</td>';
-        $str .= '</tr>';
-        $str .= '</table>';
-        $str .= '</form>';
 
         return $str;
     }
@@ -858,4 +832,189 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
         return $str;
     }
+
+    public function edit_option_form(&$cm, &$form, $action, $errors = null) {
+
+        $str = '';
+
+        $strname = get_string('opcode', 'tracker');
+        $strdescription = get_string('visiblename', 'tracker');
+        $straction = get_string('action');
+
+        $formurl = new moodle_url('/mod/tracker/view.php');
+        $str .= '<form name="editoptionform" method="post" action="'.$formurl.'">';
+        $str .= '<input type="hidden" name="id" value="'.$cm->id.'" />';
+        $str .= '<input type="hidden" name="what" value="'.$action.'elementoption" />';
+        $str .= '<input type="hidden" name="view" value="admin" />';
+        $str .= '<input type="hidden" name="type" value="'.$form->type.'" />';
+        $str .= '<input type="hidden" name="elementid" value="'.$form->elementid.'" />';
+        $str .= '<input type="hidden" name="optionid" value="'.@$form->optionid.'" />';
+        $str .= '<table width="90%">';
+
+        $str .= '<tr>';
+        $str .= '<td width="100">&nbsp;</td>';
+        $str .= '<td width="110" align="center">';
+        $str .= '<b>'.$strname.'</b>';
+        $str .= '</td>';
+        $str .= '<td width="240" align="center">';
+        $str .= '<b>'.$strdescription.'</b></td>';
+        $str .= '<td width="75" align="center"><b>'.$straction.'</b></td>';
+        $str .= '</tr>';
+
+        $str .= '<tr>';
+        $str .= '<td>&nbsp;</td>';
+        $str .= '<td align="center" '.print_error_class($errors, 'name').' >';
+        $str .= '<input type="text" name="name" value="'.@$form->name.'" size="20" maxlength="32" />';
+        $str .= '</td>';
+        $str .= '<td align="center" '.print_error_class($errors, 'description').' >';
+        $filtereddesc = htmlspecialchars(stripslashes(@$form->description));
+        $str .= '<input type="text" name="description" value="'.$filtereddesc.'" size="60" maxlength="255" />';
+        $str .= '</td>';
+        $str .= '<td align="center">';
+        $str .= '<input type="submit" name="add_btn" value="'.get_string('add').'" />';
+        $str .= '</td>';
+        $str .= '</tr>';
+
+        $str .= '</table>';
+
+        $str .= '<br/>';
+        $jshandler = 'document.forms[\'editoptionform\'].what.value = \'\';';
+        $jshandler .= 'document.forms[\'editoptionform\'].submit();';
+        $str .= '<input type="button" name="cancel_btn" value="'.get_string('continue').'" onclick="'.$jshandler.'" />';
+        $str .= '<br/>';
+        $str .= '</form>';
+        $str .= '<br/>';
+
+        return $str;
+    }
+
+    public function option_list_view(&$cm, &$element) {
+        global $COURSE;
+
+        $strname = get_string('name');
+        $strdescription = get_string('description');
+        $strsortorder = get_string('sortorder', 'tracker');
+        $straction = get_string('action');
+
+        $table = new html_table();
+        $table->width = "90%";
+        $table->size = array('15%', '15%', '50%', '30%');
+        $table->head = array('', "<b>$strname</b>", "<b>$strdescription</b>", "<b>$straction</b>");
+
+        $options = $element->options;
+        if (!empty($options)) {
+            foreach ($options as $option) {
+                $params = array('id' => $cm->id,
+                                'view' => 'admin',
+                                'what' => 'editelementoption',
+                                'optionid' => $option->id,
+                                'elementid' => $option->elementid);
+                $editoptionurl = new moodle_url('/mod/tracker/view.php', $params);
+                $pix = '<img src="'.$this->output->pix_url('/t/edit', 'core').'" />';
+                $actions  = '<a href="'.$editoptionurl.'" title="'.get_string('edit').'">'.$pix.'</a>&nbsp;';
+
+                $img = ($option->sortorder > 1) ? 'up' : 'up_shadow';
+                $params = array('id' => $cm->id,
+                                'view' => 'admin',
+                                'what' => 'moveelementoptionup',
+                                'optionid' => $option->id,
+                                'elementid' => $option->elementid);
+                $moveurl = new moodle_url('/mod/tracker/view.php', $params);
+                $pix = '<img src="'.$this->output->pix_url("{$img}", 'mod_tracker').'">';
+                $actions .= '<a href="'.$moveurl.'" title="'.get_string('up').'">'.$pix.'</a>&nbsp;';
+
+                $img = ($option->sortorder < $element->maxorder) ? 'down' : 'down_shadow';
+                $params = array('id' => $cm->id,
+                                'view' => 'admin',
+                                'what' => 'moveelementoptiondown',
+                                'optionid' => $option->id,
+                                'elementid' => $option->elementid);
+                $moveurl = new moodle_url('/mod/tracker/view.php', $params);
+                $pix = '<img src="'.$this->output->pix_url("{$img}", 'mod_tracker').'">';
+                $actions .= '<a href="'.$moveurl.'" title="'.get_string('down').'">'.$pix.'</a>&nbsp;';
+
+                $params = array('id' => $cm->id,
+                                'view' => 'admin',
+                                'what' => 'deleteelementoption',
+                                'optionid' => $option->id,
+                                'elementid' => $option->elementid);
+                $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
+                $pix = '<img src="'.$this->output->pix_url('/t/delete', 'core').'">';
+                $actions .= '<a href="'.$deleteurl.'" title="'.get_string('delete').'">'.$pix.'</a>';
+
+                $rowlabel = '<b> '.get_string('option', 'tracker').' '.$option->sortorder.':</b>';
+                $table->data[] = array($rowlabel, $option->name, format_string($option->description, true, $COURSE->id), $actions);
+            }
+        }
+        return html_writer::table($table);
+    }
+
+    public function add_query_form(&$cm, $form) {
+
+        $str = '';
+
+        $str .= $this->output->heading(get_string('addaquerytomemo', 'tracker'));
+        $str .= $this->output->box_start('center', '100%', '', '', 'generalbox', 'bugreport');
+
+        $str .= '<center>';
+
+        $formurl = new moodle_url('/mod/tracker/view.php');
+        $str .= '<form name="addqueryform" action="'.$formurl.'" method="post">';
+        $str .= '<input type="hidden" name="what" value="'.$form->action.'">';
+        $str .= '<input type="hidden" name="view" value="profile">';
+        $str .= '<input type="hidden" name="screen" value="myqueries">';
+        $str .= '<input type="hidden" name="fields" value="'.$form->fields.'">';
+        $str .= '<input type="hidden" name="id" value="'.$cm->id.'">';
+
+        $str .= '<table border="0" cellpadding="5" width="100%">';
+        $str .= '<tr>';
+        $str .= '<td align="right" width="200">';
+        $str .= '<b>'.get_string('name').':</b>';
+        $str .= '</td>';
+        $str .= '<td align="left">';
+        $str .= '<input type="text" name="name" value="" style="width:100%" />';
+        $str .= '</td>';
+        $str .= '</tr>';
+        $str .= '<tr>';
+        $str .= '<td align="right" width="200" valign="top">';
+        $str .= '<b>'.get_string('description').':</b>';
+        $str .= '</td>';
+        $str .= '<td valign="top" align="left">';
+
+        print_textarea($usehtmleditor, 20, 60, 680, 400, 'description', $form->description);
+        if ($usehtmleditor) {
+            $strr .= '<input type="hidden" name="format" value="'.FORMAT_HTML.'" />';
+        } else {
+            $str .= '<p align="right">';
+            $str .= $this->output->help_icon('textformat', 'tracker');
+            $str .= get_string('formattexttype');
+            $str .= ':&nbsp;';
+            if (empty($form->format)) {
+                $form->format = FORMAT_MOODLE;
+            }
+            $str .= html_writer::select(format_text_menu(), 'format', $form->format); 
+            $str .= '</p>';
+        }
+        $str .= '</td>';
+        $str .= '</tr>';
+        $str .= '<tr>';
+        $str .= '<td colspan="2">';
+        $onsubmitcall = ($usehtmleditor) ? "document.forms['addqueryform'].onsubmit();" : '';
+        $str .= '<input type="submit" name="save" value="'.get_string('continue').'" />';
+        $jshandler = 'document.forms[\'addqueryform\'].what.value = \'\';';
+        $jshandler .= 'document.forms[\'addqueryform\'].screen.value = \'search\';';
+        $jshandler .= $onsubmitcall;
+        $jshandler .= 'document.forms[\'addqueryform\'].submit();';
+        $str .= '<input type="button" name="cancel_btn" value="'.get_string('cancel').'" onclick="'.$jshandler.'" />';
+        $str .= '</td>';
+        $str .= '</tr>';
+        $str .= '</table>';
+        $str .= '</form>';
+
+        $str .= $this->output->box_end();
+        $str .= '</center>';
+
+        return $str;
+    }
+
 }

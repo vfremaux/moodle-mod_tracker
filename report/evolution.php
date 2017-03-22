@@ -12,25 +12,27 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package mod_tracker
- * @category mod
- * @author Valery Fremaux / 1.8
+ * @package     mod_tracker
+ * @category    mod
+ * @author      Clifford Tham, Valery Fremaux > 1.8
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/mod/tracker/forms/tracker_element_form_base.php');
+echo $OUTPUT->heading(get_string('reports', 'tracker'), 1);
+echo $OUTPUT->heading(get_string('evolution', 'tracker'), 2);
 
-class tracker_element_radiohoriz_form extends tracker_moodle_form {
-
-    public function definition() {
-        $this->start_form();
-        $this->end_form();
-    }
-
-    public function validation($data, $files) {
-        return parent::validation($data, $files);
-    }
+$alltickets = $DB->count_records('tracker_issue', array('trackerid' => $tracker->id));
+if (!$alltickets){
+    echo $OUTPUT->notification(get_string('nodata', 'tracker'));
+    return;
 }
+
+$renderer = $PAGE->get_renderer('tracker', 'reports');
+
+$renderer->init($tracker);
+echo $renderer->counters($alltickets);
+echo $renderer->evolution($alltickets);
+

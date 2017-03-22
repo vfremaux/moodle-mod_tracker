@@ -31,55 +31,55 @@
     font-weight: bold;
 }
 
-.status_resolved{
+.status-resolved{
     background-color: #2EAA20;
     color: white;
     font-weight: bold;
 }
 
-.status_posted{
+.status-posted{
     background-color: #D90000;
     color: white;
     font-weight: bold;
 }
 
-.status_open{
+.status-open{
     background-color: #FF8000;
     color: black;
     font-weight: bold;
 }
 
-.status_resolving{
+.status-resolving{
     background-color: #FCDD03;
     color: black;
     font-weight: bold;
 }
 
-.status_waiting{
+.status-waiting{
     background-color: #BAAB45;
     color: black;
     font-weight: bold;
 }
 
-.status_abandonned{
+.status-abandonned{
     background-color: #454747;
     color: white;
     font-weight: bold;
 }
 
-.status_transfered{
+.status-transfered{
     background-color: #E4E4E4;
     color: black;
     font-weight: normal;
 }
 
-.status_testing{
+.status-testing{
     background-color: #B8F079;
     color: black;
     font-weight: normal;
 }
 
-.status_published{
+.status-published{
     background-color: #58BCF1;
     color: black;
     font-weight: normal;
@@ -105,19 +105,19 @@
     visibility: hidden; 
 }
 
-.list_priority{
+.list-priority{
     font-size: 0.9em;
     text-align: center;
     vertical-align: bottom;
 }
 
-.list_issuenumber{
+.list-issuenumber{
     font-size: 0.9em;
     text-align: left;
     vertical-align: bottom;
 }
 
-.list_summary{
+.list-summary{
     font-size: 0.9em;
     padding: 2px;
     text-align: left ;
@@ -125,7 +125,7 @@
     width: 40%;
 }
 
-.list_reportedby{
+.list-reportedby{
     color: #4D4D4D;
     font-size: 0.9em ;
     text-align: left;
@@ -133,7 +133,7 @@
     width:10%;
 }
 
-.list_assignedto{
+.list-assignedto{
     color: #4D4D4D;
     font-size: 0.9em;
     text-align: left;
@@ -141,32 +141,33 @@
     width: 10%;
 }
 
-.list_watches{
+.list-watches{
     text-align: center;
     vertical-align: bottom;
     width: 5%;
 }
 
-.list_status{
+.list-status{
     text-align: center;
     vertical-align: bottom;
     width: 5%;
 }
 
-.list_transfered{
+.list-transfered{
     text-align: center;
     vertical-align: bottom;
     width: 5%;
 }
 
-.list_testing{
+.list-testing{
     text-align: center;
     vertical-align: bottom;
     width: 5%;
 }
 
-.list_action{
+.list-action{
     text-align: center;
+    min-width:120px;
     vertical-align: bottom;
     width: 5%;
 }
@@ -261,8 +262,33 @@
     padding: 3px 15px 3px 3px;
 }
 
-tracker-status {
+.tracker-status-thin {
+    min-width:4px;
+    height:100%;
+}
+
+.tracker-status {
     height: 102%;
     text-align:center;
     width: 105%;
+}
+
+.tracker-filepicker {
+    border:1px solid #000;
+    height:160px;
+    width:600px;
+}
+
+.tracker-shadow {
+    -moz-opacity:0.5;
+    opacity:0.5;
+}
+
+.tracker-report-assignee {
+    font-weight:bolder;
+    font-size:1.3em;
+}
+
+#tracker-preferences-form div.fitemtitle {
+    width:600px;
 }

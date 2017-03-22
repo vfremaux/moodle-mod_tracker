@@ -23,25 +23,9 @@
  * A view that layouts the element administration
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
-}
+defined('MOODLE_INTERNAL') || die();
 
-?>
+$renderer = $PAGE->get_renderer('tracker', 'admin');
+$renderer->init($tracker, $cm);
 
-<table width="100%">
-    <tr valign="top" width="50%">
-        <td align="center">
-            <?php
-                include $CFG->dirroot.'/mod/tracker/views/admin_elements_used.php'; 
-            ?>
-        </td>
-        <td align="center" width="50%">
-            <?php
-                include $CFG->dirroot.'/mod/tracker/views/admin_elements.php'; 
-            ?>
-        </td>
-    </tr>
-</table>
-<?php
-
+echo $renderer->admin_table($tracker);

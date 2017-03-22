@@ -1,18 +1,29 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @package mod-tracker
  * @category mod
  * @author Clifford Tham, Valery Fremaux > 1.8
- * @date 02/12/2007
  *
  * HTML form
  * Print Bug Description
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from view.php in mod/tracker
-}
+defined('MOODLE_INTERNAL') || die();
 
 $config = get_config('mod_tracker');
 
@@ -41,22 +52,27 @@ $issue->owner = $DB->get_record('user', array('id' => $issue->assignedto));
 
 tracker_loadelementsused($tracker, $elementsused);
 
-// check for lower dependancies
+// Check for lower dependancies.
 
 $childtree = tracker_printchilds($tracker, $issue->id, true, 20);
 $parenttree = tracker_printparents($tracker, $issue->id, true, -20);
 $ccs = $DB->get_records('tracker_issuecc', array('issueid' => $issue->id));
 $cced = array();
-$history = $DB->get_records_select('tracker_issueownership', " trackerid = ? AND issueid = ? ", array($tracker->id, $issue->id), 'timeassigned DESC');
-$statehistory = $DB->get_records_select('tracker_state_change', " trackerid = ? AND issueid = ? ", array($tracker->id, $issue->id),'timechange ASC');
+
+$select = " trackerid = ? AND issueid = ? ";
+$history = $DB->get_records_select('tracker_issueownership', $select, array($tracker->id, $issue->id), 'timeassigned DESC');
+
+$statehistory = $DB->get_records_select('tracker_state_change', $select, array($tracker->id, $issue->id),'timechange ASC');
 $showdependancieslink = (!empty($childtree) || !empty($parenttree)) ? "<a id=\"toggledependancieslink\" href=\"javascript:toggledependancies()\">".get_string(($initialviewmode == 'visiblediv') ? 'hidedependancies' : 'showdependancies', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
 $showccslink = (!empty($ccs)) ? "<a id=\"toggleccslink\" href=\"javascript:toggleccs()\">".get_string(($initialccsviewmode == 'visiblediv') ? 'hideccs' : 'showccs', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
 $showhistorylink = (!empty($history) || !empty($statehistory)) ? "<a id=\"togglehistorylink\" href=\"javascript:togglehistory()\">".get_string(($initialhistoryviewmode == 'visiblediv') ? 'hidehistory' : 'showhistory', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
 
 // fixing embeded files URLS
 
-$issue->description = file_rewrite_pluginfile_urls($issue->description, 'pluginfile.php', $context->id, 'mod_tracker', 'issuedescription', $issue->id);
-$issue->resolution = file_rewrite_pluginfile_urls($issue->resolution, 'pluginfile.php', $context->id, 'mod_tracker', 'issueresolution', $issue->id);
+$issue->description = file_rewrite_pluginfile_urls($issue->description, 'pluginfile.php', $context->id, 'mod_tracker',
+                                                   'issuedescription', $issue->id);
+$issue->resolution = file_rewrite_pluginfile_urls($issue->resolution, 'pluginfile.php', $context->id, 'mod_tracker',
+                                                  'issueresolution', $issue->id);
 
 // get STATUSKEYS labels
 

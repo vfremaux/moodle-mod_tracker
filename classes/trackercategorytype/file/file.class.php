@@ -14,18 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @package tracker
  * @author Clifford Tham
  * @review Valery Fremaux / 1.8
- * @date 17/12/2007
  *
- * A class implementing a textfield element
+ * A class implementing a filepicker element
  */
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
-require_once($CFG->libdir.'/uploadlib.php');
 
 class fileelement extends trackerelement {
 
@@ -41,8 +39,10 @@ class fileelement extends trackerelement {
                                           'accepted_types' => array('*'));
     }
 
-    // No care of real value of element.
-    // There is some file stored into the file area or not.
+    /*
+     * No care of real value of element.
+     * There is some file stored into the file area or not.
+     */
     public function view($issueid = 0) {
         global $CFG, $COURSE, $DB;
 
@@ -131,7 +131,8 @@ class fileelement extends trackerelement {
 
         // Non js file picker.
         $html .= '<noscript>';
-        $html .= "<div><object type='text/html' data='$nonjsfilepicker' height='160' width='600' style='border:1px solid #000'></object></div>";
+        $html .= '<div>';
+        $html .= '<object type="text/html" data="'.$nonjsfilepicker.'" class="tracker-filepicker"></object></div>';
         $html .= '</noscript>';
 
         echo $html;
@@ -162,7 +163,7 @@ class fileelement extends trackerelement {
     /**
      * used for post processing form values, or attached files management
      */
-    function formprocess(&$data) {
+    function form_process(&$data) {
         global $COURSE, $USER, $DB;
 
         $params = array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid);

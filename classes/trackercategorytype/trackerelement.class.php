@@ -14,41 +14,42 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
- * @package mod_tracker
- * @category mod
- * @author Clifford Tham, Valery Fremaux > 1.8
- * @date 02/12/2007
+ * @package     mod_tracker
+ * @category    mod
+ * @author      Clifford Tham, Valery Fremaux > 1.8
  */
 
 /**
  * A generic class for collecting all that is common to all elements
  */
+defined('MOODLE_INTERNAL') || die();
 
 abstract class trackerelement {
-    var $id;
-    var $course;
-    var $usedid;
-    var $name;
-    var $description;
-    var $format;
-    var $type;
-    var $sortorder;
-    var $maxorder;
-    var $value;
-    var $options;
-    var $tracker;
-    var $active;
-    var $private;
-    var $canbemodifiedby;
-    var $context;
 
-    function __construct(&$tracker, $elementid = null, $used = false) {
+    protected $id;
+    protected $course;
+    protected $usedid;
+    protected $name;
+    protected $description;
+    protected $format;
+    protected $type;
+    protected $sortorder;
+    protected $maxorder;
+    protected $value;
+    protected $options;
+    protected $tracker;
+    protected $active;
+    protected $private;
+    protected $mandatory;
+    protected $canbemodifiedby;
+    protected $context;
+
+    public function __construct(&$tracker, $elementid = null, $used = false) {
         global $DB;
 
         $this->id = $elementid;
+        $cm = get_coursemodule_from_instance('tracker', $tracker->id);
 
         if ($elementid && $used) {
             $elmusedrec = $DB->get_record('tracker_elementused', array('id' => $elementid));
@@ -70,44 +71,60 @@ abstract class trackerelement {
             $this->type = $elmrec->type;
         }
 
+        $this->context = context_module::instance($cm->id);
         $this->options = null;
         $this->value = null;
         $this->tracker = $tracker;
+    }
+
+    public function __get($key) {
+        $method = 'magic_get_'.$key;
+        if (method_exists($this, $method)) {
+            return $this->$method();
+        }
+        if (!isset($this->$key)) {
+            throw new moodle_exception('No such field '.$key.' in tracker element');
+        }
+        return $this->$key;
+    }
+
+    public function __set($key, $value) {
+        $method = 'magic_set_'.$key;
+        if (method_exists($this, $method)) {
+            $this->$method($value);
+        }
+        if (!isset($this->$key)) {
+            throw new moodle_exception('No such field '.$key.' in tracker element');
+        }
+        $this->$key = $value;
     }
 
     /**
      * If true, element is like a select or a radio box array
      * and has suboptions to define
      */
-    function type_has_options() {
+    public function type_has_options() {
         return false;
     }
 
     /**
      * Tells if options are defined for thsi instance
      */
-    function hasoptions() {
+    public function has_options() {
         return $this->options !== null;
     }
 
-    /** 
+    /**
      * Get an option value
      */
-    function getoption($optionid) {
+    public function get_option($optionid) {
         return $this->options[$optionid];
-    }
-
-    /** 
-     * Sets the option list
-     */
-    function setoptions($options) {
-        $this->options = $options;
     }
 
     /**
      * If true, this element can be told to be mandatory.
      */
-    function has_mandatory_option() {
+    public function has_mandatory_option() {
         return true;
     }
 
@@ -116,19 +133,15 @@ abstract class trackerelement {
      * A private element can be edited by the ticket operators,
      * but is not seen by ticket owners.
      */
-    function has_private_option() {
+    public function has_private_option() {
         return true;
-    }
-
-    function setcontext(&$context) {
-        $this->context = $context;
     }
 
     /**
      * in case we have options (such as checkboxes or radio lists, get options from db.
      * this is backcalled by specific type constructors after core construction.
      */
-    function setoptionsfromdb() {
+    public function set_options_from_db() {
         global $DB;
 
         if (isset($this->id)) {
@@ -141,16 +154,15 @@ abstract class trackerelement {
                 $this->maxorder = 0;
             }
         } else {
-            print_error ('errorinvalidelementID', 'tracker');
+            print_error('errorinvalidelementID', 'tracker');
         }
     }
 
     /**
-     * Gets the current value for this element instance
-     * in an issue
+     * Gets the current value for this element instance in an issue.
      */
-    function getvalue($issueid) {
-        global $CFG, $DB;
+    public function get_value($issueid) {
+        global $DB;
 
         if (!$issueid) {
             return '';
@@ -169,51 +181,11 @@ abstract class trackerelement {
         return($this->value);
     }
 
-    function getname() {
-        return $this->name;
-    }
-
-    function optionlistview($cm) {
-        global $CFG, $COURSE, $OUTPUT;
-
-        $strname = get_string('name');
-        $strdescription = get_string('description');
-        $strsortorder = get_string('sortorder', 'tracker');
-        $straction = get_string('action');
-        $table = new html_table();
-        $table->width = "90%";
-        $table->size = array('15%', '15%', '50%', '30%');
-        $table->head = array('', "<b>$strname</b>","<b>$strdescription</b>","<b>$straction</b>");
-        if (!empty($this->options)) {
-            foreach ($this->options as $option) {
-                $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'editelementoption', 'optionid' => $option->id, 'elementid' => $option->elementid);
-                $editoptionurl = new moodle_url('/mod/tracker/view.php', $params);
-                $actions  = '<a href="'.$editoptionurl.'" title="'.get_string('edit').'"><img src="'.$OUTPUT->pix_url('/t/edit', 'core').'" /></a>&nbsp;';
-
-                $img = ($option->sortorder > 1) ? 'up' : 'up_shadow';
-                $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'moveelementoptionup', 'optionid' => $option->id, 'elementid' => $option->elementid);
-                $moveurl = new moodle_url('/mod/tracker/view.php', $params);
-                $actions .= '<a href="'.$moveurl.'" title="'.get_string('up').'"><img src="'.$OUTPUT->pix_url("{$img}", 'mod_tracker').'"></a>&nbsp;';
-
-                $img = ($option->sortorder < $this->maxorder) ? 'down' : 'down_shadow' ;
-                $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'moveelementoptiondown', 'optionid' => $option->id, 'elementid' => $option->elementid);
-                $moveurl = new moodle_url('/mod/tracker/view.php', $params);
-                $actions .= '<a href="'.$moveurl.'" title="'.get_string('down').'"><img src="'.$OUTPUT->pix_url("{$img}", 'mod_tracker').'"></a>&nbsp;';
-
-                $params = array('id' => $cm->id, 'view' => 'admin', 'what' => 'deleteelementoption', 'optionid' => $option->id, 'elementid' => $option->elementid);
-                $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
-                $actions .= '<a href="'.$deleteurl.'" title="'.get_string('delete').'"><img src="'.$OUTPUT->pix_url('/t/delete', 'core').'"></a>';
-                $table->data[] = array('<b> '.get_string('option', 'tracker').' '.$option->sortorder.':</b>',$option->name, format_string($option->description, true, $COURSE->id), $actions);
-            }
-        }
-        return html_writer::table($table);
-    }
-
-    function viewsearch() {
+    public function view_search() {
         $this->edit();
     }
 
-    function viewquery() {
+    public function view_query() {
         $this->view(true);
     }
 
@@ -221,7 +193,7 @@ abstract class trackerelement {
      * given a tracker and an element form key in a static context,
      * build a suitable trackerelement object that represents it.
      */
-    static function find_instance(&$tracker, $elementkey) {
+    public static function find_instance(&$tracker, $elementkey) {
         global $DB;
 
         $elmname = preg_replace('/^element/', '', $elementkey);
@@ -252,19 +224,19 @@ abstract class trackerelement {
     /**
      * Get the element view when the ticket is being edited
      */
-    abstract function edit($issueid = 0);
+    abstract public function edit($issueid = 0);
 
     /**
      * Get the element view when the ticket is being displayed
      */
-    abstract function view($issueid = 0);
+    abstract public function view($issueid = 0);
 
     /**
      * Provides the form element when building a new element instance
      */
-    abstract function add_form_element(&$mform);
+    abstract public function add_form_element(&$mform);
 
-    abstract function formprocess(&$data);
+    abstract public function form_process(&$data);
 
     /**
      * given a tracker and an id of a used element in a static context,
@@ -272,7 +244,7 @@ abstract class trackerelement {
      * what we need to knwo is the type of the element to call the adequate
      * constructor.
      */
-    static function find_instance_by_usedid(&$tracker, $usedid) {
+    static public function find_instance_by_usedid(&$tracker, $usedid) {
         global $DB, $CFG;
 
         $sql = "

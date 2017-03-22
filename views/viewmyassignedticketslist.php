@@ -202,12 +202,11 @@ if (!empty($issues)) {
     // Product data for table.
     $developersmenu = array();
     foreach ($issues as $issue) {
-        $ticketurl = new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'issueid' => $issue->id));
+        $params = array('id' => $cm->id, 'screen' => 'viewanissue', 'issueid' => $issue->id);
+        $ticketurl = new moodle_url('/mod/tracker/view.php', $params);
         $issuenumber = '<a href="'.$ticketurl.'">'.$issue->ticketprefix.$issue->id.'</a>';
 
-        $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issue->id);
-        $ticketurl = new moodle_url('/mod/tracker/view.php', $params);
-        $summary = '<a href=\"'.$ticketurl.'">'.format_string($issue->summary).'</a>';
+        $summary = format_string($issue->summary);
         $datereported = date('Y/m/d H:i', $issue->datereported);
         if (has_capability('mod/tracker:manage', $context)) {
             // Managers can assign bugs.

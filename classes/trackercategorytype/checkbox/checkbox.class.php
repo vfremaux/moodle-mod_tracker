@@ -14,38 +14,42 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @package tracker
  * @author Clifford Tham
  * @review Valery Fremaux / 1.8
- * @date 02/12/2007
  *
  * A class implementing a checkbox element
  */
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 
 class checkboxelement extends trackerelement {
 
-    function __construct(&$tracker, $id = null, $used = false) {
+    public function __construct(&$tracker, $id = null, $used = false) {
         parent::__construct($tracker, $id, $used);
-        $this->setoptionsfromdb();
+        $this->set_options_from_db();
     }
 
-    function edit($issueid = 0) {
+    public function edit($issueid = 0) {
 
-        $this->getvalue($issueid);
+        $this->get_value($issueid);
 
-        $values = explode(',', $this->value); // whatever the form ... revert to an array.
+        $values = explode(',', $this->value); // Whatever the form ... revert to an array.
 
         if (isset($this->options)) {
             $optionsstrs = array();
             foreach ($this->options as $option) {
                 if (in_array($option->id, $values)) {
-                    echo html_writer::empty_tag('input', array('type' => 'checkbox', 'name' => 'element'.$this->name.$option->id, 'value' => 1, 'checked' => 'checked'));
+                    $attrs = array('type' => 'checkbox',
+                                   'name' => 'element'.$this->name.$option->id,
+                                   'value' => 1,
+                                   'checked' => 'checked');
+                    echo html_writer::empty_tag('input', $attrs);
                 } else {
-                    echo html_writer::empty_tag('input', array('type' => 'checkbox', 'name' => 'element'.$this->name.$option->id, 'value' => 1));
+                    $attrs = array('type' => 'checkbox', 'name' => 'element'.$this->name.$option->id, 'value' => 1);
+                    echo html_writer::empty_tag('input', $attrs);
                 }
                 echo format_string($option->description);
                 echo html_writer::empty_tag('br');
@@ -53,10 +57,10 @@ class checkboxelement extends trackerelement {
         }
     }
 
-    function view($issueid = 0) {
+    public function view($issueid = 0) {
         $str = '';
 
-        $this->getvalue($issueid); // loads $this->value with current value for this issue
+        $this->get_value($issueid); // Loads $this->value with current value for this issue.
         if (!empty($this->value)) {
             $values = explode(',',$this->value);
             foreach ($values as $selected) {
@@ -66,7 +70,7 @@ class checkboxelement extends trackerelement {
         return $str;
     }
 
-    function add_form_element(&$mform) {
+    public function add_form_element(&$mform) {
         if (isset($this->options)) {
             $mform->addElement('header', "head{$this->name}", format_string($this->description));
             $mform->setExpanded("head{$this->name}");
@@ -77,10 +81,10 @@ class checkboxelement extends trackerelement {
         }
     }
 
-    function set_data(&$defaults, $issueid = 0) {
+    public function set_data(&$defaults, $issueid = 0) {
         if ($issueid) {
             if (!empty($this->options)) {
-                $elmvalues = $this->getvalue($issueid);
+                $elmvalues = $this->get_value($issueid);
                 $values = explode(',', $elmvalues);
                 if (!empty($values)) {
                     foreach ($values as $v) {
@@ -95,10 +99,11 @@ class checkboxelement extends trackerelement {
         }
     }
 
-    function formprocess(&$data, $options = null) {
+    public function form_process(&$data, $options = null) {
         global $DB;
 
-        if (!$attribute = $DB->get_record('tracker_issueattribute', array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid))) {
+        $params = array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid);
+        if (!$attribute = $DB->get_record('tracker_issueattribute', $params)) {
             $attribute = new StdClass();
             $attribute->trackerid = $data->trackerid;
             $attribute->issueid = $data->issueid;
@@ -116,7 +121,7 @@ class checkboxelement extends trackerelement {
             }
         }
 
-        $attribute->elementitemid = implode(',', $elmvalues); // in this case we have elementitem id or idlist
+        $attribute->elementitemid = implode(',', $elmvalues); // In this case we have elementitem id or idlist.
         $attribute->timemodified = time();
 
         if (!isset($attribute->id)) {
@@ -129,7 +134,7 @@ class checkboxelement extends trackerelement {
         }
     }
 
-    function type_has_options() {
+    public function type_has_options() {
         return true;
     }
 }

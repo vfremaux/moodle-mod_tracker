@@ -22,7 +22,7 @@ defined('MOODLE_INTERNAL') || die();
  * @author Valery Fremaux / 1.8
  * @date 06/08/2015
  */
-require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/tracker_element_form.php');
+require_once($CFG->dirroot.'/mod/tracker/forms/tracker_element_form_base.php');
 
 class tracker_element_constant_form extends tracker_moodle_form {
 
@@ -32,16 +32,20 @@ class tracker_element_constant_form extends tracker_moodle_form {
         $mform = $this->_form;
 
         $options = array(
-            0 => get_string('constantsiteshortname', 'tracker'),
-            1 => get_string('constantsitefullname', 'tracker'),
-            2 => get_string('constantcurrentidnumber', 'tracker'),
-            3 => get_string('constantcurrentcourseidnumber', 'tracker'),
-            4 => get_string('constantcurrentcourseshortname', 'tracker'),
-            5 => get_string('constantcurrentcoursefullname', 'tracker'),
+            0 => '-- '.get_string('customconstant', 'tracker').' --',
+            1 => get_string('constantsiteshortname', 'tracker'),
+            2 => get_string('constantsitefullname', 'tracker'),
+            3 => get_string('constantcurrentidnumber', 'tracker'),
+            4 => get_string('constantcurrentcourseidnumber', 'tracker'),
+            5 => get_string('constantcurrentcourseshortname', 'tracker'),
+            6 => get_string('constantcurrentcoursefullname', 'tracker'),
         );
 
         $mform->addElement('select', 'paramint1', get_string('constantinfosource', 'tracker'), $options);
+
         $mform->addElement('text', 'paramchar2', get_string('customconstant', 'tracker'));
+        $mform->setType('paramchar2', PARAM_RAW);
+        $mform->disabledIf('paramchar2', 'paramint1', 'neq', 0);
 
         $this->end_form();
     }

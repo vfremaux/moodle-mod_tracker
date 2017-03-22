@@ -22,18 +22,27 @@
 
 require_once $CFG->libdir.'/formslib.php';
 
-class TrackerIssueForm extends moodleform{
+class TrackerIssueForm extends moodleform {
 
-    var $elements;
-    var $editoroptions;
-    var $context;
+    /**
+     * List of dynamic forms elements
+     */
+    protected $elements;
+
+    /**
+     * Options for editors
+     */
+    public $editoroptions;
+
+    /**
+     * context for file handling
+     */
+    protected $context;
 
     /**
     * Dynamically defines the form using elements setup in tracker instance
-    *
-    *
     */
-    function definition() {
+    public function definition() {
         global $DB, $COURSE;
 
         $trackerid = $this->_customdata['trackerid'];
@@ -43,7 +52,11 @@ class TrackerIssueForm extends moodleform{
         $this->context = context_module::instance($this->_customdata['cmid']);
         $maxfiles = 99;                // TODO: add some setting.
         $maxbytes = $COURSE->maxbytes; // TODO: add some setting.
-        $this->editoroptions = array('trusttext' => true, 'subdirs' => false, 'maxfiles' => $maxfiles, 'maxbytes' => $maxbytes, 'context' => $this->context);
+        $this->editoroptions = array('trusttext' => true,
+                                     'subdirs' => false,
+                                     'maxfiles' => $maxfiles,
+                                     'maxbytes' => $maxbytes,
+                                     'context' => $this->context);
 
         $mform = $this->_form;
 
@@ -64,7 +77,7 @@ class TrackerIssueForm extends moodleform{
 
         if (!empty($this->elements)) {
             foreach ($this->elements as $element) {
-                if ($element->active && !$element->private) {
+                if (($element->active == true) && ($element->private == false)) {
                     $element->add_form_element($mform);
                 }
             }

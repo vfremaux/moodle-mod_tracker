@@ -116,8 +116,45 @@ function tracker_supports_feature($feature) {
     return $versionkey;
 }
 
+function tracker_get_context($cmid, $instanceid) {
+    global $DB;
+
+    if ($cmid) {
+        if (! $cm = get_coursemodule_from_id('tracker', $cmid)) {
+            print_error('errorcoursemodid', 'tracker');
+        }
+        if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
+            print_error('errorcoursemisconfigured', 'tracker');
+        }
+        if (! $tracker = $DB->get_record('tracker', array('id' => $cm->instance))) {
+            print_error('errormoduleincorrect', 'tracker');
+        }
+    } else {
+        if (! $tracker = $DB->get_record('tracker', array('id' => $instanceid))) {
+            print_error('errormoduleincorrect', 'tracker');
+        }
+        if (! $course = $DB->get_record('course', array('id' => $tracker->course))) {
+            print_error('errorcoursemisconfigured', 'tracker');
+        }
+        if (! $cm = get_coursemodule_from_instance("tracker", $tracker->id, $course->id)) {
+            print_error('errorcoursemodid', 'tracker');
+        }
+    }
+
+    return array($cm, $tracker, $course);
+}
+
+function tracker_requires($view, $screen) {
+    global $PAGE;
+
+    if ($view == 'profile') {
+        $PAGE->requires->js('/mod/tracker/js/watchsview.js');
+    }
+
+}
+
 // Major roles against status keys.
-function shop_get_role_definition(&$tracker, $role) {
+function tracker_get_role_definition(&$tracker, $role) {
     if ($role == 'report') {
         if ($tracker->supportmode == 'bugtracker') {
             return ENABLED_POSTED | ENABLED_VALIDATED;
@@ -169,8 +206,6 @@ $STATUSCODES = array(POSTED => 'posted',
 
 /**
  * loads all elements in memory
- * @uses $CFG
- * @uses $COURSE
  * @param reference $tracker the tracker object
  * @param reference $elementsobj
  */
@@ -195,6 +230,7 @@ function tracker_loadelements(&$tracker, &$elementsobj) {
             // This get the options by the constructor.
             include_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/'.$element->type.'/'.$element->type.'.class.php');
             $constructorfunction = "{$element->type}element";
+
             $elementsobj[$element->id] = new $constructorfunction($tracker, $element->id);
             $elementsobj[$element->id]->name = $element->name;
             $elementsobj[$element->id]->description = $element->description;
@@ -206,7 +242,6 @@ function tracker_loadelements(&$tracker, &$elementsobj) {
 
 /**
  * get all available types which are plugins in classes/trackercategorytype
- * @uses $CFG
  * @return an array of known element types
  */
 function tracker_getelementtypes() {
@@ -263,12 +298,13 @@ function tracker_loadelementsused(&$tracker, &$used) {
     $cm = get_coursemodule_from_instance('tracker', $tracker->id);
     $context = context_module::instance($cm->id);
 
-    $usedelements = $DB->get_records('tracker_elementused', array('trackerid' => $tracker->id), 'sortorder', 'id,elementid,sortorder');
+    $fields = 'id, elementid, sortorder';
+    $usedelements = $DB->get_records('tracker_elementused', array('trackerid' => $tracker->id), 'sortorder', $fields);
     $used = array();
     $sortorder = 1;
     if (!empty($usedelements)) {
         foreach ($usedelements as $ueid => $ue) {
-            // normalize sortorder indexes
+            // Normalize sortorder indexes.
             if ($ue->sortorder != $sortorder) {
                 $ue->sortorder = $sortorder;
                 $DB->update_record('tracker_elementused', $ue);
@@ -276,7 +312,7 @@ function tracker_loadelementsused(&$tracker, &$used) {
             $elementused = trackerelement::find_instance_by_usedid($tracker, $ueid);
             if ($elementused) {
                 $used[$ue->elementid] = $elementused;
-                $used[$ue->elementid]->setcontext($context);
+                $used[$ue->elementid]->context = $context;
                 $sortorder++;
             }
         }
@@ -287,7 +323,6 @@ function tracker_loadelementsused(&$tracker, &$used) {
  * quite the same as above, but not loading objects, and
  * mapping hash keys by "name"
  * @param int $trackerid
- *
  */
 function tracker_getelementsused_by_name(&$tracker) {
     global $CFG, $DB;
@@ -326,7 +361,8 @@ function tracker_getelementsused_by_name(&$tracker) {
 function tracker_iselementused($trackerid, $elementid) {
     global $DB;
 
-    $inusedelements = $DB->count_records_select('tracker_elementused', 'elementid = '.$elementid.' AND trackerid = '.$trackerid);
+    $select = 'elementid = ? AND trackerid = ? ';
+    $inusedelements = $DB->count_records_select('tracker_elementused', $select, array($elementid, $trackerid));
     return $inusedelements;
 }
 
@@ -336,7 +372,9 @@ function tracker_iselementused($trackerid, $elementid) {
  * @param array $fields the array of fields to be printed
  */
 function tracker_printelements(&$tracker, $fields = null, $dest = false) {
+
     tracker_loadelementsused($tracker, $used);
+
     if (!empty($used)) {
         if (!empty($fields)) {
             foreach ($used as $element) {
@@ -347,6 +385,7 @@ function tracker_printelements(&$tracker, $fields = null, $dest = false) {
                 }
             }
         }
+
         foreach ($used as $element) {
 
             if (!$element->active) {
@@ -355,8 +394,9 @@ function tracker_printelements(&$tracker, $fields = null, $dest = false) {
 
             echo '<tr>';
             echo '<td align="right" valign="top">';
-            echo '<b>' . format_string($element->description) . ':</b>';
+            echo '<b>' . format_string($element->description).':</b>';
             echo '</td>';
+
             echo '<td align="left" colspan="3">';
             if ($dest == 'search') {
                 if ($element->type == 'file') {
@@ -377,7 +417,7 @@ function tracker_printelements(&$tracker, $fields = null, $dest = false) {
     }
 }
 
-// Search engine
+// Search engine.
 
 /**
  * constructs an adequate search query, based on both standard and user defined
@@ -400,14 +440,14 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false) {
             $elementssearch = true;
         }
     }
-    $elementsSearchClause = ($elementssearch) ? " {tracker_issueattribute} AS ia, " : '' ;
+    $elementsSearchClause = ($elementssearch) ? " {tracker_issueattribute} AS ia, " : '';
 
     $elementsSearchConstraint = '';
     foreach ($keys as $key) {
         if ($key == 'id') {
             $elementsSearchConstraint .= ' AND  (';
             foreach ($fields[$key] as $idtoken) {
-                $elementsSearchConstraint .= (empty($idquery)) ? 'i.id =' . $idtoken : ' OR i.id = ' . $idtoken ;
+                $elementsSearchConstraint .= (empty($idquery)) ? 'i.id =' . $idtoken : ' OR i.id = ' . $idtoken;
             }
             $elementsSearchConstraint .= ')';
         }
@@ -664,7 +704,7 @@ function tracker_printsearchfields($fields) {
 
     foreach ($fields as $key => $value) {
         switch (trim($key)) {
-            case 'datereported':
+            case 'datereported': {
                 if (!function_exists('trk_userdate')) {
                     function trk_userdate(&$a) {
                         $a = userdate($a);
@@ -674,13 +714,19 @@ function tracker_printsearchfields($fields) {
                 array_walk($value, 'trk_userdate');
                 $strs[] = get_string($key, 'tracker') . ' '.get_string('IN', 'tracker')." ('".implode("','", $value) . "')";
                 break;
-            case 'summary':
+            }
+
+            case 'summary': {
                 $strs[] =  "('".implode("','", $value) ."') ".get_string('IN', 'tracker').' '.get_string('summary', 'tracker');
                 break;
-            case 'description':
+            }
+
+            case 'description': {
                 $strs[] =  "('".implode("','", $value) ."') ".get_string('IN', 'tracker').' '.get_string('description');
                 break;
-            case 'reportedby':
+            }
+
+            case 'reportedby': {
                 $users = $DB->get_records_list('user', array('id' => implode(',',$value)), 'lastname', 'id,firstname,lastname');
                 $reporters = array();
                 if ($users) {
@@ -691,7 +737,9 @@ function tracker_printsearchfields($fields) {
                 $reporterlist = implode ("', '", $reporters);
                 $strs[] = get_string('reportedby', 'tracker').' '.get_string('IN', 'tracker')." ('".$reporterlist."')";
                 break;
-            case 'assignedto':
+            }
+
+            case 'assignedto': {
                 $users = $DB->get_records_list('user', array('id' => implode(',',$value)), 'lastname', 'id,firstname,lastname');
                 $assignees = array();
                 if ($users) {
@@ -702,6 +750,8 @@ function tracker_printsearchfields($fields) {
                 $assigneelist = implode ("', '", $assignees);
                 $strs[] = get_string('assignedto', 'tracker').' '.get_string('IN', 'tracker')." ('".$assigneelist."')";
                 break;
+            }
+
             default :
                 $strs[] = get_string($key, 'tracker') . ' '.get_string('IN', 'tracker')." ('".implode("','", $value) . "')";
         }
@@ -1019,8 +1069,7 @@ function tracker_recordelements(&$issue, &$data) {
     $usedelements = $DB->get_records('tracker_elementused', array('trackerid' => $issue->trackerid), 'id', 'id,elementid');
     foreach ($usedelements as $ueid => $ue) {
         if ($ueinstance = trackerelement::find_instance_by_usedid($tracker, $ueid)) {
-            $ueinstance->setcontext($PAGE->context);
-            $ueinstance->formprocess($data);
+            $ueinstance->form_process($data);
         }
     }
 }
@@ -1060,17 +1109,20 @@ function tracker_clearelements($issueid, $withfiles = false) {
  */
 if (!function_exists('print_error_class')) {
     function print_error_class($errors, $errorkeylist) {
+
+        $out = '';
         if ($errors) {
-            foreach ($errors as $anError) {
-                if ($anError->on == '') {
+            foreach ($errors as $anerror) {
+                if ($anerror->on == '') {
                     continue;
                 }
-                if (preg_match("/\\b{$anError->on}\\b/" ,$errorkeylist)) {
-                    echo " class=\"formerror\" ";
-                    return;
+                if (preg_match("/\\b{$anerror->on}\\b/" , $errorkeylist)) {
+                    $out .= 'class="formerror" ';
+                    $out .= 'title="'.$anerror->message.'" ';
                 }
             }
         }
+        return $out;
     }
 }
 
@@ -1504,7 +1556,7 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
     $issueccs = $DB->get_records('tracker_issuecc', array('issueid' => $issueid));
 
     if (!empty($issueccs)) {
-        $params = array('t' => $newtracker->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issue->id);
+        $params = array('t' => $tracker->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issue->id);
         $issueurl = new moodle_url('/mod/tracker/view.php', $params);
 
         $vars = array('COURSE_SHORT' => $COURSE->shortname,
@@ -2109,18 +2161,17 @@ function tracker_print_direct_editor($attributes, $values, $options) {
     $maxbytes     = @$options['maxbytes'];
     $areamaxbytes = @$options['areamaxbytes'];
     $maxfiles     = @$options['maxfiles'];
-    $changeformat = @$options['changeformat']; // TO DO: implement as ajax calls
+    $changeformat = @$options['changeformat']; // TODO: implement as ajax calls.
 
     $text         = $values['text'];
     $format       = $values['format'];
     $draftitemid  = $values['itemid'];
 
-    // security - never ever allow guest/not logged in user to upload anything
+    // Security - never ever allow guest/not logged in user to upload anything.
     if (isguestuser() or !isloggedin()) {
         $maxfiles = 0;
     }
 
-    // $str = $this->_getTabs();
     $str = '';
     $str .= '<div>';
 
@@ -2131,7 +2182,7 @@ function tracker_print_direct_editor($attributes, $values, $options) {
         $formats[$fid] = $strformats[$fid];
     }
 
-    // get filepicker info.
+    // Get filepicker info.
     if ($maxfiles != 0 ) {
         if (empty($draftitemid)) {
             // No existing area info provided - let's use fresh new draft area.
@@ -2141,7 +2192,8 @@ function tracker_print_direct_editor($attributes, $values, $options) {
         }
 
         $args = new stdClass();
-        // need these three to filter repositories list.
+
+        // Need these three to filter repositories list.
         $args->accepted_types = array('web_image');
         $args->return_types = @$options['return_types'];
         $args->context = $ctx;
@@ -2155,7 +2207,7 @@ function tracker_print_direct_editor($attributes, $values, $options) {
         $image_options->env = 'editor';
         $image_options->itemid = $draftitemid;
 
-        // moodlemedia plugin.
+        // Moodlemedia plugin.
         $args->accepted_types = array('video', 'audio');
         $media_options = initialise_filepicker($args);
         $media_options->context = $ctx;
@@ -2165,7 +2217,7 @@ function tracker_print_direct_editor($attributes, $values, $options) {
         $media_options->env = 'editor';
         $media_options->itemid = $draftitemid;
 
-        // advlink plugin.
+        // Advlink plugin.
         $args->accepted_types = '*';
         $link_options = initialise_filepicker($args);
         $link_options->context = $ctx;
@@ -2250,6 +2302,7 @@ function tracker_print_direct_editor($attributes, $values, $options) {
  * @param object $cm the course module. If given, only role accessible keys will be output
  */
 function tracker_get_statuskeys($tracker, $cm = null) {
+
     static $FULLSTATUSKEYS;
     static $STATUSKEYS;
 
@@ -2303,36 +2356,36 @@ function tracker_get_statuskeys($tracker, $cm = null) {
             $STATUSKEYS = array();
 
             if (has_capability('mod/tracker:report', $context)) {
-                $roledef = shop_get_role_definition($tracker, 'report');
+                $roledef = tracker_get_role_definition($tracker, 'report');
                 foreach ($FULLSTATUSKEYS as $key => $label) {
-                    $eventkey = pow(2,$key);
+                    $eventkey = pow(2, $key);
                     if ($eventkey & $roledef) {
                         $STATUSKEYS[$key] = $label;
                     }
                 }
             }
             if (has_capability('mod/tracker:develop', $context)) {
-                $roledef = shop_get_role_definition($tracker, 'develop');
+                $roledef = tracker_get_role_definition($tracker, 'develop');
                 foreach ($FULLSTATUSKEYS as $key => $label) {
-                    $eventkey = pow(2,$key);
+                    $eventkey = pow(2, $key);
                     if ($eventkey & $roledef) {
                         $STATUSKEYS[$key] = $label;
                     }
                 }
             }
             if (has_capability('mod/tracker:resolve', $context)) {
-                $roledef = shop_get_role_definition($tracker, 'resolve');
+                $roledef = tracker_get_role_definition($tracker, 'resolve');
                 foreach ($FULLSTATUSKEYS as $key => $label) {
-                    $eventkey = pow(2,$key);
+                    $eventkey = pow(2, $key);
                     if ($eventkey & $roledef) {
                         $STATUSKEYS[$key] = $label;
                     }
                 }
             }
             if (has_capability('mod/tracker:manage', $context)) {
-                $roledef = shop_get_role_definition($tracker, 'manage');
+                $roledef = tracker_get_role_definition($tracker, 'manage');
                 foreach ($FULLSTATUSKEYS as $key => $label) {
-                    $eventkey = pow(2,$key);
+                    $eventkey = pow(2, $key);
                     if ($eventkey & $roledef) {
                         $STATUSKEYS[$key] = $label;
                     }
@@ -2345,6 +2398,21 @@ function tracker_get_statuskeys($tracker, $cm = null) {
     }
 
     return $FULLSTATUSKEYS;
+}
+
+function tracker_get_statuscodes() {
+    return array(
+        POSTED => 'posted',
+        OPEN => 'open',
+        RESOLVING => 'resolving',
+        WAITING => 'waiting',
+        TESTING => 'testing',
+        VALIDATED => 'validated',
+        PUBLISHED => 'published',
+        RESOLVED => 'resolved',
+        ABANDONNED => 'abandonned',
+        TRANSFERED => 'transfered'
+    );
 }
 
 /**

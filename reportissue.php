@@ -25,33 +25,9 @@ require_once($CFG->dirroot."/mod/tracker/locallib.php");
 require_once $CFG->dirroot.'/mod/tracker/forms/reportissue_form.php';
 
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID, or.
-$a  = optional_param('a', 0, PARAM_INT);  // tracker ID.
+$t  = optional_param('t', 0, PARAM_INT);  // tracker ID.
 
-if ($id) {
-    if (! $cm = get_coursemodule_from_id('tracker', $id)) {
-        print_error('errorcoursemodid', 'tracker');
-    }
-
-    if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
-        print_error('errorcoursemisconfigured', 'tracker');
-    }
-
-    if (! $tracker = $DB->get_record('tracker', array('id' => $cm->instance))) {
-        print_error('errormoduleincorrect', 'tracker');
-    }
-} else {
-
-    if (! $tracker = $DB->get_record('tracker', array('id' => $a))) {
-        print_error('errormoduleincorrect', 'tracker');
-    }
-
-    if (! $course = $DB->get_record('course', array('id' => $tracker->course))) {
-        print_error('errorcoursemisconfigured', 'tracker');
-    }
-    if (! $cm = get_coursemodule_from_instance("tracker", $tracker->id, $course->id)) {
-        print_error('errorcoursemodid', 'tracker');
-    }
-}
+list($cm, $tracker, $course) = tracker_get_context($id, $t);
 
 $screen = tracker_resolve_screen($tracker, $cm);
 $view = tracker_resolve_view($tracker, $cm);
@@ -119,7 +95,7 @@ if (!$form->is_cancelled()) {
 echo $OUTPUT->header();
 
 $view = 'reportanissue';
-echo $renderer->tabs();
+echo $renderer->tabs($view, $screen, $tracker, $cm);
 $form->display();
 
 echo $OUTPUT->footer();

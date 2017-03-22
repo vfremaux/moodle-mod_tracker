@@ -20,45 +20,18 @@
  * @author      Clifford Tham, Valery Fremaux > 1.8
  */
 require('../../config.php');
-require_once($CFG->dirroot."/mod/tracker/lib.php");
-require_once($CFG->dirroot."/mod/tracker/locallib.php");
-require_once $CFG->dirroot.'/mod/tracker/forms/editelement_form.php';
+require_once($CFG->dirroot.'/mod/tracker/lib.php');
+require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID, or.
 $t  = optional_param('t', 0, PARAM_INT);  // Tracker ID.
 $type = required_param('type', PARAM_TEXT);  // Element class name.
 $elementid = optional_param('elementid', 0, PARAM_INT);  // Element instance id.
 
-if ($id) {
-    if (! $cm = get_coursemodule_from_id('tracker', $id)) {
-        print_error('errorcoursemodid', 'tracker');
-    }
-
-    if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
-        print_error('errorcoursemisconfigured', 'tracker');
-    }
-
-    if (! $tracker = $DB->get_record('tracker', array('id' => $cm->instance))) {
-        print_error('errormoduleincorrect', 'tracker');
-    }
-} else {
-
-    if (! $tracker = $DB->get_record('tracker', array('id' => $t))) {
-        print_error('errormoduleincorrect', 'tracker');
-    }
-
-    if (! $course = $DB->get_record('course', array('id' => $tracker->course))) {
-        print_error('errorcoursemisconfigured', 'tracker');
-    }
-
-    if (! $cm = get_coursemodule_from_instance("tracker", $tracker->id, $course->id)) {
-        print_error('errorcoursemodid', 'tracker');
-    }
-}
+list($cm, $tracker, $course) = tracker_get_context($id, $t);
 
 $screen = tracker_resolve_screen($tracker, $cm);
 $view = tracker_resolve_view($tracker, $cm);
-
 // Security.
 
 $context = context_module::instance($cm->id);
@@ -100,7 +73,7 @@ if ($data = $form->get_data()) {
     }
 
     $elementobj = trackerelement::find_instance_by_id($tracker, $element->id);
-    if (!$data->elementid && $elementobj->hasoptions()) {
+    if (!$data->elementid && $elementobj->has_options()) {
         // Bounces to the option editor.
 
         // Prepare use case bounce to further code (later in controller).

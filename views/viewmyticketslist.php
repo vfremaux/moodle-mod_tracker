@@ -125,24 +125,25 @@ $actionstr = '';
 if (!empty($tracker->parent)) {
     $transferstr = get_string('transfer', 'tracker');
     if (has_capability('mod/tracker:viewpriority', $context) && !$resolved) {
-        $tablecolumns = array('resolutionpriority', 'id', 'summary', 'datereported', 'assignedto', 'status', 'watches',
+        $tablecolumns = array('statusthin', 'resolutionpriority', 'id', 'summary', 'datereported', 'assignedto', 'status', 'watches',
                               'transfered', 'action');
-        $tableheaders = array("<b>$prioritystr</b>", "<b>$issuenumberstr</b>", "<b>$summarystr</b>", "<b>$datereportedstr</b>",
+        $tableheaders = array('', "<b>$prioritystr</b>", "<b>$issuenumberstr</b>", "<b>$summarystr</b>", "<b>$datereportedstr</b>",
                               "<b>$assignedtostr</b>", "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$transferstr</b>",
                               "<b>$actionstr</b>");
     } else {
-        $tablecolumns = array('id', 'summary', 'datereported', 'assignedto', 'status', 'watches', 'transfered', 'action');
-        $tableheaders = array("<b>$issuenumberstr</b>", "<b>$summarystr</b>", "<b>$datereportedstr</b>", "<b>$assignedtostr</b>",
+        $tablecolumns = array('statusthin', 'id', 'summary', 'datereported', 'assignedto', 'status', 'watches', 'transfered', 'action');
+        $tableheaders = array('', "<b>$issuenumberstr</b>", "<b>$summarystr</b>", "<b>$datereportedstr</b>", "<b>$assignedtostr</b>",
                               "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$transferstr</b>", "<b>$actionstr</b>");
     }
 } else {
     if (has_capability('mod/tracker:viewpriority', $context) && !$resolved) {
-        $tablecolumns = array('resolutionpriority', 'id', 'summary', 'datereported', 'assignedto', 'status', 'watches',  'action');
-        $tableheaders = array("<b>$prioritystr</b>", '', "<b>$summarystr</b>", "<b>$datereportedstr</b>", "<b>$assignedtostr</b>",
+        $tablecolumns = array('statusthin', 'resolutionpriority', 'id', 'summary', 'datereported', 'assignedto', 'status',
+                              'watches',  'action');
+        $tableheaders = array('', "<b>$prioritystr</b>", '', "<b>$summarystr</b>", "<b>$datereportedstr</b>", "<b>$assignedtostr</b>",
                               "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$actionstr</b>");
     } else {
-        $tablecolumns = array('id', 'summary', 'datereported', 'assignedto', 'status', 'watches',  'action');
-        $tableheaders = array('', "<b>$summarystr</b>", "<b>$datereportedstr</b>", "<b>$assignedtostr</b>",
+        $tablecolumns = array('statusthin', 'id', 'summary', 'datereported', 'assignedto', 'status', 'watches',  'action');
+        $tableheaders = array('', '', "<b>$summarystr</b>", "<b>$datereportedstr</b>", "<b>$assignedtostr</b>",
                               "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$actionstr</b>");
     }
 }
@@ -162,6 +163,7 @@ $table->set_attribute('id', 'issues');
 $table->set_attribute('class', 'issuelist');
 $table->set_attribute('width', '100%');
 
+$table->column_class('statusthin', 'list_statusthin');
 $table->column_class('resolutionpriority', 'list_priority');
 $table->column_class('id', 'list_issuenumber');
 $table->column_class('summary', 'list_summary');
@@ -197,6 +199,9 @@ if (!empty($issues)) {
     // Product data for table.
     $developersmenu = array();
     foreach ($issues as $issue) {
+
+        $statusthin = '<div class="status-'.$STATUSCODES[$issue->status].' tracker-status-thin"></div>';
+
         $params = array('id' => $cm->id, 'view' => 'view', 'issueid' => $issue->id);
         $ticketurl = new moodle_url('/mod.tracker/view.php', $params);
         $issuenumber = '<a href="'.$ticketurl.'">'.$tracker->ticketprefix.$issue->id.'</a>';
@@ -221,7 +226,7 @@ if (!empty($issues)) {
                 $developersmenu[$developer->id] = fullname($developer);
             }
             $attrs = array('onchange' => "document.forms['manageform'].changed{$issue->id}.value = 1;");
-            $nochooose = array('' => get_string('unassigned', 'tracker'));
+            $nochoose = array('' => get_string('unassigned', 'tracker'));
             $assignedto = html_writer::select($developersmenu, 'assignedto'.$issue->id, $issue->assignedto, $nochoose, $attrs);
 
         } else if (has_capability('mod/tracker:resolve', $context)) {
@@ -241,7 +246,7 @@ if (!empty($issues)) {
             $status = $FULLSTATUSKEYS[0 + $issue->status];
             $assignedto = fullname($user);
         }
-        $status = '<div class="status_'.$STATUSCODES[$issue->status].'" class="tracker-status">'.$status.'</div>';
+        $status = '<div class="status-'.$STATUSCODES[$issue->status].'" class="tracker-status">'.$status.'</div>';
         $hassolution = $issue->status == RESOLVED && !empty($issue->resolution);
         $pix_url = $OUTPUT->pix_url('solution', 'tracker');
         $alt = get_string('hassolution', 'tracker');
@@ -275,22 +280,22 @@ if (!empty($issues)) {
                     !$resolved) {
                 $cond = ($issue->status < RESOLVED || $issue->status == TESTING);
                 $ticketpriority = $cond ? $maxpriority - $issue->resolutionpriority + 1 : '';
-                $dataset = array($ticketpriority, $issuenumber, $summary.' '.$solution, $datereported, $assignedto, $status,
-                                 0 + $issue->watches, $transfer, $actions);
+                $dataset = array($statusthin, $ticketpriority, $issuenumber, $summary.' '.$solution, $datereported, $assignedto,
+                                 $status, 0 + $issue->watches, $transfer, $actions);
             } else {
-                $dataset = array($issuenumber, $summary.' '.$solution, $datereported, $assignedto, $status, 0 + $issue->watches,
-                                 $transfer, $actions);
+                $dataset = array($statusthin, $issuenumber, $summary.' '.$solution, $datereported, $assignedto, $status,
+                                 0 + $issue->watches, $transfer, $actions);
             }
         } else {
             if (has_capability('mod/tracker:viewpriority', $context) &&
                     !$resolved) {
                 $cond = ($issue->status < RESOLVED || $issue->status == TESTING);
                 $ticketpriority = $cond ? $maxpriority - $issue->resolutionpriority + 1 : '';
-                $dataset = array($ticketpriority, $issuenumber, $summary.' '.$solution, $datereported, $assignedto, $status,
-                                 0 + $issue->watches, $actions);
+                $dataset = array($statusthin, $ticketpriority, $issuenumber, $summary.' '.$solution, $datereported, $assignedto,
+                                 $status, 0 + $issue->watches, $actions);
             } else {
-                $dataset = array($issuenumber, $summary.' '.$solution, $datereported, $assignedto, $status, 0 + $issue->watches,
-                                 $actions);
+                $dataset = array($statusthin, $issuenumber, $summary.' '.$solution, $datereported, $assignedto, $status,
+                                 0 + $issue->watches, $actions);
             }
         }
         $table->add_data($dataset);

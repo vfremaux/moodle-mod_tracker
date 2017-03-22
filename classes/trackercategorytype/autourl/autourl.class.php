@@ -18,7 +18,6 @@
  * @package mod_tracker
  * @category mod
  * @author Valery Fremaux / 1.8
- * @date 06/08/2015
  *
  * A class implementing a hidden/labelled element that captures the referer url
  */
@@ -28,28 +27,34 @@ require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelem
 
 class autourlelement extends trackerelement {
 
-    function __construct(&$tracker, $id = null, $used = false) {
+    public function __construct(&$tracker, $id = null, $used = false) {
         parent::__construct($tracker, $id, $used);
     }
 
-    function has_mandatory_option() {
+    public function has_mandatory_option() {
         return false;
     }
 
-    function view($issueid = 0) {
-        $this->getvalue($issueid);
+    public function view($issueid = 0) {
+        $this->get_value($issueid);
         return '<a href="'.$this->value.'">'.$this->value.'</a>';
     }
 
-    function edit($issueid = 0) {
+    public function edit($issueid = 0) {
         $this->getvalue($issueid);
         $str = '';
-        $str .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'element'.$this->name, 'value' => format_string($this->value)));
-        $str .= html_writer::empty_tag('input', array('type' => 'text', 'name' => 'element'.$this->name.'_disabled', 'value' => format_string($this->value), 'disabled' => 'disabled', 'size' => 120));
+        $attrs = array('type' => 'hidden', 'name' => 'element'.$this->name, 'value' => format_string($this->value));
+        $str .= html_writer::empty_tag('input', $attrs);
+        $attrs = array('type' => 'text',
+                       'name' => 'element'.$this->name.'_disabled',
+                       'value' => format_string($this->value),
+                       'disabled' => 'disabled',
+                       'size' => 120);
+        $str .= html_writer::empty_tag('input', $attrs);
         return $str;
     }
 
-    function add_form_element(&$mform) {
+    public function add_form_element(&$mform) {
         $mform->addElement('header', "header{$this->name}", format_string($this->description));
         $mform->setExpanded("header{$this->name}");
         $mform->addElement('hidden', "element{$this->name}");
@@ -61,10 +66,10 @@ class autourlelement extends trackerelement {
         $mform->setType("element{$this->name}", PARAM_URL);
     }
 
-    function set_data(&$defaults, $issueid = 0) {
+    public function set_data(&$defaults, $issueid = 0) {
         if ($issueid) {
             $elementname = "element{$this->name}";
-            $defaults->$elementname = $this->getvalue($issueid);
+            $defaults->$elementname = $this->get_value($issueid);
         } else {
             $defaults->$elementname = $_SERVER['HTTP_REFERER'];
         }
@@ -73,10 +78,11 @@ class autourlelement extends trackerelement {
     /**
      * updates or creates the element instance for this issue
      */
-    function formprocess(&$data) {
+    public function form_process(&$data) {
         global $DB;
 
-        if (!$attribute = $DB->get_record('tracker_issueattribute', array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid))) {
+        $params = array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid);
+        if (!$attribute = $DB->get_record('tracker_issueattribute', $params)) {
             $attribute = new StdClass();
             $attribute->trackerid = $data->trackerid;
             $attribute->issueid = $data->issueid;
@@ -85,7 +91,7 @@ class autourlelement extends trackerelement {
 
         $elmname = 'element'.$this->name;
         $data->$elmname = required_param($elmname, PARAM_TEXT);
-        $attribute->elementitemid = $data->$elmname; // in this case true value in element id
+        $attribute->elementitemid = $data->$elmname; // In this case true value in element id.
         $attribute->timemodified = time();
 
         if (!isset($attribute->id)) {
@@ -98,4 +104,3 @@ class autourlelement extends trackerelement {
         }
     }
 }
-

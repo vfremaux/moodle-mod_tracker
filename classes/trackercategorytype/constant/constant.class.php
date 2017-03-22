@@ -14,38 +14,42 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @package tracker
  * @author Valery Fremaux / 1.8
- * @date 06/08/2015
  *
  * A class implementing a constant element from an internal configuration value or
  * an instance setting value
  */
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 
 class constantelement extends trackerelement {
 
-    function __construct(&$tracker, $id = null, $used = false) {
+    public function __construct(&$tracker, $id = null, $used = false) {
         parent::__construct($tracker, $id, $used);
     }
 
-    function has_mandatory_option() {
+    public function has_mandatory_option() {
         return false;
     }
 
-    function view($issueid = 0) {
-        $this->getvalue($issueid);
+    public function view($issueid = 0) {
+        $this->get_value($issueid);
         return $this->value;
     }
 
-    function edit($issueid = 0) {
-        $this->getvalue($issueid);
+    public function edit($issueid = 0) {
+        $this->get_value($issueid);
         $str = '';
-        $str .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'element'.$this->name, 'value' => format_string($this->value)));
-        $str .= html_writer::empty_tag('input', array('type' => 'text', 'name' => 'element'.$this->name.'_disabled', 'value' => format_string($this->value), 'disabled' => 'disabled', 'size' => 120));
+        $attrs = array('type' => 'hidden', 'name' => 'element'.$this->name, 'value' => format_string($this->value));
+        $str .= html_writer::empty_tag('input', $attrs);
+        $attrs = array('type' => 'text',
+                       'name' => 'element'.$this->name.'_disabled',
+                       'value' => format_string($this->value),
+                       'disabled' => 'disabled', 'size' => 120);
+        $str .= html_writer::empty_tag('input', $attrs);
         return $str;
     }
 
@@ -57,16 +61,18 @@ class constantelement extends trackerelement {
         $mform->setDefault("element{$this->name}", 'name');
         $mform->setType("element{$this->name}", PARAM_URL);
 
-        $mform->addElement('text', "element{$this->name}shadow", get_string('autourl', 'tracker'));
-        $mform->setType("element{$this->name}shadow", PARAM_URL);
-        $mform->disabledIf("element{$this->name}shadow", "element{$this->name}");
-        $mform->setDefault("element{$this->name}shadow", $_SERVER['HTTP_REFERER']);
+        if ($this->active) {
+            $mform->addElement('text', "element{$this->name}shadow", get_string('autourl', 'tracker'));
+            $mform->setType("element{$this->name}shadow", PARAM_URL);
+            $mform->disabledIf("element{$this->name}shadow", "element{$this->name}");
+            $mform->setDefault("element{$this->name}shadow", $_SERVER['HTTP_REFERER']);
+        }
     }
 
     function set_data(&$defaults, $issueid = 0) {
         if ($issueid) {
             $elementname = "element{$this->name}";
-            $defaults->$elementname = $this->getvalue($issueid);
+            $defaults->$elementname = $this->get_value($issueid);
         } else {
             $defaults->$elementname = $_SERVER['HTTP_REFERER'];
         }
@@ -75,10 +81,11 @@ class constantelement extends trackerelement {
     /**
      * updates or creates the element instance for this issue
      */
-    function formprocess(&$data) {
+    function form_process(&$data) {
         global $DB;
 
-        if (!$attribute = $DB->get_record('tracker_issueattribute', array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid))) {
+        $params = array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid);
+        if (!$attribute = $DB->get_record('tracker_issueattribute', $params)) {
             $attribute = new StdClass();
             $attribute->trackerid = $data->trackerid;
             $attribute->issueid = $data->issueid;
@@ -86,8 +93,12 @@ class constantelement extends trackerelement {
         }
 
         $elmname = 'element'.$this->name;
-        $data->$elmname = required_param($elmname, PARAM_TEXT);
-        $attribute->elementitemid = $data->$elmname; // in this case true value in element id
+        if ($this->mandatory && !$this->private) {
+            $data->$elmname = required_param($elmname, PARAM_TEXT);
+        } else {
+            $data->$elmname = optional_param($elmname, '', PARAM_TEXT);
+        }
+        $attribute->elementitemid = $data->$elmname; // In this case true value in element id.
         $attribute->timemodified = time();
 
         if (!isset($attribute->id)) {

@@ -99,7 +99,7 @@ if ($action == 'createelement') {
         $form->format = $element->format;
         $form->shared = ($element->course == 0) ;
         $form->action = 'doupdateelement';
-        include($CFG->dirroot.'/mod/classes/trackercategorytype/editelement.html');
+        echo $renderer->edi_element($cm, $form);
     } else {
         print_error('errorinvalidelementid', 'tracker');
     }
@@ -208,7 +208,7 @@ if ($action == 'submitelementoption') {
     $element->optionlistview($cm);
     $caption = get_string('addanoption', 'tracker');
     echo $OUTPUT->heading($caption . $OUTPUT->help_icon('options', 'tracker', false));
-    include($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editoptionform.html');
+    echo $renderer->edit_option_form($cm, $form, 'submit', @$errors);
     return -1;
 }
 
@@ -224,7 +224,7 @@ if ($action == 'viewelementoptions') {
         $element = tracker_getelement($form->elementid);
         $element->optionlistview($cm);
         echo $OUTPUT->heading(get_string('addanoption', 'tracker'));
-        include($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editoptionform.html');
+        echo $renderer->edit_option_form($cm, $form, 'submit', @$errors);
     } else {
         error("Cannot view element options for elementid:" . $form->elementid);
     }
@@ -262,7 +262,7 @@ if ($action == 'deleteelementoption') {
     $element->optionlistview($cm);
     $caption = get_string('addanoption', 'tracker');
     echo $OUTPUT->heading($caption . $OUTPUT->help_icon('options', 'tracker', false));
-    include($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editoptionform.html');
+    echo $renderer->edit_option_form($cm, $form, 'submit', @$errors);
     return -1;
 }
 
@@ -277,7 +277,7 @@ if ($action == 'editelementoption') {
     $form->type = $element->type;
     $form->name = $option->name;
     $form->description = $option->description;
-    include($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/updateoptionform.html');
+    echo $renderer->update_option_form($cm, $form, 'update', @$errors);
     return -1;
 }
 
@@ -323,23 +323,22 @@ if ($action == 'updateelementoption') {
         $update->name = $form->name;
         $update->description = $form->description;
         $update->format = $form->format;
-        if ($DB->update_record('tracker_elementitem', $update)) {
-            echo $OUTPUT->heading(get_string('editoptions', 'tracker'));
-            $element = tracker_getelement($form->elementid);
-            $element->optionlistview($cm);
-            echo $OUTPUT->heading(get_string('addanoption', 'tracker'));
-            include($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editoptionform.html');
-        } else {
-            error ('Cannot update the element option:"' . $element->options[$form->optionid]->name . '" (id:' . $form->optionid . ') because it is currently being used as a attribute for an issue', 'view.php?id={$cm->id}&amp;what=viewelementoptions&amp;elementid=' . $form->elementid);
-        }
+
+        $DB->update_record('tracker_elementitem', $update);
+
+        echo $OUTPUT->heading(get_string('editoptions', 'tracker'));
+        $element = tracker_getelement($form->elementid);
+        $element->optionlistview($cm);
+        echo $OUTPUT->heading(get_string('addanoption', 'tracker'));
+        echo $renderer->edit_option_form($cm, $form, 'submit', @$errors);
     } else {
-        // print errors
+        // Print errors.
         $errorstr = '';
         foreach ($errors as $anError) {
             $errorstrs[] = $anError->message;
         }
         echo $OUTPUT->box(implode("<br/>", $errorstrs), 'center', '70%', '', 5, 'errorbox');
-        include($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/updateoptionform.html');
+        echo $renderer->edit_option_form($cm, $form, 'submit', @$errors);
     }
     return -1;
 }
@@ -373,7 +372,7 @@ if ($action == 'moveelementoptionup') {
     $element->optionlistview($cm);
     $caption = get_string('addanoption', 'tracker');
     echo $OUTPUT->heading($caption . $OUTPUT->help_icon('options', 'tracker', false));
-    include($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editoptionform.html');
+    echo $renderer->edit_option_form($cm, $form, 'submit', @$errors);
     return -1;
 }
 
@@ -402,7 +401,7 @@ if ($action == 'moveelementoptiondown') {
     $element->optionlistview($cm);
     $caption = get_string('addanoption', 'tracker');
     echo $OUTPUT->heading($caption . $OUTPUT->help_icon('options', 'tracker', false));
-    include($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/editoptionform.html');
+    echo $renderer->edit_option_form($cm, $form, 'submit', @$errors);
     return -1;
 }
 

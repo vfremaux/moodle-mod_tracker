@@ -12,25 +12,18 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package mod_tracker
- * @category mod
- * @author Valery Fremaux / 1.8
+ * @package     mod_tracker
+ * @category    mod
+ * @author      Clifford Tham, Valery Fremaux > 1.8
+ *
+ * Summary for administrators
  */
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/mod/tracker/forms/tracker_element_form_base.php');
-
-class tracker_element_radiohoriz_form extends tracker_moodle_form {
-
-    public function definition() {
-        $this->start_form();
-        $this->end_form();
-    }
-
-    public function validation($data, $files) {
-        return parent::validation($data, $files);
-    }
-}
+$renderer = $PAGE->get_renderer('tracker', 'admin');
+$renderer->init($tracker, $cm);
+echo $renderer->summary();

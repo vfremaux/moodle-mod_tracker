@@ -45,7 +45,7 @@ if ($action == 'savequery') {
     $form->fields = serialize($fields); // Serialize for passthru
     $form->action = 'dosaveasquery';
     $form->description = tracker_printsearchfields($fields);
-    include $CFG->dirroot.'/mod/tracker/views/addaquery.html';
+    echo $renderer->add_query_form($cm, $form);
     return -1;
 
 } else if ($action == 'dosaveasquery') {
@@ -150,9 +150,7 @@ if ($action == 'savequery') {
     // Unregister all my watches ******************************************************************.
 
     $userid = required_param('userid', PARAM_INT);
-    if (! $DB->delete_records ('tracker_issuecc', array('trackerid' => $tracker->id, 'userid' => $userid))) {
-        print_error('errorcannotdeletecarboncopies', 'tracker', $userid);
-    }
+    $DB->delete_records ('tracker_issuecc', array('trackerid' => $tracker->id, 'userid' => $userid));
 
 } else if ($action == 'editwatch') {
 
@@ -171,7 +169,8 @@ if ($action == 'savequery') {
 } else if ($action == 'updatewatch') {
 
     // Update a watchers config for an issue *****************************************************.
-
+    // Transfered to Ajax service receiver.
+    /*
     $cc = new StdClass();
     $cc->id = required_param('ccid', PARAM_INT);
     $open = optional_param('open', '', PARAM_INT);
@@ -211,34 +210,8 @@ if ($action == 'savequery') {
     if (!$DB->update_record('tracker_issuecc', $cc)) {
         print_error('errorcannotupdatewatcher', 'tracker', $url.'&amp;view=profile');
     }
+    */
 } else if ($action == 'saveprefs') {
-
-    // Saves the user's preferences *************************************************************.
-
-    $open = optional_param('open', 1, PARAM_INT);
-    $resolving = optional_param('resolving', 1, PARAM_INT);
-    $waiting = optional_param('waiting', 1, PARAM_INT);
-    $testing = optional_param('testing', 1, PARAM_INT);
-    $published = optional_param('published', 1, PARAM_INT);
-    $resolved = optional_param('resolved', 1, PARAM_INT);
-    $abandonned = optional_param('abandonned', 1, PARAM_INT);
-    $oncomment = optional_param('oncomment', 1, PARAM_INT);
-    $pref = new StdClass();
-    $pref->trackerid = $tracker->id;
-    $pref->userid = $USER->id;
-    $pref->name = 'eventmask';
-    $pref->value = $open * EVENT_OPEN + $resolving * EVENT_RESOLVING + $waiting * EVENT_WAITING + $resolved * EVENT_RESOLVED;
-    $pref->value += $abandonned * EVENT_ABANDONNED + $oncomment * ON_COMMENT + $testing * EVENT_TESTING;
-    $pref->value += $published * EVENT_PUBLISHED;
-    $params = array('trackerid' => $tracker->id, 'userid' => $USER->id, 'name' => 'eventmask');
-    if (!$oldpref = $DB->get_record('tracker_preferences', $params)) {
-        if (!$DB->insert_record('tracker_preferences', $pref)) {
-            print_error('errorcannotsaveprefs', 'tracker', $url.'&amp;view=profile');
-        }
-    } else {
-        $pref->id = $oldpref->id;
-        if (!$DB->update_record('tracker_preferences', $pref)) {
-            print_error('errorcannotupdateprefs', 'tracker', $url.'&amp;view=profile');
-        }
-    }
+    assert(1);
+    // Deferred to mypreferences.php view.
 }

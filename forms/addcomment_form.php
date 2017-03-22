@@ -16,7 +16,7 @@
 
 require_once($CFG->libdir.'/formslib.php');
 
-class AddCommentForm extends moodleform {
+class addedit_comment_form extends moodleform {
 
     var $editoroptions;
 
