@@ -18,7 +18,6 @@
  * Define all the backup steps that will be used by the backup_vodclic_activity_task
  *
  * @package     mod_tracker
- * @subpackage  tracker
  * @copyright   2010 onwards Valery Fremaux {valery.fremaux@club-internet.fr}
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -142,12 +141,13 @@ class backup_tracker_activity_structure_step extends backup_activity_structure_s
 
         if ($userinfo) {
             $issue->set_source_table('tracker_issue', array('trackerid' => backup::VAR_PARENTID));
-            $attrib->set_source_table('tracker_issueattribute', array('trackerid' => backup::VAR_ACTIVITYID, 'issueid' => backup::VAR_PARENTID));
-            $cc->set_source_table('tracker_issuecc', array('trackerid' => backup::VAR_ACTIVITYID, 'issueid' => backup::VAR_PARENTID));
-            $comment->set_source_table('tracker_issuecomment', array('trackerid' => backup::VAR_ACTIVITYID, 'issueid' => backup::VAR_PARENTID));
+            $params = array('trackerid' => backup::VAR_ACTIVITYID, 'issueid' => backup::VAR_PARENTID);
+            $attrib->set_source_table('tracker_issueattribute', $params);
+            $cc->set_source_table('tracker_issuecc', $params);
+            $comment->set_source_table('tracker_issuecomment', $params);
             $dependancy->set_source_table('tracker_issuedependancy', array('trackerid' => backup::VAR_ACTIVITYID));
-            $ownership->set_source_table('tracker_issueownership', array('trackerid' => backup::VAR_ACTIVITYID, 'issueid' => backup::VAR_PARENTID));
-            $state->set_source_table('tracker_state_change', array('trackerid' => backup::VAR_ACTIVITYID, 'issueid' => backup::VAR_PARENTID));
+            $ownership->set_source_table('tracker_issueownership', $params);
+            $state->set_source_table('tracker_state_change', $params);
             $query->set_source_table('tracker_query', array('trackerid' => backup::VAR_ACTIVITYID));
             $preference->set_source_table('tracker_preferences', array('trackerid' => backup::VAR_ACTIVITYID));
         }

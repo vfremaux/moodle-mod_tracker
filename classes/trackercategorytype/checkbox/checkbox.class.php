@@ -62,7 +62,7 @@ class checkboxelement extends trackerelement {
 
         $this->get_value($issueid); // Loads $this->value with current value for this issue.
         if (!empty($this->value)) {
-            $values = explode(',',$this->value);
+            $values = explode(',', $this->value);
             foreach ($values as $selected) {
                 $str .= format_string($this->options[$selected]->description) . "<br/>\n";
             }

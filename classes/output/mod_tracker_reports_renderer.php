@@ -106,13 +106,15 @@ class mod_tracker_reports_renderer extends \plugin_renderer_base {
                 'color' => '#000080',
                 ),
             'legend' => array(
-                'show' => true, 
-                'location' => 'e', 
+                'show' => true,
+                'location' => 'e',
                 'placement' => 'outsideGrid',
                 'showSwatch' => true,
                 'marginLeft' => '10px',
                 'border' => '1px solid #808080',
-                'labels' => array(get_string('activeplural', 'tracker'), get_string('intest', 'tracker'), get_string('resolvedplural2', 'tracker')),
+                'labels' => array(get_string('activeplural', 'tracker'),
+                                  get_string('intest', 'tracker'),
+                                  get_string('resolvedplural2', 'tracker')),
             ),
             'axesDefaults' => array('labelRenderer' => '$.jqplot.CanvasAxisLabelRenderer'),
             'axes' => array(
@@ -209,7 +211,7 @@ class mod_tracker_reports_renderer extends \plugin_renderer_base {
         $str .= '<td width="40%" align="left" class="status-">'.$statusstr.'</td>';
         $this->dateiter->reset();
         $current = $this->dateiter->current();
-        while (strcmp($current, $this->highest) <= 0){
+        while (strcmp($current, $this->highest) <= 0) {
             $str .= '<td align="right" width="'.$this->colwidth.'%" class="c0 header"><b>';
             $new = 0 + @$ticketsbymonth[$current]['sum'];
             $valueclass = ($new == 0) ? 'nullclass' : '';
@@ -373,7 +375,7 @@ class mod_tracker_reports_renderer extends \plugin_renderer_base {
         } else {
             $str = '<table width="95%" class="generaltable">';
             $line = 0;
-            foreach($statsbyassignee as $r){
+            foreach($statsbyassignee as $r) {
                 if (empty($r->name)) {
                     $r->name = get_string('unassigned', 'tracker');
                 }

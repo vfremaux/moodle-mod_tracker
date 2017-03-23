@@ -1,8 +1,12 @@
+/**
+ *
+ */
+// jshint unused:false, undef:false
 
-function togglehistory(){
+function togglehistory() {
     historydiv = document.getElementById("issuehistory");
     historylink = document.getElementById("togglehistorylink");
-    if (historydiv.className == "visiblediv"){
+    if (historydiv.className === "visiblediv") {
         historydiv.className = "hiddendiv";
         historylink.innerText = showhistory;
     } else {
@@ -11,10 +15,10 @@ function togglehistory(){
     }
 }
 
-function toggleccs(){
+function toggleccs() {
     ccsdiv = document.getElementById("issueccs");
     ccslink = document.getElementById("toggleccslink");
-    if (ccsdiv.className == "visiblediv"){
+    if (ccsdiv.className === "visiblediv") {
         ccsdiv.className = "hiddendiv";
         ccslink.innerText = showccs;
     }
@@ -24,10 +28,10 @@ function toggleccs(){
     }
 }
 
-function toggledependancies(){
+function toggledependancies() {
     dependanciesdiv = document.getElementById("issuedependancytrees");
     dependancieslink = document.getElementById("toggledependancieslink");
-    if (dependanciesdiv.className == "visiblediv"){
+    if (dependanciesdiv.className === "visiblediv") {
         dependanciesdiv.className = "hiddendiv";
         dependancieslink.innerText = showdependancies;
     } else {
@@ -36,10 +40,10 @@ function toggledependancies(){
     }
 }
 
-function togglecomments(){
+function togglecomments() {
     commentdiv = document.getElementById("issuecomments");
     commentlink = document.getElementById("togglecommentlink");
-    if (commentdiv.className == "visiblediv comments"){
+    if (commentdiv.className === "visiblediv comments"){
         commentdiv.className = "hiddendiv comments";
         commentlink.innerText = showcomments;
     } else {

@@ -59,7 +59,8 @@ class edit_watch_form extends moodleform {
         $notresolved = ($form->events & EVENT_RESOLVED) ? '' : 'checked="checked"';
         $notabandonned = ($form->events & EVENT_ABANDONNED) ? '' : 'checked="checked"';
 
-        $mform->addElement('static', 'issuename', get_string('issuename', 'tracker'), "$tracker->ticketprefix.$form->issueid - $form->summary");
+        $html = "$tracker->ticketprefix.$form->issueid - $form->summary";
+        $mform->addElement('static', 'issuename', get_string('issuename', 'tracker'), $html);
 
         $group = array();
         $group[] = $mform->createElement('radio', 'open', get_string('yes'), 1);

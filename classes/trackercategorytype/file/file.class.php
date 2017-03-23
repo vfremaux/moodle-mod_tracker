@@ -163,7 +163,7 @@ class fileelement extends trackerelement {
     /**
      * used for post processing form values, or attached files management
      */
-    function form_process(&$data) {
+    public function form_process(&$data) {
         global $COURSE, $USER, $DB;
 
         $params = array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid);

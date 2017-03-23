@@ -17,8 +17,8 @@
 /**
  * Define all the restore steps that will be used by the restore_url_activity_task
  *
- * @package     mod_tracker
- * @category    mod
+ * @package     mod
+ * @subpackage  tracker
  * @copyright   2010 onwards Valery Fremaux (valery.freamux@club-internet.fr)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -38,7 +38,8 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         $paths[] = $tracker;
         $elements = new restore_path_element('tracker_element', '/activity/tracker/elements/element');
         $paths[] = $elements;
-        $elementitem = new restore_path_element('tracker_elementitem', '/activity/tracker/elements/element/elementitems/elementitem');
+        $path = '/activity/tracker/elements/element/elementitems/elementitem';
+        $elementitem = new restore_path_element('tracker_elementitem', $path);
         $paths[] = $elementitem;
         $usedelement = new restore_path_element('tracker_usedelement', '/activity/tracker/usedelements/usedelement');
         $paths[] = $usedelement;
@@ -82,7 +83,7 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
             foreach ($used as $u) {
                 $u->elementid = $this->get_mappingid('tracker_element', $u->elementid);
                 $DB->update_record('tracker_elementused', $u);
-             }
+            }
         }
 
         // Add tracker related files, no need to match by itemname (just internally handled context).
@@ -99,7 +100,7 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
 
         // The data is actually inserted into the database later in inform_new_usage_id.
         $newitemid = $DB->insert_record('tracker_element', $data);
-        $this->set_mapping('tracker_element', $oldid, $newitemid, false); // Has no related files
+        $this->set_mapping('tracker_element', $oldid, $newitemid, false); // Has no related files.
     }
 
     protected function process_tracker_elementitem($data) {
@@ -124,7 +125,7 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         $data->trackerid = $this->get_new_parentid('tracker');
         $data->canbemodifiedby = $this->get_mappingid('user', $data->canbemodifiedby);
 
-        /**
+        /*
          * If the used element addresses a local element backuped in the tracker
          * remap the element and store it. Otherwise forget it.
          */
@@ -174,12 +175,12 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
         if ($data->elementid) {
             $data->elementitemid = $this->get_mappingid('tracker_elementitem', $data->elementitemid);
             $data->timemodified = $this->apply_date_offset($data->timemodified);
-    
+
             // The data is actually inserted into the database later in inform_new_usage_id.
             $newitemid = $DB->insert_record('tracker_issueattribute', $data);
             // Needs no mapping as terminal record.
             $this->set_mapping('tracker_issueattribute', $oldid, $newitemid, false); // Has no related files.
-    
+
             $this->add_related_files('mod_tracker', 'issueattribute', 'tracker_issueattribute', null, $oldid);
         }
     }
@@ -212,7 +213,7 @@ class restore_tracker_activity_structure_step extends restore_activity_structure
 
         // The data is actually inserted into the database later in inform_new_usage_id.
         $newitemid = $DB->insert_record('tracker_issuecomment', $data);
-        // needs no mapping as terminal record.
+        // Needs no mapping as terminal record.
         $this->set_mapping('tracker_issuecomment', $oldid, $newitemid, false); // Has no related files.
 
         $this->add_related_files('mod_tracker', 'issuecomment', 'tracker_issuecomment', null, $oldid);

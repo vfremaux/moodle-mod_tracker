@@ -22,7 +22,6 @@
  *
  * Prints prints user's profile and stats
  */
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/lib/formslib.php');

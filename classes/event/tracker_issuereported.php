@@ -17,29 +17,17 @@
 /**
  * This file contains an event for when a feedback activity is viewed.
  *
- * @package    mod_tracker
- * @author Valery Fremaux
- * @copyright  2014 MyLearningFactory (http://www.mylearningfactory.com)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     mod_tracker
+ * @author      Valery Fremaux
+ * @copyright   2014 MyLearningFactory (http://www.mylearningfactory.com)
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace mod_tracker\event;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Event for when a tracker activity is commented.
- *
- * @property-read array $other {
- *      Extra information about event.
- *
- *      @type int anonymous if tracker is anonymous.
- *      @type int cmid course module id.
- * }
- *
- * @package    mod_tracker
- * @since      Moodle 2.7
- * @copyright  2013 Ankit Agarwal
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class tracker_issuereported extends \core\event\base {
 
@@ -64,8 +52,9 @@ class tracker_issuereported extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return 'The ' . $this->other['modulename'] . ' instance ' . $this->other['instanceid'] .
-                ' had the issue '.$this->other['issueid'].' commented by ' . $this->userid;
+        $desc = 'The '.$this->other['modulename'].' instance '.$this->other['instanceid'];
+        $desc .= ' had the issue '.$this->other['issueid'].' commented by '.$this->userid;
+        return $desc;
     }
 
     /**
@@ -73,7 +62,8 @@ class tracker_issuereported extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/' . $this->other['modulename'] . '/view.php', array('id' => $this->objectid, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $this->other['issueid']));
+        $params = array('id' => $this->objectid, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $this->other['issueid']);
+        return new \moodle_url('/mod/'.$this->other['modulename'].'/view.php', $params);
     }
 
     /**
@@ -106,8 +96,10 @@ class tracker_issuereported extends \core\event\base {
      * @return array of parameters to be passed to legacy add_to_log() function.
      */
     protected function get_legacy_logdata() {
-        $log1 = array($this->courseid, "course", "commentissue", "../mod/" . $this->other['modulename'] . "/view.php?id=" .
-                $this->objectid.'&amp;view=view&amp;screen=viewanissue&amp;issueid='.$this->other['issueid'], $this->other['modulename'] . " " . $this->other['instanceid']);
+        $logurl = '../mod/'.$this->other['modulename'].'/view.php?id=';
+        $logurl .= $this->objectid.'&amp;view=view&amp;screen=viewanissue&amp;issueid='.$this->other['issueid'];
+        $info = $this->other['modulename'].' '.$this->other['instanceid'];
+        $log1 = array($this->courseid, "course", "commentissue",  $logurl, $info);
         return array($log1);
     }
 

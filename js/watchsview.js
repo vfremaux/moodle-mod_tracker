@@ -1,6 +1,7 @@
 /**
  *
  */
+// jshint undef:false, unused:false
 
 function updatewatchs(cmid, watchid, event, state, sesskey) {
 

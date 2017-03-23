@@ -12,12 +12,12 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @package mod_tracker
  * @category mod
- * @author Valery Fremaux / 1.8
+ * @author Valery Fremaux
  *
  * A class implementing a hidden/labelled element that captures the referer url
  */
@@ -66,17 +66,17 @@ $charwidth = $ttfbox[2];
 $width = $charcount * $charwidth;
 
 $scale = 0.3;
-$elipsesize = intval((($width + $height)/2) / 5);
-$factorX = intval($width * $scale);
-$factorY = intval($height * $scale);
+$elipsesize = intval((($width + $height) / 2) / 5);
+$factorx = intval($width * $scale);
+$factory = intval($height * $scale);
 
 /*
  * I split the colors in three ranges
  * given are the max-min-values
  * $colors = array(80, 155, 255);
  */
-$colors = array(array(0,40),array(50,200),array(210,255));
-list($col_text1, $col_el, $col_text2) = $colors;
+$colors = array(array(0, 40), array(50, 200), array(210, 255));
+list($coltext1, $colel, $coltext2) = $colors;
 
 /*
  * if the text is in color_1 so the elipses can be in color_2 or color_3
@@ -88,7 +88,7 @@ $textcolnum = rand(1, 3);
 // Create the numbers to print out.
 $nums = array();
 for ($i = 0; $i < $charcount; $i++) {
-    $nums[] = rand(0,9); //Ziffern von 0-
+    $nums[] = rand(0, 9); // Randomizes some digits.
 }
 
 /*
@@ -96,14 +96,14 @@ for ($i = 0; $i < $charcount; $i++) {
  * we need th colors for that
  */
 $properties = array();
-for ($x = 0; $x < $factorX; $x++) {
-    for ($y = 0; $y < $factorY; $y++) {
+for ($x = 0; $x < $factorx; $x++) {
+    for ($y = 0; $y < $factory; $y++) {
         $propobj = null;
         $propobj->x = intval($x / $scale);
         $propobj->y = intval($y / $scale);
-        $propobj->red = get_random_color($col_el[0], $col_el[1]);
-        $propobj->green = get_random_color($col_el[0], $col_el[1]);
-        $propobj->blue = get_random_color($col_el[0], $col_el[1]);
+        $propobj->red = get_random_color($colel[0], $colel[1]);
+        $propobj->green = get_random_color($colel[0], $colel[1]);
+        $propobj->blue = get_random_color($colel[0], $colel[1]);
         $properties[] = $propobj;
     }
 }
@@ -112,26 +112,26 @@ shuffle($properties);
 // Create a blank image.
 $image = imagecreatetruecolor($width, $height);
 $bg = imagecolorallocate($image, 0, 0, 0);
-for ($i = 0; $i < ($factorX * $factorY); $i++) {
+for ($i = 0; $i < ($factorx * $factory); $i++) {
     $propobj = $properties[$i];
     // Choose a color for the ellipse.
-    $col_ellipse = imagecolorallocate($image, $propobj->red, $propobj->green, $propobj->blue);
+    $colellipse = imagecolorallocate($image, $propobj->red, $propobj->green, $propobj->blue);
     // Draw the white ellipse.
-    imagefilledellipse($image, $propobj->x, $propobj->y, $elipsesize, $elipsesize, $col_ellipse);
+    imagefilledellipse($image, $propobj->x, $propobj->y, $elipsesize, $elipsesize, $colellipse);
 }
 
 $checkchar = '';
 for ($i = 0; $i < $charcount; $i++) {
-    $colnum = rand(1,2);
+    $colnum = rand(1, 2);
     $textcol->red = get_random_color(${'col_text'.$colnum}[0], ${'col_text'.$colnum}[1]);
     $textcol->green = get_random_color(${'col_text'.$colnum}[0], ${'col_text'.$colnum}[1]);
     $textcol->blue = get_random_color(${'col_text'.$colnum}[0], ${'col_text'.$colnum}[1]);
-    $color_text = imagecolorallocate($image, $textcol->red, $textcol->green, $textcol->blue);
-    $angle_text = rand(-20, 20);
-    $left_text = $i * $charwidth;
+    $colortext = imagecolorallocate($image, $textcol->red, $textcol->green, $textcol->blue);
+    $angletext = rand(-20, 20);
+    $lefttext = $i * $charwidth;
     $text = $nums[$i];
     $checkchar .= $text;
-    ImageTTFText ($image, 30, $angle_text, $left_text, 35, $color_text, $fontfile, $text);
+    ImageTTFText($image, 30, $angletext, $lefttext, 35, $colortext, $fontfile, $text);
 }
 
 $SESSION->contact_form[$id]->captcha->checkchar = $checkchar;

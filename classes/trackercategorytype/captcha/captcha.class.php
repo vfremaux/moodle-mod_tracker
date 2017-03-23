@@ -28,11 +28,8 @@ require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelem
 
 class captchaelement extends trackerelement {
 
-    public function __construct(&$tracker, $id = null, $used = false) {
-        parent::__construct($tracker, $id, $used);
-    }
-
     public function has_mandatory_option() {
+        assert(1);
         return false;
     }
 
@@ -43,7 +40,8 @@ class captchaelement extends trackerelement {
     public function edit($issueid = 0) {
         $this->get_value($issueid);
         $str = '';
-        $str .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'element'.$this->name, 'value' => format_string($this->value)));
+        $attrs = array('type' => 'hidden', 'name' => 'element'.$this->name, 'value' => format_string($this->value));
+        $str .= html_writer::empty_tag('input', $attrs);
         return $str;
     }
 
@@ -61,7 +59,8 @@ class captchaelement extends trackerelement {
         $captcharec->length = 6;
         $SESSION->tracker[$this->tracker->id]->captcha = $captcharec; // TODO parametrize this from global settings.
         $cm = get_coursemodule_from_instance('tracker', $this->tracker->id);
-        $generatorurl = new moodle_url('/mod/tracker/classes/trackercategorytype/captcha/print_captcha.php', array('id' => $cm->id));
+        $params = array('id' => $cm->id);
+        $generatorurl = new moodle_url('/mod/tracker/classes/trackercategorytype/captcha/print_captcha.php', $params);
         $group[] = &$mform->createElement('html', '<img src="'.$generatorurl.'">');
 
         $mform->addGroup($group, 'captchagroup', get_string('captcha', 'tracker'), false, array(''), false);

@@ -162,10 +162,12 @@ class mod_tracker_admin_renderer extends \plugin_renderer_base {
                 } else {
                     if ($element->active) {
                         $activestr = get_string('isactive', 'tracker');
-                        $actions .= '&nbsp;<img title="'.$activestr.'" class="dimmed" src="'.$this->output->pix_url('/t/hide', 'core').'" />';
+                        $pixurl = $this->output->pix_url('/t/hide', 'core');
+                        $actions .= '&nbsp;<img title="'.$activestr.'" class="dimmed" src="'.$pixurl.'" />';
                     } else {
                         $activestr = get_string('isinactive', 'tracker');
-                        $actions .= '&nbsp;<img title="'.$activestr.'" class="dimmed" src="'.$this->output->pix_url('/t/show', 'core').'" />';
+                        $pixurl = $this->output->pix_url('/t/show', 'core');
+                        $actions .= '&nbsp;<img title="'.$activestr.'" class="dimmed" src="'.$pixurl.'" />';
                     }
                 }
 
@@ -190,10 +192,12 @@ class mod_tracker_admin_renderer extends \plugin_renderer_base {
                 } else {
                     if ($element->mandatory) {
                         $mandatorystr = get_string('ismandatory', 'tracker');
-                        $actions .= '&nbsp;<img title="'.$mandatorystr.'" src="'.$this->output->pix_url('notempty', 'tracker').'" />';
+                        $pixurl = $this->output->pix_url('notempty', 'tracker');
+                        $actions .= '&nbsp;<img title="'.$mandatorystr.'" src="'.$pixurl.'" />';
                     } else {
                         $mandatorystr = get_string('isoptional', 'tracker');
-                        $actions .= '&nbsp;<img title="'.$mandatorystr.'" src="'.$this->output->pix_url('empty', 'tracker').'" />';
+                        $pixurl = $this->output->pix_url('empty', 'tracker');
+                        $actions .= '&nbsp;<img title="'.$mandatorystr.'" src="'.$pixurl.'" />';
                     }
                 }
 
@@ -329,7 +333,7 @@ class mod_tracker_admin_renderer extends \plugin_renderer_base {
                 $url = new moodle_url('/mod/tracker/view.php', $params);
                 $pix = '<img src="'.$this->output->pix_url('t/delete', 'core') .'" />';
                 $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('delete').'">'.$pix.'</a>';
-        
+
                 $local = '';
                 if ($element->course == $COURSE->id) {
                     $local = '<img src="'.$this->output->pix_url('i/course', 'core') .'" />';
@@ -404,14 +408,17 @@ class mod_tracker_admin_renderer extends \plugin_renderer_base {
         $tmp = '';
         if (!empty($elements)) {
             $keys = array_keys($elements);
-            for ($i = 0; $i < sizeof($keys); $i++) {
+            for ($i = 0; $i < count($keys); $i++) {
                 $element = $elements[$keys[$i]];
-                $params = array('id' => $this->cm->id, 'what' => 'editelement', 'elementid' => $element->id, 'type' => $element->type);
+                $params = array('id' => $this->cm->id,
+                                'what' => 'editelement',
+                                'elementid' => $element->id,
+                                'type' => $element->type);
                 $url = new moodle_url('/mod/tracker/view.php', $params);
                 $tmp .= '<a href="'.$url.'">';
                 $tmp .= format_string($element->description);
                 $tmp .= '</a>';
-                if ($i < sizeof ($keys) - 1) {
+                if ($i < count($keys) - 1) {
                     $tmp .= ', ';
                 }
             }
@@ -427,10 +434,10 @@ class mod_tracker_admin_renderer extends \plugin_renderer_base {
         $tmp = '';
         if (!empty($admins)) {
             $keys = array_keys($admins);
-            for ($j = 0; $j < sizeof($keys); $j++) {
+            for ($j = 0; $j < count($keys); $j++) {
                 $admin = $admins[$keys[$j]];
                 $tmp .= fullname($admin);
-                if ($j < sizeof ($keys) - 1) {
+                if ($j < count($keys) - 1) {
                     $tmp .= ', ';
                 }
             }
@@ -446,10 +453,10 @@ class mod_tracker_admin_renderer extends \plugin_renderer_base {
         $tmp = '';
         if (!empty($resolvers)) {
             $keys = array_keys($resolvers);
-            for ($j = 0; $j < sizeof($keys); $j++) {
+            for ($j = 0; $j < count($keys); $j++) {
                 $resolver = $resolvers[$keys[$j]];
                 $tmp .= fullname($resolver);
-                if ($j < sizeof ($keys) - 1) {
+                if ($j < count($keys) - 1) {
                     $tmp .= ', ';
                 }
             }
@@ -465,10 +472,10 @@ class mod_tracker_admin_renderer extends \plugin_renderer_base {
         $tmp = '';
         if (!empty($developers)) {
             $keys = array_keys($developers);
-            for ($j = 0; $j < sizeof($keys); $j++) {
+            for ($j = 0; $j < count($keys); $j++) {
                 $developer = $developers[$keys[$j]];
                 $tmp .= fullname($developer);
-                if ($j < sizeof ($keys) - 1) {
+                if ($j < count($keys) - 1) {
                     $tmp .= ', ';
                 }
             }

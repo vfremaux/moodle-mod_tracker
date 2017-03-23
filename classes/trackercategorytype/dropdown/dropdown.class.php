@@ -100,7 +100,7 @@ class dropdownelement extends trackerelement {
                         }
                     }
                 } else {
-                    $v = $values; // single value
+                    $v = $values; // Single value.
                     if (array_key_exists($v, $this->options)) {
                         // Check option still exists.
                         $defaults->$elementname = $v;

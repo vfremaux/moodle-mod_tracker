@@ -17,7 +17,8 @@
 $string['pluginname'] = 'Ticket Tracker/User support';
 $string['pluginadministration'] = 'Tracker administration';
 
-// Capabilities
+// Capabilities.
+
 $string['tracker:addinstance'] = 'Add a tracker';
 $string['tracker:canbecced'] = 'Can be choosen for cc';
 $string['tracker:comment'] = 'Comment issues';
@@ -483,21 +484,25 @@ tecnhical operation workflow, including operations on preprod test systems.
 * User support/Ticketting: Reporters usually have only access to the tickets they have posted and cannot access to the ticket browsing mode. Some states
 have been disabled, that are more commonly used for technical operations.
 
-* Task distribution: Reporters can have or not access to the whole distributed ticket list. Workers can only have access to the tickets they are asigned to
-through the "My work" screen. They will NOT have access to the browse function. some intermediate states have beed disabled for a simpler marking of task states.
+* Task distribution: Reporters can have or not access to the whole distributed ticket list. Workers can only have access to
+the tickets they are asigned to through the "My work" screen. They will NOT have access to the browse function. some intermediate
+states have beed disabled for a simpler marking of task states.
 
-* Customized: When customized, the activity editor can choose states and overrides to apply to the tracker. This is the most flexible setting, but needs a correct knowledge of Moodle roles and setting management.
+* Customized: When customized, the activity editor can choose states and overrides to apply to the tracker. This is the most
+flexible setting, but needs a correct knowledge of Moodle roles and setting management.
 
 ';
 
 $string['modulename_help'] = 'The Tracker activity allows tracking tickets for help, bug report, or also trackable activities in a course.
 
-The activity allows creating the tracking form with attributes elements from a list of configurable elements. Some elements can be shared at site
+The activity allows creating the tracking form with attributes elements from a list of configurable elements. Some elements
+can be shared at site
 level to be reused in other trackers.
 
 the ticket (or task) can be assigned for work to another user.
 
-The tracked ticket is a statefull ticket that sends state change notifications to any follower that has enabled notifications. A user can choose which state changes he tracks usually.
+The tracked ticket is a statefull ticket that sends state change notifications to any follower that has enabled notifications.
+A user can choose which state changes he tracks usually.
 
 Tickets can be chained in dependancy, so it may be easy to follow a cause/consequence ticket sequence.
 
@@ -509,15 +514,18 @@ Trackers can now be chained so that ticket can be moved between trackers.
 ';
 
 $string['elements_help'] = '
-Issue submission form can be customized by adding form elements. The "summary", "description", et "reportedby" fields are as default, but any additional qualifier can be added to the issue description.
+Issue submission form can be customized by adding form elements. The "summary", "description", et "reportedby" fields are as
+default, but any additional qualifier can be added to the issue description.
 
-Elements that can be added are "form elements" i.e. standard form widgets that can represent any qualifier or open description, such as radio buttons, checkboxes, dropdown, textfields or textareas.
+Elements that can be added are "form elements" i.e. standard form widgets that can represent any qualifier or open description, such
+as radio buttons, checkboxes, dropdown, textfields or textareas.
 
 Elements are set using the following properties:
 
 ### A name
 
-This name is the element identifier, technically speaking. It must be a token using alphanumeric chars and the _ character, without spaces or non printable chars. The name will not appear on the user interface.
+This name is the element identifier, technically speaking. It must be a token using alphanumeric chars and the _ character, without
+spaces or non printable chars. The name will not appear on the user interface.
 
 ### Description
 
@@ -547,17 +555,22 @@ You may define the order in which the options appear in the lists.
 Textfield and textarea elements do not have any options.';
 
 $string['ticketprefix_help'] = '
-This parameter allows defining a fixed prefix thatt will be prepended to the issue numerical identifier. This should allow better identification of a issue entry in documents, forum posts...
+This parameter allows defining a fixed prefix thatt will be prepended to the issue numerical identifier. This should allow better
+identification of a issue entry in documents, forum posts...
 ';
 
 $string['urgentquery_help'] = '
 Checking this checkbox will send a signal to developpers or tickets managers so your issue can be considered more quickly.
 
-Please consider although that there is no automated process using directly this variable. The acceptation of the emergency will be depending on how urgent support administrators have considered your demand.';
+Please consider although that there is no automated process using directly this variable. The acceptation of the emergency will
+be depending on how urgent support administrators have considered your demand.';
 
 $string['mods_help'] = '
-This module provides an administrator or technical operator a way to collect locally issues on a Moodle implementation. It may be used mainly as an overall system tool for Moodle administration and support to end users, but also can be used as any other module for student projects. It can be instanciated several times within a course space.
-The issue description form is fully customisable. The tracker administrator can add as many description he needs by adding form elements. The integrated search engine do ajust itself to this customization.';
+This module provides an administrator or technical operator a way to collect locally issues on a Moodle implementation. It
+may be used mainly as an overall system tool for Moodle administration and support to end users, but also can be used as any
+other module for student projects. It can be instanciated several times within a course space. The issue description form
+is fully customisable. The tracker administrator can add as many description he needs by adding form elements. The integrated
+search engine do ajust itself to this customization.';
 
 $string['defaultassignee_help'] = '
 You might require incoming tickets are preassigned to one of the available resolvers.
@@ -568,25 +581,29 @@ When enabled some roles will be able to comment issues.
 ';
 
 $string['allownotifications_help'] = '
-When enabled some state changes may result in sending notifications to users when user is watching an issue. Users can configure which event will notify them.
+When enabled some state changes may result in sending notifications to users when user is watching an issue. Users can
+configure which event will notify them.
 ';
 
 $string['strictworkflow_help'] = '
-When enabled, each specific internal role in tracker (reporter, developer, resolvers, manager) will only have access to his accessible states against his role.
+When enabled, each specific internal role in tracker (reporter, developer, resolvers, manager) will only have access to his
+accessible states against his role.
 ';
 
-$string['networkable_help'] = 'If enabled, this tracker will be openly exposed to remote site. Users from remote site will be able to post even if they have no local account. 
-a Mnet account will be created on the fly. This will though only be possible if tracker Mnet services are properly configurated each side.';
+$string['networkable_help'] = 'If enabled, this tracker will be openly exposed to remote site. Users from remote site will
+be able to post even if they have no local account. A Mnet account will be created on the fly. This will though only
+be possible if tracker Mnet services are properly configurated each side.';
 
 $string['failovertrackerurl_help'] = '
-Using tracker inside Moodle may not address situation where moodle itself is down or working improperly. When giving a failover tracker url, 
+Using tracker inside Moodle may not address situation where moodle itself is down or working improperly. When giving a failover tracker url,
 you provide users with an information about an alternate URL they can use in case of major desease. Users will be invited to bookmark the URL in their
 own data to get it when needed.
 ';
 
 $string['failovertrackerurl_tpl'] = '
-In case this tracker is not reachable or not available, you may post a signal into the <a href="{$a}">emergency tracker</a>. You should bookmark this URL
-to get the link available even if Moodle is down or not operable properly. 
+In case this tracker is not reachable or not available, you may post a signal into the <a href="{$a}">emergency tracker</a>.
+You should bookmark this URL
+to get the link available even if Moodle is down or not operable properly.
 ';
 
 $tring['addcomment_tpl'] = 'Course : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
@@ -605,7 +622,7 @@ $string['addcomment_html_tpl'] = '
 <b>Cours :</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br/>
 <b>Tracker :</b> <%%TRACKERNAME%%><br/>
 <hr/>
-<p><%%CONTRIBUTOR%%> added a comment about the ticket:<br/> 
+<p><%%CONTRIBUTOR%%> added a comment about the ticket:<br/>
 <%%ISSUE%%> / <%%SUMMARY%%></p>
 <hr/>
 <p><%%COMMENT%%></p>
@@ -631,7 +648,7 @@ Tracker: <%%NEWTRACKERNAME%%>
 
 Assignee is now:
 -------------------------------------
-has been reassigned to: <%%ASSIGNEDTO%%> 
+has been reassigned to: <%%ASSIGNEDTO%%>
 
 -------------------------------------
 URL for viewing the issue: <%%ISSUEURL%%>
@@ -644,7 +661,7 @@ Course: [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 Tracker: <%%TRACKERNAME%%>
 --------------------------------------
 Issue: <%%ISSUE%%> / <%%SUMMARY%%>
-has been reassigned to: <%%ASSIGNEDTO%%> 
+has been reassigned to: <%%ASSIGNEDTO%%>
 By: <%%BY%%>
 
 URL for viewing the issue: <%%ISSUEURL%%>

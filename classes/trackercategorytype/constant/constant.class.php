@@ -53,7 +53,7 @@ class constantelement extends trackerelement {
         return $str;
     }
 
-    function add_form_element(&$mform) {
+    public function add_form_element(&$mform) {
         $mform->addElement('header', "header{$this->name}", '');
         $mform->setExpanded("header{$this->name}");
 
@@ -69,7 +69,7 @@ class constantelement extends trackerelement {
         }
     }
 
-    function set_data(&$defaults, $issueid = 0) {
+    public function set_data(&$defaults, $issueid = 0) {
         if ($issueid) {
             $elementname = "element{$this->name}";
             $defaults->$elementname = $this->get_value($issueid);
@@ -81,7 +81,7 @@ class constantelement extends trackerelement {
     /**
      * updates or creates the element instance for this issue
      */
-    function form_process(&$data) {
+    public function form_process(&$data) {
         global $DB;
 
         $params = array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid);

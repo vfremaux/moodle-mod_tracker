@@ -19,8 +19,9 @@
  * @category    mod
  * @author Clifford Tham, Valery Fremaux > 1.8
  */
+defined('MOODLE_INTERNAL') || die());
 
-require_once $CFG->libdir.'/formslib.php';
+require_once($CFG->libdir.'/formslib.php');
 
 class TrackerIssueForm extends moodleform {
 
@@ -40,8 +41,8 @@ class TrackerIssueForm extends moodleform {
     protected $context;
 
     /**
-    * Dynamically defines the form using elements setup in tracker instance
-    */
+     * Dynamically defines the form using elements setup in tracker instance
+     */
     public function definition() {
         global $DB, $COURSE;
 
@@ -86,16 +87,13 @@ class TrackerIssueForm extends moodleform {
         $this->add_action_buttons();
     }
 
-    function validation($data, $files = null) {
-
-    }
-
-    function set_data($defaults) {
+    public function set_data($defaults) {
         global $COURSE;
 
         $defaults->description_editor['text'] = $defaults->description;
         $defaults->description_editor['format'] = $defaults->descriptionformat;
-        $defaults = file_prepare_standard_editor($defaults, 'description', $this->editoroptions, $this->context, 'mod_tracker', 'issuedescription', $defaults->issueid);
+        $defaults = file_prepare_standard_editor($defaults, 'description', $this->editoroptions, $this->context, 'mod_tracker',
+                                                 'issuedescription', $defaults->issueid);
 
         // something to prepare for each element ?
         if (!empty($this->elements)) {

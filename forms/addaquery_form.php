@@ -63,7 +63,7 @@ class add_query_form extends moodleform {
 
             $mform->addElement('select', 'reportedby', get_string('reportedby', 'tracker'), $this->_customdata['reporters']);
 
-            $mform->addElement('datetime', 'datereported', get_string('datereported', 'tracker');
+            $mform->addElement('datetime', 'datereported', get_string('datereported', 'tracker'));
 
             $mform->addElement('text', 'summary', get_string('summary', 'tracker'));
 

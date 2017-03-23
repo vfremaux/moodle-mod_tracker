@@ -62,7 +62,7 @@ class checkboxhorizelement extends trackerelement {
 
         $this->get_value($issueid); // Loads $this->value with current value for this issue.
         if (!empty($this->value)) {
-            $values = explode(',',$this->value);
+            $values = explode(',', $this->value);
             $choices = array();
             foreach ($values as $selected) {
                 $choices[] = format_string($this->options[$selected]->description);
@@ -100,7 +100,7 @@ class checkboxhorizelement extends trackerelement {
                         }
                     }
                 } else {
-                    $v = $values; // single value
+                    $v = $values; // Single value.
                     if (array_key_exists($v, $this->options)) {
                         // Check option still exists.
                         $elementname = "element{$this->name}{$option->id}";

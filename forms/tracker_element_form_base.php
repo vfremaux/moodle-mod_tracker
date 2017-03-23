@@ -27,7 +27,7 @@ require_once($CFG->libdir.'/formslib.php');
 
 abstract class tracker_moodle_form extends moodleform {
 
-    function start_form() {
+    public function start_form() {
         $mform = $this->_form;
 
         $mform->addElement('hidden', 'id');
@@ -48,7 +48,7 @@ abstract class tracker_moodle_form extends moodleform {
         $mform->addRule('description', null, 'required', null, 'client');
     }
 
-    function end_form() {
+    public function end_form() {
 
         $mform = $this->_form;
         $mform->addElement('advcheckbox', 'shared', get_string('sharethiselement', 'tracker'));
@@ -56,7 +56,7 @@ abstract class tracker_moodle_form extends moodleform {
         $this->add_action_buttons();
     }
 
-    function validation($data, $files) {
+    public function validation($data, $files) {
         return;
     }
 }

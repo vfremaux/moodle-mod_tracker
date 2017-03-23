@@ -54,7 +54,7 @@ class backup_tracker_activity_task extends backup_activity_task {
     static public function encode_content_links($content) {
         global $CFG;
 
-        $base = preg_quote($CFG->wwwroot,"/");
+        $base = preg_quote($CFG->wwwroot, '/');
 
         // Link to the list of trackers.
         $search = "/(".$base."\/mod\/tracker\/index.php\?id\=)([0-9]+)/";
