@@ -375,7 +375,7 @@ class mod_tracker_reports_renderer extends \plugin_renderer_base {
         } else {
             $str = '<table width="95%" class="generaltable">';
             $line = 0;
-            foreach($statsbyassignee as $r) {
+            foreach ($statsbyassignee as $r) {
                 if (empty($r->name)) {
                     $r->name = get_string('unassigned', 'tracker');
                 }

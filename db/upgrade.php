@@ -15,8 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 function xmldb_tracker_upgrade($oldversion=0) {
-// This function does anything necessary to upgrade
-// older versions to match current functionality
 
     global $CFG, $DB;
 
@@ -96,21 +94,21 @@ function xmldb_tracker_upgrade($oldversion=0) {
             $DB->insert_record('mnet_service2rpc', $rpcmap);
         }
 
-        // tracker savepoint reached
+        // Tracker savepoint reached.
         upgrade_mod_savepoint(true, 2008092400, 'tracker');
     }
 
     if ($result && $oldversion < 2008092602) {
 
-    // Define field supportmode to be added to tracker
+        // Define field supportmode to be added to tracker.
         $table = new xmldb_table('tracker');
         $field = new xmldb_field('supportmode');
         $field->set_attributes(XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'bugtracker', 'parent');
 
-    // Launch add field supportmode
+        // Launch add field supportmode.
         $dbman->add_field($table, $field);
 
-        // tracker savepoint reached
+        // Tracker savepoint reached.
         upgrade_mod_savepoint(true, 2008092602, 'tracker');
     }
 
@@ -180,7 +178,7 @@ function xmldb_tracker_upgrade($oldversion=0) {
 
     if ($result && $oldversion < 2010061000) {
 
-        // Define field defaultassignee to be added to tracker
+        // Define field defaultassignee to be added to tracker.
         $table = new xmldb_table('tracker');
         $field = new xmldb_field('defaultassignee');
         $field->set_attributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'supportmode');
@@ -210,7 +208,7 @@ function xmldb_tracker_upgrade($oldversion=0) {
 
     // Unconditionnally perform Moodle 1.9 => Moodle 2 if necessary for every upgrade.
 
-    // Rename description field to intro, and define field introformat to be added to tracker
+    // Rename description field to intro, and define field introformat to be added to tracker.
     $table = new xmldb_table('tracker');
     $introfield = new xmldb_field('description', XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'name');
     if ($dbman->field_exists($table, $introfield)) {
@@ -220,33 +218,16 @@ function xmldb_tracker_upgrade($oldversion=0) {
         $dbman->rename_field($table, $formatfield, 'introformat', false);
     }
 
-    // conditionally migrate to html format in intro
-    /*
-    // weird column text compare error....
-    if ($CFG->texteditors !== 'textarea') {
-        if ($trackers = $DB->get_records('tracker', array('introformat' => FORMAT_MOODLE),'', 'id, intro, introformat')) {
-            foreach ($trackers as $t) {
-                $t->intro       = text_to_html($t->intro, false, false, true);
-                $t->introformat = FORMAT_HTML;
-                $DB->update_record('tracker', $t);
-                upgrade_set_timeout();
-            }
-        }
-    }
-    */
-
-    // Moodle 2.x
-
     if ($result && $oldversion < 2013092200) {
 
-        // Define field subtrackers to be added to tracker
+        // Define field subtrackers to be added to tracker.
         $table = new xmldb_table('tracker_issue');
         $field = new xmldb_field('format', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'description');
         if ($dbman->field_exists($table, $field)) {
             $dbman->rename_field($table, $field, 'descriptionformat', false);
         }
 
-        // tracker savepoint reached
+        // Tracker savepoint reached.
         upgrade_mod_savepoint(true, 2013092200, 'tracker');
     }
 

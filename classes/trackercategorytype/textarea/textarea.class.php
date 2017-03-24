@@ -48,7 +48,7 @@ class textareaelement extends trackerelement{
     }
 
     public function view_query() {
-       echo '<input type="text" name="element'.$this->name.'" style="width:100%" />';
+        echo '<input type="text" name="element'.$this->name.'" style="width:100%" />';
     }
 
     public function add_form_element(&$mform) {

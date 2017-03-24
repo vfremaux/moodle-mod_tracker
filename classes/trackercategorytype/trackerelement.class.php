@@ -276,7 +276,7 @@ abstract class trackerelement {
      * what we need to knwo is the type of the element to call the adequate
      * constructor.
      */
-    static function find_instance_by_id(&$tracker, $id) {
+    static public function find_instance_by_id(&$tracker, $id) {
         global $DB, $CFG;
 
         if ($element = $DB->get_record('tracker_element', array('id' => $id), 'id, type', 'id')) {

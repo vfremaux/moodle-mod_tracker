@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class tracker_issuereported extends \core\event\base {
 
-    var $issueid;
+    protected $issueid;
 
     /**
      * Init method.

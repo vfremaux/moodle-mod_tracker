@@ -19,7 +19,7 @@
  * @category    mod
  * @author Clifford Tham, Valery Fremaux > 1.8
  */
-defined('MOODLE_INTERNAL') || die());
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/formslib.php');
 
