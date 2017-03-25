@@ -80,9 +80,15 @@ function tracker_add_instance($tracker, $mform) {
     global $DB;
 
     $tracker->timemodified = time();
-    if (empty($tracker->allownotifications)) $tracker->allownotifications = 0;
-    if (empty($tracker->enablecomments)) $tracker->enablecomments = 0;
-    if (empty($tracker->format)) $tracker->format = FORMAT_MOODLE;
+    if (empty($tracker->allownotifications)) {
+        $tracker->allownotifications = 0;
+    }
+    if (empty($tracker->enablecomments)) {
+        $tracker->enablecomments = 0;
+    }
+    if (empty($tracker->format)) {
+        $tracker->format = FORMAT_MOODLE;
+    }
 
     if (is_array(@$tracker->subtrackers)) {
         $tracker->subtrackers = implode(',', $tracker->subtrackers);
@@ -274,11 +280,10 @@ function tracker_print_overview($courses, &$htmlarray) {
     foreach ($trackers as $tracker) {
 
         $str = '<div class="tracker overview">';
-        $str .= '<div class="name">'.$strtracker. ': '.
-               '<a '.($tracker->visible ? '':' class="dimmed"').
-               'title="'.$strtracker.'" href="'.$CFG->wwwroot.
-               '/mod/tracker/view.php?id='.$tracker->coursemodule.'">'.
-               format_string($tracker->name).'</a></div>';
+        $linkurl = new moodle_url('/mod/tracker/view.php', array('id' => $tracker->coursemodule));
+        $class = ($tracker->visible) ? '' : ' class="dimmed" ';
+        $link = '<a '.$class.' title="'.$strtracker.'" href="'.$linkurl.'">'.format_string($tracker->name).'</a>';
+        $str .= '<div class="name">'.$strtracker. ': '.$link.'</div>';
 
         $str .= '<div class="info">';
 
@@ -306,8 +311,10 @@ function tracker_print_overview($courses, &$htmlarray) {
             $yours = $DB->get_records_sql($sql, array($tracker->id, $USER->id));
 
             if ($yours) {
-                $link = new moodle_url('/mod/tracker/view.php', array('id' => $tracker->coursemodule, 'view' => 'view', 'screen' => 'mywork'));
-                $str .= '<div class="details"><a href="'.$link.'">'.get_string('issuestowatch', 'tracker', count($yours)).'</a></div>';
+                $params = array('id' => $tracker->coursemodule, 'view' => 'view', 'screen' => 'mywork');
+                $linkurl = new moodle_url('/mod/tracker/view.php', $params);
+                $link= '<a href="'.$linkurl.'">'.get_string('issuestowatch', 'tracker', count($yours)).'</a>';
+                $str .= '<div class="details">'.$link.'</div>';
             }
         }
 
@@ -317,8 +324,10 @@ function tracker_print_overview($courses, &$htmlarray) {
             $unassigned = $DB->get_records('tracker_issue', array('trackerid' => $tracker->id, 'assignedto' => 0, 'status' => POSTED));
 
             if ($unassigned) {
-                $link = new moodle_url('/mod/tracker/view.php', array('id' => $tracker->coursemodule, 'view' => 'view', 'screen' => 'mywork'));
-                $str .= '<div class="details"><a href="'.$link.'">'.get_string('issuestoassign', 'tracker', count($unassigned)).'</a></div>';
+                $params = array('id' => $tracker->coursemodule, 'view' => 'view', 'screen' => 'mywork');
+                $linkurl = new moodle_url('/mod/tracker/view.php', $params);
+                $link = '<a href="'.$linkurl.'">'.get_string('issuestoassign', 'tracker', count($unassigned)).'</a>';
+                $str .= '<div class="details">'.$link.'</div>';
             }
         }
         $str .= '</div>';
@@ -355,7 +364,7 @@ function tracker_cron () {
  *    return $return;
  */
 function tracker_grades($trackerid) {
-   return null;
+    return null;
 }
 
 /**
@@ -917,7 +926,8 @@ function tracker_preset_states(&$tracker) {
     } else if ($tracker->supportmode == 'bugtracker') {
         $tracker->enabledstates = ENABLED_ALL;
     } else if ($tracker->supportmode == 'ticketting') {
-        $tracker->enabledstates = ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_RESOLVED | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_VALIDATED;
+        $tracker->enabledstates = ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_RESOLVED;
+        $tracker->enabledstates |= ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_VALIDATED;
     } else {
         if (is_array(@$tracker->stateprofile)) {
             $tracker->enabledstates = array_reduce($tracker->stateprofile, 'tracker_ror', 0);

@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* @package      mod_tracker
-* @category     mod
-* @author       Clifford Tham, Valery Fremaux > 1.8
-*
-* A form for updating a watch record
-*/
+ * @package      mod_tracker
+ * @category     mod
+ * @author       Clifford Tham, Valery Fremaux > 1.8
+ *
+ * A form for updating a watch record
+ */
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/lib/formslib.php');
@@ -48,12 +48,12 @@ class edit_watch_form extends moodleform {
 
         $mform->addElement('header', 'hdr0', get_string('editwatch', 'tracker'));
 
-        $open = ($form->events & EVENT_OPEN) ? 'checked="checked"' : '' ;
-        $resolving = ($form->events & EVENT_RESOLVING) ? 'checked="checked"' : '' ;
-        $waiting = ($form->events & EVENT_WAITING) ? 'checked="checked"' : '' ;
-        $resolved = ($form->events & EVENT_RESOLVED) ? 'checked="checked"' : '' ;
-        $abandonned = ($form->events & EVENT_ABANDONNED) ? 'checked="checked"' : '' ;
-        $notopen = ($form->events & EVENT_OPEN) ? '' : 'checked="checked"' ;
+        $open = ($form->events & EVENT_OPEN) ? 'checked="checked"' : '';
+        $resolving = ($form->events & EVENT_RESOLVING) ? 'checked="checked"' : '';
+        $waiting = ($form->events & EVENT_WAITING) ? 'checked="checked"' : '';
+        $resolved = ($form->events & EVENT_RESOLVED) ? 'checked="checked"' : '';
+        $abandonned = ($form->events & EVENT_ABANDONNED) ? 'checked="checked"' : '';
+        $notopen = ($form->events & EVENT_OPEN) ? '' : 'checked="checked"';
         $notresolving = ($form->events & EVENT_RESOLVING) ? '' : 'checked="checked"';
         $notwaiting = ($form->events & EVENT_WAITING) ? '' : 'checked="checked"';
         $notresolved = ($form->events & EVENT_RESOLVED) ? '' : 'checked="checked"';

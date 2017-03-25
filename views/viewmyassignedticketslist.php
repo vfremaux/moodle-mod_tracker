@@ -29,6 +29,9 @@ defined('MOODLE_INTERNAL') || die();
 
 include_once($CFG->libdir.'/tablelib.php');
 
+$statuskeys = tracker_get_statuskeys($tracker);
+$statuscodes = tracker_get_statuscodes();
+
 /*
  * Get search engine related information
  * fields can come from a stored query,or from the current query in the user's client environement cookie
@@ -194,9 +197,10 @@ if (!empty($sort)) {
 $issues = $DB->get_records_sql($sql, array($USER->id), $table->get_page_start(), $table->get_page_size());
 $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', " trackerid = ? GROUP BY trackerid ", array($tracker->id));
 
-$FULLSTATUSKEYS = tracker_get_statuskeys($tracker);
-$STATUSKEYS = tracker_get_statuskeys($tracker, $cm);
-$STATUSKEYS[0] = get_string('nochange', 'tracker');
+$fullstatuskeys = tracker_get_statuskeys($tracker);
+$statuskeys = tracker_get_statuskeys($tracker, $cm);
+$statuskeys[0] = get_string('nochange', 'tracker');
+$statuscodes = tracker_get_statuscodes();
 
 if (!empty($issues)) {
     // Product data for table.
@@ -211,7 +215,7 @@ if (!empty($issues)) {
         if (has_capability('mod/tracker:manage', $context)) {
             // Managers can assign bugs.
             $attrs = array('onchange' => 'document.forms[\'manageform\'].schanged'.$issue->id.'.value = 1;');
-            $status = html_writer::select($STATUSKEYS, 'status'.$issue->id, $issue->status, array(), $attrs);
+            $status = html_writer::select($statuskeys, 'status'.$issue->id, $issue->status, array(), $attrs);
             $status .= '<input type="hidden" name="schanged'.$issue->id.'" value="0" />';
             $fields = 'u.id,'.get_all_user_name_fields(true, 'u');
             $developers = get_users_by_capability($context, 'mod/tracker:develop', $fields, 'lastname');
@@ -220,9 +224,9 @@ if (!empty($issues)) {
             }
         } else if (has_capability('mod/tracker:resolve', $context)) {
             // Resolvers can give a bug back to managers.
-            $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>';
+            $status = $Fullstatuskeys[0 + $issue->status].'<br/>';
             $attrs = array('onchange' => 'document.forms[\'manageform\'].schanged'.$issue->id.'.value = 1;');
-            $status .= html_writer::select($STATUSKEYS, 'status'.$issue->id, 0, array(), $attrs);
+            $status .= html_writer::select($statuskeys, 'status'.$issue->id, 0, array(), $attrs);
             $status .= '<input type="hidden" name="schanged'.$issue->id.'" value="0" />';
             $fields = 'u.id,'.get_all_user_name_fields(true, 'u');
             $managers = get_users_by_capability($context, 'mod/tracker:manage', $fields, 'lastname');
@@ -232,14 +236,14 @@ if (!empty($issues)) {
             $managersmenu[$USER->id] = fullname($USER);
         } else if (has_capability('mod/tracker:develop', $context)) {
             // Resolvers can give a bug back to managers.
-            $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>';
+            $status = $fullstatuskeys[0 + $issue->status].'<br/>';
             $attrs = array('onchange' => 'document.forms[\'manageform\'].schanged'.$issue->id.'.value = 1;');
-            $status .= html_writer::select($STATUSKEYS, 'status'.$issue->id, 0, array(), $attrs);
+            $status .= html_writer::select($statuskeys, 'status'.$issue->id, 0, array(), $attrs);
             $status .= '<input type="hidden" name="schanged'.$issue->id.'" value="0" />';
         } else {
-            $status = $FULLSTATUSKEYS[0 + $issue->status];
+            $status = $Fullstatuskeys[0 + $issue->status];
         }
-        $status = '<div class="status_'.$STATUSCODES[$issue->status].'" class="tracker-status">'.$status.'</div>';
+        $status = '<div class="status_'.$statuscodes[$issue->status].'" class="tracker-status">'.$status.'</div>';
         $reporteruser = $DB->get_record('user', array('id' => $issue->reportedby));
         $reporter = fullname($reporteruser);
         $hassolution = $issue->status == RESOLVED && !empty($issue->resolution);

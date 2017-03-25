@@ -14,8 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-function xmldb_tracker_upgrade($oldversion=0) {
+defined('MOODLE_INTERNAL') || die();
 
+function xmldb_tracker_upgrade($oldversion = 0) {
     global $CFG, $DB;
 
     $dbman = $DB->get_manager();
@@ -253,7 +254,7 @@ function xmldb_tracker_upgrade($oldversion=0) {
         }
         // Tracker savepoint reached.
         upgrade_mod_savepoint(true, 2013092400, 'tracker');
-   }
+    }
 
     if ($result && $oldversion < 2014010100) {
 
@@ -305,6 +306,7 @@ function xmldb_tracker_upgrade($oldversion=0) {
         // Tracker savepoint reached.
         upgrade_mod_savepoint(true, 2015080400, 'tracker');
     }
+
     if ($result && $oldversion < 2015080500) {
 
         // Define field uplink to be added to tracker.
@@ -346,7 +348,6 @@ function xmldb_tracker_upgrade($oldversion=0) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-
 
         // Tracker savepoint reached.
         upgrade_mod_savepoint(true, 2015080600, 'tracker');

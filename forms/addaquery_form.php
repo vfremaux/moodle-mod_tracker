@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* @package      mod_tracker
-* @category     mod
-* @author       Clifford Tham, Valery Fremaux > 1.8
-*
-* From for adding a comment
-*/
+ * @package      mod_tracker
+ * @category     mod
+ * @author       Clifford Tham, Valery Fremaux > 1.8
+ *
+ * From for adding a comment
+ */
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/lib/formslib.php');
@@ -57,7 +57,7 @@ class add_query_form extends moodleform {
         if ($this->_customdata['action']) {
             $reporters = tracker_getreporters($tracker->id);
             $reportersmenu = array();
-            foreach($reporters as $reporter){
+            foreach ($reporters as $reporter) {
                 $reportersmenu[$reporter->id] = fullname($reporter);
             }
 

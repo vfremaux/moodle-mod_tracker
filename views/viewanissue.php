@@ -76,7 +76,7 @@ $issue->resolution = file_rewrite_pluginfile_urls($issue->resolution, 'pluginfil
 
 // get STATUSKEYS labels
 
-$STATUSKEYS = tracker_get_statuskeys($tracker);
+$statuskeys = tracker_get_statuskeys($tracker);
 
 // Start printing.
 

@@ -43,7 +43,7 @@ class mod_tracker_external {
         );
     }
 
-    function get_instances($user) {
+    public static function get_instances($user) {
 
         $parameters = array(
             'user' => $user
@@ -61,7 +61,7 @@ class mod_tracker_external {
      *
      */
 
-    function get_infos($trackerid) {
+    public static function get_infos($trackerid) {
         return json_decode(tracker_rpc_get_infos($trackerid, false));
     }
 
@@ -121,7 +121,7 @@ class mod_tracker_external {
      *
      *
      */
-    function post_issue($instance, $user, $issue) {
+    public static function post_issue($instance, $user, $issue) {
 
         $parameters = array(
             'instance' => $instance,

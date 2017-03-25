@@ -24,6 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$statuskeys = tracker_get_statuskeys($tracker);
+$statuscodes = tracker_get_statuscodes();
+
 echo "<br/>";
 echo $OUTPUT->heading(get_string('me', 'tracker')); 
 
@@ -123,7 +126,7 @@ if ($resolver) {
             $params = array('id' => $cm->id, 'view' => 'view', 'screen'=> 'viewanissue', 'issueid' => $issue->id);
             $linkurl = new moodle_url('/mod/tracker/view.php', $params);
             $str .= $tracker->ticketprefix.$issue->id . ' - <a href="'.$linkurl.'">'.$issue->summary.'</a>';
-            $str .= "&nbsp;<span class=\"status_{$STATUSCODES[$issue->status]}\">".$STATUSKEYS[$issue->status].'</span>';
+            $str .= "&nbsp;<span class=\"status_{$statuscodes[$issue->status]}\">".$statuskeys[$issue->status].'</span>';
             $str .= '<br />';
         }
     } else {

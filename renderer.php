@@ -28,7 +28,10 @@ defined('MOODLE_INTERNAL') || die();
 class mod_tracker_renderer extends plugin_renderer_base {
 
     public function core_issue(&$issue, &$tracker) {
-        global $CFG, $COURSE, $DB, $USER, $STATUSCODES, $STATUSKEYS;
+        global $CFG, $COURSE, $DB, $USER;
+
+        $statuskeys = tracker_get_statuskeys($tracker);
+        $statuscodes = tracker_get_statuscodes();
 
         $str = '';
 
@@ -151,8 +154,8 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= '<td align="right" width="25%" class="tracker-issue-param" >';
         $str .= '<b>'.get_string('status', 'tracker').':</b>';
         $str .= '</td>';
-        $str .= '<td width="25%" class="status_'.$STATUSCODES[$issue->status].' tracker-issue-value">';
-        $str .= '<b>'.$STATUSKEYS[$issue->status].'</b>';
+        $str .= '<td width="25%" class="status_'.$statuscodes[$issue->status].' tracker-issue-value">';
+        $str .= '<b>'.$statuskeys[$issue->status].'</b>';
         $str .= '</td>';
         $str .= '</tr>';
 
@@ -449,7 +452,10 @@ class mod_tracker_renderer extends plugin_renderer_base {
     }
 
     public function history($history, $statehistory, $initialviewmode) {
-        global $DB, $STATUSCODES, $STATUSKEYS;
+        global $DB;
+
+        $statuskeys = tracker_get_statuskeys($tracker);
+        $statuscodes = tracker_get_statuscodes();
 
         $str = '';
 
@@ -500,12 +506,12 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 $str .= $this->user($bywhom);
                 $str .= '</td>';
                 $str .= '<td align="left">';
-                $str .= '<span class="status_'.$STATUSCODES[$state->statusfrom].'">'.$STATUSKEYS[$state->statusfrom].'</span>';
+                $str .= '<span class="status_'.$statuscodes[$state->statusfrom].'">'.$statuskeys[$state->statusfrom].'</span>';
                 $str .= '</td>';
                 $str .= '<td align="left">';
                 $str .= '</td>';
                 $str .= '<td align="left">';
-                $str .= '<span class="status_'.$STATUSCODES[$state->statusto].'">'.$STATUSKEYS[$state->statusto].'</span>';
+                $str .= '<span class="status_'.$statuscodes[$state->statusto].'">'.$statuskeys[$state->statusto].'</span>';
                 $str .= '</td>';
                 $str .= '</tr>';
             }

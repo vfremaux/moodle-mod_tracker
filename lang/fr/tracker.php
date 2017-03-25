@@ -198,6 +198,7 @@ $string['icanresolve'] = 'Je suis assigné sur certains tickets';
 $string['id'] = 'Identifiant';
 $string['intest'] = 'En test';
 $string['inworkinmonth'] = 'A resoudre';
+$string['invalidquery'] = 'Requete non trouvée : {$a}';
 $string['ismandatory'] = 'Obligatoire';
 $string['isoptional'] = 'Optionnel';
 $string['isprivate'] = 'Donnée privée';
@@ -628,7 +629,7 @@ $string['issuemoved_html_tpl'] = '
 
 <p>Le responsable est maintenant:<br/>
 <hr/><br/>
-<%%ASSIGNEDTO%%> 
+<%%ASSIGNEDTO%%>
 </p>
 
 <p>
@@ -644,7 +645,7 @@ Cours : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 Tracker : <%%TRACKERNAME%%>
 --------------------------------------
 Le défaut : <%%ISSUE%%> : <%%SUMMARY%%>
-est réassigné à : <%%ASSIGNEDTO%%> 
+est réassigné à : <%%ASSIGNEDTO%%>
 par : <%%BY%%>
 
 Pour voir la fiche défaut : <%%ISSUEURL%%>

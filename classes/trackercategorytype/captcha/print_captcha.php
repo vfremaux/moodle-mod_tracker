@@ -131,7 +131,7 @@ for ($i = 0; $i < $charcount; $i++) {
     $lefttext = $i * $charwidth;
     $text = $nums[$i];
     $checkchar .= $text;
-    Imagettftext($image, 30, $angletext, $lefttext, 35, $colortext, $fontfile, $text);
+    imagettftext($image, 30, $angletext, $lefttext, 35, $colortext, $fontfile, $text);
 }
 
 $SESSION->contact_form[$id]->captcha->checkchar = $checkchar;

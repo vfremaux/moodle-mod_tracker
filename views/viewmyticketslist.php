@@ -191,16 +191,17 @@ $issues = $DB->get_records_sql($sql, null, $table->get_page_start(), $table->get
 $select = " trackerid = ? GROUP BY trackerid ";
 $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', $select, array($tracker->id));
 
-$FULLSTATUSKEYS = tracker_get_statuskeys($tracker);
-$STATUSKEYS = tracker_get_statuskeys($tracker, $cm);
-$STATUSKEYS[0] = get_string('nochange', 'tracker');
+$fullstatuskeys = tracker_get_statuskeys($tracker);
+$statuskeys = tracker_get_statuskeys($tracker, $cm);
+$statuskeys[0] = get_string('nochange', 'tracker');
+$statuscodes = tracker_get_statuscodes();
 
 if (!empty($issues)) {
     // Product data for table.
     $developersmenu = array();
     foreach ($issues as $issue) {
 
-        $statusthin = '<div class="status-'.$STATUSCODES[$issue->status].' tracker-status-thin"></div>';
+        $statusthin = '<div class="status-'.$statuscodes[$issue->status].' tracker-status-thin"></div>';
 
         $params = array('id' => $cm->id, 'view' => 'view', 'issueid' => $issue->id);
         $ticketurl = new moodle_url('/mod.tracker/view.php', $params);
@@ -216,9 +217,9 @@ if (!empty($issues)) {
 
         if (has_capability('mod/tracker:manage', $context)) {
             // Managers can assign bugs.
-            $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>';
+            $status = $Fullstatuskeys[0 + $issue->status].'<br/>';
             $attrs = array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;");
-            $status .= html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array(), $attrs);
+            $status .= html_writer::select($statuskeys, "status{$issue->id}", 0, array(), $attrs);
 
             $fields = 'u.id,'.get_all_user_name_fields(true, 'u');
             $developers = get_users_by_capability($context, 'mod/tracker:develop', $fields, 'lastname');
@@ -231,9 +232,9 @@ if (!empty($issues)) {
 
         } else if (has_capability('mod/tracker:resolve', $context)) {
             // Resolvers can give a bug back to managers.
-            $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>';
+            $status = $Fullstatuskeys[0 + $issue->status].'<br/>';
             $attrs = array('onchange' => 'document.forms[\'manageform\'].schanged'.$issue->id.'.value = 1;');
-            $status .= html_writer::select($STATUSKEYS, 'status'.$issue->id, 0, array(), $attrs);
+            $status .= html_writer::select($statuskeys, 'status'.$issue->id, 0, array(), $attrs);
             $managers = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,'.get_all_user_name_fields(true, 'u'), 'lastname');
             foreach ($managers as $manager) {
                 $managersmenu[$manager->id] = fullname($manager);
@@ -243,10 +244,10 @@ if (!empty($issues)) {
             $nochoose = array('' => get_string('unassigned', 'tracker'));
             $assignedto = html_writer::select($developersmenu, 'assignedto'.$issue->id, $issue->assignedto, $nochoose, $attrs);
         } else {
-            $status = $FULLSTATUSKEYS[0 + $issue->status];
+            $status = $Fullstatuskeys[0 + $issue->status];
             $assignedto = fullname($user);
         }
-        $status = '<div class="status-'.$STATUSCODES[$issue->status].'" class="tracker-status">'.$status.'</div>';
+        $status = '<div class="status-'.$statuscodes[$issue->status].'" class="tracker-status">'.$status.'</div>';
         $hassolution = $issue->status == RESOLVED && !empty($issue->resolution);
         $pix_url = $OUTPUT->pix_url('solution', 'tracker');
         $alt = get_string('hassolution', 'tracker');
