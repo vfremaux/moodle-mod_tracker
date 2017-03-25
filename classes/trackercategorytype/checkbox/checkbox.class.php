@@ -27,9 +27,12 @@ require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelem
 
 class checkboxelement extends trackerelement {
 
+    protected $spacer;
+
     public function __construct(&$tracker, $id = null, $used = false) {
         parent::__construct($tracker, $id, $used);
         $this->set_options_from_db();
+        $this->spacer = html_writer::empty_tag('br');
     }
 
     public function edit($issueid = 0) {
@@ -52,7 +55,7 @@ class checkboxelement extends trackerelement {
                     echo html_writer::empty_tag('input', $attrs);
                 }
                 echo format_string($option->description);
-                echo html_writer::empty_tag('br');
+                echo $this->spacer;
             }
         }
     }
@@ -64,7 +67,7 @@ class checkboxelement extends trackerelement {
         if (!empty($this->value)) {
             $values = explode(',', $this->value);
             foreach ($values as $selected) {
-                $str .= format_string($this->options[$selected]->description) . "<br/>\n";
+                $str .= format_string($this->options[$selected]->description).$this->spacer;
             }
         }
         return $str;
@@ -84,15 +87,21 @@ class checkboxelement extends trackerelement {
     public function set_data(&$defaults, $issueid = 0) {
         if ($issueid) {
             if (!empty($this->options)) {
-                $elmvalues = $this->get_value($issueid);
-                $values = explode(',', $elmvalues);
-                if (!empty($values)) {
+                $values = $this->get_value($issueid);
+                if (is_array($values)) {
                     foreach ($values as $v) {
                         if (array_key_exists($v, $this->options)) {
                             // Check option still exists.
                             $elementname = "element{$this->name}{$option->id}";
                             $defaults->$elementname = 1;
                         }
+                    }
+                } else {
+                    $v = $values; // Single value.
+                    if (array_key_exists($v, $this->options)) {
+                        // Check option still exists.
+                        $elementname = "element{$this->name}{$option->id}";
+                        $defaults->$elementname = 1;
                     }
                 }
             }
