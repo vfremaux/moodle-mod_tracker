@@ -38,7 +38,7 @@ class mod_tracker_mod_form extends moodleform_mod {
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        $mform->addElement('text', 'name', get_string('name'), array('size'=>'64'));
+        $mform->addElement('text', 'name', get_string('name'), array('size' => '64'));
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
@@ -76,7 +76,8 @@ class mod_tracker_mod_form extends moodleform_mod {
         $select->setMultiple(true);
         $mform->setAdvanced('stateprofile');
 
-        $mform->addElement('textarea', 'thanksmessage', get_string('thanksmessage', 'tracker'), array('cols' => 60, 'rows' => 10));
+        $attrs = array('cols' => 60, 'rows' => 10);
+        $mform->addElement('textarea', 'thanksmessage', get_string('thanksmessage', 'tracker'), $attrs);
         $mform->disabledIf('thanksmessage', 'supportmode', 'neq', 'customized');
         $mform->setType('thanksmessage', PARAM_TEXT);
         $mform->setAdvanced('thanksmessage');
@@ -90,7 +91,11 @@ class mod_tracker_mod_form extends moodleform_mod {
         $mform->addElement('checkbox', 'strictworkflow', get_string('strictworkflow', 'tracker'));
         $mform->addHelpButton('strictworkflow', 'strictworkflow', 'tracker');
 
-        if (isset($this->_cm->id) && $assignableusers = get_users_by_capability(context_module::instance($this->_cm->id), 'mod/tracker:resolve', 'u.id,'.get_all_user_name_fields(true, 'u'), 'lastname,firstname')) {
+        $context = context_module::instance($this->_cm->id);
+        $fields = 'u.id,'.get_all_user_name_fields(true, 'u');
+        $order = 'lastname, firstname';
+        if (isset($this->_cm->id) &&
+                $assignableusers = get_users_by_capability($context, 'mod/tracker:resolve', $fields, $order)) {
             $useropts[0] = get_string('none');
             foreach ($assignableusers as $assignable) {
                 $useropts[$assignable->id] = fullname($assignable);

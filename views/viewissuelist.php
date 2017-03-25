@@ -290,7 +290,7 @@ if (!empty($issues)) {
         $status = '<div class="status-'.$statuscodes[$issue->status].'" class="tracker-status">'.$status.'</div>';
         $hassolution = $issue->status == RESOLVED && !empty($issue->resolution);
         $pixurl = $OUTPUT->pix_url('solution', 'tracker');
-        $solution = ($hassolution) ? '<img src="'.$pixurl.'" height="15" alt="'.get_string('hassolution','tracker').'" />' : '';
+        $solution = ($hassolution) ? '<img src="'.$pixurl.'" height="15" alt="'.get_string('hassolution', 'tracker').'" />' : '';
         $actions = '';
 
         if (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context)) {
@@ -308,7 +308,11 @@ if (!empty($issues)) {
         }
 
         if (!$DB->get_record('tracker_issuecc', array('userid' => $USER->id, 'issueid' => $issue->id))) {
-            $params = array('id' => $cm->id, 'view' => 'profile', 'screen' => $screen, 'issueid' => $issue->id, 'what' => 'register');
+            $params = array('id' => $cm->id,
+                            'view' => 'profile',
+                            'screen' => $screen,
+                            'issueid' => $issue->id,
+                            'what' => 'register');
             $registerurl = new moodle_url('/mod/tracker/view.php', $params);
             $pix = '<img src="'.$OUTPUT->pix_url('register', 'mod_tracker').'" />';
             $actions .= '&nbsp;<a href="'.$registerurl.'" title="'.get_string('register', 'tracker').'" >'.$pix.'</a>';

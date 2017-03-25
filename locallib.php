@@ -2291,9 +2291,9 @@ function tracker_print_direct_editor($attributes, $values, $options) {
             $str .= '<noscript>';
             $str .= '<div>';
             $attrs = array('type' => 'text/html',
-                           'data' = $editorurl,
+                           'data' => $editorurl,
                            'height' => 160,
-                           'width' = 600,
+                           'width' => 600,
                            'style' => 'border:1px solid #000');
             $str .= html_writer::tag('object', '', $attrs);
             $sr .= '</div>';

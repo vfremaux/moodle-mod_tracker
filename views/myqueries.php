@@ -44,17 +44,17 @@ if (!empty($queries)) {
         $query->description = tracker_printsearchfields($fields);
         $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'browse', 'what' => 'usequery', 'queryid' => $query->id);
         $searchurl = new moodle_url('/mod/tracker/view.php', $params);
-        $pix = '<img src="'.$OUTPUT->pix_url('search','mod_tracker').'" />';
+        $pix = '<img src="'.$OUTPUT->pix_url('search', 'mod_tracker').'" />';
         $searchlink = '<a href="'.$searchurl.'" title="'.get_string('searchwiththat', 'tracker').'">'.$pix.'</a>';
 
         $params = array('id' => $cm->id, 'what' => 'editquery', 'queryid' => $query->id);
         $editurl = new moodle_url('/mod/tracker/view.php', $params);
-        $pix = '<img src="'.$OUTPUT->pix_url('t/edit','core').'" />';
+        $pix = '<img src="'.$OUTPUT->pix_url('t/edit', 'core').'" />';
         $action = '<a href="'.$editurl.'" title="'.get_string('update').'" >'.$pix.'</a>';
 
         $params = array('id' => $cm->id, 'what' => 'deletequery', 'queryid' => $query->id);
         $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
-        $pix = '<img src="'.$OUTPUT->pix_url('t/delete','core').'" />';
+        $pix = '<img src="'.$OUTPUT->pix_url('t/delete', 'core').'" />';
         $action .= '&nbsp;<a href="'.$deleteurl.'" title="'.get_string('delete').'" >'.$pix.'</a>';
         $table->data[] = array($searchlink, "&nbsp;{$query->name}", format_string($query->description), $action);
     }

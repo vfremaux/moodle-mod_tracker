@@ -27,7 +27,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-include_once($CFG->libdir.'/tablelib.php');
+require_once($CFG->libdir.'/tablelib.php');
 
 $statuskeys = tracker_get_statuskeys($tracker);
 $statuscodes = tracker_get_statuscodes();
@@ -195,7 +195,8 @@ if (!empty($sort)) {
 }
 
 $issues = $DB->get_records_sql($sql, array($USER->id), $table->get_page_start(), $table->get_page_size());
-$maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', " trackerid = ? GROUP BY trackerid ", array($tracker->id));
+$select = " trackerid = ? GROUP BY trackerid ";
+$maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', $select, array($tracker->id));
 
 $fullstatuskeys = tracker_get_statuskeys($tracker);
 $statuskeys = tracker_get_statuskeys($tracker, $cm);
@@ -224,7 +225,7 @@ if (!empty($issues)) {
             }
         } else if (has_capability('mod/tracker:resolve', $context)) {
             // Resolvers can give a bug back to managers.
-            $status = $Fullstatuskeys[0 + $issue->status].'<br/>';
+            $status = $fullstatuskeys[0 + $issue->status].'<br/>';
             $attrs = array('onchange' => 'document.forms[\'manageform\'].schanged'.$issue->id.'.value = 1;');
             $status .= html_writer::select($statuskeys, 'status'.$issue->id, 0, array(), $attrs);
             $status .= '<input type="hidden" name="schanged'.$issue->id.'" value="0" />';
@@ -241,14 +242,14 @@ if (!empty($issues)) {
             $status .= html_writer::select($statuskeys, 'status'.$issue->id, 0, array(), $attrs);
             $status .= '<input type="hidden" name="schanged'.$issue->id.'" value="0" />';
         } else {
-            $status = $Fullstatuskeys[0 + $issue->status];
+            $status = $fullstatuskeys[0 + $issue->status];
         }
         $status = '<div class="status_'.$statuscodes[$issue->status].'" class="tracker-status">'.$status.'</div>';
         $reporteruser = $DB->get_record('user', array('id' => $issue->reportedby));
         $reporter = fullname($reporteruser);
         $hassolution = $issue->status == RESOLVED && !empty($issue->resolution);
-        $pix_url = $OUTPUT->pix_url('solution', 'tracker');
-        $solution = ($hassolution) ? '<img src="'.$pix_url.'" height="15" alt="'.get_string('hassolution','tracker').'" />' : '';
+        $pixurl = $OUTPUT->pix_url('solution', 'tracker');
+        $solution = ($hassolution) ? '<img src="'.$pixurl.'" height="15" alt="'.get_string('hassolution', 'tracker').'" />' : '';
         $actions = '';
         if (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context)) {
             $params = array('id' => $cm->id, 'issueid' => $issue->id, 'screen' => 'editanissue');
@@ -263,8 +264,9 @@ if (!empty($issues)) {
             $actions .= '&nbsp;<a href="'.$deleteurl.'" title="'.get_string('delete').'" >'.$pix.'</a>';
         }
         // Ergo Report I3 2012 => self list displays owned tickets. Already registered.
-        if (($issue->resolutionpriority < $maxpriority) && has_capability('mod/tracker:viewpriority', $context) && 
-                !has_capability('mod/tracker:managepriority', $context)) {
+        if (($issue->resolutionpriority < $maxpriority) &&
+                has_capability('mod/tracker:viewpriority', $context) &&
+                        !has_capability('mod/tracker:managepriority', $context)) {
             $params = array('id' => $cm->id, 'issueid' => $issue->id, 'what' => 'askraise');
             $raiseurl = new moodle_url('/mod/tracker/view.php', $params);
             $pix = '<img src="'.$OUTPUT->pix_url('askraise', 'tracker').'" />';

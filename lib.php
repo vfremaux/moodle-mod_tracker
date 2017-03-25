@@ -313,7 +313,7 @@ function tracker_print_overview($courses, &$htmlarray) {
             if ($yours) {
                 $params = array('id' => $tracker->coursemodule, 'view' => 'view', 'screen' => 'mywork');
                 $linkurl = new moodle_url('/mod/tracker/view.php', $params);
-                $link= '<a href="'.$linkurl.'">'.get_string('issuestowatch', 'tracker', count($yours)).'</a>';
+                $link = '<a href="'.$linkurl.'">'.get_string('issuestowatch', 'tracker', count($yours)).'</a>';
                 $str .= '<div class="details">'.$link.'</div>';
             }
         }
@@ -321,7 +321,8 @@ function tracker_print_overview($courses, &$htmlarray) {
         if (has_capability('mod/tracker:manage', $context)) {
 
             // Count how many unassigned.
-            $unassigned = $DB->get_records('tracker_issue', array('trackerid' => $tracker->id, 'assignedto' => 0, 'status' => POSTED));
+            $params = array('trackerid' => $tracker->id, 'assignedto' => 0, 'status' => POSTED);
+            $unassigned = $DB->get_records('tracker_issue', $params);
 
             if ($unassigned) {
                 $params = array('id' => $tracker->coursemodule, 'view' => 'view', 'screen' => 'mywork');

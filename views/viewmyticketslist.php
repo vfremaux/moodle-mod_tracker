@@ -125,22 +125,24 @@ $actionstr = '';
 if (!empty($tracker->parent)) {
     $transferstr = get_string('transfer', 'tracker');
     if (has_capability('mod/tracker:viewpriority', $context) && !$resolved) {
-        $tablecolumns = array('statusthin', 'resolutionpriority', 'id', 'summary', 'datereported', 'assignedto', 'status', 'watches',
-                              'transfered', 'action');
-        $tableheaders = array('', "<b>$prioritystr</b>", "<b>$issuenumberstr</b>", "<b>$summarystr</b>", "<b>$datereportedstr</b>",
+        $tablecolumns = array('statusthin', 'resolutionpriority', 'id', 'summary', 'datereported', 'assignedto', 'status',
+                              'watches', 'transfered', 'action');
+        $tableheaders = array('', "<b>$prioritystr</b>", "<b>$issuenumberstr</b>", "<b>$summarystr</b>",
+                              "<b>$datereportedstr</b>", "<b>$assignedtostr</b>", "<b>$statusstr</b>", "<b>$watchesstr</b>",
+                              "<b>$transferstr</b>", "<b>$actionstr</b>");
+    } else {
+        $tablecolumns = array('statusthin', 'id', 'summary', 'datereported', 'assignedto', 'status', 'watches', 'transfered',
+                              'action');
+        $tableheaders = array('', "<b>$issuenumberstr</b>", "<b>$summarystr</b>", "<b>$datereportedstr</b>",
                               "<b>$assignedtostr</b>", "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$transferstr</b>",
                               "<b>$actionstr</b>");
-    } else {
-        $tablecolumns = array('statusthin', 'id', 'summary', 'datereported', 'assignedto', 'status', 'watches', 'transfered', 'action');
-        $tableheaders = array('', "<b>$issuenumberstr</b>", "<b>$summarystr</b>", "<b>$datereportedstr</b>", "<b>$assignedtostr</b>",
-                              "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$transferstr</b>", "<b>$actionstr</b>");
     }
 } else {
     if (has_capability('mod/tracker:viewpriority', $context) && !$resolved) {
         $tablecolumns = array('statusthin', 'resolutionpriority', 'id', 'summary', 'datereported', 'assignedto', 'status',
                               'watches',  'action');
-        $tableheaders = array('', "<b>$prioritystr</b>", '', "<b>$summarystr</b>", "<b>$datereportedstr</b>", "<b>$assignedtostr</b>",
-                              "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$actionstr</b>");
+        $tableheaders = array('', "<b>$prioritystr</b>", '', "<b>$summarystr</b>", "<b>$datereportedstr</b>";
+                              "<b>$assignedtostr</b>", "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$actionstr</b>");
     } else {
         $tablecolumns = array('statusthin', 'id', 'summary', 'datereported', 'assignedto', 'status', 'watches',  'action');
         $tableheaders = array('', '', "<b>$summarystr</b>", "<b>$datereportedstr</b>", "<b>$assignedtostr</b>",
@@ -154,7 +156,7 @@ $table->define_headers($tableheaders);
 
 $table->define_baseurl($CFG->wwwroot.'/mod/tracker/view.php?id='.$cm->id.'&view='.$view.'&screen='.$screen);
 
-$table->sortable(true, 'datereported', SORT_DESC); //sorted by datereported by default
+$table->sortable(true, 'datereported', SORT_DESC); // Sorted by datereported by default.
 $table->collapsible(true);
 $table->initialbars(true);
 
@@ -217,7 +219,7 @@ if (!empty($issues)) {
 
         if (has_capability('mod/tracker:manage', $context)) {
             // Managers can assign bugs.
-            $status = $Fullstatuskeys[0 + $issue->status].'<br/>';
+            $status = $fullstatuskeys[0 + $issue->status].'<br/>';
             $attrs = array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;");
             $status .= html_writer::select($statuskeys, "status{$issue->id}", 0, array(), $attrs);
 
@@ -232,7 +234,7 @@ if (!empty($issues)) {
 
         } else if (has_capability('mod/tracker:resolve', $context)) {
             // Resolvers can give a bug back to managers.
-            $status = $Fullstatuskeys[0 + $issue->status].'<br/>';
+            $status = $fullstatuskeys[0 + $issue->status].'<br/>';
             $attrs = array('onchange' => 'document.forms[\'manageform\'].schanged'.$issue->id.'.value = 1;');
             $status .= html_writer::select($statuskeys, 'status'.$issue->id, 0, array(), $attrs);
             $managers = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,'.get_all_user_name_fields(true, 'u'), 'lastname');
@@ -249,9 +251,9 @@ if (!empty($issues)) {
         }
         $status = '<div class="status-'.$statuscodes[$issue->status].'" class="tracker-status">'.$status.'</div>';
         $hassolution = $issue->status == RESOLVED && !empty($issue->resolution);
-        $pix_url = $OUTPUT->pix_url('solution', 'tracker');
+        $pixurl = $OUTPUT->pix_url('solution', 'tracker');
         $alt = get_string('hassolution', 'tracker');
-        $solution = ($hassolution) ? '<img src="'.$pix_url.'" height="15" alt="'.$alt.'" />' : '';
+        $solution = ($hassolution) ? '<img src="'.$pixurl.'" height="15" alt="'.$alt.'" />' : '';
         $actions = '';
         if (has_capability('mod/tracker:manage', $context) ||
                 has_capability('mod/tracker:resolve', $context)) {

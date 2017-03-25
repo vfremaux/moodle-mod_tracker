@@ -128,7 +128,7 @@ class mod_tracker_external {
             'user' => $user,
             'issue' => $issue
         );
-        
+
         $params = validate_parameters(self::post_issue_parameters(), $parameters);
 
         return tracker_rpc_post_issue($params['username'], $params['remoteuserhostroot'], $params['trackerid'], $issue);

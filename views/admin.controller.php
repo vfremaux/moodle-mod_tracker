@@ -189,7 +189,7 @@ if ($action == 'viewelementoptions') {
     // Edit an element option **********************************************************************.
 
     $form = new StdClass();
-    $form->elementid = optional_param('elementid', @$bounce_elementid, PARAM_INT);
+    $form->elementid = optional_param('elementid', @$bounceelementid, PARAM_INT);
     if ($form->elementid) {
         $element = trackerelement::find_instance_by_id($tracker, $form->elementid);
         $form->type = $element->type;
@@ -248,7 +248,7 @@ if ($action == 'deleteelementoption') {
 
 if ($action == 'editelementoption') {
 
-    // Edit an element option -----------------------------------.
+    // Edit an element option *******************************************************.
 
     $form = new StdClass;
     $form->elementid = required_param('elementid', PARAM_INT);
@@ -263,8 +263,11 @@ if ($action == 'editelementoption') {
 
     return -1;
 }
-/************************************* edit an element option *****************************/
+
 if ($action == 'updateelementoption') {
+
+    // Edit an element option *****************************.
+
     $form = new Stdclass();
     $form->elementid = required_param('elementid', PARAM_INT);
     $form->optionid = required_param('optionid', PARAM_INT);
@@ -331,7 +334,7 @@ if ($action == 'updateelementoption') {
 
 if ($action == 'moveelementoptionup') {
 
-    // Move an option up in list -----------------------------------------------.
+    // Move an option up in list ******************************************************.
 
     $form = new StdClass;
     $form->elementid = required_param('elementid', PARAM_INT);
@@ -368,7 +371,7 @@ if ($action == 'moveelementoptionup') {
 
 if ($action == 'moveelementoptiondown') {
 
-    // Move an option down in list -----------------------------------------.
+    // Move an option down in list *************************************************.
 
     $form = new StdClass;
     $form->elementid = required_param('elementid', PARAM_INT);
@@ -407,7 +410,7 @@ if ($action == 'moveelementoptiondown') {
 
 if ($action == 'addelement') {
 
-    // Add an element to be used ----------------------------------------------------.
+    // Add an element to be used **************************************************.
 
     $elementid = required_param('elementid', PARAM_INT);
 
@@ -436,7 +439,7 @@ if ($action == 'addelement') {
 
 if ($action == 'removeelement') {
 
-    // Remove an element from usable list -----------------------------------------------.
+    // Remove an element from usable list ******************************************************.
 
     $usedid = required_param('usedid', PARAM_INT);
     $params = array('elementid' => $usedid, 'trackerid' => $tracker->id);
@@ -445,7 +448,7 @@ if ($action == 'removeelement') {
 
 if ($action == 'raiseelement') {
 
-    // Raise element pos in usable list ----------------------------------------------.
+    // Raise element pos in usable list ********************************************************.
 
     $usedid = required_param('elementid', PARAM_INT);
     $params = array('elementid' => $usedid, 'trackerid' => $tracker->id);

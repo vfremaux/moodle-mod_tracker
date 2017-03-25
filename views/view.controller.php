@@ -244,7 +244,7 @@ if ($action == 'updateanissue') {
                 $DB->insert_record('tracker_issueownership', $ownership);
             }
 
-            // update actual ticket
+            // Update actual ticket.
             $issue = new StdClass;
             $issue->id = $issueid;
             $issue->bywhomid = $USER->id;

@@ -41,7 +41,7 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($action == 'createelement') {
 
-    // Create element form -----------------------------------------------------------------------.
+    // Create element form ************************************************************************.
 
     $form->type = required_param('type', PARAM_ALPHA);
     $form->action = 'doaddelement';
@@ -50,7 +50,7 @@ if ($action == 'createelement') {
 
 } else if ($action == 'doaddelement') {
 
-    // Add an element ----------------------------------------------------------------------------.
+    // Add an element ******************************************************************************.
 
     $form->name = required_param('name', PARAM_ALPHANUM);
     $form->name = preg_replace('/\s+|-|\\\'|\"/', '', $form->name); // Remove all spaces.
@@ -88,7 +88,7 @@ if ($action == 'createelement') {
 
 } else if ($action == 'editelement') {
 
-    // Edit an element form ----------------------------------------------------------------.
+    // Edit an element form ********************************************************************.
 
     $form->elementid = required_param('elementid', PARAM_INT);
     if ($form->elementid != null) {
@@ -108,7 +108,7 @@ if ($action == 'createelement') {
 
 if ($action == 'doupdateelement') {
 
-    // Update an element ------------------------------------------------------------.
+    // Update an element *****************************************************************************.
 
     $form->elementid = required_param('elementid', PARAM_INT);
     $form->name = required_param('name', PARAM_ALPHANUM);
@@ -145,7 +145,7 @@ if ($action == 'doupdateelement') {
 
 if ($action == 'deleteelement') {
 
-    // Delete an element from available ------------------------------------------------------.
+    // Delete an element from available ************************************************************.
 
     $elementid = required_param('elementid', PARAM_INT);
     if (!tracker_iselementused($tracker->id, $elementid)) {
@@ -156,7 +156,7 @@ if ($action == 'deleteelement') {
 
 if ($action == 'submitelementoption') {
 
-    // Add an element option --------------------------------------------------------------.
+    // Add an element option ***********************************************************************.
 
     $form->elementid = required_param('elementid', PARAM_INT);
     $form->name = required_param('name', PARAM_ALPHANUM);
@@ -214,7 +214,7 @@ if ($action == 'submitelementoption') {
 
 if ($action == 'viewelementoptions') {
 
-    // Edit an element option ------------------------------------------------------------.
+    // Edit an element option **********************************************************************.
 
     $form->elementid = optional_param('elementid', @$form->elementid, PARAM_INT);
     if ($form->elementid != null) {
@@ -233,7 +233,7 @@ if ($action == 'viewelementoptions') {
 
 if ($action == 'deleteelementoption') {
 
-    // Delete an element option ----------------------------------------------------------.
+    // Delete an element option **********************************************************************.
 
     $form->elementid = optional_param('elementid', null, PARAM_INT);
     $form->optionid = required_param('optionid', PARAM_INT);
@@ -271,7 +271,7 @@ if ($action == 'deleteelementoption') {
 
 if ($action == 'editelementoption') {
 
-    // Edit an element option ---------------------------------------------------------------.
+    // Edit an element option **************************************************************************.
 
     $form->elementid = required_param('elementid', PARAM_INT);
     $form->optionid = required_param('optionid', PARAM_INT);
@@ -286,7 +286,7 @@ if ($action == 'editelementoption') {
 
 if ($action == 'updateelementoption') {
 
-    // Edit an element option ----------------------------------------------------------------.
+    // Edit an element option ****************************************************************************.
 
     $form->elementid = required_param('elementid', PARAM_INT);
     $form->optionid = required_param('optionid', PARAM_INT);
@@ -348,7 +348,7 @@ if ($action == 'updateelementoption') {
 
 if ($action == 'moveelementoptionup') {
 
-    // Move an option up in list ----------------------------------------------------.
+    // Move an option up in list *******************************************************************.
 
     $form->elementid = required_param('elementid', PARAM_INT);
     $form->optionid = required_param('optionid', PARAM_INT);
@@ -381,7 +381,7 @@ if ($action == 'moveelementoptionup') {
 
 if ($action == 'moveelementoptiondown') {
 
-    // Move an option down in list -------------------------------------------------.
+    // Move an option down in list ***********************************************************************.
 
     $form->elementid = required_param('elementid', PARAM_INT);
     $form->optionid = required_param('optionid', PARAM_INT);
@@ -412,7 +412,7 @@ if ($action == 'moveelementoptiondown') {
 
 if ($action == 'addelement') {
 
-    // Add an element to be used ----------------------------------------------------.
+    // Add an element to be used *******************************************************************.
 
     $elementid = required_param('elementid', PARAM_INT);
 
@@ -435,7 +435,7 @@ if ($action == 'addelement') {
 
 if ($action == 'removeelement') {
 
-    // Remove an element from usable list -------------------------------------------.
+    // Remove an element from usable list ************************************************************.
 
     $usedid = required_param('usedid', PARAM_INT);
     $DB->delete_records('tracker_elementused', 'elementid', $usedid, 'trackerid', $tracker->id);

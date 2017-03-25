@@ -63,14 +63,14 @@ $cced = array();
 $select = " trackerid = ? AND issueid = ? ";
 $history = $DB->get_records_select('tracker_issueownership', $select, array($tracker->id, $issue->id), 'timeassigned DESC');
 
-$statehistory = $DB->get_records_select('tracker_state_change', $select, array($tracker->id, $issue->id),'timechange ASC');
+$statehistory = $DB->get_records_select('tracker_state_change', $select, array($tracker->id, $issue->id), 'timechange ASC');
 
 $linklabel = get_string(($initialviewmode == 'visiblediv') ? 'hidedependancies' : 'showdependancies', 'tracker');
 $link = '<a id="toggledependancieslink" href="javascript:toggledependancies()">'.$linklabel.'</a>&nbsp;-&nbsp;';
 $showdependancieslink = (!empty($childtree) || !empty($parenttree)) ? $link : '';
 
 $linklabel = get_string(($initialccsviewmode == 'visiblediv') ? 'hideccs' : 'showccs', 'tracker');
-$link = '<a id="toggleccslink" href="javascript:toggleccs()">'.$linklabel.'</a>&nbsp;-&nbsp;'
+$link = '<a id="toggleccslink" href="javascript:toggleccs()">'.$linklabel.'</a>&nbsp;-&nbsp;';
 $showccslink = (!empty($ccs)) ? $link : '';
 
 $linklabel = get_string(($initialhistoryviewmode == 'visiblediv') ? 'hidehistory' : 'showhistory', 'tracker');
@@ -103,7 +103,7 @@ if (tracker_can_workon($tracker, $context, $issue)) {
         $oldstatus = $issue->status;
         $issue->status = OPEN;
         $DB->set_field('tracker_issue', 'status', OPEN, array('id' => $issueid));
-        // log state change
+        // Log state change.
         $stc = new StdClass;
         $stc->userid = $USER->id;
         $stc->issueid = $issue->id;
@@ -195,7 +195,7 @@ if ($tracker->enablecomments) {
                 <tr>
                     <td>&nbsp;</td>
                     <td align="left" style="white-space : nowrap">
-                    <?php 
+                    <?php
                         echo $parenttree;
                         echo $tracker->ticketprefix.$issue->id.' - '.format_string($issue->summary).'<br/>';
                         echo $childtree;

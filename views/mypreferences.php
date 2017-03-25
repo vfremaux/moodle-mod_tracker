@@ -32,7 +32,7 @@ $form = new my_preferences_form(new moodle_url('/mod/tracker/view.php', array('i
 
 if ($data = $form->get_data()) {
 
-    // Saves the user's preferences ----------------------------------------------------.
+    // Saves the user's preferences ****************************************************************.
 
     $open = $data->open;
     $resolving = $data->resolving;
