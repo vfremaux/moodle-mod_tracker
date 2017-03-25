@@ -25,7 +25,7 @@ echo $OUTPUT->heading(get_string('reports', 'tracker'), 1);
 echo $OUTPUT->heading(get_string('evolution', 'tracker'), 2);
 
 $alltickets = $DB->count_records('tracker_issue', array('trackerid' => $tracker->id));
-if (!$alltickets){
+if (!$alltickets) {
     echo $OUTPUT->notification(get_string('nodata', 'tracker'));
     return;
 }

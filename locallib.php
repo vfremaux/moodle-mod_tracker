@@ -158,7 +158,7 @@ function tracker_get_role_definition(&$tracker, $role) {
         if ($tracker->supportmode == 'bugtracker') {
             return ENABLED_POSTED | ENABLED_VALIDATED;
         } else {
-            return ENABLED_POSTED | ENABLED_RESOLVED| ENABLED_VALIDATED;
+            return ENABLED_POSTED | ENABLED_RESOLVED | ENABLED_VALIDATED;
         }
     } else if ($role == 'develop') {
         if ($tracker->supportmode == 'bugtracker') {
@@ -427,7 +427,7 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false) {
     }
     $elementssearchclause = ($elementssearch) ? " {tracker_issueattribute} AS ia, " : '';
 
-    $elementsSearchConstraint = '';
+    $elementssearchconstraint = '';
     foreach ($keys as $key) {
         if ($key == 'id') {
             $elementssearchconstraint .= ' AND  (';
@@ -757,7 +757,7 @@ function tracker_extractsearchparametersfromdb($queryid = null) {
     $queryrecord = $DB->get_record('tracker_query', array('id' => $queryid));
     $fields = null;
 
-    if (!empty($query_record)) {
+    if (!empty($queryrecord)) {
         $fieldnames = explode(',', $queryrecord->fieldnames);
         $fieldvalues = explode(',', $queryrecord->fieldvalues);
         $count = 0;
@@ -1084,12 +1084,12 @@ function tracker_clearelements($issueid, $withfiles = false) {
     }
 }
 
-/**
- * adds an error css marker in case of matching error
- * @param array $errors the current error set
- * @param string $errorkey
- */
 if (!function_exists('print_error_class')) {
+    /**
+     * adds an error css marker in case of matching error
+     * @param array $errors the current error set
+     * @param string $errorkey
+     */
     function print_error_class($errors, $errorkeylist) {
 
         $out = '';
@@ -1145,7 +1145,7 @@ function tracker_getpotentialdependancies($trackerid, $issueid) {
     global $DB;
 
     $subtreelist = tracker_get_subtree_list($trackerid, $issueid);
-    $subtreeclause = (!empty($subtreelist)) ? "AND i.id NOT IN ({$subtreelist}) " : '' ;
+    $subtreeclause = (!empty($subtreelist)) ? "AND i.id NOT IN ({$subtreelist}) " : '';
 
     $sql = "
        SELECT
@@ -1189,7 +1189,9 @@ function tracker_get_subtree_list($trackerid, $id) {
         foreach (array_values($res) as $asub) {
             $ids[] = $asub;
             $subs = tracker_get_subtree_list($trackerid, $asub);
-            if (!empty($subs)) $ids[] = $subs;
+            if (!empty($subs)) {
+                $ids[] = $subs;
+            }
         }
     }
     return(implode(',', $ids));
@@ -1230,7 +1232,8 @@ function tracker_printchilds(&$tracker, $issueid, $return = false, $indent = '')
             $issueurl = new moodle_url('/mod/tracker/view.php', $params);
             $link = '<a href="'.$issueurl.'">'.$tracker->ticketprefix.$asub->childid.' - '.format_string($asub->summary).'</a>';
             $str .= '<span style="position : relative; left : '.$indent.'px">'.$link;
-            $str .= "&nbsp;<span class=\"status_".$statuscodes[$asub->status]."\">".$statuskeys[$asub->status]."</span></span><br/>\n";
+            $str .= '&nbsp;<span class="status_'.$statuscodes[$asub->status].'">'.$statuskeys[$asub->status].'</span>';
+            $str .= "</span><br/>\n";
             $indent = $indent + 20;
             $str .= tracker_printchilds($tracker, $asub->childid, true, $indent);
             $indent = $indent - 20;
@@ -1327,7 +1330,8 @@ function tracker_getwatches($trackerid, $userid) {
 function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = null) {
     global $COURSE, $SITE, $CFG, $USER, $DB;
 
-    if (empty($tracker)) { // database access optimization in case we have a tracker from somewhere else
+    if (empty($tracker)) {
+        // Database access optimization in case we have a tracker from somewhere else.
         $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
     }
 
@@ -1353,8 +1357,7 @@ function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = 
                   'URGENT' => $urgentrequest,
                   'BY' => fullname($by),
                   'REQUESTEDBY' => fullname($USER),
-                  'ISSUEURL' => $issueurl,
-                  );
+                  'ISSUEURL' => $issueurl);
 
     include_once($CFG->dirroot."/mod/tracker/mailtemplatelib.php");
 
@@ -1363,7 +1366,7 @@ function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = 
             $notification = tracker_compile_mail_template('raiserequest', $vars, $manager->lang);
             $notificationhtml = tracker_compile_mail_template('raiserequest_html', $vars, $manager->lang);
             if ($CFG->debugsmtp) {
-                echo "Sending Raise Request Mail Notification to " . fullname($manager) . '<br/>'.$notificationhtml;
+                echo "Sending Raise Request Mail Notification to ".fullname($manager).'<br/>'.$notificationhtml;
             }
             $subject = get_string('raiserequestcaption', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
             email_to_user($manager, $USER, $subject, $notification, $notificationhtml);
@@ -1397,7 +1400,8 @@ function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = 
 function tracker_notify_submission($issue, &$cm, $tracker = null) {
     global $COURSE, $SITE, $CFG, $USER, $DB;
 
-    if (empty($tracker)) { // database access optimization in case we have a tracker from somewhere else
+    if (empty($tracker)) {
+        // Database access optimization in case we have a tracker from somewhere else.
         $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
     }
 
@@ -1408,7 +1412,7 @@ function tracker_notify_submission($issue, &$cm, $tracker = null) {
 
     $by = $DB->get_record('user', array('id' => $issue->reportedby));
 
-    $params = array('t' => $tracker->id, 'view' => 'view'; 'screen' => 'viewanissue', 'issueid' => $issue->id);
+    $params = array('t' => $tracker->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issue->id);
     $issueurl = new moodle_url('/mod/tracker/view.php', $params);
     $params = array('t' => $tracker->id,
                     'view' => 'profile',
@@ -1425,8 +1429,7 @@ function tracker_notify_submission($issue, &$cm, $tracker = null) {
                       'DESCRIPTION' => format_string(stripslashes($issue->description)),
                       'BY' => fullname($by),
                       'ISSUEURL' => $issueurl,
-                      'CCURL' => $ccurl
-                      );
+                      'CCURL' => $ccurl);
         include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
 
         foreach ($managers as $manager) {
@@ -2176,7 +2179,7 @@ function tracker_print_direct_editor($attributes, $values, $options) {
 
     $editor = editors_get_preferred_editor($format);
     $strformats = format_text_menu();
-    $formats =  $editor->get_supported_formats();
+    $formats = $editor->get_supported_formats();
     foreach ($formats as $fid) {
         $formats[$fid] = $strformats[$fid];
     }
@@ -2253,7 +2256,7 @@ function tracker_print_direct_editor($attributes, $values, $options) {
     $str .= '</div>';
 
     $str .= '<div>';
-    if (count($formats)>1) {
+    if (count($formats) > 1) {
         $str .= html_writer::label(get_string('format'), 'menu'. $elname. 'format', false, array('class' => 'accesshide'));
         $str .= html_writer::select($formats, $elname.'[format]', $format, false, array('id' => 'menu'. $elname. 'format'));
     } else {
@@ -2286,7 +2289,14 @@ function tracker_print_direct_editor($attributes, $values, $options) {
                 'sesskey' => sesskey(),
                 ));
             $str .= '<noscript>';
-            $str .= "<div><object type='text/html' data='$editorurl' height='160' width='600' style='border:1px solid #000'></object></div>";
+            $str .= '<div>';
+            $attrs = array('type' => 'text/html',
+                           'data' = $editorurl,
+                           'height' => 160,
+                           'width' = 600,
+                           'style' => 'border:1px solid #000');
+            $str .= html_writer::tag('object', '', $attrs);
+            $sr .= '</div>';
             $str .= '</noscript>';
         }
     }
@@ -2317,8 +2327,7 @@ function tracker_get_statuskeys($tracker, $cm = null) {
             PUBLISHED => get_string('published', 'tracker'),
             RESOLVED => get_string('resolved', 'tracker'),
             ABANDONNED => get_string('abandonned', 'tracker'),
-            TRANSFERED => get_string('transfered', 'tracker')
-        );
+            TRANSFERED => get_string('transfered', 'tracker'));
 
         if (!($tracker->enabledstates & ENABLED_OPEN)) {
             unset($fullstatuskeys[OPEN]);

@@ -34,7 +34,7 @@ if (!function_exists('debug_trace')) {
     }
 }
 
-/**
+/*
  * Constants
  *
  */
@@ -182,11 +182,11 @@ function tracker_rpc_get_instances($username, $remotehostroot) {
  * remote post an entry in a tracker
  * @param object $remoteuser a user description
  * @param int $trackerid the local trackerid where to post
- * @param string $remote_issue a JSON encoded variable containing all
+ * @param string $remoteissue a JSON encoded variable containing all
  * information about an issue.
  * @return the local issue record id
  */
-function tracker_rpc_post_issue($remoteuser, $trackerid, $remote_issue, $islocalcall = false) {
+function tracker_rpc_post_issue($remoteuser, $trackerid, $remoteissue, $islocalcall = false) {
     global $DB, $USER;
 
     $tracker = $DB->get_record('tracker', array('id' => $trackerid));
@@ -200,7 +200,7 @@ function tracker_rpc_post_issue($remoteuser, $trackerid, $remote_issue, $islocal
     // Objectify received arrays.
     $remoteuser = (object)$remoteuser;
     // Clone is important here to unbind instances.
-    $newissue = clone((object)$remote_issue);
+    $newissue = clone((object)$remoteissue);
 
     if (!$islocalcall) {
         if ($tracker->networkable) {
@@ -212,7 +212,7 @@ function tracker_rpc_post_issue($remoteuser, $trackerid, $remote_issue, $islocal
                 return $failedcheck;
             }
         } else {
-            // Simply checks user and returns $localuser record
+            // Simply checks user and returns $localuser record.
             if ($failedcheck = tracker_rpc_check($remoteuser, $localuser)) {
                 return $failedcheck;
             }

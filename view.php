@@ -50,7 +50,7 @@ if ($view == "view" && (empty($screen) || $screen == 'viewanissue' || $screen ==
     redirect(new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => 'view', 'screen' => 'browse')));
 }
 if ($view == 'reportanissue') {
-    redirect(new moodle_url('/mod/tracker/reportissue.php', array('id'=> $id)));
+    redirect(new moodle_url('/mod/tracker/reportissue.php', array('id' => $id)));
 }
 
 // Implicit routing.
@@ -75,7 +75,6 @@ $eventparams = array(
     'context' => $context,
 );
 
-// require_once($CFG->dirroot.'/mod/tracker/classes/event/course_module_viewed.php');
 $event = \mod_tracker\event\course_module_viewed::create($eventparams);
 $event->add_record_snapshot('tracker', $tracker);
 $event->trigger();
@@ -83,7 +82,7 @@ $event->trigger();
 tracker_loadpreferences($tracker->id, $USER->id);
 
 // Search controller - special implementation.
-// TODO : consider incorporing this controller back into standard MVC
+// TODO : consider incorporing this controller back into standard MVC.
 
 if ($action == 'searchforissues') {
     $search = optional_param('search', null, PARAM_CLEANHTML);
@@ -133,7 +132,7 @@ $renderer = $PAGE->get_renderer('tracker');
 
 // Process controllers
 
-$result = 0 ;
+$result = 0;
 if ($view == 'view') {
     if ($action != '') {
         $result = include($CFG->dirroot.'/mod/tracker/views/view.controller.php');
@@ -194,7 +193,7 @@ if ($view == 'view') {
 
             case 'viewanissue': {
                 // If user it trying to view an issue, check to see if user has privileges to view this issue.
-                $caps = array('mod/tracker:seeissues','mod/tracker:resolve','mod/tracker:develop','mod/tracker:manage');
+                $caps = array('mod/tracker:seeissues', 'mod/tracker:resolve', 'mod/tracker:develop', 'mod/tracker:manage');
                 if (!has_any_capability($caps, $context)) {
                     print_error('errornoaccessissue', 'tracker');
                 } else {

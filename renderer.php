@@ -101,7 +101,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 if ($cm && $DB->record_exists('tracker_issue', array('id' => $issueid))) {
                     $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issueid);
                     $url = new moodle_url('/mod/tracker/view.php', $params);
-    
+
                     $context = context_module::instance($cm->id);
                     if (has_capability('mod/tracker:seeissues', $context)) {
                         $link = html_writer::link($url, get_string('gototransfered', 'tracker'));
@@ -180,11 +180,11 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= '<b>'.get_string('assignedto', 'tracker').':</b>';
         $str .= '</td>';
         $str .= '<td width="25%" class="tracker-issue-value">';
-        if (!$issue->owner){
+        if (!$issue->owner) {
             $str .= get_string('unassigned', 'tracker');
         } else {
             $str .= $this->output->user_picture($issue->owner, array('courseid' => $COURSE->id, 'size' => 35));
-            $str .= '&nbsp;'.fullname($issue->owner); 
+            $str .= '&nbsp;'.fullname($issue->owner);
         }
         $str .= '</td>';
         $str .= '<td align="right" width="25%" class="tracker-issue-param">';
@@ -203,7 +203,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= format_text($issue->description);
         $str .= '</td>';
         $str .= '</tr>';
-    
+
         return $str;
     }
 
@@ -307,7 +307,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         }
         $str .= '</select>';
         $str .= '</form>';
-        $str .= " <a href=\"Javascript:document.forms['distribute'].submit();\">".get_string('distribute','tracker').'</a>';
+        $str .= " <a href=\"Javascript:document.forms['distribute'].submit();\">".get_string('distribute', 'tracker').'</a>';
 
         return $str;
     }
@@ -342,11 +342,11 @@ class mod_tracker_renderer extends plugin_renderer_base {
     }
 
     /**
-    * a local version of the print user command that fits  better to the tracker situation
-    * @uses $COURSE
-    * @uses $CFG
-    * @param object $user the user record
-    */
+     * a local version of the print user command that fits  better to the tracker situation
+     * @uses $COURSE
+     * @uses $CFG
+     * @param object $user the user record
+     */
     public function user($user) {
         global $COURSE, $CFG;
 
@@ -558,12 +558,12 @@ class mod_tracker_renderer extends plugin_renderer_base {
             $rows[0][] = new tabobject('reportanissue', $taburl, get_string('newissue', 'tracker'));
         }
 
-        $label = get_string('view', 'tracker').' ('.$totalissues.' '.get_string('issues','tracker').')';
+        $label = get_string('view', 'tracker').' ('.$totalissues.' '.get_string('issues', 'tracker').')';
         $params = array('id' => $cm->id, 'view' => 'view');
         $taburl = new moodle_url('/mod/tracker/view.php', $params);
         $rows[0][] = new tabobject('view', $taburl, $label);
 
-        $label = get_string('resolvedplural', 'tracker').' ('.$totalresolvedissues.' '.get_string('issues','tracker').')';
+        $label = get_string('resolvedplural', 'tracker').' ('.$totalresolvedissues.' '.get_string('issues', 'tracker').')';
         $params = array('id' => $cm->id, 'view' => 'resolved');
         $taburl = new moodle_url('/mod/tracker/view.php', $params);
         $rows[0][] = new tabobject('resolved', $taburl, $label);
@@ -998,7 +998,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
             if (empty($form->format)) {
                 $form->format = FORMAT_MOODLE;
             }
-            $str .= html_writer::select(format_text_menu(), 'format', $form->format); 
+            $str .= html_writer::select(format_text_menu(), 'format', $form->format);
             $str .= '</p>';
         }
         $str .= '</td>';

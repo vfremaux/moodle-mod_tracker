@@ -22,7 +22,7 @@
 require('../../config.php');
 require_once($CFG->dirroot."/mod/tracker/lib.php");
 require_once($CFG->dirroot."/mod/tracker/locallib.php");
-require_once $CFG->dirroot.'/mod/tracker/forms/reportissue_form.php';
+require_once($CFG->dirroot.'/mod/tracker/forms/reportissue_form.php');
 
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID, or.
 $t  = optional_param('t', 0, PARAM_INT);  // tracker ID.
@@ -56,16 +56,16 @@ if (!$form->is_cancelled()) {
             print_error('errorcannotsubmitticket', 'tracker');
         }
 
-        // add_to_log($course->id, 'tracker', "reportissue", "view.php?id={$cm->id}", "$tracker->id", $cm->id);
         $event = \mod_tracker\event\tracker_issuereported::create_from_issue($tracker, $issue->id);
         $event->trigger();
 
-        // stores files
-        $data = file_postupdate_standard_editor($data, 'description', $form->editoroptions, $context, 'mod_tracker', 'issuedescription', $data->issueid);
-        // update back reencoded field text content
+        // Stores files.
+        $data = file_postupdate_standard_editor($data, 'description', $form->editoroptions, $context, 'mod_tracker',
+                                                'issuedescription', $data->issueid);
+        // Update back reencoded field text content.
         $DB->set_field('tracker_issue', 'description', $data->description, array('id' => $issue->id));
 
-        // log state change
+        // Log state change.
         $stc = new StdClass;
         $stc->userid = $USER->id;
         $stc->issueid = $issue->id;
@@ -76,12 +76,12 @@ if (!$form->is_cancelled()) {
         $DB->insert_record('tracker_state_change', $stc);
         echo $OUTPUT->header();
         echo $OUTPUT->box_start('generalbox', 'tracker-acknowledge');
-        echo (empty($tracker->thanksmessage)) ? get_string('thanksdefault', 'tracker') : format_string($tracker->thanksmessage) ;
+        echo (empty($tracker->thanksmessage)) ? get_string('thanksdefault', 'tracker') : format_string($tracker->thanksmessage);
         echo $OUTPUT->box_end();
         echo $OUTPUT->continue_button(new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => 'view', 'screen' => 'browse')));
         echo $OUTPUT->footer();
 
-        // notify all admins
+        // Notify all admins.
         if ($tracker->allownotifications) {
             tracker_notify_submission($issue, $cm, $tracker);
             if ($issue->assignedto) {
