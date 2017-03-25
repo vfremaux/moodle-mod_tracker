@@ -141,7 +141,7 @@ if (!empty($tracker->parent)) {
     if (has_capability('mod/tracker:viewpriority', $context) && !$resolved) {
         $tablecolumns = array('statusthin', 'resolutionpriority', 'id', 'summary', 'datereported', 'assignedto', 'status',
                               'watches',  'action');
-        $tableheaders = array('', "<b>$prioritystr</b>", '', "<b>$summarystr</b>", "<b>$datereportedstr</b>";
+        $tableheaders = array('', "<b>$prioritystr</b>", '', "<b>$summarystr</b>", "<b>$datereportedstr</b>",
                               "<b>$assignedtostr</b>", "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$actionstr</b>");
     } else {
         $tablecolumns = array('statusthin', 'id', 'summary', 'datereported', 'assignedto', 'status', 'watches',  'action');
