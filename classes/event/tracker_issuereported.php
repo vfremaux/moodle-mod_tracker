@@ -29,18 +29,9 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Event for when a tracker activity is commented.
  */
-class tracker_issuereported extends \core\event\base {
+class tracker_issuereported extends tracker_baseevent {
 
     protected $issueid;
-
-    /**
-     * Init method.
-     */
-    protected function init() {
-        $this->data['crud'] = 'u';
-        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
-        $this->data['objecttable'] = 'tracker';
-    }
 
     public static function get_name() {
         return get_string('event_tracker_issue_reported', 'tracker');
@@ -103,50 +94,5 @@ class tracker_issuereported extends \core\event\base {
         return array($log1);
     }
 
-    /**
-     * custom validations
-     *
-     * Throw \coding_exception notice in case of any problems.
-     */
-    protected function validate_data() {
-        parent::validate_data();
-        if (!isset($this->other['modulename'])) {
-            throw new \coding_exception("Field other['modulename'] cannot be empty");
-        }
-        if (!isset($this->other['instanceid'])) {
-            throw new \coding_exception("Field other['instanceid'] cannot be empty");
-        }
-        if (!isset($this->other['name'])) {
-            throw new \coding_exception("Field other['name'] cannot be empty");
-        }
-        if (!isset($this->other['issueid'])) {
-            throw new \coding_exception("Field other['issueid'] cannot be empty");
-        }
-    }
-
-    public final static function create_from_issue(&$tracker, $issueid) {
-        global $USER;
-        // If not set, get the module context.
-
-        $cm = get_coursemodule_from_instance('tracker', $tracker->id);
-
-        if (empty($modcontext)) {
-            $modcontext = \context_module::instance($cm->id);
-        }
-
-        // Create event object for course module update action.
-        $event = static::create(array(
-            'context'  => $modcontext,
-            'objectid' => $cm->id,
-            'userid' => $USER->id,
-            'other'    => array(
-                'modulename' => $cm->modname,
-                'instanceid' => $cm->instance,
-                'name'       => $cm->name,
-                'issueid'    => $issueid,
-            )
-        ));
-        return $event;
-    }
 }
 
