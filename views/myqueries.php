@@ -15,13 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* @package      mod_tracker
-* @category     mod
-* @author       Clifford Tham, Valery Fremaux > 1.8
-*
-* Prints list of user's stored queries
-*/
-
+ * @package      mod_tracker
+ * @category     mod
+ * @author       Clifford Tham, Valery Fremaux > 1.8
+ *
+ * Prints list of user's stored queries
+ */
 defined('MOODLE_INTERNAL') || die();
 
 $select = " userid = ? AND trackerid = ? ";

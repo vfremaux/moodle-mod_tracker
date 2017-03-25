@@ -112,6 +112,7 @@ if ($action == 'updateanissue') {
         $DB->insert_record('tracker_state_change', $stc);
 
         if ($stc->statusto == RESOLVED || $stc->statusto == PUBLISHED) {
+            assert(1);
             // Check if was cascaded and needs backreported then backreport.
             // TODO : backreport to original.
         }
@@ -194,10 +195,10 @@ if ($action == 'updateanissue') {
 
     // Updating list and status ******************************************************************.
 
-    $keys = array_keys($_POST);                                // get the key value of all the fields submitted.
-    $statuskeys = preg_grep('/status./' , $keys);              // filter out only the status.
-    $assignedtokeys = preg_grep('/assignedto./' , $keys);      // filter out only the assigned updating.
-    $newassignedtokeys = preg_grep('/assignedtoi./' , $keys);  // filter out only the new assigned.
+    $keys = array_keys($_POST);                                // Get the key value of all the fields submitted.
+    $statuskeys = preg_grep('/status./' , $keys);              // Filter out only the status.
+    $assignedtokeys = preg_grep('/assignedto./' , $keys);      // Filter out only the assigned updating.
+    $newassignedtokeys = preg_grep('/assignedtoi./' , $keys);  // Filter out only the new assigned.
     foreach ($statuskeys as $akey) {
         $issueid = str_replace('status', '', $akey);
         $haschanged = optional_param('schanged'.$issueid, 0, PARAM_INT);
@@ -261,7 +262,7 @@ if ($action == 'updateanissue') {
     // Reorder priority field and discard newly resolved or abandonned.
     tracker_update_priority_stack($tracker);
 
-} elseif ($action == 'usequery') {
+} else if ($action == 'usequery') {
 
     // Reactivates a stored search *************************************************************.
 
@@ -282,7 +283,7 @@ if ($action == 'updateanissue') {
     $ccid = optional_param('ccid', $USER->id, PARAM_INT);
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
     tracker_register_cc($tracker, $issue, $ccid);
-} elseif ($action == 'cascade') {
+} else if ($action == 'cascade') {
     global $USER;
 
     // Copy an issue to a parent tracker *********************************************************.
@@ -318,7 +319,7 @@ if ($action == 'updateanissue') {
     $comments = $DB->get_records('tracker_issuecomment', array('issueid' => $issue->id));
     $track = '';
     if (!empty($comments)) {
-        // collect userids
+        // Collect userids.
         foreach ($comments as $comment) {
             $useridsarray[] = $comment->userid;
         }
@@ -360,7 +361,7 @@ if ($action == 'updateanissue') {
         list($remoteid, $mnethostroot) = explode('@', $tracker->parent);
 
         // Get network tracker properties.
-        include_once $CFG->dirroot.'/mnet/xmlrpc/client.php';
+        include_once($CFG->dirroot.'/mnet/xmlrpc/client.php');
         $userroot = $DB->get_field('mnet_host', 'wwwroot', array('id' => $USER->mnethostid));
         $rpcclient = new mnet_xmlrpc_client();
         $rpcclient->set_method('mod/tracker/rpclib.php/tracker_rpc_post_issue');
@@ -422,7 +423,7 @@ if ($action == 'updateanissue') {
     }
 } else if ($action == 'distribute') {
 
-    /**
+    /*
      * distribution only work with local subtrackers. Elements are not remapped
      *
      */
@@ -458,7 +459,7 @@ if ($action == 'updateanissue') {
             tracker_notifyccs_changeownership($issue->id, $newtracker);
         }
 
-        // log state change.
+        // Log state change.
         if ($oldstatus != $issue->status) {
             $stc = new StdClass;
             $stc->userid = $USER->id;
@@ -538,7 +539,8 @@ if ($action == 'updateanissue') {
     $issueid = required_param('issueid', PARAM_INT);
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
     if ($issue->resolutionpriority > 0) {
-        $nextissue = $DB->get_record('tracker_issue', array('trackerid' => $tracker->id, 'resolutionpriority' => $issue->resolutionpriority - 1));
+        $params = array('trackerid' => $tracker->id, 'resolutionpriority' => $issue->resolutionpriority - 1);
+        $nextissue = $DB->get_record('tracker_issue', $params);
         $issue->resolutionpriority--;
         $nextissue->resolutionpriority++;
         $DB->update_record('tracker_issue', $issue);
@@ -574,7 +576,7 @@ if ($action == 'updateanissue') {
 
 } else if ($action == 'askraise') {
 
-    // get some context for sending raising request ***************************************************.
+    // Get some context for sending raising request ***************************************************.
     $issueid = required_param('issueid', PARAM_INT);
 
      include($CFG->dirroot.'/mod/tracker/views/raiserequest.html');

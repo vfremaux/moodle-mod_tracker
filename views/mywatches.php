@@ -15,13 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* @package      mod_tracker
-* @category     mod
-* @author       Clifford Tham, Valery Fremaux > 1.8
-*
-* Prints a form for user preferences.
-*/
-
+ * @package      mod_tracker
+ * @category     mod
+ * @author       Clifford Tham, Valery Fremaux > 1.8
+ *
+ * Prints a form for user preferences.
+ */
 defined('MOODLE_INTERNAL') || die();
 
 $mywatches = tracker_getwatches($tracker->id, $USER->id);
@@ -39,7 +38,11 @@ if (empty($mywatches)) {
     $actionstr = get_string('action', 'tracker');
     $notificationstr = get_string('notifications', 'tracker');
     $table = new html_table();
-    $table->head = array("<b>$idstr</b>", "<b>$summarystr</b>", "<b>$peoplestr</b>", "<b>$actionstr</b>", "<b>$notificationstr</b>");
+    $table->head = array("<b>$idstr</b>",
+                         "<b>$summarystr</b>",
+                         "<b>$peoplestr</b>",
+                         "<b>$actionstr</b>",
+                         "<b>$notificationstr</b>");
     $table->size = array('10%', '50%', '10%', '10%', '%20');
     $table->align = array('left', 'left', 'center', 'center', 'center');
     foreach ($mywatches as $awatch) {
@@ -49,7 +52,7 @@ if (empty($mywatches)) {
                         'issueid' => $awatch->issueid,
                         'ccid' => $awatch->userid);
         $unregisterurl = new moodle_url('/mod.tracker/view.php', $params);
-        $pix = '<img src="'.$OUTPUT->pix_url('t/delete','core').'" />';
+        $pix = '<img src="'.$OUTPUT->pix_url('t/delete', 'core').'" />';
         $actions = '<a href="'.$unregister.'" title="'.get_string('delete').'">'.$pix.'</a>';
 
         $params = array('id' => $cm->id, 'view' => 'profile', 'what' => 'editwatch', 'ccid' => $awatch->userid);

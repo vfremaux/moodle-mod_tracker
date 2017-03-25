@@ -42,7 +42,8 @@ if (!$issue) {
         $trackerurl = new moodle_url('/mod/tracker/viex.php', array('view' => 'view', 'screen' => 'browse', 'a' => $tracker->id));
         redirect($trackerurl);
     } else {
-        $trackerurl = new moodle_url('/mod/tracker/viex.php', array('view' => 'view', 'screen' => 'mytickets', 'a' => $tracker->id));
+        $params = array('view' => 'view', 'screen' => 'mytickets', 'a' => $tracker->id);
+        $trackerurl = new moodle_url('/mod/tracker/viex.php', $params);
         redirect($trackerurl);
     }
 }
@@ -63,46 +64,41 @@ $select = " trackerid = ? AND issueid = ? ";
 $history = $DB->get_records_select('tracker_issueownership', $select, array($tracker->id, $issue->id), 'timeassigned DESC');
 
 $statehistory = $DB->get_records_select('tracker_state_change', $select, array($tracker->id, $issue->id),'timechange ASC');
-$showdependancieslink = (!empty($childtree) || !empty($parenttree)) ? "<a id=\"toggledependancieslink\" href=\"javascript:toggledependancies()\">".get_string(($initialviewmode == 'visiblediv') ? 'hidedependancies' : 'showdependancies', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
-$showccslink = (!empty($ccs)) ? "<a id=\"toggleccslink\" href=\"javascript:toggleccs()\">".get_string(($initialccsviewmode == 'visiblediv') ? 'hideccs' : 'showccs', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
-$showhistorylink = (!empty($history) || !empty($statehistory)) ? "<a id=\"togglehistorylink\" href=\"javascript:togglehistory()\">".get_string(($initialhistoryviewmode == 'visiblediv') ? 'hidehistory' : 'showhistory', 'tracker').'</a>&nbsp;-&nbsp;' : '' ;
 
-// fixing embeded files URLS
+$linklabel = get_string(($initialviewmode == 'visiblediv') ? 'hidedependancies' : 'showdependancies', 'tracker');
+$link = '<a id="toggledependancieslink" href="javascript:toggledependancies()">'.$linklabel.'</a>&nbsp;-&nbsp;';
+$showdependancieslink = (!empty($childtree) || !empty($parenttree)) ? $link : '';
+
+$linklabel = get_string(($initialccsviewmode == 'visiblediv') ? 'hideccs' : 'showccs', 'tracker');
+$link = '<a id="toggleccslink" href="javascript:toggleccs()">'.$linklabel.'</a>&nbsp;-&nbsp;'
+$showccslink = (!empty($ccs)) ? $link : '';
+
+$linklabel = get_string(($initialhistoryviewmode == 'visiblediv') ? 'hidehistory' : 'showhistory', 'tracker');
+$link = '<a id="togglehistorylink" href="javascript:togglehistory()">'.$linklabel.'</a>&nbsp;-&nbsp;';
+$showhistorylink = (!empty($history) || !empty($statehistory)) ? $link : '';
+
+// Fixing embeded files URLS.
 
 $issue->description = file_rewrite_pluginfile_urls($issue->description, 'pluginfile.php', $context->id, 'mod_tracker',
                                                    'issuedescription', $issue->id);
 $issue->resolution = file_rewrite_pluginfile_urls($issue->resolution, 'pluginfile.php', $context->id, 'mod_tracker',
                                                   'issueresolution', $issue->id);
 
-// get STATUSKEYS labels
+// Get statuskeys labels.
 
 $statuskeys = tracker_get_statuskeys($tracker);
 
 // Start printing.
 
 echo $OUTPUT->box_start('generalbox', 'bugreport');
-?>
 
-<!-- Print Bug Form -->
+echo $renderer->issue_js_init();
 
-<table cellpadding="5" class="tracker-issue">
-<script type="text/javascript">
-    var showhistory = "<?php print_string('showhistory', 'tracker') ?>";
-    var hidehistory = "<?php print_string('hidehistory', 'tracker') ?>";
-
-    var showccs = "<?php print_string('showccs', 'tracker') ?>";
-    var hideccs = "<?php print_string('hideccs', 'tracker') ?>";
-
-    var showdependancies = "<?php print_string('showdependancies', 'tracker') ?>";
-    var hidedependancies = "<?php print_string('hidedependancies', 'tracker') ?>";
-
-    var showcomments = "<?php print_string('showcomments', 'tracker') ?>";
-    var hidecomments = "<?php print_string('hidecomments', 'tracker') ?>";
-</script>
-<?php
+echo '<!-- Print Bug Form -->';
+echo '<table cellpadding="5" class="tracker-issue">';
 
 if (tracker_can_workon($tracker, $context, $issue)) {
-    // If I can resolve and I have seen, the bug is open
+    // If I can resolve and I have seen, the bug is open.
     if ($issue->status < OPEN) {
         $oldstatus = $issue->status;
         $issue->status = OPEN;
@@ -124,11 +120,9 @@ if (tracker_can_edit($tracker, $context, $issue)) {
 }
 
 echo $renderer->core_issue($issue, $tracker);
-?>
-    
-    <!--Print Bug Attributes-->
-    
-<?php
+
+echo '<!--Print Bug Attributes-->';
+
 if (is_array($elementsused)) {
     echo $renderer->issue_attributes($issue, $elementsused);
 }
@@ -141,13 +135,15 @@ if ($tracker->enablecomments) {
     $commentscount = $DB->count_records('tracker_issuecomment', array('issueid' => $issue->id));
     $addcommentlink = '';
     if (has_capability('mod/tracker:comment', $context)) {
-        $addcommentlink = "<a href=\"addcomment.php?id={$cm->id}&amp;issueid={$issueid}\">".get_string('addacomment', 'tracker').'</a>';
+        $linkurl = new moodle_url('/mod/tracker/addcomment.php', array('id' => $cm->id, 'issueid' => $issueid));
+        $addcommentlink = '<a href="'.$linkurl.'">'.get_string('addacomment', 'tracker').'</a>';
     }
     $showcommentslink = '';
     if ($commentscount) {
-        $showcommentslink = "<a id=\"togglecommentlink\" href=\"javascript:togglecomments()\">".get_string('showcomments', 'tracker').'</a>&nbsp;-&nbsp;';
+        $label = get_string('showcomments', 'tracker');
+        $showcommentslink = '<a id="togglecommentlink" href="javascript:togglecomments()">'.$label.'</a>&nbsp;-&nbsp;';
     } else {
-        $showcommentslink = '<i>'.get_string('nocomments','tracker').'</i>&nbsp;-&nbsp;';
+        $showcommentslink = '<i>'.get_string('nocomments', 'tracker').'</i>&nbsp;-&nbsp;';
     }
 }
 
@@ -157,7 +153,9 @@ if ($tracker->parent &&
                 (has_capability('mod/tracker:manage', $context) ||
                         has_capability('mod/tracker:resolve', $context) ||
                                 has_capability('mod/tracker:develop', $context))) {
-    $transferlink = " - <a href=\"view.php?id={$cm->id}&amp;view=view&amp;what=cascade&amp;issueid={$issueid}\">".get_string('cascade','tracker')."</a>";
+    $params = array('id' => $cm->id, 'view' => 'view', 'what' => 'cascade', 'issueid' => $issueid);
+    $linkurl = new moodle_url('/mod/tracker/view.php', $params);
+    $transferlink = ' - <a href="'.$linkurl.'">'.get_string('cascade', 'tracker').'</a>';
 }
 
 $distribute = '';
@@ -169,13 +167,12 @@ if ($tracker->subtrackers &&
     $distribute = $renderer->distribution_form($tracker, $issue, $cm);
 }
 
-?>
-    <tr valign="top">
-        <td align="right" colspan="4">
-            <?php echo $showhistorylink.$showccslink.$showdependancieslink.$showcommentslink.$addcommentlink.$transferlink.$distribute; ?>
-        </td>
-    </tr>
-<?php
+echo '<tr valign="top">';
+echo '<td align="right" colspan="4">';
+echo $showhistorylink.$showccslink.$showdependancieslink.$showcommentslink.$addcommentlink.$transferlink.$distribute;
+echo '</td>';
+echo '</tr>';
+
 if ($tracker->enablecomments) {
     if (!empty($commentscount)) {
 ?>
@@ -219,10 +216,10 @@ if (has_capability('mod/tracker:managewatches', $context)) {
 if ($showhistorylink) {
     echo $renderer->history($history, $statehistory, $initialhistoryviewmode);
 }
-?>
-</table>
-<?php
+
+echo '</table>';
+
 echo $OUTPUT->box_end();
 $nohtmleditorneeded = true;
-?>
-</center>
+
+echo '</center>';

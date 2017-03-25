@@ -200,6 +200,7 @@ $string['errorcoursemisconfigured'] = 'Course is misconfigured';
 $string['errorcoursemodid'] = 'Course Module ID was incorrect';
 $string['errordbupdate'] = 'Could not update element';
 $string['errorelementdoesnotexist'] = 'Element does not exist';
+$string['errordeleteelement'] = 'Cannot delete the element option: {$a} because it is currently being used as a attribute for an issue';
 $string['errorelementinuse'] = 'Element already in use';
 $string['errorfindingaction'] = 'Error:  Cannot find action: {$a}';
 $string['errorinvalidtrackerelementid'] = 'Invalid element. Cannot edit element id';

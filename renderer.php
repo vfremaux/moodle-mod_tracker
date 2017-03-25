@@ -1023,4 +1023,18 @@ class mod_tracker_renderer extends plugin_renderer_base {
         return $str;
     }
 
+    public function issue_js_init() {
+        $str = '<script type="text/javascript">';
+        $str .= '    var showhistory = "'.get_string('showhistory', 'tracker').'";';
+        $str .= '    var hidehistory = "'.get_string('hidehistory', 'tracker').'";';
+        $str .= '    var showccs = "'.get_string('showccs', 'tracker').'";';
+        $str .= '    var hideccs = "'.get_string('hideccs', 'tracker').'";';
+        $str .= '    var showdependancies = "'.get_string('showdependancies', 'tracker').'";';
+        $str .= '    var hidedependancies = "'.get_string('hidedependancies', 'tracker').'";';
+        $str .= '    var showcomments = "'.get_string('showcomments', 'tracker').'";';
+        $str .= '    var hidecomments = "'.get_string('hidecomments', 'tracker').'";';
+        $str .= '</script>';
+
+        return $str;
+    }
 }

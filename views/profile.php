@@ -28,9 +28,9 @@ $statuskeys = tracker_get_statuskeys($tracker);
 $statuscodes = tracker_get_statuscodes();
 
 echo "<br/>";
-echo $OUTPUT->heading(get_string('me', 'tracker')); 
+echo $OUTPUT->heading(get_string('me', 'tracker'));
 
-echo $OUTPUT->box_start('center', '90%', '', '', 'generalbox', 'bugreport'); 
+echo $OUTPUT->box_start('center', '90%', '', '', 'generalbox', 'bugreport');
 
 $table = new html_table();
 $table->head = array('', '');
@@ -105,7 +105,7 @@ if ($resolver) {
     $table->width = '90%';
     $table->size = array('30%', '70%');
     $table->align = array('right', 'left');
-    
+
     $str = '';
     $assignees = tracker_getassignees($USER->id);
     if ($assignees) {
@@ -123,7 +123,7 @@ if ($resolver) {
     $str = '';
     if ($issues) {
         foreach ($issues as $issue) {
-            $params = array('id' => $cm->id, 'view' => 'view', 'screen'=> 'viewanissue', 'issueid' => $issue->id);
+            $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issue->id);
             $linkurl = new moodle_url('/mod/tracker/view.php', $params);
             $str .= $tracker->ticketprefix.$issue->id . ' - <a href="'.$linkurl.'">'.$issue->summary.'</a>';
             $str .= "&nbsp;<span class=\"status_{$statuscodes[$issue->status]}\">".$statuskeys[$issue->status].'</span>';

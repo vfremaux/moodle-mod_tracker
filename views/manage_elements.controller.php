@@ -15,33 +15,33 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* @package  mod-tracker
-* @category mod
-* @author   Valery Fremaux > 1.8
-*
-* Controller for all "element management" related views
-*
-* @usecase createelement
-* @usecase doaddelement
-* @usecase editelement
-* @usecase doupdateelement
-* @usecase deleteelement
-* @usecase submitelementoption
-* @usecase viewelementoptions
-* @usecase deleteelementoption
-* @usecase editelementoption
-* @usecase updateelementoption
-* @usecase moveelementoptionup
-* @usecase moveelementoptiondown
-* @usecase addelement
-* @usecase removeelement
-*/
+ * @package  mod-tracker
+ * @category mod
+ * @author   Valery Fremaux > 1.8
+ *
+ * Controller for all "element management" related views
+ *
+ * @usecase createelement
+ * @usecase doaddelement
+ * @usecase editelement
+ * @usecase doupdateelement
+ * @usecase deleteelement
+ * @usecase submitelementoption
+ * @usecase viewelementoptions
+ * @usecase deleteelementoption
+ * @usecase editelementoption
+ * @usecase updateelementoption
+ * @usecase moveelementoptionup
+ * @usecase moveelementoptiondown
+ * @usecase addelement
+ * @usecase removeelement
+ */
 
 defined('MOODLE_INTERNAL') || die();
 
 if ($action == 'createelement') {
 
-    // Create element form ********************************************************************.
+    // Create element form -----------------------------------------------------------------------.
 
     $form->type = required_param('type', PARAM_ALPHA);
     $form->action = 'doaddelement';
@@ -50,7 +50,7 @@ if ($action == 'createelement') {
 
 } else if ($action == 'doaddelement') {
 
-    // Add an element **********************************************************************.
+    // Add an element ----------------------------------------------------------------------------.
 
     $form->name = required_param('name', PARAM_ALPHANUM);
     $form->name = preg_replace('/\s+|-|\\\'|\"/', '', $form->name); // Remove all spaces.
@@ -88,7 +88,7 @@ if ($action == 'createelement') {
 
 } else if ($action == 'editelement') {
 
-    // Edit an element form ***********************************************************.
+    // Edit an element form ----------------------------------------------------------------.
 
     $form->elementid = required_param('elementid', PARAM_INT);
     if ($form->elementid != null) {
@@ -97,7 +97,7 @@ if ($action == 'createelement') {
         $form->name = $element->name;
         $form->description = $element->description;
         $form->format = $element->format;
-        $form->shared = ($element->course == 0) ;
+        $form->shared = ($element->course == 0);
         $form->action = 'doupdateelement';
         echo $renderer->edi_element($cm, $form);
     } else {
@@ -108,7 +108,7 @@ if ($action == 'createelement') {
 
 if ($action == 'doupdateelement') {
 
-    // Update an element ***********************************************************************.
+    // Update an element ------------------------------------------------------------.
 
     $form->elementid = required_param('elementid', PARAM_INT);
     $form->name = required_param('name', PARAM_ALPHANUM);
@@ -145,7 +145,7 @@ if ($action == 'doupdateelement') {
 
 if ($action == 'deleteelement') {
 
-    // Delete an element from available ******************************************************.
+    // Delete an element from available ------------------------------------------------------.
 
     $elementid = required_param('elementid', PARAM_INT);
     if (!tracker_iselementused($tracker->id, $elementid)) {
@@ -156,7 +156,7 @@ if ($action == 'deleteelement') {
 
 if ($action == 'submitelementoption') {
 
-    // Add an element option ******************************************************************.
+    // Add an element option --------------------------------------------------------------.
 
     $form->elementid = required_param('elementid', PARAM_INT);
     $form->name = required_param('name', PARAM_ALPHANUM);
@@ -198,8 +198,8 @@ if ($action == 'submitelementoption') {
     } else {
         // Print errors.
         $errorstr = '';
-        foreach ($errors as $anError) {
-            $errorstrs[] = $anError->message;
+        foreach ($errors as $error) {
+            $errorstrs[] = $error->message;
         }
         echo $OUTPUT->box(implode('<br/>', $errorstrs), '', 'errorbox');
     }
@@ -214,7 +214,7 @@ if ($action == 'submitelementoption') {
 
 if ($action == 'viewelementoptions') {
 
-    // Edit an element option *******************************************************************.
+    // Edit an element option ------------------------------------------------------------.
 
     $form->elementid = optional_param('elementid', @$form->elementid, PARAM_INT);
     if ($form->elementid != null) {
@@ -233,7 +233,7 @@ if ($action == 'viewelementoptions') {
 
 if ($action == 'deleteelementoption') {
 
-    // Delete an element option ****************************************************************.
+    // Delete an element option ----------------------------------------------------------.
 
     $form->elementid = optional_param('elementid', null, PARAM_INT);
     $form->optionid = required_param('optionid', PARAM_INT);
@@ -242,7 +242,10 @@ if ($action == 'deleteelementoption') {
     $form->type = $element->type;
 
     if ($DB->get_records('tracker_issueattribute', array('elementitemid' => $form->optionid))) {
-        error ('Cannot delete the element option:"' . $element->options[$form->optionid]->name . '" (id:' . $form->optionid . ') because it is currently being used as a attribute for an issue', "view.php?id={$cm->id}&amp;what=viewelementoptions&amp;elementid=" . $form->elementid);
+        $params = array('id' => $cm->id, 'what' => 'viewelementoptions', 'elementid' => $form->elementid);
+        $returl = new moodle_url('/mod.tracker/view.php', $params);
+        $optname = $element->options[$form->optionid]->name.'" (id:'.$form->optionid.') ';
+        print_error('errordeleteelement', 'tracker', $optname, $returl);
     }
     $DB->delete_records('tracker_elementitem', array('id' => $form->optionid));
 
@@ -268,7 +271,7 @@ if ($action == 'deleteelementoption') {
 
 if ($action == 'editelementoption') {
 
-    // Edit an element option ************************************************************************.
+    // Edit an element option ---------------------------------------------------------------.
 
     $form->elementid = required_param('elementid', PARAM_INT);
     $form->optionid = required_param('optionid', PARAM_INT);
@@ -283,7 +286,7 @@ if ($action == 'editelementoption') {
 
 if ($action == 'updateelementoption') {
 
-    // Edit an element option ***********************************************************************.
+    // Edit an element option ----------------------------------------------------------------.
 
     $form->elementid = required_param('elementid', PARAM_INT);
     $form->optionid = required_param('optionid', PARAM_INT);
@@ -334,8 +337,8 @@ if ($action == 'updateelementoption') {
     } else {
         // Print errors.
         $errorstr = '';
-        foreach ($errors as $anError) {
-            $errorstrs[] = $anError->message;
+        foreach ($errors as $error) {
+            $errorstrs[] = $error->message;
         }
         echo $OUTPUT->box(implode("<br/>", $errorstrs), 'center', '70%', '', 5, 'errorbox');
         echo $renderer->edit_option_form($cm, $form, 'submit', @$errors);
@@ -345,7 +348,7 @@ if ($action == 'updateelementoption') {
 
 if ($action == 'moveelementoptionup') {
 
-    // Move an option up in list ***************************************************************.
+    // Move an option up in list ----------------------------------------------------.
 
     $form->elementid = required_param('elementid', PARAM_INT);
     $form->optionid = required_param('optionid', PARAM_INT);
@@ -378,7 +381,7 @@ if ($action == 'moveelementoptionup') {
 
 if ($action == 'moveelementoptiondown') {
 
-    // Move an option down in list ****************************************************************.
+    // Move an option down in list -------------------------------------------------.
 
     $form->elementid = required_param('elementid', PARAM_INT);
     $form->optionid = required_param('optionid', PARAM_INT);
@@ -387,10 +390,12 @@ if ($action == 'moveelementoptiondown') {
     $element = tracker_getelement($form->elementid);
     $form->type = $element->type;
     $option->id = $form->optionid;
-    $sortorder = $DB->get_field('tracker_elementitem', 'sortorder', array('elementid' => $form->elementid, 'id' => $form->optionid));
+    $params = array('elementid' => $form->elementid, 'id' => $form->optionid);
+    $sortorder = $DB->get_field('tracker_elementitem', 'sortorder', $params);
     if ($sortorder < $element->maxorder) {
         $option->sortorder = $sortorder + 1;
-        $nextoption->id = $DB->get_field('tracker_elementitem', 'id', array('elementid' => $form->elementid, 'sortorder' => $sortorder + 1));
+        $params = array('elementid' => $form->elementid, 'sortorder' => $sortorder + 1);
+        $nextoption->id = $DB->get_field('tracker_elementitem', 'id', $params);
         $nextoption->sortorder = $sortorder;
         // swap options in database
         $DB->update_record('tracker_elementitem', $option);
@@ -407,7 +412,7 @@ if ($action == 'moveelementoptiondown') {
 
 if ($action == 'addelement') {
 
-    // Add an element to be used ***************************************************************************.
+    // Add an element to be used ----------------------------------------------------.
 
     $elementid = required_param('elementid', PARAM_INT);
 
@@ -430,7 +435,7 @@ if ($action == 'addelement') {
 
 if ($action == 'removeelement') {
 
-    // Remove an element from usable list *****************************************************************.
+    // Remove an element from usable list -------------------------------------------.
 
     $usedid = required_param('usedid', PARAM_INT);
     $DB->delete_records('tracker_elementused', 'elementid', $usedid, 'trackerid', $tracker->id);

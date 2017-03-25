@@ -42,7 +42,7 @@ if ($action == 'savequery') {
     // Collects name and description on the way.
 
     $fields = tracker_extractsearchparametersfrompost();
-    $form->fields = serialize($fields); // Serialize for passthru
+    $form->fields = serialize($fields); // Serialize for passthru.
     $form->action = 'dosaveasquery';
     $form->description = tracker_printsearchfields($fields);
     echo $renderer->add_query_form($cm, $form);
@@ -86,7 +86,7 @@ if ($action == 'savequery') {
     $query = $DB->get_record('tracker_query', array('id' => $form->queryid));
     $fields = tracker_extractsearchparametersfromdb($form->queryid);
     $form->name = $query->name;
-    $form->checkdate = (empty($fields['datereported'])) ? false : true ;
+    $form->checkdate = (empty($fields['datereported'])) ? false : true;
     if (empty($fields['reportedby'])) {
         $fields['reportedby'] = array();
     }
@@ -130,7 +130,7 @@ if ($action == 'savequery') {
         $cc->trackerid = $tracker->id;
         $cc->issueid = $issueid;
         $cc->userid = $USER->id;
-        $cc->events = (isset($USER->trackerprefs->eventmask)) ? $USER->trackerprefs->eventmask : ALL_EVENTS ;
+        $cc->events = (isset($USER->trackerprefs->eventmask)) ? $USER->trackerprefs->eventmask : ALL_EVENTS;
         $DB->insert_record('tracker_issuecc', $cc);
     }
 
@@ -163,54 +163,9 @@ if ($action == 'savequery') {
     $issue = $DB->get_record('tracker_issue', array('id' => $form->issueid));
     $form->summary = $issue->summary;
 
-    include("views/editwatch.html");
+    include($CFG->dirroot.'/mod/tracker/views/editwatch.html');
     return -1;
 
-} else if ($action == 'updatewatch') {
-
-    // Update a watchers config for an issue *****************************************************.
-    // Transfered to Ajax service receiver.
-    /*
-    $cc = new StdClass();
-    $cc->id = required_param('ccid', PARAM_INT);
-    $open = optional_param('open', '', PARAM_INT);
-    $resolving = optional_param('resolving', '', PARAM_INT);
-    $waiting = optional_param('waiting', '', PARAM_INT);
-    $testing = optional_param('testing', '', PARAM_INT);
-    $published = optional_param('published', '', PARAM_INT);
-    $resolved = optional_param('resolved', '', PARAM_INT);
-    $abandonned = optional_param('abandonned', '', PARAM_INT);
-    $oncomment = optional_param('oncomment', '', PARAM_INT);
-    $cc->events = $DB->get_field('tracker_issuecc', 'events', array('id' => $cc->id));
-    if (is_numeric($open)) {
-        $cc->events = ($open === 1) ? $cc->events | EVENT_OPEN : $cc->events & ~EVENT_OPEN;
-    }
-    if (is_numeric($resolving)) {
-        $cc->events = ($resolving === 1) ? $cc->events | EVENT_RESOLVING : $cc->events & ~EVENT_RESOLVING;
-    }
-    if (is_numeric($waiting)) {
-        $cc->events = ($waiting === 1) ? $cc->events | EVENT_WAITING : $cc->events & ~EVENT_WAITING;
-    }
-    if (is_numeric($testing)) {
-        $cc->events = ($testing === 1) ? $cc->events | EVENT_TESTING : $cc->events & ~EVENT_TESTING;
-    }
-    if (is_numeric($published)) {
-        $cc->events = ($published === 1) ? $cc->events | EVENT_PUBLISHED : $cc->events & ~EVENT_PUBLISHED;
-    }
-    if (is_numeric($resolved)) {
-        $cc->events = ($resolved === 1) ? $cc->events | EVENT_RESOLVED : $cc->events & ~EVENT_RESOLVED;
-    }
-    if (is_numeric($abandonned)) {
-        $cc->events = ($abandonned === 1) ? $cc->events | EVENT_ABANDONNED : $cc->events & ~EVENT_ABANDONNED;
-    }
-    if (is_numeric($oncomment)) {
-        $cc->events = ($oncomment === 1) ? $cc->events | ON_COMMENT : $cc->events & ~ON_COMMENT;
-    }
-
-    if (!$DB->update_record('tracker_issuecc', $cc)) {
-        print_error('errorcannotupdatewatcher', 'tracker', $url.'&amp;view=profile');
-    }
-    */
 } else if ($action == 'saveprefs') {
     assert(1);
     // Deferred to mypreferences.php view.
