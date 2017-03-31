@@ -23,18 +23,9 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
+require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/text/text.class.php');
 
-class textareaelement extends trackerelement{
-
-    public function __construct(&$tracker, $id = null, $used = false) {
-        parent::__construct($tracker, $id, $used);
-    }
-
-    public function view($issueid = 0) {
-        $this->get_value($issueid);
-        echo format_text(format_string($this->value), $this->format);
-    }
+class textareaelement extends textelement {
 
     public function edit($issueid = 0) {
         $this->get_value($issueid);
@@ -61,39 +52,5 @@ class textareaelement extends trackerelement{
         }
     }
 
-    public function set_data(&$defaults, $issueid = 0) {
-        if ($issueid) {
-            $elementname = "element{$this->name}";
-            $defaults->$elementname = $this->get_value($issueid);
-        } else {
-            $defaults->$elementname = '';
-        }
-    }
-
-    public function form_process(&$data) {
-        global $DB;
-
-        $params = array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid);
-        if (!$attribute = $DB->get_record('tracker_issueattribute', $params)) {
-            $attribute = new StdClass();
-            $attribute->trackerid = $data->trackerid;
-            $attribute->issueid = $data->issueid;
-            $attribute->elementid = $this->id;
-        }
-
-        $elmname = 'element'.$this->name;
-        $data->$elmname = required_param($elmname, PARAM_TEXT);
-        $attribute->elementitemid = $data->$elmname; // In this case true value in element id.
-        $attribute->timemodified = time();
-
-        if (!isset($attribute->id)) {
-            $attribute->id = $DB->insert_record('tracker_issueattribute', $attribute);
-            if (empty($attribute->id)) {
-                print_error('erroraddissueattribute', 'tracker', '', 2);
-            }
-        } else {
-            $DB->update_record('tracker_issueattribute', $attribute);
-        }
-    }
 }
 

@@ -40,19 +40,6 @@ class constantelement extends trackerelement {
         return $this->value;
     }
 
-    public function edit($issueid = 0) {
-        $this->get_value($issueid);
-        $str = '';
-        $attrs = array('type' => 'hidden', 'name' => 'element'.$this->name, 'value' => format_string($this->value));
-        $str .= html_writer::empty_tag('input', $attrs);
-        $attrs = array('type' => 'text',
-                       'name' => 'element'.$this->name.'_disabled',
-                       'value' => format_string($this->value),
-                       'disabled' => 'disabled', 'size' => 120);
-        $str .= html_writer::empty_tag('input', $attrs);
-        return $str;
-    }
-
     public function add_form_element(&$mform) {
         $mform->addElement('header', "header{$this->name}", '');
         $mform->setExpanded("header{$this->name}");

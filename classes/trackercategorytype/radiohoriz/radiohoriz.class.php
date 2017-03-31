@@ -23,51 +23,9 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
+require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/radio/radio.class.php');
 
-class radiohorizelement extends trackerelement {
-
-    public function __construct(&$tracker, $id = null, $used = false) {
-        parent::__construct($tracker, $id, $used);
-        $this->set_options_from_db();
-    }
-
-    public function view($issueid = 0) {
-        $this->get_value($issueid);
-
-        $optbynames = array();
-        foreach ($this->options as $opt) {
-            $optbynames[$opt->name] = format_string($opt->description);
-        }
-
-        if (!empty($this->options) && !empty($this->value) && array_key_exists($this->value, $optbynames)) {
-            return $optbynames[$this->value];
-        }
-    }
-
-    public function edit($issueid = 0) {
-        global $OUTPUT;
-
-        $this->get_value($issueid);
-        if (isset($this->options)) {
-            $optbynames = array();
-            foreach ($this->options as $opt) {
-                $optbynames[$opt->name] = format_string($opt->description);
-            }
-
-            foreach ($optbynames as $name => $option) {
-                if ($this->value == $name) {
-                    $attrs = array('type' => 'radio', 'name' => 'element'.$this->name, 'value' => $name, 'checked' => 'checked');
-                    echo html_writer::empty_tag('input', $attrs);
-                } else {
-                    $attrs = array('type' => 'radio', 'name' => 'element'.$this->name, 'value' => $name);
-                    echo html_writer::empty_tag('input', $attrs);
-                }
-                echo format_string($option);
-                echo html_writer::empty_tag('br');
-            }
-        }
-    }
+class radiohorizelement extends radioelement {
 
     public function add_form_element(&$mform) {
 
@@ -89,22 +47,8 @@ class radiohorizelement extends trackerelement {
         }
     }
 
-    public function set_data(&$defaults, $issueid = 0) {
-        if ($issueid) {
-            if (!empty($this->options)) {
-                $elmvalues = $this->get_value($issueid);
-                $values = explode(',', $elmvalues);
-                if (!empty($values)) {
-                    foreach ($values as $v) {
-                        if (array_key_exists($v, $this->options)) {
-                            // Check option still exists.
-                            $elementname = "element{$this->name}{$option->id}";
-                            $defaults->$elementname = 1;
-                        }
-                    }
-                }
-            }
-        }
+    public function options_sep() {
+        return ', ';
     }
 
     public function form_process(&$data) {

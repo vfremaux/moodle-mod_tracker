@@ -40,60 +40,7 @@ function xmldb_tracker_upgrade($oldversion = 0) {
     if ($result && $oldversion < 2008092400) {
 
         // Setup XML-RPC services for tracker.
-
-        if (!$DB->get_record('mnet_service', array('name' => 'tracker_cascade'))) {
-            $service->name = 'tracker_cascade';
-            $service->description = get_string('transferservice', 'tracker');
-            $service->apiversion = 1;
-            $service->offer = 1;
-            if (!$serviceid = $DB->insert_record('mnet_service', $service)) {
-                echo $OUTPUT->notification('Error installing tracker_cascade service.');
-                $result = false;
-            }
-
-            $rpc->function_name = 'tracker_rpc_get_instances';
-            $rpc->xmlrpc_path = 'mod/tracker/rpclib.php/tracker_rpc_get_instances';
-            $rpc->parent_type = 'mod';
-            $rpc->parent = 'tracker';
-            $rpc->enabled = 0;
-            $rpc->help = 'Get instances of available trackers for cascading.';
-            $rpc->profile = '';
-            if (!$rpcid = $DB->insert_record('mnet_rpc', $rpc)) {
-                echo $OUTPUT->notification('Error installing tracker_cascade RPC calls.');
-                $result = false;
-            }
-            $rpcmap->serviceid = $serviceid;
-            $rpcmap->rpcid = $rpcid;
-            $DB->insert_record('mnet_service2rpc', $rpcmap);
-
-            $rpc->function_name = 'tracker_rpc_get_infos';
-            $rpc->xmlrpc_path = 'mod/tracker/rpclib.php/tracker_rpc_get_infos';
-            $rpc->parent_type = 'mod';
-            $rpc->parent = 'tracker';
-            $rpc->enabled = 0;
-            $rpc->help = 'Get information about one tracker.';
-            $rpc->profile = '';
-            if (!$rpcid = $DB->insert_record('mnet_rpc', $rpc)) {
-                echo $OUTPUT->notification('Error installing tracker_cascade RPC calls.');
-                $result = false;
-            }
-            $rpcmap->rpcid = $rpcid;
-            $DB->insert_record('mnet_service2rpc', $rpcmap);
-
-            $rpc->function_name = 'tracker_rpc_post_issue';
-            $rpc->xmlrpc_path = 'mod/tracker/rpclib.php/tracker_rpc_post_issue';
-            $rpc->parent_type = 'mod';
-            $rpc->parent = 'tracker';
-            $rpc->enabled = 0;
-            $rpc->help = 'Cascades an issue.';
-            $rpc->profile = '';
-            if (!$rpcid = $DB->insert_record('mnet_rpc', $rpc)) {
-                echo $OUTPUT->notification('Error installing tracker_cascade RPC calls.');
-                $result = false;
-            }
-            $rpcmap->rpcid = $rpcid;
-            $DB->insert_record('mnet_service2rpc', $rpcmap);
-        }
+        tracker_install();
 
         // Tracker savepoint reached.
         upgrade_mod_savepoint(true, 2008092400, 'tracker');

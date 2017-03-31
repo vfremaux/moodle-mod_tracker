@@ -40,25 +40,13 @@ class autourlelement extends trackerelement {
         return '<a href="'.$this->value.'">'.$this->value.'</a>';
     }
 
-    public function edit($issueid = 0) {
-        $this->getvalue($issueid);
-        $str = '';
-        $attrs = array('type' => 'hidden', 'name' => 'element'.$this->name, 'value' => format_string($this->value));
-        $str .= html_writer::empty_tag('input', $attrs);
-        $attrs = array('type' => 'text',
-                       'name' => 'element'.$this->name.'_disabled',
-                       'value' => format_string($this->value),
-                       'disabled' => 'disabled',
-                       'size' => 120);
-        $str .= html_writer::empty_tag('input', $attrs);
-        return $str;
-    }
-
     public function add_form_element(&$mform) {
         $mform->addElement('header', "header{$this->name}", format_string($this->description));
         $mform->setExpanded("header{$this->name}");
+
         $mform->addElement('hidden', "element{$this->name}");
         $mform->setDefault("element{$this->name}", $_SERVER['HTTP_REFERER']);
+
         $mform->addElement('text', "element{$this->name}shadow", get_string('autourl', 'tracker'));
         $mform->setType("element{$this->name}shadow", PARAM_URL);
         $mform->disabledIf("element{$this->name}shadow", "element{$this->name}");

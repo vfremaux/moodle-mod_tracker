@@ -222,9 +222,21 @@ abstract class trackerelement {
     }
 
     /**
-     * Get the element view when the ticket is being edited
+     * Get the element view when the ticket is being edited. The default version 
+     * assumes a simple text field as input.
      */
-    abstract public function edit($issueid = 0);
+    public function edit($issueid = 0) {
+        $this->get_value($issueid);
+        $str = '';
+        $attrs = array('type' => 'hidden', 'name' => 'element'.$this->name, 'value' => format_string($this->value));
+        $str .= html_writer::empty_tag('input', $attrs);
+        $attrs = array('type' => 'text',
+                       'name' => 'element'.$this->name.'_disabled',
+                       'value' => format_string($this->value),
+                       'disabled' => 'disabled', 'size' => 120);
+        $str .= html_writer::empty_tag('input', $attrs);
+        return $str;
+    }
 
     /**
      * Get the element view when the ticket is being displayed

@@ -246,7 +246,7 @@ if (!empty($issues)) {
             $nochoose = array('' => get_string('unassigned', 'tracker'));
             $assignedto = html_writer::select($developersmenu, 'assignedto'.$issue->id, $issue->assignedto, $nochoose, $attrs);
         } else {
-            $status = $Fullstatuskeys[0 + $issue->status];
+            $status = $fullstatuskeys[0 + $issue->status];
             $assignedto = fullname($user);
         }
         $status = '<div class="status-'.$statuscodes[$issue->status].'" class="tracker-status">'.$status.'</div>';

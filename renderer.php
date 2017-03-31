@@ -62,23 +62,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     $DB->set_field('tracker_issue', 'downlink', '', array('id' => $issue->id));
                 }
             } else {
-                $host = $DB->get_record('mnet_host', array('id' => $hostid));
-
-                // This is optional, in case useing block User_Mnet_Host based access restrictions.
-                if (file_exists($CFG->dirroot.'/blocks/user_mnet_hosts/xlib.php')) {
-                    include_once($CFG->dirroot.'/blocks/user_mnet_hosts/xlib.php');
-                    $access = user_mnet_hosts_read_access($USER, $host->wwwroot);
-                }
-
-                if ($access) {
-                    $params = array('t' => $instanceid, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issueid);
-                    $remoteurl = new moodle_url('/mod/tracker/view.php', $params);
-                    $mnetauth = is_enabled_auth('multimnet') ? 'multimnet' : 'mnet';
-                    $url = new moodle_url('/auth/'.$mnetauth.'/jump.php', array('hostwwwroot' => $host->wwwroot, 'wantsurl' => $remoteurl));
-                    $link = html_writer::link($url, get_string('gotooriginal', 'tracker'));
-                } else {
-                    $link = get_string('originalticketnoaccess', 'tracker');
-                }
+                $link = $this->remote_link($hostid, $instanceid, $issueid);
             }
 
             if (!empty($link)) {
@@ -118,21 +102,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     $DB->update_record('tracker_issue', $issue);
                 }
             } else {
-                $host = $DB->get_record('mnet_host', array('id' => $hostid));
-
-                if (file_exists($CFG->dirroot.'/blocks/user_mnet_hosts/xlib.php')) {
-                    include_once($CFG->dirroot.'/blocks/user_mnet_hosts/xlib.php');
-                    $access = user_mnet_hosts_read_access($USER, $host->wwwroot);
-                }
-                if ($access) {
-                    $params = array('t' => $instanceid, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issueid);
-                    $remoteurl = new moodle_url('/mod/tracker/view.php', $params);
-                    $mnetauth = is_enabled_auth('multimnet') ? 'multimnet' : 'mnet';
-                    $url = new moodle_url('/auth/'.$mnetauth.'/jump.php', array('hostwwwroot' => $host->wwwroot, 'wantsurl' => $remoteurl));
-                    $link = html_writer::link($url, get_string('gototransfered', 'tracker'));
-                } else {
-                    $link = get_string('transferedticketnoaccess', 'tracker');
-                }
+                $link = $this->remote_link($hostid, $instanceid, $issueid);
             }
 
             if (!empty($link)) {
@@ -224,6 +194,24 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= '</tr>';
 
         return $str;
+    }
+
+    public function remote_link($hostid, $instanceid, $issueid) {
+        $host = $DB->get_record('mnet_host', array('id' => $hostid));
+
+        if (file_exists($CFG->dirroot.'/blocks/user_mnet_hosts/xlib.php')) {
+            include_once($CFG->dirroot.'/blocks/user_mnet_hosts/xlib.php');
+            $access = user_mnet_hosts_read_access($USER, $host->wwwroot);
+        }
+        if ($access) {
+            $params = array('t' => $instanceid, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issueid);
+            $remoteurl = new moodle_url('/mod/tracker/view.php', $params);
+            $mnetauth = is_enabled_auth('multimnet') ? 'multimnet' : 'mnet';
+            $url = new moodle_url('/auth/'.$mnetauth.'/jump.php', array('hostwwwroot' => $host->wwwroot, 'wantsurl' => $remoteurl));
+            return html_writer::link($url, get_string('gototransfered', 'tracker'));
+        } else {
+            return get_string('transferedticketnoaccess', 'tracker');
+        }
     }
 
     public function issue_attributes($issue, $elementsused) {

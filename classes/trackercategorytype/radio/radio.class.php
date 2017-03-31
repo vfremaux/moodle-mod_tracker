@@ -66,9 +66,13 @@ class radioelement extends trackerelement {
                     echo html_writer::empty_tag('input', $attrs);
                 }
                 echo format_string($option);
-                echo html_writer::empty_tag('br');
+                echo $this->options_sep();
             }
         }
+    }
+
+    public function options_sep() {
+        return html_writer::empty_tag('br');
     }
 
     public function add_form_element(&$mform) {
