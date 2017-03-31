@@ -5,7 +5,7 @@
 
 function updatewatchs(cmid, watchid, event, state, sesskey) {
 
-    url = M.cfg.wwwroot.'/mod/tracker/ajax/service.php';
+    url = M.cfg.wwwroot + '/mod/tracker/ajax/service.php';
     url += '?id=' + cmid + '&what=updatewatch&ccid=' + watchid + '&event=' + event + '&state=' + state + '&sesskey' + sesskey;
 
     $.get(url, function(data, status) {

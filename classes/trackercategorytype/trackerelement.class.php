@@ -222,7 +222,7 @@ abstract class trackerelement {
     }
 
     /**
-     * Get the element view when the ticket is being edited. The default version 
+     * Get the element view when the ticket is being edited. The default version
      * assumes a simple text field as input.
      */
     public function edit($issueid = 0) {
