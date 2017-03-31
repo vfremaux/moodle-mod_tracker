@@ -54,15 +54,6 @@ class autourlelement extends trackerelement {
         $mform->setType("element{$this->name}", PARAM_URL);
     }
 
-    public function set_data(&$defaults, $issueid = 0) {
-        if ($issueid) {
-            $elementname = "element{$this->name}";
-            $defaults->$elementname = $this->get_value($issueid);
-        } else {
-            $defaults->$elementname = $_SERVER['HTTP_REFERER'];
-        }
-    }
-
     /**
      * updates or creates the element instance for this issue
      */

@@ -24,36 +24,15 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once('../../../../../config.php');
+require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 
-$id = required_param('id', PARAM_INT); // Id of the tracker module id.
+$id = optional_param('id', PARAM_INT); // Id of the tracker module id.
+$t = optional_param('t', PARAM_INT); // Id of the tracker instance.
 
-if ($id) {
-    if (! $cm = get_coursemodule_from_id('tracker', $id)) {
-        print_error('errorcoursemodid', 'tracker');
-    }
-
-    if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
-        print_error('errorcoursemisconfigured', 'tracker');
-    }
-
-    if (! $tracker = $DB->get_record('tracker', array('id' => $cm->instance))) {
-        print_error('errormoduleincorrect', 'tracker');
-    }
-} else {
-    if (! $tracker = $DB->get_record('tracker', array('id' => $t))) {
-        print_error('errormoduleincorrect', 'tracker');
-    }
-
-    if (! $course = $DB->get_record('course', array('id' => $tracker->course))) {
-        print_error('errorcoursemisconfigured', 'tracker');
-    }
-    if (! $cm = get_coursemodule_from_instance("tracker", $tracker->id, $course->id)) {
-        print_error('errorcoursemodid', 'tracker');
-    }
-}
+list($course, $cm, $tracker) = tracker_get_context($id, $t);
 
 if (!isset($SESSION->tracker[$id]->captcha->length)) {
-    error('not allowed');
+    print_error('not allowed');
 }
 
 $height = 40;

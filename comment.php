@@ -25,37 +25,13 @@ require_once($CFG->dirroot.'/mod/tracker/lib.php');
 require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 require_once($CFG->dirroot.'/mod/tracker/forms/addcomment_form.php');
 
-$id = optional_param('id', 0, PARAM_INT); // Course Module ID, or.
-$t = optional_param('t', 0, PARAM_INT);  // Tracker ID.
 $issueid = required_param('issueid', PARAM_INT);  // Tracker ID.
 $commentid = required_param('commentid', PARAM_INT);  // Id of comment ofr editing.
 
-if ($id) {
-    if (! $cm = get_coursemodule_from_id('tracker', $id)) {
-        print_error('errorcoursemodid', 'tracker');
-    }
+$id = optional_param('id', 0, PARAM_INT); // Course Module ID, or.
+$t = optional_param('t', 0, PARAM_INT);  // Tracker ID.
 
-    if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
-        print_error('errorcoursemisconfigured', 'tracker');
-    }
-
-    if (! $tracker = $DB->get_record('tracker', array('id' => $cm->instance))) {
-        print_error('errormoduleincorrect', 'tracker');
-    }
-} else {
-
-    if (! $tracker = $DB->get_record('tracker', array('id' => $t))) {
-        print_error('errormoduleincorrect', 'tracker');
-    }
-
-    if (! $course = $DB->get_record('course', array('id' => $tracker->course))) {
-        print_error('errorcoursemisconfigured', 'tracker');
-    }
-
-    if (! $cm = get_coursemodule_from_instance("tracker", $tracker->id, $course->id)) {
-        print_error('errorcoursemodid', 'tracker');
-    }
-}
+list($course, $cm, $tracker) = tracker_get_context($id, $t);
 
 // Security.
 

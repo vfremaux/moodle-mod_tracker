@@ -51,33 +51,4 @@ class radiohorizelement extends radioelement {
         return ', ';
     }
 
-    public function form_process(&$data) {
-        global $DB;
-
-        $params = array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid);
-        if (!$attribute = $DB->get_record('tracker_issueattribute', $params)) {
-            $attribute = new StdClass();
-            $attribute->trackerid = $data->trackerid;
-            $attribute->issueid = $data->issueid;
-            $attribute->elementid = $this->id;
-        }
-
-        $elmname = 'element'.$this->name;
-        $data->$elmname = optional_param($elmname, '', PARAM_TEXT);
-        $attribute->elementitemid = $data->$elmname; // In this case we have elementitem id or idlist.
-        $attribute->timemodified = time();
-
-        if (!isset($attribute->id)) {
-            $attribute->id = $DB->insert_record('tracker_issueattribute', $attribute);
-            if (empty($attribute->id)) {
-                print_error('erroraddissueattribute', 'tracker', '', 2);
-            }
-        } else {
-            $DB->update_record('tracker_issueattribute', $attribute);
-        }
-    }
-
-    public function type_has_options() {
-        return true;
-    }
 }

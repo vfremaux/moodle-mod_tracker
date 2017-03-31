@@ -238,6 +238,15 @@ abstract class trackerelement {
         return $str;
     }
 
+    public function set_data(&$defaults, $issueid = 0) {
+        if ($issueid) {
+            $elementname = "element{$this->name}";
+            $defaults->$elementname = $this->get_value($issueid);
+        } else {
+            $defaults->$elementname = $_SERVER['HTTP_REFERER'];
+        }
+    }
+
     /**
      * Get the element view when the ticket is being displayed
      */
