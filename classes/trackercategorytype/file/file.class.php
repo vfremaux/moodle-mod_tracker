@@ -44,11 +44,8 @@ class fileelement extends trackerelement {
      * There is some file stored into the file area or not.
      */
     public function view($issueid = 0) {
-        global $CFG, $COURSE, $DB;
+        global $CFG, $DB;
 
-        $elmname = 'element'.$this->name;
-
-        $issue = $DB->get_record('tracker_issue', array('id' => "$issueid"));
         $attribute = $DB->get_record('tracker_issueattribute', array('issueid' => $issueid, 'elementid' => $this->id));
 
         if ($attribute) {
@@ -84,7 +81,7 @@ class fileelement extends trackerelement {
     }
 
     public function edit($issueid = 0) {
-        global $COURSE, $OUTPUT, $DB, $PAGE;
+        global $OUTPUT, $DB, $PAGE;
 
         if ($attribute = $DB->get_record('tracker_issueattribute', array('elementid' => $this->id, 'issueid' => $issueid))) {
             $itemid = $attribute->id;
@@ -139,7 +136,6 @@ class fileelement extends trackerelement {
     }
 
     public function add_form_element(&$mform) {
-        global $COURSE;
 
         $mform->addElement('header', "head{$this->name}", format_string($this->description));
         $mform->setExpanded("head{$this->name}");
@@ -154,7 +150,6 @@ class fileelement extends trackerelement {
 
         $elmname = 'element'.$this->name;
         $draftitemid = file_get_submitted_draft_itemid($elmname);
-        $maxbytes = $COURSE->maxbytes;
         file_prepare_draft_area($draftitemid, $this->context->id, 'mod_tracker', 'issueattribute',
                                 $this->id, $this->filemanageroptions);
         $defaults->$elmname = $draftitemid;
@@ -164,7 +159,7 @@ class fileelement extends trackerelement {
      * used for post processing form values, or attached files management
      */
     public function form_process(&$data) {
-        global $COURSE, $USER, $DB;
+        global $DB;
 
         $params = array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid);
         if (!$attribute = $DB->get_record('tracker_issueattribute', $params)) {

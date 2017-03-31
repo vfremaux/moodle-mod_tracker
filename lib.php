@@ -77,7 +77,7 @@ function tracker_supports($feature) {
  * of the new instance.
  * @param object $tracker
  */
-function tracker_add_instance($tracker, $mform) {
+function tracker_add_instance($tracker) {
     global $DB;
 
     $tracker->timemodified = time();
@@ -122,7 +122,7 @@ function tracker_add_instance($tracker, $mform) {
  * (defined by the form in mod.html) this function
  * will update an existing instance with new data.
  */
-function tracker_update_instance($tracker, $mform) {
+function tracker_update_instance($tracker) {
     global $DB;
 
     $tracker->timemodified = time();
@@ -217,7 +217,7 @@ function tracker_user_complete($course, $user, $mod, $tracker) {
  * Return true if there was output, or false is there was none.
  */
 function tracker_print_recent_activity($course, $isteacher, $timestart) {
-    global $DB, $CFG;
+    global $DB;
 
     $sql = "
         SELECT
@@ -261,7 +261,7 @@ function tracker_print_recent_activity($course, $isteacher, $timestart) {
  * @param array $htmlarray The array of html to return
  */
 function tracker_print_overview($courses, &$htmlarray) {
-    global $USER, $CFG, $DB;
+    global $USER, $DB;
 
     // Check if really installed.
     if (!$DB->record_exists('modules', array('name' => 'tracker'))) {
@@ -351,7 +351,6 @@ function tracker_print_overview($courses, &$htmlarray) {
  * as sending out mail, toggling flags etc ...
  */
 function tracker_cron () {
-    global $CFG;
 
     return true;
 }
@@ -512,7 +511,7 @@ function tracker_uninstall() {
 }
 
 function tracker_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload) {
-    global $CFG, $DB;
+    global $DB;
 
     if ($context->contextlevel != CONTEXT_MODULE) {
         return false;

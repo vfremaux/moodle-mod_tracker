@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 class mod_tracker_renderer extends plugin_renderer_base {
 
     public function core_issue(&$issue, &$tracker) {
-        global $CFG, $COURSE, $DB, $USER;
+        global $CFG, $COURSE, $DB;
 
         $statuskeys = tracker_get_statuskeys($tracker);
         $statuscodes = tracker_get_statuscodes();
@@ -134,7 +134,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= '<b>'.get_string('reportedby', 'tracker').':</b>';
         $str .= '</td>';
         $str .= '<td width="25%" class="tracker-issue-value">';
-        $str .= $OUTPUT->user_picture($issue->reporter);
+        $str .= $this->output->user_picture($issue->reporter);
         $str .= '&nbsp;'.fullname($issue->reporter);
         $str .= '</td>';
         $str .= '<td align="right" width="25%" class="tracker-issue-param" >';
@@ -197,6 +197,8 @@ class mod_tracker_renderer extends plugin_renderer_base {
     }
 
     public function remote_link($hostid, $instanceid, $issueid) {
+        global $CFG;
+
         $host = $DB->get_record('mnet_host', array('id' => $hostid));
 
         if (file_exists($CFG->dirroot.'/blocks/user_mnet_hosts/xlib.php')) {

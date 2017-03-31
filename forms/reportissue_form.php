@@ -88,7 +88,6 @@ class TrackerIssueForm extends moodleform {
     }
 
     public function set_data($defaults) {
-        global $COURSE;
 
         $defaults->description_editor['text'] = $defaults->description;
         $defaults->description_editor['format'] = $defaults->descriptionformat;

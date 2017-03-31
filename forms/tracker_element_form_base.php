@@ -56,7 +56,4 @@ abstract class tracker_moodle_form extends moodleform {
         $this->add_action_buttons();
     }
 
-    public function validation($data, $files) {
-        return;
-    }
 }

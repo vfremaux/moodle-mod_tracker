@@ -89,7 +89,7 @@ class dropdownelement extends trackerelement {
 
             if (!empty($this->options)) {
                 $values = $this->get_value($issueid);
-                if ($multiple && is_array($values)) {
+                if ($this->multiple && is_array($values)) {
                     foreach ($values as $v) {
                         if (array_key_exists($v, $this->options)) {
                             // Check option still exists.

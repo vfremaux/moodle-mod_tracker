@@ -43,8 +43,7 @@ class mod_tracker_admin_renderer extends \plugin_renderer_base {
     /**
      * Print admin table container
      */
-    public function admin_table($tracker) {
-        global $CFG;
+    public function admin_table() {
 
         $str = '';
 
@@ -256,7 +255,7 @@ class mod_tracker_admin_renderer extends \plugin_renderer_base {
         $str = '';
 
         $str .= $this->output->box_start('center', '100%', '', '', 'generalbox', 'description');
-        $str .= $this->admin_elements_form($cm);
+        $str .= $this->admin_elements_form();
         $str .= $this->output->box_end();
 
         $str .= $this->output->box_start('center', '100%', '', '', 'generalbox', 'description');
@@ -352,7 +351,7 @@ class mod_tracker_admin_renderer extends \plugin_renderer_base {
         return $str;
     }
 
-    public function admin_elements_form(&$cm) {
+    public function admin_elements_form() {
         $str = '';
 
         $formurl = new moodle_url('/mod/tracker/view.php');

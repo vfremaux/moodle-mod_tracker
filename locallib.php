@@ -840,7 +840,6 @@ function tracker_clearsearchcookies() {
 
 /**
  * settles data for memoising current search context
- * @uses $CFG
  * @param int $trackerid
  * @param int $cmid
  */
@@ -1960,7 +1959,7 @@ function tracker_get_stats_by_month(&$tracker, $from = null, $to = null) {
  * @param objectref &$tracker
  */
 function tracker_backtrack_stats_by_month(&$tracker) {
-    global $CFG, $DB;
+    global $DB;
 
     $sql = "
         SELECT
@@ -2276,7 +2275,7 @@ function tracker_print_direct_editor($attributes, $values, $options) {
             $str .= '<input type="hidden" name="'.$elname.'[itemid]" value="'.$draftitemid.'" />';
 
             // Used by non js editor only.
-            $editorurl = new moodle_url($CFG->wwwroot.'/repository/draftfiles_manager.php', array(
+            $editorurl = new moodle_url('/repository/draftfiles_manager.php', array(
                 'action' => 'browse',
                 'env' => 'editor',
                 'itemid' => $draftitemid,

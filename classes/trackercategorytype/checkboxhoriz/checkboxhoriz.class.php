@@ -30,6 +30,8 @@ class checkboxhorizelement extends checkboxelement {
     protected $spacer;
 
     public function __construct(&$tracker, $id = null, $used = false) {
+        global $OUTPUT;
+
         parent::__construct($tracker, $id, $used);
         $this->set_options_from_db();
         $attrs = array('src' => $OUTPUT->pix_url('spacer'), 'width' => 30, 'hight' => 1);

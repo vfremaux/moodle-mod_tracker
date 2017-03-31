@@ -32,7 +32,7 @@ require_once($CFG->dirroot.'/course/moodleform_mod.php');
 class mod_tracker_mod_form extends moodleform_mod {
 
     public function definition() {
-        global $CFG, $COURSE, $DB;
+        global $CFG, $DB;
 
         $mform    =& $this->_form;
 

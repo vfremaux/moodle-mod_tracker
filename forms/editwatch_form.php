@@ -48,17 +48,6 @@ class edit_watch_form extends moodleform {
 
         $mform->addElement('header', 'hdr0', get_string('editwatch', 'tracker'));
 
-        $open = ($form->events & EVENT_OPEN) ? 'checked="checked"' : '';
-        $resolving = ($form->events & EVENT_RESOLVING) ? 'checked="checked"' : '';
-        $waiting = ($form->events & EVENT_WAITING) ? 'checked="checked"' : '';
-        $resolved = ($form->events & EVENT_RESOLVED) ? 'checked="checked"' : '';
-        $abandonned = ($form->events & EVENT_ABANDONNED) ? 'checked="checked"' : '';
-        $notopen = ($form->events & EVENT_OPEN) ? '' : 'checked="checked"';
-        $notresolving = ($form->events & EVENT_RESOLVING) ? '' : 'checked="checked"';
-        $notwaiting = ($form->events & EVENT_WAITING) ? '' : 'checked="checked"';
-        $notresolved = ($form->events & EVENT_RESOLVED) ? '' : 'checked="checked"';
-        $notabandonned = ($form->events & EVENT_ABANDONNED) ? '' : 'checked="checked"';
-
         $html = "$tracker->ticketprefix.$form->issueid - $form->summary";
         $mform->addElement('static', 'issuename', get_string('issuename', 'tracker'), $html);
 
