@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<libraries>
+  <library>
+    <location>extralib</location>
+    <name>Extra libs to override some check rules</name>
+    <license>GPL</license>
+    <version>v3</version>
+    <licenseversion>v3</licenseversion>
+  </library>
+</libraries>

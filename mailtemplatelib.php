@@ -10,7 +10,7 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -27,6 +27,7 @@
  * @copyright    (C) 2008 onwards Valery Fremaux (http://www
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * useful templating functions from an older project of mine, hacked for Moodle
@@ -37,12 +38,14 @@
 function tracker_compile_mail_template($template, $infomap, $lang = '') {
     global $USER;
 
-    if (empty($lang)) $lang = $USER->lang;
-    $lang = substr($lang, 0, 2); // be sure we are in moodle 2
+    if (empty($lang)) {
+        $lang = $USER->lang;
+    }
+    $lang = substr($lang, 0, 2); // Be sure we are in moodle 2.
 
     $notification = implode('', tracker_get_mail_template($template, $lang));
-    foreach ($infomap as $aKey => $aValue) {
-        $notification = str_replace("<%%$aKey%%>", $aValue, $notification);
+    foreach ($infomap as $akey => $avalue) {
+        $notification = str_replace("<%%$akey%%>", $avalue, $notification);
     }
     return $notification;
 }

@@ -4,209 +4,209 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="tracker" COMMENT="tracker table retrofitted from MySQL" NEXT="tracker_element">
+    <TABLE NAME="tracker" COMMENT="tracker table retrofitted from MySQL" >
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="course"/>
-        <FIELD NAME="course" TYPE="int" LENGTH="11" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="name"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="course" NEXT="intro"/>
-        <FIELD NAME="intro" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="name" NEXT="introformat"/>
-        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="intro" NEXT="requirelogin"/>
-        <FIELD NAME="requirelogin" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" PREVIOUS="introformat" NEXT="allownotifications"/>
-        <FIELD NAME="allownotifications" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="requirelogin" NEXT="enablecomments"/>
-        <FIELD NAME="enablecomments" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="allownotifications" NEXT="ticketprefix"/>
-        <FIELD NAME="ticketprefix" TYPE="char" LENGTH="16" NOTNULL="true" SEQUENCE="false" PREVIOUS="enablecomments" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="ticketprefix" NEXT="parent"/>
-        <FIELD NAME="parent" TYPE="char" LENGTH="80" NOTNULL="false" SEQUENCE="false" PREVIOUS="timemodified" NEXT="supportmode"/>
-        <FIELD NAME="supportmode" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="bugtracker" SEQUENCE="false" PREVIOUS="parent" NEXT="defaultassignee"/>
-        <FIELD NAME="defaultassignee" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="supportmode" NEXT="subtrackers" />
-        <FIELD NAME="subtrackers" TYPE="char" LENGTH="100" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="defaultassignee" NEXT="enabledstates" />
-        <FIELD NAME="enabledstates" TYPE="int" LENGTH="11" NOTNULL="true" DEFAULT="511" SEQUENCE="false" PREVIOUS="subtrackers" NEXT="thanksmessage" />
-        <FIELD NAME="thanksmessage" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="enabledstates" NEXT="strictworkflow" />
-        <FIELD NAME="strictworkflow" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="thanksmessage" NEXT="networkable" />
-        <FIELD NAME="networkable" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" DEFAULT="0" PREVIOUS="strictworkflow" />
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" />
+        <FIELD NAME="course" TYPE="int" LENGTH="11" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" />
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="intro" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" />
+        <FIELD NAME="requirelogin" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" />
+        <FIELD NAME="allownotifications" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" />
+        <FIELD NAME="enablecomments" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" />
+        <FIELD NAME="ticketprefix" TYPE="char" LENGTH="16" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="parent" TYPE="char" LENGTH="80" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="supportmode" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="bugtracker" SEQUENCE="false" />
+        <FIELD NAME="defaultassignee" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="subtrackers" TYPE="char" LENGTH="100" NOTNULL="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="enabledstates" TYPE="int" LENGTH="11" NOTNULL="true" DEFAULT="511" SEQUENCE="false" />
+        <FIELD NAME="thanksmessage" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="strictworkflow" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="networkable" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" DEFAULT="0" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="tracker_element" COMMENT="tracker_element table retrofitted from MySQL" PREVIOUS="tracker" NEXT="tracker_elementitem">
+    <TABLE NAME="tracker_element" COMMENT="tracker_element table retrofitted from MySQL">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="course"/>
-        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="name"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" PREVIOUS="course" NEXT="description"/>
-        <FIELD NAME="description" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="name" NEXT="type"/>
-        <FIELD NAME="type" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" PREVIOUS="description" NEXT="paramint1"/>
-        <FIELD NAME="paramint1" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="type" NEWT="paramint2" />
-        <FIELD NAME="paramint2" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="paramint1" NEXT="paramchar1" />
-        <FIELD NAME="paramchar1" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" PREVIOUS="paramint2" NEXT="paramchar2"/>
-        <FIELD NAME="paramchar2" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" PREVIOUS="paramchar1"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" />
+        <FIELD NAME="name" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="description" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="type" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="paramint1" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="paramint2" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="paramchar1" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="paramchar2" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_element"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="tracker_elementitem" COMMENT="tracker_elementitem table retrofitted from MySQL" PREVIOUS="tracker_element" NEXT="tracker_elementused">
+    <TABLE NAME="tracker_elementitem" COMMENT="tracker_elementitem table retrofitted from MySQL">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="elementid"/>
-        <FIELD NAME="elementid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="name"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" PREVIOUS="elementid" NEXT="description"/>
-        <FIELD NAME="description" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="name" NEXT="sortorder"/>
-        <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="description" NEXT="active"/>
-        <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" PREVIOUS="sortorder"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" />
+        <FIELD NAME="elementid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="name" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="description" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_elementitem"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="tracker_elementused" COMMENT="tracker_elementused table retrofitted from MySQL" PREVIOUS="tracker_elementitem" NEXT="tracker_issue">
+    <TABLE NAME="tracker_elementused" COMMENT="tracker_elementused table retrofitted from MySQL">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="trackerid"/>
-        <FIELD NAME="trackerid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="elementid"/>
-        <FIELD NAME="elementid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="trackerid" NEXT="sortorder"/>
-        <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="elementid" NEXT="canbemodifiedby"/>
-        <FIELD NAME="canbemodifiedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="sortorder" NEXT="active"/>
-        <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" PREVIOUS="canbemodifiedby" NEXT="mandatory" />
-        <FIELD NAME="mandatory" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" PREVIOUS="active" NEWT="private" />
-        <FIELD NAME="private" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" PREVIOUS="mandatory"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" />
+        <FIELD NAME="trackerid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="elementid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" />
+        <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" />
+        <FIELD NAME="canbemodifiedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" />
+        <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" />
+        <FIELD NAME="mandatory" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" />
+        <FIELD NAME="private" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_elementused"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="tracker_issue" COMMENT="tracker_issue table retrofitted from MySQL" PREVIOUS="tracker_elementused" NEXT="tracker_issueattribute">
+    <TABLE NAME="tracker_issue" COMMENT="tracker_issue table retrofitted from MySQL">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="trackerid"/>
-        <FIELD NAME="trackerid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="summary"/>
-        <FIELD NAME="summary" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="trackerid" NEXT="description"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" PREVIOUS="summary" NEXT="descriptionformat"/>
-        <FIELD NAME="descriptionformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="description" NEXT="datereported"/>
-        <FIELD NAME="datereported" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="descriptionformat" NEXT="reportedby"/>
-        <FIELD NAME="reportedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="datereported" NEXT="status"/>
-        <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="reportedby" NEXT="assignedto"/>
-        <FIELD NAME="assignedto" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" DEFAULT="0" PREVIOUS="status" NEXT="bywhomid"/>
-        <FIELD NAME="bywhomid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="assignedto" NEXT="timeassigned"/>
-        <FIELD NAME="timeassigned" TYPE="int" LENGTH="11" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="bywhomid" NEXT="resolution"/>
-        <FIELD NAME="resolution" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="timeassigned" NEXT="resolutionformat"/>
-        <FIELD NAME="resolutionformat" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="resolution" NEXT="resolutionpriority" />
-        <FIELD NAME="resolutionpriority" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="resolutionformat" NEXT="uplink" />
-        <FIELD NAME="uplink" TYPE="char" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="resolutionformat" NEXT="downlink" />
-        <FIELD NAME="downlink" TYPE="char" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="uplink"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" />
+        <FIELD NAME="trackerid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="summary" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="description" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="descriptionformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" />
+        <FIELD NAME="datereported" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="reportedby" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" />
+        <FIELD NAME="assignedto" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" DEFAULT="0" />
+        <FIELD NAME="bywhomid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" />
+        <FIELD NAME="timeassigned" TYPE="int" LENGTH="11" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" />
+        <FIELD NAME="resolution" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="resolutionformat" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" />
+        <FIELD NAME="resolutionpriority" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" />
+        <FIELD NAME="uplink" TYPE="char" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"  />
+        <FIELD NAME="downlink" TYPE="char" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_issue"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="tracker_issueattribute" COMMENT="tracker_issueattribute table retrofitted from MySQL" PREVIOUS="tracker_issue" NEXT="tracker_issuecc">
+    <TABLE NAME="tracker_issueattribute" COMMENT="tracker_issueattribute table retrofitted from MySQL">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="trackerid"/>
-        <FIELD NAME="trackerid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="id" NEXT="issueid"/>
-        <FIELD NAME="issueid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="trackerid" NEXT="elementid"/>
-        <FIELD NAME="elementid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="issueid" NEXT="elementitemid"/>
-        <FIELD NAME="elementitemid" TYPE="text" NOTNULL="false" SEQUENCE="false" PREVIOUS="elementid" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="elementitemid"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" />
+        <FIELD NAME="trackerid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" />
+        <FIELD NAME="issueid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="elementid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="elementitemid" TYPE="text" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_issueattribute"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="tracker_issuecc" COMMENT="tracker_issuecc table retrofitted from MySQL" PREVIOUS="tracker_issueattribute" NEXT="tracker_issuecomment">
+    <TABLE NAME="tracker_issuecc" COMMENT="tracker_issuecc table retrofitted from MySQL" >
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="trackerid"/>
-        <FIELD NAME="trackerid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="trackerid" NEXT="issueid"/>
-        <FIELD NAME="issueid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="events"/>
-        <FIELD NAME="events" TYPE="int" LENGTH="3" NOTNULL="false" UNSIGNED="true" DEFAULT="31" SEQUENCE="false" PREVIOUS="issueid"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" />
+        <FIELD NAME="trackerid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" />
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="issueid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="events" TYPE="int" LENGTH="3" NOTNULL="false" UNSIGNED="true" DEFAULT="31" SEQUENCE="false" />
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_issuecc" NEXT="unique_assignation"/>
-        <KEY NAME="unique_assignation" TYPE="unique" FIELDS="trackerid, userid, issueid" PREVIOUS="primary"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_issuecc" />
+        <KEY NAME="unique_assignation" TYPE="unique" FIELDS="trackerid, userid, issueid" />
       </KEYS>
     </TABLE>
-    <TABLE NAME="tracker_issuecomment" COMMENT="tracker_issuecomment table retrofitted from MySQL" PREVIOUS="tracker_issuecc" NEXT="tracker_issuedependancy">
+    <TABLE NAME="tracker_issuecomment" COMMENT="tracker_issuecomment table retrofitted from MySQL" >
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="trackerid"/>
-        <FIELD NAME="trackerid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="trackerid" NEXT="issueid"/>
-        <FIELD NAME="issueid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="comment"/>
-        <FIELD NAME="comment" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" PREVIOUS="issueid" NEXT="commentformat"/>
-        <FIELD NAME="commentformat" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="comment" NEXT="datecreated"/>
-        <FIELD NAME="datecreated" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="commentformat"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" />
+        <FIELD NAME="trackerid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" />
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="issueid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="comment" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="commentformat" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" />
+        <FIELD NAME="datecreated" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_issuecomment"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="tracker_issuedependancy" COMMENT="tracker_issuedependancy table retrofitted from MySQL" PREVIOUS="tracker_issuecomment" NEXT="tracker_issueownership">
+    <TABLE NAME="tracker_issuedependancy" COMMENT="tracker_issuedependancy table retrofitted from MySQL" >
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="trackerid"/>
-        <FIELD NAME="trackerid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="id" NEXT="parentid"/>
-        <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="trackerid" NEXT="childid"/>
-        <FIELD NAME="childid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="parentid" NEXT="comment"/>
-        <FIELD NAME="comment" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" PREVIOUS="childid" NEXT="commentformat"/>
-        <FIELD NAME="commentformat" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="comment"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" />
+        <FIELD NAME="trackerid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" />
+        <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="childid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="comment" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="commentformat" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_issuedependancy"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="tracker_issueownership" COMMENT="tracker_issueownership table retrofitted from MySQL" PREVIOUS="tracker_issuedependancy" NEXT="tracker_preferences">
+    <TABLE NAME="tracker_issueownership" COMMENT="tracker_issueownership table retrofitted from MySQL" >
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="trackerid"/>
-        <FIELD NAME="trackerid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="trackerid" NEXT="issueid"/>
-        <FIELD NAME="issueid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="bywhomid"/>
-        <FIELD NAME="bywhomid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="issueid" NEXT="timeassigned"/>
-        <FIELD NAME="timeassigned" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="bywhomid"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" />
+        <FIELD NAME="trackerid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" />
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="issueid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="bywhomid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" />
+        <FIELD NAME="timeassigned" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_issueownership"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="tracker_preferences" COMMENT="tracker_preferences table retrofitted from MySQL" PREVIOUS="tracker_issueownership" NEXT="tracker_query">
+    <TABLE NAME="tracker_preferences" COMMENT="tracker_preferences table retrofitted from MySQL" >
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="trackerid"/>
-        <FIELD NAME="trackerid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="trackerid" NEXT="name"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" PREVIOUS="userid" NEXT="value"/>
-        <FIELD NAME="value" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="name"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" />
+        <FIELD NAME="trackerid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" />
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" />
+        <FIELD NAME="name" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="value" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" />
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_preferences" NEXT="unique_pref_entry"/>
-        <KEY NAME="unique_pref_entry" TYPE="unique" FIELDS="trackerid, userid, name" PREVIOUS="primary"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_preferences" />
+        <KEY NAME="unique_pref_entry" TYPE="unique" FIELDS="trackerid, userid, name" />
       </KEYS>
     </TABLE>
-    <TABLE NAME="tracker_query" COMMENT="tracker_query table retrofitted from MySQL" PREVIOUS="tracker_preferences" NEXT="tracker_state_change">
+    <TABLE NAME="tracker_query" COMMENT="tracker_query table retrofitted from MySQL" >
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="trackerid"/>
-        <FIELD NAME="trackerid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="trackerid" NEXT="name"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="userid" NEXT="description"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="name" NEXT="published"/>
-        <FIELD NAME="published" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="description" NEXT="fieldnames"/>
-        <FIELD NAME="fieldnames" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" PREVIOUS="published" NEXT="fieldvalues"/>
-        <FIELD NAME="fieldvalues" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" PREVIOUS="fieldnames"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" />
+        <FIELD NAME="trackerid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" />
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="description" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="published" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="fieldnames" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="fieldvalues" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for tracker_query"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="tracker_state_change" COMMENT="tracker_state_change table retrofitted from MySQL" PREVIOUS="tracker_query">
+    <TABLE NAME="tracker_state_change" COMMENT="tracker_state_change table retrofitted from MySQL" >
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="trackerid"/>
-        <FIELD NAME="trackerid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="issueid"/>
-        <FIELD NAME="issueid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="trackerid" NEXT="userid"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="issueid" NEXT="timechange"/>
-        <FIELD NAME="timechange" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="statusfrom"/>
-        <FIELD NAME="statusfrom" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timechange" NEXT="statusto"/>
-        <FIELD NAME="statusto" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="statusfrom"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" />
+        <FIELD NAME="trackerid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="issueid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="userid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="timechange" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="statusfrom" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="statusto" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="mdl_tracstatchan_iss_ix" UNIQUE="false" FIELDS="issueid" NEXT="mdl_tracstatchan_use_ix"/>
-        <INDEX NAME="mdl_tracstatchan_use_ix" UNIQUE="false" FIELDS="userid" PREVIOUS="mdl_tracstatchan_iss_ix" NEXT="mdl_tracstatchan_tra_ix"/>
-        <INDEX NAME="mdl_tracstatchan_tra_ix" UNIQUE="false" FIELDS="trackerid" PREVIOUS="mdl_tracstatchan_use_ix"/>
+        <INDEX NAME="mdl_tracstatchan_iss_ix" UNIQUE="false" FIELDS="issueid" />
+        <INDEX NAME="mdl_tracstatchan_use_ix" UNIQUE="false" FIELDS="userid" />
+        <INDEX NAME="mdl_tracstatchan_tra_ix" UNIQUE="false" FIELDS="trackerid" />
       </INDEXES>
     </TABLE>
   </TABLES>

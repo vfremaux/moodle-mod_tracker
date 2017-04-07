@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @package mod_tracker
  * @category mod
@@ -25,9 +23,18 @@ defined('MOODLE_INTERNAL') || die();
  * Library of functions for rpc remote calls at tracker. All complex
  * variables transport are performed using JSON format.
  */
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 
-/**
+if (!function_exists('debug_trace')) {
+    function debug_trace($str) {
+        // Empty fake function if missing.
+        assert(1);
+    }
+}
+
+/*
  * Constants
  *
  */
@@ -43,13 +50,6 @@ if (!defined('RPC_SUCCESS')) {
 
 define('CREATE_IF_MISSING', true);
 
-if (!function_exists('debug_trace')) {
-    function debug_trace($str) {
-        // Empty fake function if missing.
-        assert(1);
-    }
-}
-
 /**
  * checks an user has local identity and comes from a known host
  * @param string $username the user's login
@@ -59,16 +59,18 @@ if (!function_exists('debug_trace')) {
 function tracker_rpc_check($remoteuser, &$localuser, $createmissing = false) {
     global $DB;
 
-    // get local identity for user
+    // Get local identity for user.
 
     if (!$remotehost = $DB->get_record('mnet_host', array('wwwroot' => $remoteuser->hostwwwroot))) {
         $response->status = RPC_FAILURE;
         $response->error[] = "Calling host is not registered. Check MNET configuration";
         return json_encode($response);
     }
-    if (!$localuser = $DB->get_record_select('user', "username = ? AND mnethostid = ? AND deleted = 0", array($remoteuser->username, $remotehost->id))) {
+
+    $select = "username = ? AND mnethostid = ? AND deleted = 0";
+    if (!$localuser = $DB->get_record_select('user', $select, array($remoteuser->username, $remotehost->id))) {
         if ($createmissing) {
-            debug_trace('Needs create');
+
             // We create a minimalistic mnet user. Profile might be completed later.
             $localuser = new StdClass();
             $localuser->username = $remoteuser->username;
@@ -83,8 +85,6 @@ function tracker_rpc_check($remoteuser, &$localuser, $createmissing = false) {
             $localuser->deleted = 0;
             $localuser->email = $remoteuser->email;
             $localuser->mnethostid = $remotehost->id;
-
-            debug_trace('will create '.serialize($localuser));
 
             try {
                 $localuser->id = $DB->insert_record('user', $localuser);
@@ -104,7 +104,7 @@ function tracker_rpc_check($remoteuser, &$localuser, $createmissing = false) {
     return null;
 }
 
-/*
+/**
  * sends tracker information to remote caller. This is intended for
  * administrative binding GUIs.
  * @param int $trackerid
@@ -112,7 +112,7 @@ function tracker_rpc_check($remoteuser, &$localuser, $createmissing = false) {
  * @return string a JSON encoded information structure.
  */
 function tracker_rpc_get_infos($trackerid, $nojson = false) {
-    global $CFG, $DB;
+    global $DB;
 
     $tracker = $DB->get_record('tracker', array('id' => "$trackerid"));
     $query = "
@@ -152,11 +152,15 @@ function tracker_rpc_get_instances($username, $remotehostroot) {
     $trackers = $DB->get_records('tracker', null, 'name', 'id, name, networkable');
     if (!empty($trackers)) {
         foreach ($trackers as $id => $tracker) {
-            // A networkable tracker is exposed at once the tracker 
-            // ticket transport layer is enabled.
+            /*
+             * A networkable tracker is exposed at once the tracker
+             * ticket transport layer is enabled.
+             */
             if (!$tracker->networkable) {
-                // Non networkable trackers will need the remote user
-                // has proper write capabilities to nbe able to link and post
+                /*
+                 * Non networkable trackers will need the remote user
+                 * has proper write capabilities to nbe able to link and post
+                 */
                 try {
                     $cm = get_coursemodule_from_instance('tracker', $id);
                     $modulecontext = context_module::instance($cm->id);
@@ -178,11 +182,11 @@ function tracker_rpc_get_instances($username, $remotehostroot) {
  * remote post an entry in a tracker
  * @param object $remoteuser a user description
  * @param int $trackerid the local trackerid where to post
- * @param string $remote_issue a JSON encoded variable containing all
+ * @param string $remoteissue a JSON encoded variable containing all
  * information about an issue.
  * @return the local issue record id
  */
-function tracker_rpc_post_issue($remoteuser, $trackerid, $remote_issue, $islocalcall = false) {
+function tracker_rpc_post_issue($remoteuser, $trackerid, $remoteissue, $islocalcall = false) {
     global $DB, $USER;
 
     $tracker = $DB->get_record('tracker', array('id' => $trackerid));
@@ -193,25 +197,25 @@ function tracker_rpc_post_issue($remoteuser, $trackerid, $remote_issue, $islocal
         return json_encode($response);
     }
 
-    // Objectify received arrays
+    // Objectify received arrays.
     $remoteuser = (object)$remoteuser;
-    // Cline is important here to unbind instances
-    $newissue = clone((object)$remote_issue);
+    // Clone is important here to unbind instances.
+    $newissue = clone((object)$remoteissue);
 
     if (!$islocalcall) {
         if ($tracker->networkable) {
-            // If tracker is networkable, we consider service binding is enough to accept
-            // local user creation if missing.
-            debug_trace('Checking for addition : '.serialize($remoteuser));
+            /*
+             * If tracker is networkable, we consider service binding is enough to accept
+             * local user creation if missing.
+             */
             if ($failedcheck = tracker_rpc_check($remoteuser, $localuser, CREATE_IF_MISSING)) {
-                debug_trace('Failed : '.serialize($failedcheck));
                 return $failedcheck;
             }
-            debug_trace('Created or existing user : '.serialize($localuser));
         } else {
-            // Simply checks user and returns $localuser record
-            if ($failedcheck = tracker_rpc_check($remoteuser, $localuser)) return $failedcheck;
-            debug_trace('Checked existing user : '.serialize($localuser));
+            // Simply checks user and returns $localuser record.
+            if ($failedcheck = tracker_rpc_check($remoteuser, $localuser)) {
+                return $failedcheck;
+            }
         }
         $originhostid = $DB->get_field('mnet_host', 'id', array('wwwroot' => $remoteuser->hostwwwroot));
     } else {
@@ -222,16 +226,16 @@ function tracker_rpc_post_issue($remoteuser, $trackerid, $remote_issue, $islocal
     $response = new StdClass;
     $response->status = RPC_SUCCESS;
 
-    // get additional data and cleanup the issue record for insertion
+    // Get additional data and cleanup the issue record for insertion.
     if (isset($newissue->attributes)) {
         $attributes = $newissue->attributes;
-        unset($newissue->attributes); // clears attributes so we have an issue record
+        unset($newissue->attributes); // Clears attributes so we have an issue record.
     }
 
     $comment = $newissue->comment;
     unset($newissue->comment);
 
-    unset($newissue->id); // clears id, so it will be a new record
+    unset($newissue->id); // Clears id, so it will be a new record.
     $newissue->trackerid = $trackerid;
     $newissue->status = POSTED;
     $newissue->reportedby = $localuser->id;
@@ -244,37 +248,33 @@ function tracker_rpc_post_issue($remoteuser, $trackerid, $remote_issue, $islocal
     $newissue->uplink = '';
 
     try {
-        /*
-        ob_start();
-        print_object($newissue);
-        debug_trace(ob_get_clean());
-        */
         $followid = $DB->insert_record('tracker_issue', $newissue);
-    } catch(Exception $e) {
+    } catch (Exception $e) {
         $response->status = RPC_FAILURE;
         $response->error[] = "Remote error : Could not insert cascade issue record";
         $response->error[] = $e->error;
         return json_encode($response);
     }
 
-    //TODO : rebind attributes and add them
+    // TODO : rebind attributes and add them.
     if (!empty($newissue->attributes)) {
         $used = tracker_getelementsused_by_name($tracker);
         foreach ($newissue->attributes as $attribute) {
-            // cleanup and crossmap attribute records
+            // Cleanup and crossmap attribute records.
             $attribute->elementid = $used[$attribute->elementname]->id;
             unset($attribute->elementname);
             unset($attribute->id);
             $attribute->trackerid = $trackerid;
             $attribute->issueid = $followid;
-            // don't really worry if it fails
+            // Don't really worry if it fails.
             try {
                 $DB->insert_record('tracker_issueattribute', $attribute);
             } catch (Exception $e) {
+                assert(1);
             }
         }
     }
-    // get comment track and add starting comment backtrace
+    // Get comment track and add starting comment backtrace.
     $issuecomment = new StdClass;
     $issuecomment->trackerid = $trackerid;
     $issuecomment->issueid = $followid;
