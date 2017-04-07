@@ -48,9 +48,6 @@ class captchaelement extends trackerelement {
     public function add_form_element(&$mform) {
         global $SESSION;
 
-        $mform->addElement('header', "header{$this->name}", '');
-        $mform->setExpanded("header{$this->name}");
-
         $group[] = &$mform->createElement('text', "element{$this->name}");
         $mform->setType("element{$this->name}", PARAM_TEXT);
 
@@ -59,9 +56,9 @@ class captchaelement extends trackerelement {
         $captcharec->length = 6;
         $SESSION->tracker[$this->tracker->id]->captcha = $captcharec; // TODO parametrize this from global settings.
         $cm = get_coursemodule_from_instance('tracker', $this->tracker->id);
-        $params = array('id' => $cm->id);
+        $params = array('t' => $this->tracker->id);
         $generatorurl = new moodle_url('/mod/tracker/classes/trackercategorytype/captcha/print_captcha.php', $params);
-        $group[] = &$mform->createElement('html', '<img src="'.$generatorurl.'">');
+        $group[] = &$mform->createElement('html', '<div class="tracker-captcha"><img src="'.$generatorurl.'"></div>');
 
         $mform->addGroup($group, 'captchagroup', get_string('captcha', 'tracker'), false, array(''), false);
         $mform->setType("captchagroup[element{$this->name}]", PARAM_TEXT);

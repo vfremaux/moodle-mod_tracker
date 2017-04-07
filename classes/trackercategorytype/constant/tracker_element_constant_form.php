@@ -43,9 +43,9 @@ class tracker_element_constant_form extends tracker_moodle_form {
 
         $mform->addElement('select', 'paramint1', get_string('constantinfosource', 'tracker'), $options);
 
-        $mform->addElement('text', 'paramchar2', get_string('customconstant', 'tracker'));
-        $mform->setType('paramchar2', PARAM_RAW);
-        $mform->disabledIf('paramchar2', 'paramint1', 'neq', 0);
+        $mform->addElement('text', 'paramchar1', get_string('customconstant', 'tracker'));
+        $mform->setType('paramchar1', PARAM_RAW);
+        $mform->disabledIf('paramchar1', 'paramint1', 'neq', 0);
 
         $this->end_form();
     }

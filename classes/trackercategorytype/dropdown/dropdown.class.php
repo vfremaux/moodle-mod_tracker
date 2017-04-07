@@ -68,8 +68,6 @@ class dropdownelement extends trackerelement {
 
     public function add_form_element(&$mform) {
 
-        $mform->addElement('header', "head{$this->name}", format_string($this->description));
-        $mform->setExpanded("head{$this->name}");
         if (isset($this->options)) {
             foreach ($this->options as $option) {
                 $optionsmenu[$option->id] = format_string($option->description);
@@ -77,7 +75,7 @@ class dropdownelement extends trackerelement {
 
             $mform->addElement('select', 'element'.$this->name, format_string($this->description), $optionsmenu);
             if (!empty($this->mandatory)) {
-                $mform->addRule($this->name, null, 'required', null, 'client');
+                $mform->addRule('element'.$this->name, null, 'required', null, 'client');
             }
         }
     }

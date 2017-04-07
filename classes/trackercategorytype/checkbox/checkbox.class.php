@@ -75,10 +75,10 @@ class checkboxelement extends trackerelement {
 
     public function add_form_element(&$mform) {
         if (isset($this->options)) {
-            $mform->addElement('header', "head{$this->name}", format_string($this->description));
-            $mform->setExpanded("head{$this->name}");
+
+            $mform->addElement('static', 'element'.$this->name.'_set', format_string($this->description));
             foreach ($this->options as $option) {
-                $mform->addElement('checkbox', "element{$this->name}{$option->id}", format_string($option->description));
+                $mform->addElement('checkbox', "element{$this->name}{$option->id}", '&ensp;'.format_string($option->description));
                 $mform->setType("element{$this->name}{$option->id}", PARAM_INT);
             }
         }
@@ -88,22 +88,18 @@ class checkboxelement extends trackerelement {
         if ($issueid) {
             if (!empty($this->options)) {
                 $values = $this->get_value($issueid);
-                if (is_array($values)) {
+                if (!empty($values)) {
+                    $values = explode(',', $values);
                     foreach ($values as $v) {
                         if (array_key_exists($v, $this->options)) {
                             // Check option still exists.
-                            $elementname = "element{$this->name}{$option->id}";
+                            $elementname = "element{$this->name}{$v}";
                             $defaults->$elementname = 1;
                         }
                     }
-                } else {
-                    $v = $values; // Single value.
-                    if (array_key_exists($v, $this->options)) {
-                        // Check option still exists.
-                        $elementname = "element{$this->name}{$option->id}";
-                        $defaults->$elementname = 1;
-                    }
                 }
+            } else {
+                mtrace("Empty options ");
             }
         }
     }

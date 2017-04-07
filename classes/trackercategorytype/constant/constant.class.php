@@ -40,19 +40,63 @@ class constantelement extends trackerelement {
         return $this->value;
     }
 
+    /**
+     * Constant source reference :
+     * 1 => site shortname
+     * 2 => site fullname
+     * 3 => current idnumber
+     * 4 => current courseidnumber
+     * 5 => current courseshortname
+     * 6 => current coursefullname
+     */
     public function add_form_element(&$mform) {
-        $mform->addElement('header', "header{$this->name}", '');
-        $mform->setExpanded("header{$this->name}");
+        global $SITE, $COURSE;
 
         $mform->addElement('hidden', "element{$this->name}");
         $mform->setDefault("element{$this->name}", 'name');
         $mform->setType("element{$this->name}", PARAM_URL);
 
+        switch ($this->paramint1) {
+            case 1: {
+                $constant = $SITE->shortname;
+                break;
+            }
+
+            case 2: {
+                $constant = $SITE->fullname;
+                break;
+            }
+
+            case 3: {
+                $cm = get_coursemodule_from_instance('tracker', $this->tracker->id);
+                $constant = $cm->idnumber;
+                break;
+            }
+
+            case 4: {
+                $constant = $COURSE->idnumber;
+                break;
+            }
+
+            case 5: {
+                $constant = $COURSE->shortname;
+                break;
+            }
+
+            case 6: {
+                $constant = $COURSE->fullname;
+                break;
+            }
+
+            default:
+                $contant = '';
+        }
+
         if ($this->active) {
-            $mform->addElement('text', "element{$this->name}shadow", get_string('autourl', 'tracker'));
+            $mform->addElement('text', "element{$this->name}shadow", get_string('constant', 'tracker'));
             $mform->setType("element{$this->name}shadow", PARAM_URL);
             $mform->disabledIf("element{$this->name}shadow", "element{$this->name}");
-            $mform->setDefault("element{$this->name}shadow", $_SERVER['HTTP_REFERER']);
+            $mform->setDefault("element{$this->name}shadow", $constant);
         }
     }
 

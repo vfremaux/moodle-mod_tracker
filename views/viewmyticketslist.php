@@ -102,7 +102,7 @@ if (isset($searchqueries)) {
 }
 
 // Display list of my issues.
-
+echo $output;
 echo $renderer->search_queries($cm);
 
 $formurl = new moodle_url('/mod/tracker.view.php');
@@ -206,11 +206,11 @@ if (!empty($issues)) {
         $statusthin = '<div class="status-'.$statuscodes[$issue->status].' tracker-status-thin"></div>';
 
         $params = array('id' => $cm->id, 'view' => 'view', 'issueid' => $issue->id);
-        $ticketurl = new moodle_url('/mod.tracker/view.php', $params);
+        $ticketurl = new moodle_url('/mod/tracker/view.php', $params);
         $issuenumber = '<a href="'.$ticketurl.'">'.$tracker->ticketprefix.$issue->id.'</a>';
 
         $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issue->id);
-        $summaryurl = new moodle_url('/mod.tracker/view.php', $params);
+        $summaryurl = new moodle_url('/mod/tracker/view.php', $params);
         $summary = '<a href="'.$summaryurl.'">'.format_string($issue->summary).'</a>';
 
         $datereported = date('Y/m/d H:i', $issue->datereported);

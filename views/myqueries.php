@@ -26,11 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 $select = " userid = ? AND trackerid = ? ";
 $queries = $DB->get_records_select('tracker_query', $select, array($USER->id, $tracker->id));
 
-echo $OUTPUT->heading(get_string('myqueries', 'tracker'));
-
-echo $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'tracker-queries');
-echo '<center>';
-
 if (!empty($queries)) {
     $searchstr = get_string('query', 'tracker');
     $namestr = get_string('name');
@@ -58,11 +53,20 @@ if (!empty($queries)) {
         $action .= '&nbsp;<a href="'.$deleteurl.'" title="'.get_string('delete').'" >'.$pix.'</a>';
         $table->data[] = array($searchlink, "&nbsp;{$query->name}", format_string($query->description), $action);
     }
-    echo html_writer::table($table);
+    $tablehtml = html_writer::table($table);
 } else {
-    print_string('noqueryssaved', 'tracker');
+    $tablehtml = $OUTPUT->notification(get_string('noqueryssaved', 'tracker'));
 }
 
+// Start printing screen.
+
+echo $output;
+echo $OUTPUT->heading(get_string('myqueries', 'tracker'));
+
+echo $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'tracker-queries');
+
+echo '<center>';
+echo $tablehtml;
 echo '</center>';
 
 echo $OUTPUT->box_end();

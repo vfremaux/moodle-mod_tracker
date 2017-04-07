@@ -46,14 +46,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($action == 'createelementobsolete') {
+if ($action == 'createelement') {
 
     // Create element form *************************************************************************.
 
     $type = required_param('type', PARAM_TEXT);
     redirect(new moodle_url('/mod/tracker/editelement.php', array('id' => $id, 'type' => $type, 'elementid' => 0)));
 
-} else if ($action == 'editelementobsolete') {
+} else if ($action == 'editelement') {
 
     // Edit an element form *************************************************************************.
 
@@ -63,7 +63,7 @@ if ($action == 'createelementobsolete') {
     redirect(new moodle_url('/mod/tracker/editelement.php', $params));
 }
 
-if ($action == 'doupdateelementobsolete') {
+if ($action == 'doupdateelement') {
 
     // Update an element ****************************************************************************.
 

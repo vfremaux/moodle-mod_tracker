@@ -46,9 +46,7 @@ class TrackerIssueForm extends moodleform {
     public function definition() {
         global $DB, $COURSE;
 
-        $trackerid = $this->_customdata['trackerid'];
-
-        $tracker = $DB->get_record('tracker', array('id' => $trackerid));
+        $tracker = $this->_customdata['tracker'];
 
         $this->context = context_module::instance($this->_customdata['cmid']);
         $maxfiles = 99;                // TODO: add some setting.
@@ -61,9 +59,13 @@ class TrackerIssueForm extends moodleform {
 
         $mform = $this->_form;
 
-        $mform->addElement('hidden', 'id', $this->_customdata['cmid']);
+        $mform->addElement('hidden', 'id'); // Course module id.
         $mform->setType('id', PARAM_INT);
-        $mform->addElement('hidden', 'trackerid', $trackerid);
+
+        $mform->addElement('hidden', 'issueid'); // Issue id.
+        $mform->setType('issueid', PARAM_INT);
+
+        $mform->addElement('hidden', 'trackerid', $tracker->id);
         $mform->setType('trackerid', PARAM_INT);
 
         $mform->addElement('header', 'header0', get_string('description'));
@@ -78,10 +80,55 @@ class TrackerIssueForm extends moodleform {
 
         if (!empty($this->elements)) {
             foreach ($this->elements as $element) {
+                if ((get_class($element) == 'captchaelement') && ($this->_customdata['mode'] == 'update')) {
+                    // Avoid captcha when updating issue data.
+                    continue;
+                }
                 if (($element->active == true) && ($element->private == false)) {
                     $element->add_form_element($mform);
                 }
             }
+        }
+
+        if ($this->_customdata['mode'] == 'update') {
+
+            $mform->addelement('header', 'processinghdr', get_string('processing', 'tracker'), '');
+
+            // Assignee.
+            $context = context_module::instance($this->_customdata['cmid']);
+            $resolvers = tracker_getresolvers($context);
+            $resolversmenu[0] = '---- '. get_string('unassigned', 'tracker').' -----';
+            if ($resolvers) {
+                foreach ($resolvers as $resolver) {
+                    $resolversmenu[$resolver->id] = fullname($resolver);
+                }
+                $mform->addElement('select', 'assignedto', get_string('assignedto', 'tracker'), $resolversmenu);
+            } else {
+                $mform->addElement('static', 'resolversshadow', get_string('assignedto', 'tracker'), get_string('noresolvers', 'tracker'));
+                $mform->addElement('hidden', 'assignedto');
+                $mform->setType('assignedto', PARAM_INT);
+            }
+
+            // Status.
+            $statuskeys = tracker_get_statuskeys($tracker);
+            $mform->addElement('select', 'status', get_string('status', 'tracker'), $statuskeys);
+
+            // Dependencies.
+            $dependencies = tracker_getpotentialdependancies($tracker->id, $this->_customdata['issueid']);
+            if (!empty($dependencies)) {
+                foreach($dependencies as $dependency) {
+                    $summary = shorten_text(format_string($dependency->summary));
+                    $dependenciesmenu[$dependency->id] = "{$tracker->ticketprefix}{$dependency->id} - ".$summary;
+                }
+                $select = &$mform->addElement('select', 'dependencies', get_string('dependson', 'tracker'), $dependenciesmenu);
+                $select->setMultiple(true);
+            } else {
+                $mform->addElement('static', 'dependenciesshadow', get_string('dependson', 'tracker'), get_string('nopotentialdeps', 'tracker'));
+            }
+
+            $mform->addelement('header', 'resolutionhdr', get_string('resolution', 'tracker'), '');
+            $mform->addElement('editor', 'resolution_editor', get_string('resolution', 'tracker'), $this->editoroptions);
+
         }
 
         $this->add_action_buttons();
@@ -97,10 +144,31 @@ class TrackerIssueForm extends moodleform {
         // Something to prepare for each element ?
         if (!empty($this->elements)) {
             foreach ($this->elements as $element) {
-                $element->set_data($defaults);
+                $element->set_data($defaults, $this->_customdata['issueid']);
             }
         }
 
+        print_object($defaults);
+
+        $defaults->resolution_editor['text'] = $defaults->resolution;
+        $defaults->resolution_editor['format'] = $defaults->resolutionformat;
+        $defaults = file_prepare_standard_editor($defaults, 'resolution', $this->editoroptions, $this->context, 'mod_tracker',
+                                                 'issueresolution', $defaults->issueid);
+
         parent::set_data($defaults);
+    }
+
+    public function validate($data, $files = array()) {
+
+        $errors = array();
+
+        // Something to prepare for each element ?
+        if (!empty($this->elements)) {
+            foreach ($this->elements as $element) {
+                $errors = array_merge($errors, $element->validate($data, $files));
+            }
+        }
+
+        return $errors;
     }
 }

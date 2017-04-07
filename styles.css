@@ -292,3 +292,8 @@
 #tracker-preferences-form div.fitemtitle {
     width:600px;
 }
+
+.tracker-captcha {
+    margin-left: 285px;
+    margin-bottom: 10px;
+}

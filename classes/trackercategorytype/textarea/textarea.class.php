@@ -43,9 +43,8 @@ class textareaelement extends textelement {
     }
 
     public function add_form_element(&$mform) {
-        $mform->addElement('header', "header{$this->name}", format_string($this->description));
-        $mform->setExpanded("header{$this->name}");
-        $mform->addElement('textarea', "element{$this->name}", '', array('cols' => 60, 'rows' => 15));
+
+        $mform->addElement('textarea', "element{$this->name}", format_string($this->description), array('cols' => 60, 'rows' => 15));
         $mform->setType("element{$this->name}", PARAM_TEXT);
         if (!empty($this->mandatory)) {
             $mform->addRule('element'.$this->name, null, 'required', null, 'client');

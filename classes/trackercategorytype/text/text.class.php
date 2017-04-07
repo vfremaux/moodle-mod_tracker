@@ -46,21 +46,11 @@ class textelement extends trackerelement {
     }
 
     public function add_form_element(&$mform) {
-        $mform->addElement('header', "header{$this->name}", format_string($this->description));
-        $mform->setExpanded("header{$this->name}");
+
         $mform->addElement('text', "element{$this->name}", format_string($this->description), array('size' => 80));
         $mform->setType("element{$this->name}", PARAM_TEXT);
         if (!empty($this->mandatory)) {
             $mform->addRule('element'.$this->name, null, 'required', null, 'client');
-        }
-    }
-
-    public function set_data(&$defaults, $issueid = 0) {
-        if ($issueid) {
-            $elementname = "element{$this->name}";
-            $defaults->$elementname = $this->get_value($issueid);
-        } else {
-            $defaults->$elementname = '';
         }
     }
 

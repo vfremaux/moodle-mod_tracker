@@ -25,12 +25,13 @@ defined('MOODLE_INTERNAL') || die();
 
 $mywatches = tracker_getwatches($tracker->id, $USER->id);
 
+echo $output;
 echo $OUTPUT->heading(get_string('mywatches', 'tracker'));
 
-$OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'bugreport');
+echo $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'bugreport');
 
 if (empty($mywatches)) {
-    print_string('nowatches', 'tracker');
+    echo $OUTPUT->notification(get_string('nowatches', 'tracker'));
 } else {
     $idstr = get_string('id', 'tracker');
     $summarystr = get_string('summary', 'tracker');
@@ -95,4 +96,4 @@ if (empty($mywatches)) {
     echo html_writer::table($table);
 }
 
-$OUTPUT->box_end();
+echo $OUTPUT->box_end();

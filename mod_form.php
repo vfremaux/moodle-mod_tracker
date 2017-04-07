@@ -32,7 +32,7 @@ require_once($CFG->dirroot.'/course/moodleform_mod.php');
 class mod_tracker_mod_form extends moodleform_mod {
 
     public function definition() {
-        global $CFG, $DB;
+        global $CFG, $DB, $COURSE;
 
         $mform    =& $this->_form;
 
@@ -91,7 +91,11 @@ class mod_tracker_mod_form extends moodleform_mod {
         $mform->addElement('checkbox', 'strictworkflow', get_string('strictworkflow', 'tracker'));
         $mform->addHelpButton('strictworkflow', 'strictworkflow', 'tracker');
 
-        $context = context_module::instance($this->_cm->id);
+        if ($this->_cm) {
+            $context = context_module::instance($this->_cm->id);
+        } else {
+            $context = context_course::instance($COURSE->id);
+        }
         $fields = 'u.id,'.get_all_user_name_fields(true, 'u');
         $order = 'lastname, firstname';
         if (isset($this->_cm->id) &&

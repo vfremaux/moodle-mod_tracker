@@ -124,7 +124,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= '<td align="right" width="25%" class="tracker-issue-param" >';
         $str .= '<b>'.get_string('status', 'tracker').':</b>';
         $str .= '</td>';
-        $str .= '<td width="25%" class="status_'.$statuscodes[$issue->status].' tracker-issue-value">';
+        $str .= '<td width="25%" class="status-'.$statuscodes[$issue->status].' tracker-issue-value">';
         $str .= '<b>'.$statuskeys[$issue->status].'</b>';
         $str .= '</td>';
         $str .= '</tr>';
@@ -343,7 +343,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str = '';
 
         if ($user) {
-            $str .= $this->output->user_picture ($user, array('courseid' => $COURSE->id, 'size' => 25));
+            $str .= $this->output->user_picture($user, array('courseid' => $COURSE->id, 'size' => 24));
             $userurl = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $COURSE->id));
             if ($CFG->messaging) {
                 $str .= '&nbsp;<a href="'.$userurl.'">'.fullname($user).'</a>';
@@ -370,7 +370,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
         $str .= '<tr>';
         $str .= '<td colspan="4" width="100%" class="tracker-ccs">';
-        $str .= '<table id="issueccs" class="'.$initialviewmode.'" width="100%">';
+        $str .= '<table id="tracker-issueccs" class="'.$initialviewmode.'" width="100%">';
         $str .= '<tr valign="top">';
         $str .= '<td colspan="3">';
         $str .= $this->output->heading(get_string('cced', 'tracker'));
@@ -441,7 +441,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         return $str;
     }
 
-    public function history($history, $statehistory, $initialviewmode) {
+    public function history(&$tracker, $history, $statehistory, $initialviewmode) {
         global $DB;
 
         $statuskeys = tracker_get_statuskeys($tracker);
@@ -450,18 +450,14 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str = '';
 
         $str .= '<tr>';
-        $str .= '<td colspan="4" align="center" width="100%">';
-        $str .= '<table id="issuehistory" class="'.$initialviewmode.'" width="100%">';
-        $str .= '<tr valign="top">';
-        $str .= '<td width="50%">';
-        $str .= $this->output->heading(get_string('history', 'tracker'));
-        $str .= '</td>';
-        $str .= '<td width="50%">';
-        $str .= $this->output->heading(get_string('statehistory', 'tracker'));
-        $str .= '</td>';
-        $str .= '</tr>';
-        $str .= '<tr>';
-        $str .= '<td width="50%">';
+        $str .= '<td colspan="4" width="100%">';
+        $str .= '<div id="tracker-issuehistory" class="'.$initialviewmode.'">';
+        $str .= $this->output->heading(get_string('history', 'tracker'), 2);
+        $str .= '<div class="row-fluid">'; // Row
+        $str .= '<div class="span6 col-6">'; // Cell
+
+        $str .= $this->output->heading(get_string('assignees', 'tracker'), 3);
+
         $str .= '<table width="100%">';
         if (!empty($history)) {
             foreach ($history as $owner) {
@@ -482,8 +478,12 @@ class mod_tracker_renderer extends plugin_renderer_base {
             }
         }
         $str .= '</table>';
-        $str .= '</td>';
-        $str .= '<td width="50%">';
+
+        $str .= '</div>'; // Cell
+        $str .= '<div class="span6 col-6">'; // Cell
+
+        $str .= $this->output->heading(get_string('statehistory', 'tracker'), 3);
+
         $str .= '<table width="100%">';
         if (!empty($statehistory)) {
             foreach ($statehistory as $state) {
@@ -507,11 +507,11 @@ class mod_tracker_renderer extends plugin_renderer_base {
             }
         }
         $str .= '</table>';
-        $str .= '</td>';
+        $str .= '</div>'; // Cell.
+        $str .= '</div>'; // Row.
+        $str .= '</div>'; // Div.
         $str .= '</tr>';
         $str .= '</table>';
-        $str .= ' </td>';
-        $str .= '</tr>';
 
         return $str;
     }

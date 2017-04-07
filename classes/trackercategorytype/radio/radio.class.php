@@ -37,13 +37,8 @@ class radioelement extends trackerelement {
 
         $this->get_value($issueid);
 
-        $optbynames = array();
-        foreach ($this->options as $opt) {
-            $optbynames[$opt->name] = format_string($opt->description);
-        }
-
-        if (!empty($this->options) && !empty($this->value) && array_key_exists($this->value, $optbynames)) {
-            $str = $optbynames[$this->value];
+        if (!empty($this->options) && !empty($this->value) && array_key_exists($this->value, $this->options)) {
+            $str = format_string($this->options[$this->value]->description);
         }
         return $str;
     }
@@ -77,10 +72,10 @@ class radioelement extends trackerelement {
 
     public function add_form_element(&$mform) {
         if (isset($this->options)) {
-            $mform->addElement('header', "head{$this->name}", format_string($this->description));
-            $mform->setExpanded("head{$this->name}");
+
+            $mform->addElement('static', 'element'.$this->name.'_set', format_string($this->description));
             foreach ($this->options as $option) {
-                $mform->addElement('radio', 'element'.$this->name, format_string($option->description), '', $option->name);
+                $mform->addElement('radio', 'element'.$this->name, format_string($option->description), '', $option->id);
                 $mform->setType('element'.$this->name, PARAM_TEXT);
             }
             if (!empty($this->mandatory)) {
@@ -98,8 +93,8 @@ class radioelement extends trackerelement {
                     foreach ($values as $v) {
                         if (array_key_exists($v, $this->options)) {
                             // Check option still exists.
-                            $elementname = "element{$this->name}{$option->id}";
-                            $defaults->$elementname = 1;
+                            $elementname = "element{$this->name}";
+                            $defaults->$elementname = $v;
                         }
                     }
                 }

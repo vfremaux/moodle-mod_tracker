@@ -100,7 +100,8 @@ if ($action == 'searchforissues') {
 } else if ($action == 'clearsearch') {
     if (tracker_clearsearchcookies($tracker->id)) {
         $returnview = ($tracker->supportmode == 'bugtracker') ? 'browse' : 'mytickets';
-        redirect("view.php?id={$cm->id}&amp;view=view&amp;screen={$returnview}");
+        $params = array('id' => $cm->id, 'view' => 'view', 'screen' => $returnview);
+        redirect(new moodle_url('/mod/tracker/view.php', $params));
     }
 }
 
@@ -151,14 +152,16 @@ if ($view == 'view') {
     }
 }
 
-echo $OUTPUT->header();
+$output = $OUTPUT->header();
 
-echo $OUTPUT->box_start('', 'tracker-view');
-echo $renderer->tabs($view, $screen, $tracker, $cm);
+$output .= $OUTPUT->box_start('', 'tracker-view');
+if (!in_array($screen, array('editanissue'))) {
+    $output .= $renderer->tabs($view, $screen, $tracker, $cm);
+}
 
 // A pre-buffer that may be a controller output.
 if (!empty($out)) {
-    echo $out;
+    $output .= $out;
 }
 
 /*

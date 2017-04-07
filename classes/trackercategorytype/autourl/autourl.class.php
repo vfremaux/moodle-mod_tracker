@@ -41,8 +41,6 @@ class autourlelement extends trackerelement {
     }
 
     public function add_form_element(&$mform) {
-        $mform->addElement('header', "header{$this->name}", format_string($this->description));
-        $mform->setExpanded("header{$this->name}");
 
         $mform->addElement('hidden', "element{$this->name}");
         $mform->setDefault("element{$this->name}", $_SERVER['HTTP_REFERER']);
@@ -80,6 +78,15 @@ class autourlelement extends trackerelement {
             }
         } else {
             $DB->update_record('tracker_issueattribute', $attribute);
+        }
+    }
+
+    public function set_data(&$defaults, $issueid = 0) {
+        $elementname = "element{$this->name}";
+        if ($issueid) {
+            $defaults->$elementname = $this->get_value($issueid);
+        } else {
+            $defaults->$elementname = $_SERVER['HTTP_REFERER'];
         }
     }
 }

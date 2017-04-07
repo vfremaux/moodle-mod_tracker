@@ -26,4 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $renderer = $PAGE->get_renderer('tracker', 'admin');
 $renderer->init($tracker, $cm);
+
+echo $output;
 echo $renderer->summary();

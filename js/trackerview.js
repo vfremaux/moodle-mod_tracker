@@ -4,7 +4,7 @@
 // jshint unused:false, undef:false
 
 function togglehistory() {
-    historydiv = document.getElementById("issuehistory");
+    historydiv = document.getElementById("tracker-issuehistory");
     historylink = document.getElementById("togglehistorylink");
     if (historydiv.className === "visiblediv") {
         historydiv.className = "hiddendiv";
@@ -16,7 +16,7 @@ function togglehistory() {
 }
 
 function toggleccs() {
-    ccsdiv = document.getElementById("issueccs");
+    ccsdiv = document.getElementById("tracker-issueccs");
     ccslink = document.getElementById("toggleccslink");
     if (ccsdiv.className === "visiblediv") {
         ccsdiv.className = "hiddendiv";

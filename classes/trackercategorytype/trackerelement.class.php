@@ -44,7 +44,20 @@ abstract class trackerelement {
     protected $mandatory;
     protected $canbemodifiedby;
     protected $context;
+    protected $paramint1;
+    protected $paramint2;
+    protected $paramchar1;
+    protected $paramchar2;
 
+    /**
+     * Loads all data about a traker element. 
+     * If the element is a used element, will pull as master id the tracker element record and adds the used attributes to it.
+     * @param objectref $tracker
+     * @param int $elementid if $used is true, points to the tracker_elementused table. If false, points directly to the tracker_element table.
+     * @param bool $used
+     * @return an object that represents a pure tracker_element or a tracker_usedelement as an element with additional attributes and a
+     * usedid additional id.
+     */
     public function __construct(&$tracker, $elementid = null, $used = false) {
         global $DB;
 
@@ -69,6 +82,10 @@ abstract class trackerelement {
             $this->description = $elmrec->description;
             $this->course = $elmrec->course;
             $this->type = $elmrec->type;
+            $this->paramint1 = $elmrec->paramint1;
+            $this->paramint2 = $elmrec->paramint2;
+            $this->paramchar1 = $elmrec->paramchar1;
+            $this->paramchar2 = $elmrec->paramchar2;
         }
 
         $this->context = context_module::instance($cm->id);
@@ -77,6 +94,9 @@ abstract class trackerelement {
         $this->tracker = $tracker;
     }
 
+    /**
+     * Magic Get function for php object attribute read control.
+     */
     public function __get($key) {
         $method = 'magic_get_'.$key;
         if (method_exists($this, $method)) {
@@ -88,6 +108,9 @@ abstract class trackerelement {
         return $this->$key;
     }
 
+    /**
+     * Magic Set function for php object change control.
+     */
     public function __set($key, $value) {
         $method = 'magic_set_'.$key;
         if (method_exists($this, $method)) {
@@ -108,7 +131,7 @@ abstract class trackerelement {
     }
 
     /**
-     * Tells if options are defined for thsi instance
+     * Tells if options are defined for this instance
      */
     public function has_options() {
         return $this->options !== null;
@@ -239,11 +262,11 @@ abstract class trackerelement {
     }
 
     public function set_data(&$defaults, $issueid = 0) {
+        $elementname = "element{$this->name}";
         if ($issueid) {
-            $elementname = "element{$this->name}";
             $defaults->$elementname = $this->get_value($issueid);
         } else {
-            $defaults->$elementname = $_SERVER['HTTP_REFERER'];
+            $defaults->$elementname = '';
         }
     }
 

@@ -31,18 +31,16 @@ class radiohorizelement extends radioelement {
 
         if (isset($this->options)) {
             $group = array();
-            $mform->addElement('header', "head{$this->name}", format_string($this->description));
-            $mform->setExpanded("head{$this->name}");
+
             foreach ($this->options as $option) {
-                $label = format_string($option->description);
-                $group[] = &$mform->createElement('radio', 'element'.$this->name, '', $label, $option->name);
-                $mform->setType('element'.$this->name, PARAM_TEXT);
+                $label = ' '.format_string($option->description);
+                $group[] = &$mform->createElement('radio', 'element'.$this->name, '', $label, $option->id);
             }
 
-            $mform->addGroup($group, 'element' . $this->name.'_set', '', false);
+            $mform->addGroup($group, 'element'.$this->name.'_set', format_string($this->description), array(' '), false);
 
             if (!empty($this->mandatory)) {
-                $mform->addRule('element'.$this->name, null, 'required', null, 'client');
+                $mform->addRule('element'.$this->name.'_set', null, 'required', null, 'client');
             }
         }
     }

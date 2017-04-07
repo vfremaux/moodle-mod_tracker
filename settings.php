@@ -23,7 +23,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/mod/trackeR/locallib.php');
+require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 
 /*
  * Global settings for the learningtimecheck
@@ -66,12 +66,12 @@ if ($ADMIN->fulltree) {
     $key = 'mod_tracker/initiallymandatory';
     $label = get_string('configinitiallymandatory', 'mod_tracker');
     $desc = get_string('configinitiallymandatory_desc', 'mod_tracker');
-    $settings->add(new admin_setting_configselect($key, $label, $desc, 1, $yesnoopts));
+    $settings->add(new admin_setting_configselect($key, $label, $desc, 0, $yesnoopts));
 
     $key = 'mod_tracker/initiallyprivate';
     $label = get_string('configinitiallyprivate', 'mod_tracker');
     $desc = get_string('configinitiallyprivate_desc', 'mod_tracker');
-    $settings->add(new admin_setting_configselect($key, $label, $desc, 1, $yesnoopts));
+    $settings->add(new admin_setting_configselect($key, $label, $desc, 0, $yesnoopts));
 
 
     if (tracker_supports_feature('emulate/community')) {

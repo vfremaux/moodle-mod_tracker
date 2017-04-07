@@ -47,7 +47,8 @@ $PAGE->set_button($OUTPUT->update_module_button($cm->id, 'tracker'));
 
 $renderer = $PAGE->get_renderer('mod_tracker');
 
-$form = new TrackerIssueForm(new moodle_url('/mod/tracker/reportissue.php'), array('trackerid' => $tracker->id, 'cmid' => $id));
+$params = array('tracker' => $tracker, 'cmid' => $id, 'mode' => 'add');
+$form = new TrackerIssueForm(new moodle_url('/mod/tracker/reportissue.php'), $params);
 
 if (!$form->is_cancelled()) {
     if ($data = $form->get_data()) {

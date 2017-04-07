@@ -121,7 +121,7 @@ if (isset($searchqueries)) {
 }
 
 // Display list of issues.
-
+echo $output;
 echo '<center>';
 echo '<table border="1" width="100%">';
 
@@ -302,7 +302,7 @@ if (!empty($issues)) {
 
         if (has_capability('mod/tracker:manage', $context)) {
             $params = array('id' => $cm->id, 'issueid' => $issue->id, 'what' => 'delete');
-            $deleteurl = new moodle_url('/mod.tracker/view.php', $params);
+            $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
             $pix = '<img src="'.$OUTPUT->pix_url('t/delete', 'core').'" />';
             $actions .= '&nbsp;<a href="'.$deleteurl.'" title="'.get_string('delete').'" >'.$pix.'</a>';
         }

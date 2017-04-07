@@ -65,6 +65,10 @@ if ($data = $form->get_data()) {
     $element->description = $data->description;
     $element->type = $data->type;
     $element->course = (@$data->shared) ? 0 : $COURSE->id;
+    $element->paramint1 = 0 + @$data->paramint1;
+    $element->paramint2 = 0 + @$data->paramint2;
+    $element->paramchar1 = @$data->paramchar1;
+    $element->paramchar2 = @$data->paramchar2;
     if (!$data->elementid) {
         $element->id = $DB->insert_record('tracker_element', $element);
     } else {

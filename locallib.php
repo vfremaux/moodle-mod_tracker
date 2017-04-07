@@ -997,27 +997,45 @@ function tracker_getassignees($userid) {
 function tracker_submitanissue(&$tracker, &$data) {
     global $DB, $USER;
 
+    $cm = get_coursemodule_from_instance('tracker', $tracker->id);
+    $context =  context_module::instance($cm->id);
+
     $issue = new StdClass();
     $issue->datereported = time();
     $issue->summary = $data->summary;
     $issue->description = $data->description_editor['text'];
     $issue->descriptionformat = $data->description_editor['format'];
+
     $issue->assignedto = $tracker->defaultassignee;
     $issue->bywhomid = 0;
     $issue->trackerid = $tracker->id;
-    $issue->status = POSTED;
     $issue->reportedby = $USER->id;
 
-    // Fetch max actual priority.
-    $select = " trackerid = ? GROUP BY trackerid ";
-    $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', $select, array($tracker->id));
-    $issue->resolutionpriority = $maxpriority + 1;
+    if (empty($data->id)) {
+        $issue->status = POSTED;
 
-    $issue->id = $DB->insert_record('tracker_issue', $issue);
-    $data->issueid = $issue->id;
+        // Fetch max actual priority.
+        $select = " trackerid = ? GROUP BY trackerid ";
+        $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', $select, array($tracker->id));
+        $issue->resolutionpriority = $maxpriority + 1;
+
+        $issue->id = $DB->insert_record('tracker_issue', $issue);
+        $data->issueid = $issue->id;
+
+        // If not CCed, the assignee should be.
+        tracker_register_cc($tracker, $issue, $issue->reportedby);
+
+    } else {
+        $issue->id = $data->id;
+        $issue->status = $data->status;
+        $issue->resolution = $data->resolution_editor['text'];
+        $issue->resolutionformat = $data->resolution_editor['format'];
+
+        $issue->id = $DB->update_record('tracker_issue', $issue);
+    }
+
     tracker_recordelements($issue, $data);
-    // If not CCed, the assignee should be.
-    tracker_register_cc($tracker, $issue, $issue->reportedby);
+
     return $issue;
 }
 
@@ -1579,8 +1597,8 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
                 case OPEN: {
                     if ($cc->events & EVENT_OPEN) {
                         $vars['EVENT'] = get_string('open', 'tracker');
-                        $notification = tracker_compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
-                        $notificationhtml = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                        $notification = tracker_compile_mail_template('statechanged', $vars, $ccuser->lang);
+                        $notificationhtml = tracker_compile_mail_template('statechanged_html', $vars, $ccuser->lang);
                     }
                     break;
                 }
@@ -1588,8 +1606,8 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
                 case RESOLVING: {
                     if ($cc->events & EVENT_RESOLVING) {
                         $vars['EVENT'] = get_string('resolving', 'tracker');
-                        $notification = tracker_compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
-                        $notificationhtml = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                        $notification = tracker_compile_mail_template('statechanged', $vars, $ccuser->lang);
+                        $notificationhtml = tracker_compile_mail_template('statechanged_html', $vars, $ccuser->lang);
                     }
                     break;
                 }
@@ -1597,8 +1615,8 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
                 case WAITING: {
                     if ($cc->events & EVENT_WAITING) {
                         $vars['EVENT'] = get_string('waiting', 'tracker');
-                        $notification = tracker_compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
-                        $notificationhtml = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                        $notification = tracker_compile_mail_template('statechanged', $vars, $ccuser->lang);
+                        $notificationhtml = tracker_compile_mail_template('statechanged_html', $vars, $ccuser->lang);
                     }
                     break;
                 }
@@ -1606,8 +1624,8 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
                 case RESOLVED: {
                     if ($cc->events & EVENT_RESOLVED) {
                         $vars['EVENT'] = get_string('resolved', 'tracker');
-                        $notification = tracker_compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
-                        $notificationhtml = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                        $notification = tracker_compile_mail_template('statechanged', $vars, $ccuser->lang);
+                        $notificationhtml = tracker_compile_mail_template('statechanged_html', $vars, $ccuser->lang);
                     }
                     break;
                 }
@@ -1615,8 +1633,8 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
                 case ABANDONNED: {
                     if ($cc->events & EVENT_ABANDONNED) {
                         $vars['EVENT'] = get_string('abandonned', 'tracker');
-                        $notification = tracker_compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
-                        $notificationhtml = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                        $notification = tracker_compile_mail_template('statechanged', $vars, $ccuser->lang);
+                        $notificationhtml = tracker_compile_mail_template('statechanged_html', $vars, $ccuser->lang);
                     }
                     break;
                 }
@@ -1624,8 +1642,8 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
                 case TRANSFERED: {
                     if ($cc->events & EVENT_TRANSFERED) {
                         $vars['EVENT'] = get_string('transfered', 'tracker');
-                        $notification = tracker_compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
-                        $notificationhtml = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                        $notification = tracker_compile_mail_template('statechanged', $vars, $ccuser->lang);
+                        $notificationhtml = tracker_compile_mail_template('statechanged_html', $vars, $ccuser->lang);
                     }
                     break;
                 }
@@ -1633,8 +1651,8 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
                 case TESTING: {
                     if ($cc->events & EVENT_TESTING) {
                         $vars['EVENT'] = get_string('testing', 'tracker');
-                        $notification = tracker_compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
-                        $notificationhtml = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                        $notification = tracker_compile_mail_template('statechanged', $vars, $ccuser->lang);
+                        $notificationhtml = tracker_compile_mail_template('statechanged_html', $vars, $ccuser->lang);
                     }
                     break;
                 }
@@ -1642,8 +1660,8 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
                 case PUBLISHED: {
                     if ($cc->events & EVENT_PUBLISHED) {
                         $vars['EVENT'] = get_string('published', 'tracker');
-                        $notification = tracker_compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
-                        $notificationhtml = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                        $notification = tracker_compile_mail_template('statechanged', $vars, $ccuser->lang);
+                        $notificationhtml = tracker_compile_mail_template('statechanged_html', $vars, $ccuser->lang);
                     }
                     break;
                 }
@@ -1651,8 +1669,8 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
                 case VALIDATED: {
                     if ($cc->events & EVENT_VALIDATED) {
                         $vars['EVENT'] = get_string('validated', 'tracker');
-                        $notification = tracker_compile_mail_template('statechanged', $vars, 'tracker', $ccuser->lang);
-                        $notificationhtml = tracker_compile_mail_template('statechanged_html', $vars, 'tracker', $ccuser->lang);
+                        $notification = tracker_compile_mail_template('statechanged', $vars, $ccuser->lang);
+                        $notificationhtml = tracker_compile_mail_template('statechanged_html', $vars, $ccuser->lang);
                     }
                     break;
                 }
@@ -1686,7 +1704,7 @@ function tracker_notifyccs_comment($issueid, $comment, $tracker = null) {
     $issueccs = $DB->get_records('tracker_issuecc', array('issueid' => $issue->id));
     if (!empty($issueccs)) {
 
-        $params = array('t' => $newtracker->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issue->id);
+        $params = array('t' => $tracker->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issue->id);
         $issueurl = new moodle_url('/mod/tracker/view.php', $params);
         $vars = array('COURSE_SHORT' => $COURSE->shortname,
                       'COURSENAME' => format_string($COURSE->fullname),
@@ -1706,8 +1724,8 @@ function tracker_notifyccs_comment($issueid, $comment, $tracker = null) {
                 $vars['CONTRIBUTOR'] = fullname($USER);
                 $vars['UNCCURL'] = $unccurl;
                 $vars['ALLUNCCURL'] = $allunccurl;
-                $notification = tracker_compile_mail_template('addcomment', $vars, 'tracker', $ccuser->lang);
-                $notificationhtml = tracker_compile_mail_template('addcomment_html', $vars, 'tracker', $ccuser->lang);
+                $notification = tracker_compile_mail_template('addcomment', $vars, $ccuser->lang);
+                $notificationhtml = tracker_compile_mail_template('addcomment_html', $vars, $ccuser->lang);
                 $subject = get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
                 email_to_user($ccuser, $USER, $subject, $notification, $notificationhtml);
             }

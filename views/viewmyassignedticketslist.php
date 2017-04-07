@@ -117,7 +117,7 @@ if (isset($searchqueries)) {
 }
 
 // Display list of my issues.
-
+echo $output;
 echo $renderer->search_queries($cm);
 
 echo '<form name="manageform" action="view.php" method="post">';

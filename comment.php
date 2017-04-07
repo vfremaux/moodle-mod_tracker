@@ -26,12 +26,12 @@ require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 require_once($CFG->dirroot.'/mod/tracker/forms/addcomment_form.php');
 
 $issueid = required_param('issueid', PARAM_INT);  // Tracker ID.
-$commentid = required_param('commentid', PARAM_INT);  // Id of comment ofr editing.
+$commentid = optional_param('commentid', 0, PARAM_INT);  // Id of comment for editing.
 
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID, or.
 $t = optional_param('t', 0, PARAM_INT);  // Tracker ID.
 
-list($course, $cm, $tracker) = tracker_get_context($id, $t);
+list($cm, $tracker, $course) = tracker_get_context($id, $t);
 
 // Security.
 
@@ -52,56 +52,55 @@ $PAGE->set_title(format_string($tracker->name));
 $PAGE->set_heading(format_string($tracker->name));
 $PAGE->set_button($OUTPUT->update_module_button($cm->id, 'tracker'));
 
-$form = new add_comment_form(new moodle_url('/mod/tracker/comment.php'), array('issueid' => $issueid, 'cmid' => $id));
+$form = new addedit_comment_form(new moodle_url('/mod/tracker/comment.php'), array('issueid' => $issueid, 'cmid' => $id));
 
-if (!$form->is_cancelled()) {
-    if ($data = $form->get_data()) {
-
-        if (empty($data->commentid)) {
-            $comment = new StdClass();
-            $comment->comment = $data->comment_editor['text'];
-            $comment->commentformat = $data->comment_editor['format'];
-            $comment->userid = $USER->id;
-            $comment->trackerid = $tracker->id;
-            $comment->issueid = $issueid;
-            $comment->datecreated = time();
-            $commentid = $DB->insert_record('tracker_issuecomment', $comment);
-        } else {
-            $comment = $data;
-            $comment->id = $comment->commentid;
-            unset($data->id);
-            $DB->update_record('tracker_issuecomment', $comment);
-        }
-
-        if ($tracker->allownotifications) {
-            tracker_notifyccs_comment($issueid, $comment->comment, $tracker);
-        }
-        tracker_register_cc($tracker, $issue, $USER->id);
-
-        // Stores files.
-        $data = file_postupdate_standard_editor($data, 'comment', $form->editoroptions, $context,
-                                                'mod_tracker', 'issuecomment', $commentid);
-
-        // Update back reencoded field text content.
-        $DB->set_field('tracker_issuecomment', 'comment', $data->comment, array('id' => $comment->id));
-        $params = array('id' => $id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issueid);
-
-        $event = \mod_tracker\event\tracker_issuecommented::create_from_issue($tracker, $issueid);
-        $event->trigger();
-
-        redirect(new moodle_url('/mod/tracker/view.php', $params));
-    }
-
-    $comment = $DB->get_record('tracker_issuecomment', array('id' => $commentid));
-
-} else {
+if ($form->is_cancelled()) {
     $params = array('id' => $id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issueid);
     redirect(new moodle_url('/mod/tracker/view.php', $params));
 }
 
+if ($data = $form->get_data()) {
+
+    if (empty($data->commentid)) {
+        $comment = new StdClass();
+        $comment->comment = $data->comment_editor['text'];
+        $comment->commentformat = $data->comment_editor['format'];
+        $comment->userid = $USER->id;
+        $comment->trackerid = $tracker->id;
+        $comment->issueid = $issueid;
+        $comment->datecreated = time();
+        $commentid = $DB->insert_record('tracker_issuecomment', $comment);
+    } else {
+        $comment = $data;
+        $comment->id = $comment->commentid;
+        unset($data->id);
+        $DB->update_record('tracker_issuecomment', $comment);
+    }
+
+    if ($tracker->allownotifications) {
+        tracker_notifyccs_comment($issueid, $comment->comment, $tracker);
+    }
+    tracker_register_cc($tracker, $issue, $USER->id);
+
+    // Stores files.
+    $data = file_postupdate_standard_editor($data, 'comment', $form->editoroptions, $context,
+                                            'mod_tracker', 'issuecomment', $commentid);
+
+    // Update back reencoded field text content.
+    $DB->set_field('tracker_issuecomment', 'comment', $data->comment, array('id' => $comment->id));
+    $params = array('id' => $id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issueid);
+
+    $event = \mod_tracker\event\tracker_issuecommented::create_from_issue($tracker, $issueid);
+    $event->trigger();
+
+    redirect(new moodle_url('/mod/tracker/view.php', $params));
+}
+
+$comment = $DB->get_record('tracker_issuecomment', array('id' => $commentid));
+
 echo $OUTPUT->header();
 
-echo $OUTPUT->heading($issue->summary);
+echo $OUTPUT->heading('['.$tracker->ticketprefix.$issue->id.'] '.$issue->summary);
 
 $description = file_rewrite_pluginfile_urls($issue->description, 'pluginfile.php', $context->id, 'mod_tracker',
                                             'issuedescription', $issue->id);

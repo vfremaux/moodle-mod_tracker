@@ -57,15 +57,15 @@ class checkboxhorizelement extends checkboxelement {
     public function add_form_element(&$mform) {
         if (isset($this->options)) {
             $group = array();
-            $mform->addElement('header', "head{$this->name}", format_string($this->description));
-            $mform->setExpanded("head{$this->name}");
+
             foreach ($this->options as $option) {
                 $key = "element{$this->name}{$option->id}";
-                $group[] = &$mform->createElement('checkbox', $key, '', format_string($option->description));
+                $label = ' '.format_string($option->description);
+                $group[] = &$mform->createElement('checkbox', $key, '', $label);
                 $mform->setType("element{$this->name}{$option->id}", PARAM_INT);
             }
 
-            $mform->addGroup($group, 'element' . $this->name.'_set');
+            $mform->addGroup($group, 'element' . $this->name.'_set', format_string($this->description), array(' '), false);
         }
     }
 }

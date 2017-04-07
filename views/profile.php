@@ -27,7 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 $statuskeys = tracker_get_statuskeys($tracker);
 $statuscodes = tracker_get_statuscodes();
 
-echo "<br/>";
+echo $output;
+echo '<br/>';
 echo $OUTPUT->heading(get_string('me', 'tracker'));
 
 echo $OUTPUT->box_start('center', '90%', '', '', 'generalbox', 'bugreport');

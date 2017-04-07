@@ -39,11 +39,11 @@ $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
 
 if (!$issue) {
     if ($tracker->supportmode == 'bugtrack') {
-        $trackerurl = new moodle_url('/mod/tracker/viex.php', array('view' => 'view', 'screen' => 'browse', 'a' => $tracker->id));
+        $trackerurl = new moodle_url('/mod/tracker/view.php', array('view' => 'view', 'screen' => 'browse', 't' => $tracker->id));
         redirect($trackerurl);
     } else {
-        $params = array('view' => 'view', 'screen' => 'mytickets', 'a' => $tracker->id);
-        $trackerurl = new moodle_url('/mod/tracker/viex.php', $params);
+        $params = array('view' => 'view', 'screen' => 'mytickets', 't' => $tracker->id);
+        $trackerurl = new moodle_url('/mod/tracker/view.php', $params);
         redirect($trackerurl);
     }
 }
@@ -65,7 +65,7 @@ $history = $DB->get_records_select('tracker_issueownership', $select, array($tra
 
 $statehistory = $DB->get_records_select('tracker_state_change', $select, array($tracker->id, $issue->id), 'timechange ASC');
 
-$linklabel = get_string(($initialviewmode == 'visiblediv') ? 'hidedependancies' : 'showdependancies', 'tracker');
+$linklabel = get_string(($initialdepsviewmode == 'visiblediv') ? 'hidedependancies' : 'showdependancies', 'tracker');
 $link = '<a id="toggledependancieslink" href="javascript:toggledependancies()">'.$linklabel.'</a>&nbsp;-&nbsp;';
 $showdependancieslink = (!empty($childtree) || !empty($parenttree)) ? $link : '';
 
@@ -89,7 +89,7 @@ $issue->resolution = file_rewrite_pluginfile_urls($issue->resolution, 'pluginfil
 $statuskeys = tracker_get_statuskeys($tracker);
 
 // Start printing.
-
+echo $output;
 echo $OUTPUT->box_start('generalbox', 'bugreport');
 
 echo $renderer->issue_js_init();
@@ -135,7 +135,7 @@ if ($tracker->enablecomments) {
     $commentscount = $DB->count_records('tracker_issuecomment', array('issueid' => $issue->id));
     $addcommentlink = '';
     if (has_capability('mod/tracker:comment', $context)) {
-        $linkurl = new moodle_url('/mod/tracker/addcomment.php', array('id' => $cm->id, 'issueid' => $issueid));
+        $linkurl = new moodle_url('/mod/tracker/comment.php', array('id' => $cm->id, 'issueid' => $issueid));
         $addcommentlink = '<a href="'.$linkurl.'">'.get_string('addacomment', 'tracker').'</a>';
     }
     $showcommentslink = '';
@@ -214,7 +214,7 @@ if (has_capability('mod/tracker:managewatches', $context)) {
     echo $renderer->watches_form($issue, $cm, $cced);
 }
 if ($showhistorylink) {
-    echo $renderer->history($history, $statehistory, $initialhistoryviewmode);
+    echo $renderer->history($tracker, $history, $statehistory, $initialhistoryviewmode);
 }
 
 echo '</table>';

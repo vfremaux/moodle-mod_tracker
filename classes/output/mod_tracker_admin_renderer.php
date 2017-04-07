@@ -65,6 +65,7 @@ class mod_tracker_admin_renderer extends \plugin_renderer_base {
      * Prints used element list
      */
     public function admin_elements_used() {
+        global $DB;
 
         if (empty($this->tracker)) {
             throw new moodle_exception('Admin renderer not initialized');
@@ -219,6 +220,10 @@ class mod_tracker_admin_renderer extends \plugin_renderer_base {
                         $actions .= '&nbsp;<a href="'.$url.'" title="'.get_string('setprivate', 'tracker').'">'.$pix.'</a>';
                     }
                 } else {
+                    if ($element->has_private_option()) {
+                        // Is can choose privac but mandatory, needs to be forced visible.
+                        $DB->set_field('tracker_elementused', 'private', 0, array('id' => $element->id));
+                    }
                     if ($element->private) {
                         $privatestr = get_string('isprivate', 'tracker');
                         $actions .= '&nbsp;<img title="'.$privatestr.'" src="'.$this->output->pix_url('t/locked', 'core').'" />';
@@ -356,15 +361,15 @@ class mod_tracker_admin_renderer extends \plugin_renderer_base {
 
         $formurl = new moodle_url('/mod/tracker/view.php');
         $str .= '<form name="addelement" method="post" action="'.$formurl.'">';
+        $str .= '<input type="hidden" name="view" value="admin" />';
+        $str .= '<input type="hidden" name="id" value="'.$this->cm->id.'" />';
+        $str .= '<input type="hidden" name="what" value="createelement" />';
         $str .= '<table width="100%">';
         $str .= '<tr>';
         $str .= '<td valign="top">';
         $str .= '<b>'.get_string('createnewelement', 'tracker').':</b>';
         $str .= '</td>';
         $str .= '<td valign="top">';
-        $str .= '<input type="hidden" name="view" value="admin" />';
-        $str .= '<input type="hidden" name="id" value="'.$this->cm->id.'" />';
-        $str .= '<input type="hidden" name="what" value="createelement" />';
         $types = tracker_getelementtypes();
         foreach ($types as $type) {
             $elementtypesmenu[$type] = get_string($type, 'tracker');
@@ -422,7 +427,7 @@ class mod_tracker_admin_renderer extends \plugin_renderer_base {
                 }
             }
         } else {
-            $tmp .= get_string('noelementscreated', 'tracker');
+            $tmp .= $this->output->notification(get_string('noelementscreated', 'tracker'));
             $tmp .= '<br/>';
         }
 

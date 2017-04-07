@@ -21,22 +21,20 @@
  *
  * A class implementing a hidden/labelled element that captures the referer url
  */
-defined('MOODLE_INTERNAL') || die();
-
 require_once('../../../../../config.php');
 require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 
-$id = optional_param('id', PARAM_INT); // Id of the tracker module id.
-$t = optional_param('t', PARAM_INT); // Id of the tracker instance.
+$id = optional_param('id', '', PARAM_INT); // Id of the tracker module id.
+$t = optional_param('t', '', PARAM_INT); // Id of the tracker instance.
 
-list($course, $cm, $tracker) = tracker_get_context($id, $t);
+list($cm, $tracker, $course) = tracker_get_context($id, $t);
 
-if (!isset($SESSION->tracker[$id]->captcha->length)) {
+if (!isset($SESSION->tracker[$tracker->id]->captcha->length)) {
     print_error('not allowed');
 }
 
 $height = 40;
-$charcount = $SESSION->contact_form[$id]->captcha->length;
+$charcount = $SESSION->tracker[$tracker->id]->captcha->length;
 $fontfile = $CFG->libdir.'/default.ttf';
 
 $ttfbox = imagettfbbox( 30, 0, $fontfile, 'H' ); // The text to measure.
@@ -77,7 +75,7 @@ for ($i = 0; $i < $charcount; $i++) {
 $properties = array();
 for ($x = 0; $x < $factorx; $x++) {
     for ($y = 0; $y < $factory; $y++) {
-        $propobj = null;
+        $propobj = new StdClass;
         $propobj->x = intval($x / $scale);
         $propobj->y = intval($y / $scale);
         $propobj->red = get_random_color($colel[0], $colel[1]);
@@ -102,9 +100,10 @@ for ($i = 0; $i < ($factorx * $factory); $i++) {
 $checkchar = '';
 for ($i = 0; $i < $charcount; $i++) {
     $colnum = rand(1, 2);
-    $textcol->red = get_random_color(${'col_text'.$colnum}[0], ${'col_text'.$colnum}[1]);
-    $textcol->green = get_random_color(${'col_text'.$colnum}[0], ${'col_text'.$colnum}[1]);
-    $textcol->blue = get_random_color(${'col_text'.$colnum}[0], ${'col_text'.$colnum}[1]);
+    $textcol = new StdClass;
+    $textcol->red = get_random_color(${'coltext'.$colnum}[0], ${'coltext'.$colnum}[1]);
+    $textcol->green = get_random_color(${'coltext'.$colnum}[0], ${'coltext'.$colnum}[1]);
+    $textcol->blue = get_random_color(${'coltext'.$colnum}[0], ${'coltext'.$colnum}[1]);
     $colortext = imagecolorallocate($image, $textcol->red, $textcol->green, $textcol->blue);
     $angletext = rand(-20, 20);
     $lefttext = $i * $charwidth;
@@ -113,7 +112,7 @@ for ($i = 0; $i < $charcount; $i++) {
     imagettftext($image, 30, $angletext, $lefttext, 35, $colortext, $fontfile, $text);
 }
 
-$SESSION->contact_form[$id]->captcha->checkchar = $checkchar;
+$SESSION->tracker[$tracker->id]->captcha->checkchar = $checkchar;
 
 // Output the picture.
 header("Content-type: image/png");

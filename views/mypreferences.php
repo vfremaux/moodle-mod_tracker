@@ -58,6 +58,9 @@ if ($data = $form->get_data()) {
     }
 }
 
+// Start printing screen.
+
+echo $output;
 echo $OUTPUT->heading(get_string('mypreferences', 'tracker'));
 echo $OUTPUT->box_start('generalbox', 'tracker-preferences-form');
 
