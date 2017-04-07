@@ -998,7 +998,7 @@ function tracker_submitanissue(&$tracker, &$data) {
     global $DB, $USER;
 
     $cm = get_coursemodule_from_instance('tracker', $tracker->id);
-    $context =  context_module::instance($cm->id);
+    $context = context_module::instance($cm->id);
 
     $issue = new StdClass();
     $issue->datereported = time();
