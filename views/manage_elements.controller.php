@@ -91,75 +91,13 @@ if ($action == 'createelement') {
     }
 
 } else if ($action == 'editelement') {
-
     throw (new coding_exception("Deprecated use case. @see /editelement.php"));
-
-    // Edit an element form ********************************************************************.
-    /*
-    $form->elementid = required_param('elementid', PARAM_INT);
-    if ($form->elementid != null) {
-        $element = tracker_getelement($form->elementid);
-        $form->type = $element->type;
-        $form->name = $element->name;
-        $form->description = $element->description;
-        $form->format = $element->format;
-        $form->paramint1 = @$element->paramint1;
-        $form->paramint2 = @$element->paramint2;
-        $form->paramchar1 = @$element->paramchar1;
-        $form->paramchar2 = @$element->paramchar2;
-        $form->shared = ($element->course == 0);
-        $form->action = 'doupdateelement';
-        echo $renderer->edit_element($cm, $form);
-    } else {
-        print_error('errorinvalidelementid', 'tracker');
-    }
-    return -1;
-    */
 }
 
 if ($action == 'doupdateelement') {
-
     throw (new coding_exception("Deprecated use case. @see /editelement.php"));
-
-    // Update an element *****************************************************************************.
-    /*
-    $form->elementid = required_param('elementid', PARAM_INT);
-    $form->name = required_param('name', PARAM_ALPHANUM);
-    $form->name = preg_replace('/\s+|-|\\\'|\"/', '', $form->name); // Remove all spaces.
-    $form->description = required_param('description', PARAM_CLEANHTML);
-    $form->format = optional_param('format', '', PARAM_INT);
-    $form->type = required_param('type', PARAM_ALPHA);
-    $form->shared = optional_param('shared', 0, PARAM_INT);
-
-    if (empty($form->elementid)) {
-        print_error('errorelementdoesnotexist', 'tracker');
-    }
-
-    $errors = array();
-    if (empty($form->name)) {
-        $error->message = get_string('namecannotbeblank', 'tracker');
-        $error->on = "name";
-        $errors[] = $error;
-    }
-
-    if (!count($errors)) {
-        $element->id = $form->elementid;
-        $element->name = $form->name;
-        $element->type = $form->type;
-        $element->description = $form->description;
-        $element->format = $form->format;
-        $element->course = ($form->shared) ? 0 : $COURSE->id;
-        $element->paramint1 = @$form->paramint1;
-        $element->paramint2 = @$form->paramint2;
-        $element->paramchar1 = @$form->paramchar1;
-        $element->paramchar2 = @$form->paramchar2;
-        $DB->update_record('tracker_element', $element);
-    } else {
-        $form->action = 'doupdateelement';
-        echo $renderer->edit_element($cm, $form);
-    }
 }
-*/
+
 
 if ($action == 'deleteelement') {
 
