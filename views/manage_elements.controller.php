@@ -91,11 +91,11 @@ if ($action == 'createelement') {
     }
 
 } else if ($action == 'editelement') {
-    throw (new coding_exception("Deprecated use case. @see /editelement.php"));
+    throw new coding_exception("Deprecated use case. @see /editelement.php");
 }
 
 if ($action == 'doupdateelement') {
-    throw (new coding_exception("Deprecated use case. @see /editelement.php"));
+    throw new coding_exception("Deprecated use case. @see /editelement.php");
 }
 
 
