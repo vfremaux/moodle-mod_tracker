@@ -50,7 +50,7 @@ abstract class trackerelement {
     protected $paramchar2;
 
     /**
-     * Loads all data about a traker element. 
+     * Loads all data about a traker element.
      * If the element is a used element, will pull as master id the tracker element record and adds the used attributes to it.
      * @param objectref $tracker
      * @param int $elementid if $used is true, points to the tracker_elementused table. If false, points directly to the tracker_element table.
