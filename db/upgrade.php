@@ -14,10 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-function xmldb_tracker_upgrade($oldversion=0) {
-// This function does anything necessary to upgrade
-// older versions to match current functionality
+defined('MOODLE_INTERNAL') || die();
 
+function xmldb_tracker_upgrade($oldversion = 0) {
     global $CFG, $DB;
 
     $dbman = $DB->get_manager();
@@ -41,76 +40,23 @@ function xmldb_tracker_upgrade($oldversion=0) {
     if ($result && $oldversion < 2008092400) {
 
         // Setup XML-RPC services for tracker.
+        tracker_install();
 
-        if (!$DB->get_record('mnet_service', array('name' => 'tracker_cascade'))) {
-            $service->name = 'tracker_cascade';
-            $service->description = get_string('transferservice', 'tracker');
-            $service->apiversion = 1;
-            $service->offer = 1;
-            if (!$serviceid = $DB->insert_record('mnet_service', $service)) {
-                echo $OUTPUT->notification('Error installing tracker_cascade service.');
-                $result = false;
-            }
-
-            $rpc->function_name = 'tracker_rpc_get_instances';
-            $rpc->xmlrpc_path = 'mod/tracker/rpclib.php/tracker_rpc_get_instances';
-            $rpc->parent_type = 'mod';
-            $rpc->parent = 'tracker';
-            $rpc->enabled = 0;
-            $rpc->help = 'Get instances of available trackers for cascading.';
-            $rpc->profile = '';
-            if (!$rpcid = $DB->insert_record('mnet_rpc', $rpc)) {
-                echo $OUTPUT->notification('Error installing tracker_cascade RPC calls.');
-                $result = false;
-            }
-            $rpcmap->serviceid = $serviceid;
-            $rpcmap->rpcid = $rpcid;
-            $DB->insert_record('mnet_service2rpc', $rpcmap);
-
-            $rpc->function_name = 'tracker_rpc_get_infos';
-            $rpc->xmlrpc_path = 'mod/tracker/rpclib.php/tracker_rpc_get_infos';
-            $rpc->parent_type = 'mod';
-            $rpc->parent = 'tracker';
-            $rpc->enabled = 0;
-            $rpc->help = 'Get information about one tracker.';
-            $rpc->profile = '';
-            if (!$rpcid = $DB->insert_record('mnet_rpc', $rpc)) {
-                echo $OUTPUT->notification('Error installing tracker_cascade RPC calls.');
-                $result = false;
-            }
-            $rpcmap->rpcid = $rpcid;
-            $DB->insert_record('mnet_service2rpc', $rpcmap);
-
-            $rpc->function_name = 'tracker_rpc_post_issue';
-            $rpc->xmlrpc_path = 'mod/tracker/rpclib.php/tracker_rpc_post_issue';
-            $rpc->parent_type = 'mod';
-            $rpc->parent = 'tracker';
-            $rpc->enabled = 0;
-            $rpc->help = 'Cascades an issue.';
-            $rpc->profile = '';
-            if (!$rpcid = $DB->insert_record('mnet_rpc', $rpc)) {
-                echo $OUTPUT->notification('Error installing tracker_cascade RPC calls.');
-                $result = false;
-            }
-            $rpcmap->rpcid = $rpcid;
-            $DB->insert_record('mnet_service2rpc', $rpcmap);
-        }
-
-        // tracker savepoint reached
+        // Tracker savepoint reached.
         upgrade_mod_savepoint(true, 2008092400, 'tracker');
     }
 
     if ($result && $oldversion < 2008092602) {
 
-    // Define field supportmode to be added to tracker
+        // Define field supportmode to be added to tracker.
         $table = new xmldb_table('tracker');
         $field = new xmldb_field('supportmode');
         $field->set_attributes(XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'bugtracker', 'parent');
 
-    // Launch add field supportmode
+        // Launch add field supportmode.
         $dbman->add_field($table, $field);
 
-        // tracker savepoint reached
+        // Tracker savepoint reached.
         upgrade_mod_savepoint(true, 2008092602, 'tracker');
     }
 
@@ -180,7 +126,7 @@ function xmldb_tracker_upgrade($oldversion=0) {
 
     if ($result && $oldversion < 2010061000) {
 
-        // Define field defaultassignee to be added to tracker
+        // Define field defaultassignee to be added to tracker.
         $table = new xmldb_table('tracker');
         $field = new xmldb_field('defaultassignee');
         $field->set_attributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'supportmode');
@@ -210,7 +156,7 @@ function xmldb_tracker_upgrade($oldversion=0) {
 
     // Unconditionnally perform Moodle 1.9 => Moodle 2 if necessary for every upgrade.
 
-    // Rename description field to intro, and define field introformat to be added to tracker
+    // Rename description field to intro, and define field introformat to be added to tracker.
     $table = new xmldb_table('tracker');
     $introfield = new xmldb_field('description', XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'name');
     if ($dbman->field_exists($table, $introfield)) {
@@ -220,33 +166,16 @@ function xmldb_tracker_upgrade($oldversion=0) {
         $dbman->rename_field($table, $formatfield, 'introformat', false);
     }
 
-    // conditionally migrate to html format in intro
-    /*
-    // weird column text compare error....
-    if ($CFG->texteditors !== 'textarea') {
-        if ($trackers = $DB->get_records('tracker', array('introformat' => FORMAT_MOODLE),'', 'id, intro, introformat')) {
-            foreach ($trackers as $t) {
-                $t->intro       = text_to_html($t->intro, false, false, true);
-                $t->introformat = FORMAT_HTML;
-                $DB->update_record('tracker', $t);
-                upgrade_set_timeout();
-            }
-        }
-    }
-    */
-
-    // Moodle 2.x
-
     if ($result && $oldversion < 2013092200) {
 
-        // Define field subtrackers to be added to tracker
+        // Define field subtrackers to be added to tracker.
         $table = new xmldb_table('tracker_issue');
         $field = new xmldb_field('format', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'description');
         if ($dbman->field_exists($table, $field)) {
             $dbman->rename_field($table, $field, 'descriptionformat', false);
         }
 
-        // tracker savepoint reached
+        // Tracker savepoint reached.
         upgrade_mod_savepoint(true, 2013092200, 'tracker');
     }
 
@@ -272,7 +201,7 @@ function xmldb_tracker_upgrade($oldversion=0) {
         }
         // Tracker savepoint reached.
         upgrade_mod_savepoint(true, 2013092400, 'tracker');
-   }
+    }
 
     if ($result && $oldversion < 2014010100) {
 
@@ -324,6 +253,7 @@ function xmldb_tracker_upgrade($oldversion=0) {
         // Tracker savepoint reached.
         upgrade_mod_savepoint(true, 2015080400, 'tracker');
     }
+
     if ($result && $oldversion < 2015080500) {
 
         // Define field uplink to be added to tracker.
@@ -365,7 +295,6 @@ function xmldb_tracker_upgrade($oldversion=0) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-
 
         // Tracker savepoint reached.
         upgrade_mod_savepoint(true, 2015080600, 'tracker');
