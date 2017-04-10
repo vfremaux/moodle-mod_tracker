@@ -14,16 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @package tracker
  * @author Clifford Tham
  * @review Valery Fremaux / 1.8
- * @date 02/12/2007
  *
  * A class implementing a dropdown element
  */
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
 
 class dropdownelement extends trackerelement {
@@ -32,12 +31,12 @@ class dropdownelement extends trackerelement {
 
     public function __construct(&$tracker, $id = null, $used = false) {
         parent::__construct($tracker, $id, $used);
-        $this->setoptionsfromdb();
+        $this->set_options_from_db();
     }
 
     public function view($issueid = 0) {
 
-        $this->getvalue($issueid); // Loads $this->value with current value for this issue.
+        $this->get_value($issueid); // Loads $this->value with current value for this issue.
         if (isset($this->options)) {
             $optionstrs = array();
             foreach ($this->options as $option) {
@@ -54,7 +53,7 @@ class dropdownelement extends trackerelement {
 
     public function edit($issueid = 0) {
 
-        $this->getvalue($issueid);
+        $this->get_value($issueid);
 
         $values = explode(',', $this->value); // Whatever the form ... revert to an array.
 
@@ -69,8 +68,6 @@ class dropdownelement extends trackerelement {
 
     public function add_form_element(&$mform) {
 
-        $mform->addElement('header', "head{$this->name}", format_string($this->description));
-        $mform->setExpanded("head{$this->name}");
         if (isset($this->options)) {
             foreach ($this->options as $option) {
                 $optionsmenu[$option->id] = format_string($option->description);
@@ -78,7 +75,7 @@ class dropdownelement extends trackerelement {
 
             $mform->addElement('select', 'element'.$this->name, format_string($this->description), $optionsmenu);
             if (!empty($this->mandatory)) {
-                $mform->addRule($this->name, null, 'required', null, 'client');
+                $mform->addRule('element'.$this->name, null, 'required', null, 'client');
             }
         }
     }
@@ -89,8 +86,8 @@ class dropdownelement extends trackerelement {
             $elementname = 'element'.$this->name;
 
             if (!empty($this->options)) {
-                $values = $this->getvalue($issueid);
-                if ($multiple && is_array($values)) {
+                $values = $this->get_value($issueid);
+                if ($this->multiple && is_array($values)) {
                     foreach ($values as $v) {
                         if (array_key_exists($v, $this->options)) {
                             // Check option still exists.
@@ -101,7 +98,7 @@ class dropdownelement extends trackerelement {
                         }
                     }
                 } else {
-                    $v = $values; // single value
+                    $v = $values; // Single value.
                     if (array_key_exists($v, $this->options)) {
                         // Check option still exists.
                         $defaults->$elementname = $v;
@@ -111,7 +108,7 @@ class dropdownelement extends trackerelement {
         }
     }
 
-    public function formprocess(&$data) {
+    public function form_process(&$data) {
         global $DB;
 
         $sqlparams = array('elementid' => $this->id, 'trackerid' => $data->trackerid, 'issueid' => $data->issueid);
