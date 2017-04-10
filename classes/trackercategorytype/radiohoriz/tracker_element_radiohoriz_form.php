@@ -12,26 +12,22 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
-
-defined('MOODLE_INTERNAL') || die();
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @package mod_tracker
  * @category mod
  * @author Valery Fremaux / 1.8
- * @date 06/08/2015
  */
-require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/tracker_element_form.php');
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot.'/mod/tracker/forms/tracker_element_form_base.php');
 
 class tracker_element_radiohoriz_form extends tracker_moodle_form {
 
-    function definition() {
+    public function definition() {
         $this->start_form();
         $this->end_form();
     }
 
-    function validation($data, $files) {
-        return parent::validation($data, $files);
-    }
 }

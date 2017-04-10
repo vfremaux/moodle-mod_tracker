@@ -24,9 +24,7 @@
  * Print Bug List
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');
-}
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/tablelib.php');
 
@@ -47,14 +45,6 @@ if ($page <= 0) {
 }
 
 if (isset($searchqueries)) {
-    /* SEARCH DEBUG
-    $strsql = str_replace("\n", "<br/>", $searchqueries->count);
-    $strsql = str_replace("\t", "&nbsp;&nbsp;&nbsp;", $strsql);
-    echo "<div align=\"left\"> <b>count using :</b> ".$strsql." <br/>";
-    $strsql = str_replace("\n", "<br/>", $searchqueries->search);
-    $strsql = str_replace("\t", "&nbsp;&nbsp;&nbsp;", $strsql);
-    echo " <b>search using :</b> ".str_replace("\n", "<br/>", $strsql)." <br/></div>";
-    */
     $sql = $searchqueries->search;
     $numrecords = $DB->count_records_sql($searchqueries->count);
 } else {
@@ -111,33 +101,18 @@ if (isset($searchqueries)) {
     $numrecords = $DB->count_records_sql($sqlcount);
 }
 
-// display list of my issues
-?>
-<center>
-<table border="1" width="100%">
-<?php
-if (isset($searchqueries)) {
-?>
-    <tr>
-        <td colspan="2">
-            <?php print_string('searchresults', 'tracker') ?>: <?php echo $numrecords ?> <br/>
-        </td>
-        <td colspan="2" align="right">
-                <a href="view.php?id=<?php p($cm->id) ?>&amp;what=clearsearch"><?php print_string('clearsearch', 'tracker') ?></a>
-        </td>
-    </tr>
-<?php
-}
-?>
-</table>
-</center>
-<form name="manageform" action="view.php" method="post">
-<input type="hidden" name="id" value="<?php p($cm->id) ?>" />
-<input type="hidden" name="what" value="updatelist" />
-<input type="hidden" name="view" value="resolved" />
-<?php
+// Display list of my issues.
+echo $output;
+echo $renderer->search_queries($cm);
 
-// define table object
+$formurl = new moodle_url('/mod/tracker.view.php');
+echo '<form name="manageform" action="'.$formurl.'" method="post">';
+echo '<input type="hidden" name="id" value="'.$cm->id.'" />';
+echo '<input type="hidden" name="what" value="updatelist" />';
+echo '<input type="hidden" name="view" value="resolved" />';
+
+// Define table object.
+
 $prioritystr = get_string('priority', 'tracker');
 $issuenumberstr = get_string('issuenumber', 'tracker');
 $summarystr = get_string('summary', 'tracker');
@@ -150,19 +125,28 @@ $actionstr = '';
 if (!empty($tracker->parent)) {
     $transferstr = get_string('transfer', 'tracker');
     if (has_capability('mod/tracker:viewpriority', $context) && !$resolved) {
-        $tablecolumns = array('resolutionpriority', 'id', 'summary', 'datereported', 'assignedto', 'status', 'watches', 'transfered', 'action');
-        $tableheaders = array("<b>$prioritystr</b>", "<b>$issuenumberstr</b>", "<b>$summarystr</b>", "<b>$datereportedstr</b>", "<b>$assignedtostr</b>", "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$transferstr</b>", "<b>$actionstr</b>");
+        $tablecolumns = array('statusthin', 'resolutionpriority', 'id', 'summary', 'datereported', 'assignedto', 'status',
+                              'watches', 'transfered', 'action');
+        $tableheaders = array('', "<b>$prioritystr</b>", "<b>$issuenumberstr</b>", "<b>$summarystr</b>",
+                              "<b>$datereportedstr</b>", "<b>$assignedtostr</b>", "<b>$statusstr</b>", "<b>$watchesstr</b>",
+                              "<b>$transferstr</b>", "<b>$actionstr</b>");
     } else {
-        $tablecolumns = array('id', 'summary', 'datereported', 'assignedto', 'status', 'watches', 'transfered', 'action');
-        $tableheaders = array("<b>$issuenumberstr</b>", "<b>$summarystr</b>", "<b>$datereportedstr</b>", "<b>$assignedtostr</b>", "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$transferstr</b>", "<b>$actionstr</b>");
+        $tablecolumns = array('statusthin', 'id', 'summary', 'datereported', 'assignedto', 'status', 'watches', 'transfered',
+                              'action');
+        $tableheaders = array('', "<b>$issuenumberstr</b>", "<b>$summarystr</b>", "<b>$datereportedstr</b>",
+                              "<b>$assignedtostr</b>", "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$transferstr</b>",
+                              "<b>$actionstr</b>");
     }
 } else {
     if (has_capability('mod/tracker:viewpriority', $context) && !$resolved) {
-        $tablecolumns = array('resolutionpriority', 'id', 'summary', 'datereported', 'assignedto', 'status', 'watches',  'action');
-        $tableheaders = array("<b>$prioritystr</b>", '', "<b>$summarystr</b>", "<b>$datereportedstr</b>", "<b>$assignedtostr</b>", "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$actionstr</b>");
+        $tablecolumns = array('statusthin', 'resolutionpriority', 'id', 'summary', 'datereported', 'assignedto', 'status',
+                              'watches',  'action');
+        $tableheaders = array('', "<b>$prioritystr</b>", '', "<b>$summarystr</b>", "<b>$datereportedstr</b>",
+                              "<b>$assignedtostr</b>", "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$actionstr</b>");
     } else {
-        $tablecolumns = array('id', 'summary', 'datereported', 'assignedto', 'status', 'watches',  'action');
-        $tableheaders = array('', "<b>$summarystr</b>", "<b>$datereportedstr</b>", "<b>$assignedtostr</b>", "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$actionstr</b>");
+        $tablecolumns = array('statusthin', 'id', 'summary', 'datereported', 'assignedto', 'status', 'watches',  'action');
+        $tableheaders = array('', '', "<b>$summarystr</b>", "<b>$datereportedstr</b>", "<b>$assignedtostr</b>",
+                              "<b>$statusstr</b>", "<b>$watchesstr</b>", "<b>$actionstr</b>");
     }
 }
 
@@ -172,19 +156,16 @@ $table->define_headers($tableheaders);
 
 $table->define_baseurl($CFG->wwwroot.'/mod/tracker/view.php?id='.$cm->id.'&view='.$view.'&screen='.$screen);
 
-$table->sortable(true, 'datereported', SORT_DESC); //sorted by datereported by default
+$table->sortable(true, 'datereported', SORT_DESC); // Sorted by datereported by default.
 $table->collapsible(true);
 $table->initialbars(true);
-
-// allow column hiding
-// $table->column_suppress('reportedby');
-// $table->column_suppress('watches');
 
 $table->set_attribute('cellspacing', '0');
 $table->set_attribute('id', 'issues');
 $table->set_attribute('class', 'issuelist');
 $table->set_attribute('width', '100%');
 
+$table->column_class('statusthin', 'list_statusthin');
 $table->column_class('resolutionpriority', 'list_priority');
 $table->column_class('id', 'list_issuenumber');
 $table->column_class('summary', 'list_summary');
@@ -199,18 +180,7 @@ if (!empty($tracker->parent)) {
 
 $table->setup();
 
-// set list length limits
-/*
-if ($limit > $numrecords) {
-    $offset = 0;
-}
-else{
-    $offset = $limit * ($page - 1);
-}
-$sql = $sql . ' LIMIT ' . $limit . ' OFFSET ' . $offset;
-*/
-
-// get extra query parameters from flexible_table behaviour
+// Get extra query parameters from flexible_table behaviour.
 $where = $table->get_sql_where();
 $sort = $table->get_sql_sort();
 $table->pagesize($limit, $numrecords);
@@ -220,68 +190,117 @@ if (!empty($sort)) {
 }
 
 $issues = $DB->get_records_sql($sql, null, $table->get_page_start(), $table->get_page_size());
-$maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', " trackerid = $tracker->id GROUP BY trackerid ");
+$select = " trackerid = ? GROUP BY trackerid ";
+$maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', $select, array($tracker->id));
 
-$FULLSTATUSKEYS = tracker_get_statuskeys($tracker);
-$STATUSKEYS = tracker_get_statuskeys($tracker, $cm);
-$STATUSKEYS[0] = get_string('nochange', 'tracker');
+$fullstatuskeys = tracker_get_statuskeys($tracker);
+$statuskeys = tracker_get_statuskeys($tracker, $cm);
+$statuskeys[0] = get_string('nochange', 'tracker');
+$statuscodes = tracker_get_statuscodes();
 
 if (!empty($issues)) {
-    // product data for table
+    // Product data for table.
     $developersmenu = array();
     foreach ($issues as $issue) {
-        $issuenumber = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;issueid={$issue->id}\">{$tracker->ticketprefix}{$issue->id}</a>";
-        $summary = "<a href=\"view.php?id={$cm->id}&amp;view=view&amp;screen=viewanissue&amp;issueid={$issue->id}\">".format_string($issue->summary).'</a>';
+
+        $statusthin = '<div class="status-'.$statuscodes[$issue->status].' tracker-status-thin"></div>';
+
+        $params = array('id' => $cm->id, 'view' => 'view', 'issueid' => $issue->id);
+        $ticketurl = new moodle_url('/mod/tracker/view.php', $params);
+        $issuenumber = '<a href="'.$ticketurl.'">'.$tracker->ticketprefix.$issue->id.'</a>';
+
+        $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issue->id);
+        $summaryurl = new moodle_url('/mod/tracker/view.php', $params);
+        $summary = '<a href="'.$summaryurl.'">'.format_string($issue->summary).'</a>';
+
         $datereported = date('Y/m/d H:i', $issue->datereported);
+
         $user = $DB->get_record('user', array('id' => $issue->assignedto));
-        if (has_capability('mod/tracker:manage', $context)) { // managers can assign bugs
-            $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;"));
-            $developers = get_users_by_capability($context, 'mod/tracker:develop', 'u.id,'.get_all_user_name_fields(true, 'u'), 'lastname');
+
+        if (has_capability('mod/tracker:manage', $context)) {
+            // Managers can assign bugs.
+            $status = $fullstatuskeys[0 + $issue->status].'<br/>';
+            $attrs = array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;");
+            $status .= html_writer::select($statuskeys, "status{$issue->id}", 0, array(), $attrs);
+
+            $fields = 'u.id,'.get_all_user_name_fields(true, 'u');
+            $developers = get_users_by_capability($context, 'mod/tracker:develop', $fields, 'lastname');
             foreach ($developers as $developer) {
                 $developersmenu[$developer->id] = fullname($developer);
             }
-            $assignedto = html_writer::select($developersmenu, "assignedto{$issue->id}", $issue->assignedto, array('' => get_string('unassigned', 'tracker')), array('onchange' => "document.forms['manageform'].changed{$issue->id}.value = 1;"));
-        } elseif (has_capability('mod/tracker:resolve', $context)) { // resolvers can give a bug back to managers
-            $status = $FULLSTATUSKEYS[0 + $issue->status].'<br/>'.html_writer::select($STATUSKEYS, "status{$issue->id}", 0, array(), array('onchange' => "document.forms['manageform'].schanged{$issue->id}.value = 1;"));
+            $attrs = array('onchange' => "document.forms['manageform'].changed{$issue->id}.value = 1;");
+            $nochoose = array('' => get_string('unassigned', 'tracker'));
+            $assignedto = html_writer::select($developersmenu, 'assignedto'.$issue->id, $issue->assignedto, $nochoose, $attrs);
+
+        } else if (has_capability('mod/tracker:resolve', $context)) {
+            // Resolvers can give a bug back to managers.
+            $status = $fullstatuskeys[0 + $issue->status].'<br/>';
+            $attrs = array('onchange' => 'document.forms[\'manageform\'].schanged'.$issue->id.'.value = 1;');
+            $status .= html_writer::select($statuskeys, 'status'.$issue->id, 0, array(), $attrs);
             $managers = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,'.get_all_user_name_fields(true, 'u'), 'lastname');
             foreach ($managers as $manager) {
                 $managersmenu[$manager->id] = fullname($manager);
             }
             $managersmenu[$USER->id] = fullname($USER);
-            $assignedto = html_writer::select($developersmenu, "assignedto{$issue->id}", $issue->assignedto, array('' => get_string('unassigned', 'tracker')), array('onchange' => "document.forms['manageform'].changed{$issue->id}.value = 1;"));
+            $attrs = array('onchange' => 'document.forms[\'manageform\'].changed'.$issue->id.'.value = 1;');
+            $nochoose = array('' => get_string('unassigned', 'tracker'));
+            $assignedto = html_writer::select($developersmenu, 'assignedto'.$issue->id, $issue->assignedto, $nochoose, $attrs);
         } else {
-            $status = $FULLSTATUSKEYS[0 + $issue->status];
+            $status = $fullstatuskeys[0 + $issue->status];
             $assignedto = fullname($user);
         }
-        $status = '<div class="status_'.$STATUSCODES[$issue->status].'" style="width: 110%; height: 105%; text-align:center">'.$status.'</div>';
+        $status = '<div class="status-'.$statuscodes[$issue->status].'" class="tracker-status">'.$status.'</div>';
         $hassolution = $issue->status == RESOLVED && !empty($issue->resolution);
-        $solution = ($hassolution) ? '<img src="'.$OUTPUT->pix_url('solution', 'tracker').'" height="15" alt="'.get_string('hassolution','tracker').'" />' : '' ;
+        $pixurl = $OUTPUT->pix_url('solution', 'tracker');
+        $alt = get_string('hassolution', 'tracker');
+        $solution = ($hassolution) ? '<img src="'.$pixurl.'" height="15" alt="'.$alt.'" />' : '';
         $actions = '';
-        if (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context)) {
-            $actions = "<a href=\"view.php?id={$cm->id}&amp;view=resolved&amp;issueid={$issue->id}&screen=editanissue\" title=\"".get_string('update')."\" ><img src=\"".$OUTPUT->pix_url('t/edit', 'core')."\" border=\"0\" /></a>";
+        if (has_capability('mod/tracker:manage', $context) ||
+                has_capability('mod/tracker:resolve', $context)) {
+            $params = array('id' => $cm->id, 'view' => 'resolved', 'issueid' => $issue->id, 'screen' => 'editanissue');
+            $actionurl = new moodle_url('/mod/tracker/view.php', $params);
+            $pix = '<img src="'.$OUTPUT->pix_url('t/edit', 'core').'" />';
+            $actions = '<a href="'.$actionurl.'" title="'.get_string('update').'" >'.$pix.'</a>';
         }
         if (has_capability('mod/tracker:manage', $context)) {
-            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=resolved&amp;issueid={$issue->id}&what=delete\" title=\"".get_string('delete')."\" ><img src=\"".$OUTPUT->pix_url('t/delete', 'core')."\" border=\"0\" /></a>";
+            $params = array('id' => $cm->id, 'view' => 'resolved', 'issueid' => $issue->id, 'what' => 'delete');
+            $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
+            $pix = '<img src="'.$OUTPUT->pix_url('t/delete', 'core').'" />';
+            $actions .= '&nbsp;<a href="'.$deleteurl.'" title="'.get_string('delete').'" >'.$pix.'</a>';
         }
-        // Ergo Report I3 2012 => self list displays owned tickets. Already registered
-        // $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=profile&amp;screen=mywatches&amp;issueid={$issue->id}&what=register\" title=\"".get_string('register', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('register', 'mod_tracker')."\" border=\"0\" /></a>";
-        if ($issue->resolutionpriority < $maxpriority && has_capability('mod/tracker:viewpriority', $context) && !has_capability('mod/tracker:managepriority', $context)) {
-            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=resolved&amp;issueid={$issue->id}&amp;what=askraise\" title=\"".get_string('askraise', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('askraise', 'mod_tracker')."\" border=\"0\" /></a>";
+        // Ergo Report I3 2012 => self list displays owned tickets. Already registered.
+        if (tracker_supports_feature('priority/askraise')) {
+            if ($issue->resolutionpriority < $maxpriority &&
+                    has_capability('mod/tracker:viewpriority', $context) &&
+                            !has_capability('mod/tracker:managepriority', $context)) {
+                $params = array('id' => $cm->id, 'issueid' => $issue->id);
+                $raiseurl = new moodle_url('/mod/tracker/pro/raiserequest.php', $params);
+                $pix = '<img src="'.$OUTPUT->pix_url('askraise', 'mod_tracker').'" />';
+                $actions .= '&nbsp;<a href="'.$raiseurl.'" title="'.get_string('askraise', 'tracker').'" >'.$pix.'</a>';
+            }
         }
         if (!empty($tracker->parent)) {
-            $transfer = ($issue->status == TRANSFERED) ? tracker_print_transfer_link($tracker, $issue) : '' ;
-            if (has_capability('mod/tracker:viewpriority', $context) && !$resolved) {
-                $ticketpriority = ($issue->status < RESOLVED || $issue->status == TESTING) ? $maxpriority - $issue->resolutionpriority + 1 : '' ;
-                $dataset = array($ticketpriority, $issuenumber, $summary.' '.$solution, $datereported, $assignedto, $status, 0 + $issue->watches, $transfer, $actions);
+            $transfer = ($issue->status == TRANSFERED) ? tracker_print_transfer_link($tracker, $issue) : '';
+            if (has_capability('mod/tracker:viewpriority', $context) &&
+                    !$resolved) {
+                $cond = ($issue->status < RESOLVED || $issue->status == TESTING);
+                $ticketpriority = $cond ? $maxpriority - $issue->resolutionpriority + 1 : '';
+                $dataset = array($statusthin, $ticketpriority, $issuenumber, $summary.' '.$solution, $datereported, $assignedto,
+                                 $status, 0 + $issue->watches, $transfer, $actions);
             } else {
-                $dataset = array($issuenumber, $summary.' '.$solution, $datereported, $assignedto, $status, 0 + $issue->watches, $transfer, $actions);
+                $dataset = array($statusthin, $issuenumber, $summary.' '.$solution, $datereported, $assignedto, $status,
+                                 0 + $issue->watches, $transfer, $actions);
             }
         } else {
-            if (has_capability('mod/tracker:viewpriority', $context) && !$resolved) {
-                $ticketpriority = ($issue->status < RESOLVED || $issue->status == TESTING) ? $maxpriority - $issue->resolutionpriority + 1 : '' ;
-                $dataset = array($ticketpriority, $issuenumber, $summary.' '.$solution, $datereported, $assignedto, $status, 0 + $issue->watches, $actions);
+            if (has_capability('mod/tracker:viewpriority', $context) &&
+                    !$resolved) {
+                $cond = ($issue->status < RESOLVED || $issue->status == TESTING);
+                $ticketpriority = $cond ? $maxpriority - $issue->resolutionpriority + 1 : '';
+                $dataset = array($statusthin, $ticketpriority, $issuenumber, $summary.' '.$solution, $datereported, $assignedto,
+                                 $status, 0 + $issue->watches, $actions);
             } else {
-                $dataset = array($issuenumber, $summary.' '.$solution, $datereported, $assignedto, $status, 0 + $issue->watches, $actions);
+                $dataset = array($statusthin, $issuenumber, $summary.' '.$solution, $datereported, $assignedto, $status,
+                                 0 + $issue->watches, $actions);
             }
         }
         $table->add_data($dataset);

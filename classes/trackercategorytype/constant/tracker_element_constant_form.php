@@ -12,9 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
-
-defined('MOODLE_INTERNAL') || die();
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @package mod_tracker
@@ -22,31 +20,34 @@ defined('MOODLE_INTERNAL') || die();
  * @author Valery Fremaux / 1.8
  * @date 06/08/2015
  */
-require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/tracker_element_form.php');
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot.'/mod/tracker/forms/tracker_element_form_base.php');
 
 class tracker_element_constant_form extends tracker_moodle_form {
 
-    function definition() {
+    public function definition() {
         $this->start_form();
 
         $mform = $this->_form;
 
         $options = array(
-            0 => get_string('constantsiteshortname', 'tracker'),
-            1 => get_string('constantsitefullname', 'tracker'),
-            2 => get_string('constantcurrentidnumber', 'tracker'),
-            3 => get_string('constantcurrentcourseidnumber', 'tracker'),
-            4 => get_string('constantcurrentcourseshortname', 'tracker'),
-            5 => get_string('constantcurrentcoursefullname', 'tracker'),
+            0 => '-- '.get_string('customconstant', 'tracker').' --',
+            1 => get_string('constantsiteshortname', 'tracker'),
+            2 => get_string('constantsitefullname', 'tracker'),
+            3 => get_string('constantcurrentidnumber', 'tracker'),
+            4 => get_string('constantcurrentcourseidnumber', 'tracker'),
+            5 => get_string('constantcurrentcourseshortname', 'tracker'),
+            6 => get_string('constantcurrentcoursefullname', 'tracker'),
         );
 
         $mform->addElement('select', 'paramint1', get_string('constantinfosource', 'tracker'), $options);
-        $mform->addElement('text', 'paramchar2', get_string('customconstant', 'tracker'));
+
+        $mform->addElement('text', 'paramchar1', get_string('customconstant', 'tracker'));
+        $mform->setType('paramchar1', PARAM_RAW);
+        $mform->disabledIf('paramchar1', 'paramint1', 'neq', 0);
 
         $this->end_form();
     }
 
-    function validation($data, $files) {
-        return parent::validation($data, $files);
-    }
 }

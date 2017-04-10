@@ -17,29 +17,18 @@
 /**
  * This file contains an event for when a feedback activity is viewed.
  *
- * @package    mod_tracker
- * @author Valery Fremaux
- * @copyright  2014 MyLearningFactory (http://www.mylearningfactory.com)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     mod_tracker
+ * @author      Valery Fremaux <valery.fremaux@gmail.com>
+ * @copyright   2014 onwards Valery Frmaux (http://www.mylearningfactory.com)
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace mod_tracker\event;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Event for when a tracker activity is viewed.
  *
- * @property-read array $other {
- *      Extra information about event.
- *
- *      @type int anonymous if tracker is anonymous.
- *      @type int cmid course module id.
- * }
- *
- * @package    mod_tracker
- * @since      Moodle 2.7
- * @copyright  2013 Ankit Agarwal
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class course_module_viewed extends \core\event\course_module_viewed {
 
