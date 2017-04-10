@@ -17,20 +17,22 @@
 /**
  * Version details.
  *
- * @package    mod_tracker
- * @category   mod
- * @author Clifford Tham, Valery Fremaux from Moodle 1.8 ahead
- * @copyright  2009 onwards Valery Fremaux (valery.fremaux@gmail.com)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     mod_tracker
+ * @category    mod
+ * @author      Clifford Tham till 1.8
+ * @author      Valery Fremaux (valery.fremaux@gmeil.com)
+ * @copyright   2009 onwards Valery Fremaux (valery.fremaux@gmeil.com)
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2015091300;  // The current module version (Date: YYYYMMDDXX).
+$plugin->version  = 2015111100;  // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2016052300;
 $plugin->component = 'mod_tracker';   // Full name of the plugin (used for diagnostics).
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.2.0 (Build 2015091300)';
+$plugin->maturity = MATURITY_BETA;
+$plugin->release = '3.2.0 (Build 2015111100)';
+$plugin->dependencies = array('local_vflibs' => 2016081100);
 
 // Non Moodle attributes.
-$plugin->codeincrement = '3.2.0001';
+$plugin->codeincrement = '3.2.0002';
