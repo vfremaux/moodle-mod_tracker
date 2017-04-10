@@ -131,7 +131,7 @@ if ($screen == 'print') {
 
 $renderer = $PAGE->get_renderer('tracker');
 
-// Process controllers
+// Process controllers.
 
 $result = 0;
 if ($view == 'view') {

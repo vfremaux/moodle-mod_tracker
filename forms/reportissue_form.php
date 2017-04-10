@@ -116,7 +116,7 @@ class TrackerIssueForm extends moodleform {
             // Dependencies.
             $dependencies = tracker_getpotentialdependancies($tracker->id, $this->_customdata['issueid']);
             if (!empty($dependencies)) {
-                foreach($dependencies as $dependency) {
+                foreach ($dependencies as $dependency) {
                     $summary = shorten_text(format_string($dependency->summary));
                     $dependenciesmenu[$dependency->id] = "{$tracker->ticketprefix}{$dependency->id} - ".$summary;
                 }
@@ -147,8 +147,6 @@ class TrackerIssueForm extends moodleform {
                 $element->set_data($defaults, $this->_customdata['issueid']);
             }
         }
-
-        print_object($defaults);
 
         $defaults->resolution_editor['text'] = $defaults->resolution;
         $defaults->resolution_editor['format'] = $defaults->resolutionformat;

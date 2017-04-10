@@ -38,7 +38,7 @@ define('TESTING', 7);
 define('PUBLISHED', 8);
 define('VALIDATED', 9);
 
-// status defines.
+// Status defines.
 define('ENABLED_POSTED', 1);
 define('ENABLED_OPEN', 2);
 define('ENABLED_RESOLVING', 4);
@@ -163,9 +163,13 @@ function tracker_get_role_definition(&$tracker, $role) {
         }
     } else if ($role == 'develop') {
         if ($tracker->supportmode == 'bugtracker') {
-            return ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED | ENABLED_VALIDATED;
+            $switches = ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED;
+            $switches -= ENABLED_TESTING | ENABLED_PUBLISHED | ENABLED_VALIDATED;
+            return $switches;
         } else {
-            return ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED | ENABLED_TESTING | ENABLED_PUBLISHED;
+            $switches = ENABLED_OPEN | ENABLED_RESOLVING | ENABLED_WAITING | ENABLED_ABANDONNED;
+            $switches |= ENABLED_TESTING | ENABLED_PUBLISHED;
+            return $switches;
         }
     } else if ($role == 'resolve') {
         return ENABLED_RESOLVED | ENABLED_VALIDATED | ENABLED_ABANDONNED | ENABLED_TRANSFERED;
@@ -619,8 +623,8 @@ function tracker_extractsearchparametersfrompost() {
             $fields['summary'][] = $summary;
         }
 
-        $keys = array_keys($_POST);                         // Get the key value of all the fields submitted;
-        $elementkeys = preg_grep('/element./' , $keys);     // Filter out only the element keys;
+        $keys = array_keys($_POST);                     // Get the key value of all the fields submitted;
+        $elementkeys = preg_grep('/element./' , $keys); // Filter out only the element keys;
 
         foreach ($elementkeys as $elementkey) {
             preg_match('/element(.*)$/', $elementkey, $elementid);
@@ -999,7 +1003,7 @@ function tracker_submitanissue(&$tracker, &$data) {
     global $DB, $USER;
 
     $cm = get_coursemodule_from_instance('tracker', $tracker->id);
-    $context =  context_module::instance($cm->id);
+    $context = context_module::instance($cm->id);
 
     $issue = new StdClass();
     $issue->datereported = time();
