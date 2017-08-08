@@ -26,7 +26,7 @@ class mod_tracker_mod_form extends moodleform_mod {
           $mform->setType('name', PARAM_CLEANHTML);
           $mform->addRule('name', null, 'required', null, 'client');
 
-        $this->add_intro_editor(true, get_string('intro', 'tracker'));
+        $this->standard_intro_elements(true, get_string('intro', 'tracker'));
 
           // $mform->addRule('summary', get_string('required'), 'required', null, 'client');
           $modeoptions['bugtracker'] = get_string('mode_bugtracker', 'tracker');
