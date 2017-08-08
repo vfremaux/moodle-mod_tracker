@@ -36,23 +36,23 @@ if (!empty($used)) {
     foreach ($used as $element) {
         $icontype = "<img src=\"".$OUTPUT->pix_url("/types/{$element->type}", 'mod_tracker')."\" />";
         if ($element->sortorder > 1) {
-            $actions = "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=raiseelement&amp;elementid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/up', 'core')."\" /></a>";
+            $actions = "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=raiseelement&amp;elementid={$element->id}\"><img src=\"".$OUTPUT->image_url('/t/up', 'core')."\" /></a>";
         } else {
-            $actions = "&nbsp;<img src=\"".$OUTPUT->pix_url('up_shadow', 'mod_tracker')."\" />";
+            $actions = "&nbsp;<img src=\"".$OUTPUT->image_url('up_shadow', 'mod_tracker')."\" />";
         }
         if ($element->sortorder < count($used)) {
-            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=lowerelement&amp;elementid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/down', 'core')."\" /></a>";
+            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=lowerelement&amp;elementid={$element->id}\"><img src=\"".$OUTPUT->image_url('/t/down', 'core')."\" /></a>";
         } else {
-            $actions .= "&nbsp;<img src=\"".$OUTPUT->pix_url('down_shadow', 'mod_tracker')."\" />";
+            $actions .= "&nbsp;<img src=\"".$OUTPUT->image_url('down_shadow', 'mod_tracker')."\" />";
         }
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=editelement&amp;elementid={$element->id}&amp;used=1\"><img src=\"".$OUTPUT->pix_url('/t/edit', 'core')."\" /></a>";
+        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=editelement&amp;elementid={$element->id}&amp;used=1\"><img src=\"".$OUTPUT->image_url('/t/edit', 'core')."\" /></a>";
 
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=viewelementoptions&amp;elementid={$element->id}\" title=\"".get_string('editoptions', 'mod_tracker')."\"><img src=\"".$OUTPUT->pix_url('editoptions', 'mod_tracker')."\" /></a>";
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=removeelement&amp;usedid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/right', 'core')."\" /></a>";
+        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=viewelementoptions&amp;elementid={$element->id}\" title=\"".get_string('editoptions', 'mod_tracker')."\"><img src=\"".$OUTPUT->image_url('editoptions', 'mod_tracker')."\" /></a>";
+        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=removeelement&amp;usedid={$element->id}\"><img src=\"".$OUTPUT->image_url('/t/right', 'core')."\" /></a>";
         if ($element->active) {
-            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=setinactive&amp;usedid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/hide', 'core')."\" /></a>";
+            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=setinactive&amp;usedid={$element->id}\"><img src=\"".$OUTPUT->image_url('/t/hide', 'core')."\" /></a>";
         } else {
-            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=setactive&amp;usedid={$element->id}\"><img src=\"".$OUTPUT->pix_url('/t/show', 'core')."\" /></a>";
+            $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=setactive&amp;usedid={$element->id}\"><img src=\"".$OUTPUT->image_url('/t/show', 'core')."\" /></a>";
         }
         $table->data[] = array($element->sortorder, format_string($element->description), $icontype, $actions);
     }

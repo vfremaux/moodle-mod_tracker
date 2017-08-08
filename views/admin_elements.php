@@ -80,16 +80,16 @@ if (!empty($elements)) {
         if ($element->hasoptions() && empty($element->options)) {
             $name .= ' <span class="error">('.get_string('nooptions', 'tracker').')</span>';
         }
-        $actions = "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=addelement&amp;elementid={$element->id}\" title=\"".get_string('addtothetracker', 'tracker')."\" ><img src=\"".$OUTPUT->pix_url('t/moveleft', 'core') ."\" /></a>";
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=viewelementoptions&amp;elementid={$element->id}\" title=\"".get_string('editoptions', 'tracker')."\"><img src=\"".$OUTPUT->pix_url('editoptions', 'mod_tracker')."\" /></a>";
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=editelement&amp;elementid={$element->id}\" title=\"".get_string('editproperties', 'tracker')."\"><img src=\"".$OUTPUT->pix_url('t/edit', 'core') ."\" /></a>";
-        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=deleteelement&amp;elementid={$element->id}\" title=\"".get_string('delete')."\"><img src=\"".$OUTPUT->pix_url('t/delete', 'core') ."\" /></a>";
+        $actions = "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=addelement&amp;elementid={$element->id}\" title=\"".get_string('addtothetracker', 'tracker')."\" ><img src=\"".$OUTPUT->image_url('t/moveleft', 'core') ."\" /></a>";
+        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=viewelementoptions&amp;elementid={$element->id}\" title=\"".get_string('editoptions', 'tracker')."\"><img src=\"".$OUTPUT->image_url('editoptions', 'mod_tracker')."\" /></a>";
+        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=editelement&amp;elementid={$element->id}\" title=\"".get_string('editproperties', 'tracker')."\"><img src=\"".$OUTPUT->image_url('t/edit', 'core') ."\" /></a>";
+        $actions .= "&nbsp;<a href=\"view.php?id={$cm->id}&amp;view=admin&amp;what=deleteelement&amp;elementid={$element->id}\" title=\"".get_string('delete')."\"><img src=\"".$OUTPUT->image_url('t/delete', 'core') ."\" /></a>";
 
         $local = '';
         if ($element->course == $COURSE->id) {
-            $local = "<img src=\"".$OUTPUT->pix_url('i/course', 'core') ."\" />";
+            $local = "<img src=\"".$OUTPUT->image_url('i/course', 'core') ."\" />";
         }
-        $type = "<img src=\"".$OUTPUT->pix_url("types/{$element->type}", 'mod_tracker')."\" />";
+        $type = "<img src=\"".$OUTPUT->image_url("types/{$element->type}", 'mod_tracker')."\" />";
         $table->data[] = array($actions, $name, $local, $type);
     }
     echo html_writer::table($table);
