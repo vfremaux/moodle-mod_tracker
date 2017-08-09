@@ -156,7 +156,7 @@ elseif ($action == 'delete') {
 
     if ($attributeids) {
         foreach ($attributeids as $attributeid => $void) {
-            $fs->delete_area_files($context->id, 'mod_tracker', 'issueattribute', $issue->id);
+            $fs->delete_area_files($context->id, 'mod_tracker', 'issueattribute', $issueid);
         }
     }
 
