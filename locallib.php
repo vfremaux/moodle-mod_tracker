@@ -576,7 +576,7 @@ function tracker_savesearchparameterstodb($query, $fields) {
  */
 function tracker_printsearchfields($fields) {
     global $DB;
-
+    $strs[] = '';
     foreach ($fields as $key => $value) {
         switch (trim($key)) {
             case 'datereported' :
@@ -618,11 +618,15 @@ function tracker_printsearchfields($fields) {
                 $strs[] = get_string('assignedto', 'tracker').' '.get_string('IN', 'tracker')." ('".$assigneelist."')";
                 break;
             default :
-                $strs[] = '';
-            //$strs[] = get_string($key, 'tracker') . ' '.get_string('IN', 'tracker')." ('".implode("','", $value) . "')";
+
+            $strs[] = get_string($key, 'tracker') . ' '.get_string('IN', 'tracker')." ('".implode("','", $value) . "')";
         }
     }
-    return implode (' '.get_string('AND', 'tracker').' ', $strs);
+    if (count($strs) > 0) {
+        return implode (' '.get_string('AND', 'tracker').' ', $strs);}
+    else {
+        return '';
+    }
 }
 
 /**
