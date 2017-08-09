@@ -618,7 +618,8 @@ function tracker_printsearchfields($fields) {
                 $strs[] = get_string('assignedto', 'tracker').' '.get_string('IN', 'tracker')." ('".$assigneelist."')";
                 break;
             default :
-                $strs[] = get_string($key, 'tracker') . ' '.get_string('IN', 'tracker')." ('".implode("','", $value) . "')";
+                $strs[] = '';
+            //$strs[] = get_string($key, 'tracker') . ' '.get_string('IN', 'tracker')." ('".implode("','", $value) . "')";
         }
     }
     return implode (' '.get_string('AND', 'tracker').' ', $strs);
