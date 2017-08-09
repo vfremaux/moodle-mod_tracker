@@ -418,6 +418,7 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false) {
                 $elementsSearchConstraint
         ";
     } else {
+        $sql = new StdClass();
         $sql->search = "
             SELECT DISTINCT
                 i.id,
