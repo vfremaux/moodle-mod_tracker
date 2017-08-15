@@ -316,6 +316,7 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false) {
 
     $keys = array_keys($fields);
 
+
     // Check to see if we are search using elements as a parameter.
     // If so, we need to include the table tracker_issueattribute in the search query.
     $elementssearch = false;
@@ -456,6 +457,7 @@ function tracker_constructsearchqueries($trackerid, $fields, $own = false) {
                 $elementsSearchConstraint
         ";
     }
+
     return $sql;
 }
 

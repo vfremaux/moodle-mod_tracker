@@ -89,7 +89,7 @@ var datereporteditems = ['day','month','year'];
         <td align="right" width="130" valign="top"><b><?php print_string('assignedto', 'tracker') ?>:</b><br /></td>
         <td width="180" valign="top" align="left">
 <?php
-    $assignees = tracker_getassignees($tracker->id);
+    $assignees = tracker_getassignees(0);
 
     $assigneesmenu = array();
     if ($assignees){
