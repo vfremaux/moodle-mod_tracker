@@ -97,6 +97,10 @@ echo $OUTPUT->header();
 
 $view = 'reportanissue';
 echo $renderer->tabs($view, $screen, $tracker, $cm);
+
+$formdata = new StdClass;
+$formdata->id = $id;
+$form->set_data($formdata);
 $form->display();
 
 echo $OUTPUT->footer();

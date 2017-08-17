@@ -1010,13 +1010,20 @@ function tracker_submitanissue(&$tracker, &$data) {
     $issue->summary = $data->summary;
     $issue->description = $data->description_editor['text'];
     $issue->descriptionformat = $data->description_editor['format'];
+    if (isset($data->resolution_editor)) {
+        $issue->resolution = $data->resolution_editor['text'];
+        $issue->resolutionformat = $data->resolution_editor['format'];
+    } else {
+        $issue->resolution = '';
+        $issue->resolutionformat = FORMAT_MOODLE;
+    }
 
     $issue->assignedto = $tracker->defaultassignee;
     $issue->bywhomid = 0;
     $issue->trackerid = $tracker->id;
     $issue->reportedby = $USER->id;
 
-    if (empty($data->id)) {
+    if (empty($data->issueid)) {
         $issue->status = POSTED;
 
         // Fetch max actual priority.
@@ -1031,10 +1038,12 @@ function tracker_submitanissue(&$tracker, &$data) {
         tracker_register_cc($tracker, $issue, $issue->reportedby);
 
     } else {
+        $issue->oldstatus = $DB->get_field('tracker_issue', 'status', array('id' => $data->issueid));
+
         $issue->id = $data->id;
-        $issue->status = $data->status;
-        $issue->resolution = $data->resolution_editor['text'];
-        $issue->resolutionformat = $data->resolution_editor['format'];
+        $issue->status = @$data->status;
+        $issue->resolution = @$data->resolution_editor['text'];
+        $issue->resolutionformat = @$data->resolution_editor['format'];
 
         $issue->id = $DB->update_record('tracker_issue', $issue);
     }
@@ -1357,7 +1366,7 @@ function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = 
         $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
     }
 
-    $fields = 'u.id,'.get_all_user_name_fields(true, 'u').',lang,email,emailstop,mailformat,mnethostid';
+    $fields = 'u.id,'.get_all_user_name_fields(true, 'u').',username,lang,email,emailstop,mailformat,mnethostid';
 
     $context = context_module::instance($cm->id);
     $managers = get_users_by_capability($context, 'mod/tracker:manage', $fields, 'lastname', '', '', '', '', true);
@@ -1427,7 +1436,7 @@ function tracker_notify_submission($issue, &$cm, $tracker = null) {
         $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
     }
 
-    $fields = 'u.id,'.get_all_user_name_fields(true, 'u').',lang,email,emailstop,mailformat,mnethostid';
+    $fields = 'u.id,'.get_all_user_name_fields(true, 'u').',username,lang,email,emailstop,mailformat,mnethostid';
 
     $context = context_module::instance($cm->id);
     $managers = get_users_by_capability($context, 'mod/tracker:manage', $fields, 'lastname', '', '', '', '', true);

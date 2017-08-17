@@ -611,7 +611,7 @@ You should bookmark this URL
 to get the link available even if Moodle is down or not operable properly.
 ';
 
-$tring['addcomment_tpl'] = 'Course : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+$string['addcomment_tpl'] = 'Course : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 Tracker : <%%TRACKERNAME%%>
 --------------------------------------
 <%%CONTRIBUTOR%%> added a comment about the ticket:
@@ -659,6 +659,32 @@ has been reassigned to: <%%ASSIGNEDTO%%>
 URL for viewing the issue: <%%ISSUEURL%%>
 URL for unregistering from watches on this issue: <%%UNCCURL%%>
 URL for unregistering from all watches on this tracker: <%%ALLUNCCURL%%>
+';
+
+$string['issuemoved_html_tpl'] = '
+<p>The following ticket:</p>
+
+<p>Ticket: <b><%%ISSUE%%> / <%%SUMMARY%%></b></p>
+
+<p>has moved from tracker:</p>
+
+<p>Course: <b>[<%%COURSE_SHORT%%>] <%%COURSENAME%%></b><br/>
+Tracker: <b><%%TRACKERNAME%%></b></p>
+
+<p>To:</p>
+
+<p>Course: <b>[<%%NEWCOURSE_SHORT%%>] <%%NEWCOURSENAME%%></b><br/>
+Tracker: <b><%%NEWTRACKERNAME%%></b></p>
+
+<p>Assignee is now:</p>
+
+<p>has been reassigned to: <b><%%ASSIGNEDTO%%></b></p>
+
+<hr>
+<p><a href="<%%ISSUEURL%%>">View the issue</a><br>
+<a href="<%%UNCCURL%%>">Unregister from watches on this issue</a><br/>
+<a href="<%%ALLUNCCURL%%>">Unregister from all watches on this tracker</a>
+</p>
 ';
 
 $string['ownershipchanged_tpl'] = '
