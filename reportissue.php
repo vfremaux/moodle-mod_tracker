@@ -89,7 +89,6 @@ if (!$form->is_cancelled()) {
                 tracker_notifyccs_changeownership($issue->id, $tracker);
             }
         }
-        die;
     }
 }
 
@@ -97,6 +96,10 @@ echo $OUTPUT->header();
 
 $view = 'reportanissue';
 echo $renderer->tabs($view, $screen, $tracker, $cm);
+
+$formdata = new StdClass;
+$formdata->id = $id;
+$form->set_data($formdata);
 $form->display();
 
 echo $OUTPUT->footer();

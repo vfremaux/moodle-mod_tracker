@@ -180,8 +180,10 @@ if ($action == 'submitelementoption') {
     $out .= $OUTPUT->heading($caption . $OUTPUT->help_icon('options', 'tracker', false));
 
     $out .= $renderer->edit_option_form($cm, $form, 'submit', @$errors);
-
-    return -1;
+    echo $OUTPUT->header();
+    echo $out;
+    echo $OUTPUT->footer();
+    die;
 }
 
 if ($action == 'viewelementoptions') {
@@ -202,6 +204,11 @@ if ($action == 'viewelementoptions') {
         $out .= $renderer->edit_option_form($cm, $form, 'submit', @$errors);
 
         $out .= '</center>';
+
+        echo $OUTPUT->header();
+        echo $out;
+        echo $OUTPUT->footer();
+        die;
     } else {
         print_error('errorcannotviewelementoption', 'tracker', $url);
     }
@@ -243,7 +250,10 @@ if ($action == 'deleteelementoption') {
 
     $out .= $renderer->edit_option_form($cm, $form, @$errors);
 
-    return -1;
+    echo $OUTPUT->header();
+    echo $out;
+    echo $OUTPUT->footer();
+    die;
 }
 
 if ($action == 'editelementoption') {
@@ -329,7 +339,10 @@ if ($action == 'updateelementoption') {
 
         $out .= $renderer->edit_option_form($cm, $form, 'update', @$errors);
     }
-    return -1;
+    echo $OUTPUT->header();
+    echo $out;
+    echo $OUTPUT->footer();
+    die;
 }
 
 if ($action == 'moveelementoptionup') {
@@ -366,6 +379,10 @@ if ($action == 'moveelementoptionup') {
 
     $out .= $renderer->edit_option_form($cm, $form, 'submit', @$errors);
 
+    echo $OUTPUT->header();
+    echo $out;
+    echo $OUTPUT->footer();
+    die;
     return -1;
 }
 
@@ -404,6 +421,11 @@ if ($action == 'moveelementoptiondown') {
     $out .= $OUTPUT->heading($caption . $OUTPUT->help_icon('options', 'tracker', false));
 
     $out .= $renderer->edit_option_form($cm, $form, 'submit', @$errors);
+
+    echo $OUTPUT->header();
+    echo $out;
+    echo $OUTPUT->footer();
+    die;
 
     return -1;
 }

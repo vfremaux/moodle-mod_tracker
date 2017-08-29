@@ -1,0 +1,109 @@
+{{!
+    This file is part of The Dashboard Block
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_tracker/coreissue
+
+    Classes required for JS:
+    * none
+
+}}
+    <tr valign="top">
+        <td colspan="4" align="left" class="tracker-issue-summary">
+            {{{summary}}}
+        </td>
+    </tr>
+
+{{#downlink}}
+    <tr valign="top">
+        <td colspan="4" align="left" class="tracker-issue-downlink">
+            {{{downlink}}}
+        </td>
+    </tr>
+{{/downlink}}
+
+{{#uplink}}
+    <tr valign="top">
+        <td colspan="4" align="left" class="tracker-issue-uplink">
+            {{{uplink}}}
+        </td>
+    </tr>
+{{/uplink}}
+
+    <tr valign="top">
+        <td align="right" width="25%" class="tracker-issue-param">
+            <b>{{strissuenumber}}:</b>
+        </td>
+
+        <td width="25%" class="tracker-issue-value">
+            {{fullid}}
+        </td>
+
+        <td align="right" width="25%" class="tracker-issue-param" >
+            <b>{{strstatus}}:</b>
+        </td>
+
+        <td width="25%" class="status-{{statuscode}} tracker-issue-value">
+            <b>{{{status}}}</b>
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right" width="25%" class="tracker-issue-param">
+            <b>{{strreportedby}}:</b>
+        </td>
+
+        <td width="25%" class="tracker-issue-value">
+            {{{reporterpicture}}} &nbsp; {{reportername}}
+        </td>
+
+        <td align="right" width="25%" class="tracker-issue-param" >
+            <b>{{strdatereported}}:</b>
+        </td>
+
+        <td width="25%" class="tracker-issue-value">
+            {{datereported}}
+        </td>
+    </tr>
+
+    <tr valign="top">
+
+        <td align="right" width="25%" class="tracker-issue-param">
+            <b>{{strassignedto}}:</b>
+        </td>
+
+        <td width="25%" class="tracker-issue-value">
+            {{assigneduser}}
+        </td>
+
+        <td align="right" width="25%" class="tracker-issue-param">
+            <b>{{strcced}}:</b>
+        </td>
+
+        <td width="25%" class="tracker-issue-value">
+            {{ccscount}}
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right" width="25%" class="tracker-issue-param">
+            <b>{{strdescription}}:</b>
+        </td>
+
+        <td align="left" colspan="3" width="75%" class="tracker-issue-value">
+            {{{description}}}
+        </td>
+    </tr>
