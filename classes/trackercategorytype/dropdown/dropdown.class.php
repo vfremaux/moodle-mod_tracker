@@ -39,9 +39,9 @@ class dropdownelement extends trackerelement {
         $this->get_value($issueid); // Loads $this->value with current value for this issue.
         if (isset($this->options)) {
             $optionstrs = array();
-            foreach ($this->options as $option) {
+            foreach ($this->options as $optid => $option) {
                 if ($this->value != null) {
-                    if ($this->value == $option->name) {
+                    if ($this->value == $optid) {
                         $optionstrs[] = format_string($option->description);
                     }
                 }
@@ -98,7 +98,7 @@ class dropdownelement extends trackerelement {
                         }
                     }
                 } else {
-                    $v = $values; // Single value.
+                    $v = ''.$values; // Single value.
                     if (array_key_exists($v, $this->options)) {
                         // Check option still exists.
                         $defaults->$elementname = $v;

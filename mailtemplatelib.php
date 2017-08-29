@@ -45,7 +45,7 @@ function tracker_compile_mail_template($template, $infomap, $lang = '') {
 
     $notification = tracker_get_mail_template($template, $lang);
     foreach ($infomap as $akey => $avalue) {
-        $notification = str_replace("<%%$akey%%>", $avalue, $notification);
+        $notification = str_replace("<%%{$akey}%%>", $avalue, $notification);
     }
     return $notification;
 }

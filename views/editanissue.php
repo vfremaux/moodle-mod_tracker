@@ -140,7 +140,8 @@ if ($data = $form->get_data()) {
 echo $output;
 
 // Transfer ids to proper form attributes.
-$issue->issueid = $issue->id;
-$issue->id = $cm->id;
-$form->set_data($issue);
+$formdata = clone($issue);
+$formdata->issueid = $issue->id;
+$formdata->id = $cm->id;
+$form->set_data($formdata);
 $form->display();

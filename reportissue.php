@@ -89,7 +89,6 @@ if (!$form->is_cancelled()) {
                 tracker_notifyccs_changeownership($issue->id, $tracker);
             }
         }
-        die;
     }
 }
 

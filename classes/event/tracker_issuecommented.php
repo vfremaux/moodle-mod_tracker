@@ -37,7 +37,7 @@ class tracker_issuecommented extends tracker_baseevent {
      * Init method.
      */
     protected function init() {
-        $this->data['crud'] = 'w';
+        $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
         $this->data['objecttable'] = 'tracker_issuecomment';
     }

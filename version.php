@@ -27,11 +27,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2015111100;  // The current module version (Date: YYYYMMDDXX).
+$plugin->version  = 2017081700;  // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2017050500;
 $plugin->component = 'mod_tracker';   // Full name of the plugin (used for diagnostics).
 $plugin->maturity = MATURITY_RC;
-$plugin->release = '3.3.0 (Build 2015111100)';
+$plugin->release = '3.3.0 (Build 2017081700)';
 $plugin->dependencies = array('local_vflibs' => 2016081100);
 
 // Non Moodle attributes.
