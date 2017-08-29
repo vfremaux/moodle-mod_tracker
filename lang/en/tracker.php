@@ -274,8 +274,8 @@ $string['mandatory'] = 'Mandatory answer';
 $string['me'] = 'My profile';
 $string['message_bugtracker'] = 'Thanks for your contribution and helping making this service more reliable.';
 $string['message_taskspread'] = 'You just defined a task. Don\'t foget assigning it to some recepient in the nxt screns to distribute it.';
-$string['message_ticketting'] = 'We have registered your query. I has been assigned to {$a}.';
-$string['message_ticketting_preassigned'] = 'We have registered your query. It will be assigned and handled as soon as possible.';
+$string['message_ticketting'] = 'We have registered your query.';
+$string['message_ticketting_preassigned'] = 'We have registered your query. It will be assigned and handled as soon as possible. It has been assigned to {$a}.';
 $string['mode_bugtracker'] = 'Team bug tracker';
 $string['mode_customized'] = 'Customized tracker';
 $string['mode_taskspread'] = 'Task distributor';
@@ -611,7 +611,7 @@ You should bookmark this URL
 to get the link available even if Moodle is down or not operable properly.
 ';
 
-$tring['addcomment_tpl'] = 'Course : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+$string['addcomment_tpl'] = 'Course : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 Tracker : <%%TRACKERNAME%%>
 --------------------------------------
 <%%CONTRIBUTOR%%> added a comment about the ticket:
@@ -659,6 +659,32 @@ has been reassigned to: <%%ASSIGNEDTO%%>
 URL for viewing the issue: <%%ISSUEURL%%>
 URL for unregistering from watches on this issue: <%%UNCCURL%%>
 URL for unregistering from all watches on this tracker: <%%ALLUNCCURL%%>
+';
+
+$string['issuemoved_html_tpl'] = '
+<p>The following ticket:</p>
+
+<p>Ticket: <b><%%ISSUE%%> / <%%SUMMARY%%></b></p>
+
+<p>has moved from tracker:</p>
+
+<p>Course: <b>[<%%COURSE_SHORT%%>] <%%COURSENAME%%></b><br/>
+Tracker: <b><%%TRACKERNAME%%></b></p>
+
+<p>To:</p>
+
+<p>Course: <b>[<%%NEWCOURSE_SHORT%%>] <%%NEWCOURSENAME%%></b><br/>
+Tracker: <b><%%NEWTRACKERNAME%%></b></p>
+
+<p>Assignee is now:</p>
+
+<p>has been reassigned to: <b><%%ASSIGNEDTO%%></b></p>
+
+<hr>
+<p><a href="<%%ISSUEURL%%>">View the issue</a><br>
+<a href="<%%UNCCURL%%>">Unregister from watches on this issue</a><br/>
+<a href="<%%ALLUNCCURL%%>">Unregister from all watches on this tracker</a>
+</p>
 ';
 
 $string['ownershipchanged_tpl'] = '

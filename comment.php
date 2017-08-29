@@ -69,7 +69,7 @@ if ($data = $form->get_data()) {
         $comment->trackerid = $tracker->id;
         $comment->issueid = $issueid;
         $comment->datecreated = time();
-        $commentid = $DB->insert_record('tracker_issuecomment', $comment);
+        $comment->id = $DB->insert_record('tracker_issuecomment', $comment);
     } else {
         $comment = $data;
         $comment->id = $comment->commentid;

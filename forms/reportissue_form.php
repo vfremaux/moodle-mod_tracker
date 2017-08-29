@@ -136,22 +136,22 @@ class TrackerIssueForm extends moodleform {
 
     public function set_data($defaults) {
 
-        $defaults->description_editor['text'] = $defaults->description;
-        $defaults->description_editor['format'] = $defaults->descriptionformat;
+        $defaults->description_editor['text'] = @$defaults->description;
+        $defaults->description_editor['format'] = @$defaults->descriptionformat;
         $defaults = file_prepare_standard_editor($defaults, 'description', $this->editoroptions, $this->context, 'mod_tracker',
-                                                 'issuedescription', $defaults->issueid);
+                                                 'issuedescription', @$defaults->issueid);
 
         // Something to prepare for each element ?
         if (!empty($this->elements)) {
             foreach ($this->elements as $element) {
-                $element->set_data($defaults, $this->_customdata['issueid']);
+                $element->set_data($defaults, @$this->_customdata['issueid']);
             }
         }
 
-        $defaults->resolution_editor['text'] = $defaults->resolution;
-        $defaults->resolution_editor['format'] = $defaults->resolutionformat;
+        $defaults->resolution_editor['text'] = @$defaults->resolution;
+        $defaults->resolution_editor['format'] = @$defaults->resolutionformat;
         $defaults = file_prepare_standard_editor($defaults, 'resolution', $this->editoroptions, $this->context, 'mod_tracker',
-                                                 'issueresolution', $defaults->issueid);
+                                                 'issueresolution', @$defaults->issueid);
 
         parent::set_data($defaults);
     }
