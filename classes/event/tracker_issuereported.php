@@ -32,6 +32,18 @@ defined('MOODLE_INTERNAL') || die();
 class tracker_issuereported extends tracker_baseevent {
 
     protected $issueid;
+<<<<<<< HEAD
+=======
+
+    /**
+     * Init method.
+     */
+    protected function init() {
+        $this->data['crud'] = 'c';
+        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
+        $this->data['objecttable'] = 'tracker_issue';
+    }
+>>>>>>> MOODLE_33_STABLE
 
     public static function get_name() {
         return get_string('event_tracker_issue_reported', 'tracker');

@@ -29,9 +29,24 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Event for when a tracker activity is commented.
  */
+<<<<<<< HEAD
 class tracker_issuecommented extends \core\event\base {
 
     protected $issueid;
+=======
+class tracker_issuecommented extends tracker_baseevent {
+
+    protected $issueid;
+
+    /**
+     * Init method.
+     */
+    protected function init() {
+        $this->data['crud'] = 'c';
+        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
+        $this->data['objecttable'] = 'tracker_issuecomment';
+    }
+>>>>>>> MOODLE_33_STABLE
 
     public static function get_name() {
         return get_string('event_tracker_issue_commented', 'tracker');
@@ -76,7 +91,11 @@ class tracker_issuecommented extends \core\event\base {
      */
     protected function get_legacy_logdata() {
         $logurl = '../mod/'.$this->other['modulename'].'/view.php?id=';
+<<<<<<< HEAD
         $log1 .= $this->objectid.'&amp;view=view&amp;screen=viewanissue&amp;issueid='.$this->other['issueid'];
+=======
+        $logurl .= $this->objectid.'&amp;view=view&amp;screen=viewanissue&amp;issueid='.$this->other['issueid'];
+>>>>>>> MOODLE_33_STABLE
         $info = $this->other['modulename'] . ' '.$this->other['instanceid'];
         $log1 = array($this->courseid, 'course', 'commentissue', $logurl, $info);
         return array($log1);

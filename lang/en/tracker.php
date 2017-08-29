@@ -274,8 +274,8 @@ $string['mandatory'] = 'Mandatory answer';
 $string['me'] = 'My profile';
 $string['message_bugtracker'] = 'Thanks for your contribution and helping making this service more reliable.';
 $string['message_taskspread'] = 'You just defined a task. Don\'t foget assigning it to some recepient in the nxt screns to distribute it.';
-$string['message_ticketting'] = 'We have registered your query. I has been assigned to {$a}.';
-$string['message_ticketting_preassigned'] = 'We have registered your query. It will be assigned and handled as soon as possible.';
+$string['message_ticketting'] = 'We have registered your query.';
+$string['message_ticketting_preassigned'] = 'We have registered your query. It will be assigned and handled as soon as possible. It has been assigned to {$a}.';
 $string['mode_bugtracker'] = 'Team bug tracker';
 $string['mode_customized'] = 'Customized tracker';
 $string['mode_taskspread'] = 'Task distributor';
@@ -609,6 +609,7 @@ $string['failovertrackerurl_tpl'] = '
 In case this tracker is not reachable or not available, you may post a signal into the <a href="{$a}">emergency tracker</a>.
 You should bookmark this URL
 to get the link available even if Moodle is down or not operable properly.
+<<<<<<< HEAD
 ';
 
 $tring['addcomment_tpl'] = 'Course : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
@@ -764,6 +765,189 @@ URL for viewing the issue: <%%ISSUEURL%%>
 URL for registering for watches: <%%CCURL%%>
 ';
 
+=======
+';
+
+$string['addcomment_tpl'] = 'Course : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+Tracker : <%%TRACKERNAME%%>
+--------------------------------------
+<%%CONTRIBUTOR%%> added a comment about the ticket:
+ <%%ISSUE%%> / <%%SUMMARY%%>
+------------------------------------------
+<%%COMMENT%%>
+------------------------------------------
+See the ticket : <%%ISSUEURL%%>
+Unregister from ticket : <%%UNCCURL%%>
+Unregister fromm all tickets in this tracker : <%%ALLUNCCURL%%>';
+
+$string['addcomment_html_tpl'] = '
+<b>Cours :</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br/>
+<b>Tracker :</b> <%%TRACKERNAME%%><br/>
+<hr/>
+<p><%%CONTRIBUTOR%%> added a comment about the ticket:<br/>
+<%%ISSUE%%> / <%%SUMMARY%%></p>
+<hr/>
+<p><%%COMMENT%%></p>
+<hr/>
+<p><a href="<%%ISSUEURL%%>">See the ticket</a><br/>
+<a href="<%%UNCCURL%%>">Se désabonner du défaut</a><br/>
+<a href="<%%ALLUNCCURL%%>">Se désabonner de ce tracker</a></p>';
+
+$string['issuemoved_tpl'] = '
+The following ticket:
+--------------------------------------
+Ticket: <%%ISSUE%%> / <%%SUMMARY%%>
+
+has moved from tracker:
+--------------------------------------
+Course: [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+Tracker: <%%TRACKERNAME%%>
+
+To:
+--------------------------------------
+Course: [<%%NEWCOURSE_SHORT%%>] <%%NEWCOURSENAME%%>
+Tracker: <%%NEWTRACKERNAME%%>
+
+Assignee is now:
+-------------------------------------
+has been reassigned to: <%%ASSIGNEDTO%%>
+
+-------------------------------------
+URL for viewing the issue: <%%ISSUEURL%%>
+URL for unregistering from watches on this issue: <%%UNCCURL%%>
+URL for unregistering from all watches on this tracker: <%%ALLUNCCURL%%>
+';
+
+$string['issuemoved_html_tpl'] = '
+<p>The following ticket:</p>
+
+<p>Ticket: <b><%%ISSUE%%> / <%%SUMMARY%%></b></p>
+
+<p>has moved from tracker:</p>
+
+<p>Course: <b>[<%%COURSE_SHORT%%>] <%%COURSENAME%%></b><br/>
+Tracker: <b><%%TRACKERNAME%%></b></p>
+
+<p>To:</p>
+
+<p>Course: <b>[<%%NEWCOURSE_SHORT%%>] <%%NEWCOURSENAME%%></b><br/>
+Tracker: <b><%%NEWTRACKERNAME%%></b></p>
+
+<p>Assignee is now:</p>
+
+<p>has been reassigned to: <b><%%ASSIGNEDTO%%></b></p>
+
+<hr>
+<p><a href="<%%ISSUEURL%%>">View the issue</a><br>
+<a href="<%%UNCCURL%%>">Unregister from watches on this issue</a><br/>
+<a href="<%%ALLUNCCURL%%>">Unregister from all watches on this tracker</a>
+</p>
+';
+
+$string['ownershipchanged_tpl'] = '
+Course: [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+Tracker: <%%TRACKERNAME%%>
+--------------------------------------
+Issue: <%%ISSUE%%> / <%%SUMMARY%%>
+has been reassigned to: <%%ASSIGNEDTO%%>
+By: <%%BY%%>
+
+URL for viewing the issue: <%%ISSUEURL%%>
+URL for unregistering from watches on this issue: <%%UNCCURL%%>
+URL for unregistering from all watches on this tracker: <%%ALLUNCCURL%%>
+';
+
+$string['ownershipchanged_html_tpl'] = '
+<b>Course:</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br />
+<b>Tracker:</b> <%%TRACKERNAME%%><br/>
+<hr/>
+<p><b>Issue:</b> <%%ISSUE%%> / <%%SUMMARY%%><br />
+<b>has been reassigned to:</b> <%%ASSIGNEDTO%%> <br />
+<b>By:</b> <%%BY%%></p>
+<hr/>
+<p><a href="<%%ISSUEURL%%>">View the issue record</a><br/>
+<a href="<%%UNCCURL%%>">Unregister watches from this issue</a><br/>
+<a href="<%%ALLUNCCURL%%>">Unregister from all watches on this tracker</a></p>
+';
+
+$string['raiserequest_tpl'] = '
+Course: [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+Tracker: <%%TRACKERNAME%%>
+--------------------------------------
+A request for higher priority has been submitted by:
+<%%REQUESTEDBY%%>
+for the following ticket:
+<%%ISSUE%%> : <%%SUMMARY%%>
+from:
+<%%BY%%>
+
+Given reason is:
+<%%REASON%%>
+
+------------------------------------------
+<%%URGENT%%>
+------------------------------------------
+See the ticket there: <%%ISSUEURL%%>
+';
+
+$string['raiserequest_html_tpl'] = '
+<b>Course:</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br/>
+<b>Tracker:</b> <%%TRACKERNAME%%><br/>
+<hr/>
+<p><b>A raise request has been submitted by:</b><br/>
+<%%REQUESTEDBY%%><br/>
+<b>for following ticket:</b><br/>
+</b> <%%ISSUE%%> / <%%SUMMARY%%><br/>
+<b>from:</b><br/>
+<%%BY%%></p>
+<p><b>Given reason is:</b><br/>
+<%%REASON%%>
+<hr/>
+<%%URGENT%%>
+<hr/>
+<p><a href="<%%ISSUEURL%%>">See the ticket</a><br/></p>
+';
+
+$string['statechanged_tpl'] = '
+Course: [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+Tracker: <%%TRACKERNAME%%>
+--------------------------------------
+Bug entry: <%%ISSUE%%> / <%%SUMMARY%%>
+status was changed to <%%EVENT%%>
+By: <%%BY%%>
+
+URL for viewing the issue: <%%ISSUEURL%%>
+URL for unregistering from watches on this issue: <%%UNCCURL%%>
+URL for unregistering from all watches on this tracker: <%%ALLUNCCURL%%>
+';
+
+$string['statechanged_html_tpl'] = '
+<p><b>Course:</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+<b>Tracker:</b> <%%TRACKERNAME%%>
+<hr/>
+<b>Issue:</b> <%%ISSUE%%> / <%%SUMMARY%%><br/>
+<b>status was changed to</b> <%%EVENT%%><br/>
+<b>By:</b> <%%BY%%></p>
+<hr/>
+<p><a href="<%%ISSUEURL%%>">View this issue record</a><br/>
+<a href="<%%UNCCURL%%>">Unregister from watches on this issue</a><br/>
+<a href="<%%ALLUNCCURL%%>">Unregister from all watches on this tracker</a></p>
+';
+
+$string['submission_tpl'] = '
+Course: [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+Tracker: <%%TRACKERNAME%%>
+--------------------------------------
+New bug entry: <%%ISSUE%%> / <%%SUMMARY%%>
+By: <%%BY%%>
+
+Description : <%%DESCRIPTION%%>
+
+URL for viewing the issue: <%%ISSUEURL%%>
+URL for registering for watches: <%%CCURL%%>
+';
+
+>>>>>>> MOODLE_33_STABLE
 $string['submission_html_tpl'] = '
 <b>Course:</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br/>
 <b>Tracker:</b> <%%TRACKERNAME%%><br/>

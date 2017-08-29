@@ -91,6 +91,7 @@ class mod_tracker_mod_form extends moodleform_mod {
         $mform->addElement('checkbox', 'strictworkflow', get_string('strictworkflow', 'tracker'));
         $mform->addHelpButton('strictworkflow', 'strictworkflow', 'tracker');
 
+<<<<<<< HEAD
         $context = context_module::instance($this->_cm->id);
         $fields = 'u.id,'.get_all_user_name_fields(true, 'u');
         $order = 'lastname, firstname';
@@ -99,11 +100,24 @@ class mod_tracker_mod_form extends moodleform_mod {
             $useropts[0] = get_string('none');
             foreach ($assignableusers as $assignable) {
                 $useropts[$assignable->id] = fullname($assignable);
+=======
+        if (isset($this->_cm->id)) {
+            $context = context_module::instance($this->_cm->id);
+            $fields = 'u.id,'.get_all_user_name_fields(true, 'u');
+            $order = 'lastname, firstname';
+            if ($assignableusers = get_users_by_capability($context, 'mod/tracker:resolve', $fields, $order)) {
+                $useropts[0] = get_string('none');
+                foreach ($assignableusers as $assignable) {
+                    $useropts[$assignable->id] = fullname($assignable);
+                }
+                $mform->addElement('select', 'defaultassignee', get_string('defaultassignee', 'tracker'), $useropts);
+                $mform->addHelpButton('defaultassignee', 'defaultassignee', 'tracker');
+                $mform->disabledIf('defaultassignee', 'supportmode', 'eq', 'taskspread');
+                $mform->setAdvanced('defaultassignee');
+            } else {
+                $mform->addElement('hidden', 'defaultassignee', 0);
+>>>>>>> MOODLE_33_STABLE
             }
-            $mform->addElement('select', 'defaultassignee', get_string('defaultassignee', 'tracker'), $useropts);
-            $mform->addHelpButton('defaultassignee', 'defaultassignee', 'tracker');
-            $mform->disabledIf('defaultassignee', 'supportmode', 'eq', 'taskspread');
-            $mform->setAdvanced('defaultassignee');
         } else {
             $mform->addElement('hidden', 'defaultassignee', 0);
         }

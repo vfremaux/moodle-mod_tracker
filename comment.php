@@ -69,7 +69,11 @@ if ($data = $form->get_data()) {
         $comment->trackerid = $tracker->id;
         $comment->issueid = $issueid;
         $comment->datecreated = time();
+<<<<<<< HEAD
         $commentid = $DB->insert_record('tracker_issuecomment', $comment);
+=======
+        $comment->id = $DB->insert_record('tracker_issuecomment', $comment);
+>>>>>>> MOODLE_33_STABLE
     } else {
         $comment = $data;
         $comment->id = $comment->commentid;
