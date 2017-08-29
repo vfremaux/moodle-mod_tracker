@@ -107,7 +107,7 @@ function tracker_rpc_check($remoteuser, &$localuser, $createmissing = false) {
 /**
  * sends tracker information to remote caller. This is intended for
  * administrative binding GUIs.
- * @param int $trackerid
+ * @param int $trackerid the id of the tracker instance
  * @param boolean $nojson when true, avoids serializing through JSON syntax
  * @return string a JSON encoded information structure.
  */
