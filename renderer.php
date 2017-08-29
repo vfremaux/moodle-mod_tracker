@@ -33,15 +33,10 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $statuskeys = tracker_get_statuskeys($tracker);
         $statuscodes = tracker_get_statuscodes();
 
-        $str = '';
+        $template = new Stdclass;
 
-        $str .= '<tr valign="top">';
-        $str .= '<td colspan="4" align="left" class="tracker-issue-summary">';
-        $str .= format_string($issue->summary);
-        $str .= '</td>';
-        $str .= '</tr>';
+        $template->summary = format_string($issue->summary);
 
-        $link = '';
         if ($issue->downlink) {
             $access = true;
             list($hostid, $instanceid, $issueid) = explode(':', $issue->downlink);
@@ -52,9 +47,9 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     $url = new moodle_url('/mod/tracker/view.php', $params);
                     $context = context_module::instance($cm->id);
                     if (has_capability('mod/tracker:seeissues', $context)) {
-                        $link = html_writer::link($url, get_string('gotooriginal', 'tracker'));
+                        $template->downlink = html_writer::link($url, get_string('gotooriginal', 'tracker'));
                     } else {
-                        $link = get_string('originalticketnoaccess', 'tracker');
+                        $template->downlink = get_string('originalticketnoaccess', 'tracker');
                     }
                 } else {
                     // Local downstream tracker is gone, or downstream issue was deleted.
@@ -62,15 +57,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     $DB->set_field('tracker_issue', 'downlink', '', array('id' => $issue->id));
                 }
             } else {
-                $link = $this->remote_link($hostid, $instanceid, $issueid);
-            }
-
-            if (!empty($link)) {
-                $str .= '<tr valign="top">';
-                $str .= '<td colspan="4" align="left" class="tracker-issue-downlink">';
-                $str .= $link;
-                $str .= '</td>';
-                $str .= '</tr>';
+                $template->downlink = $this->remote_link($hostid, $instanceid, $issueid);
             }
         }
 
@@ -88,9 +75,9 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
                     $context = context_module::instance($cm->id);
                     if (has_capability('mod/tracker:seeissues', $context)) {
-                        $link = html_writer::link($url, get_string('gototransfered', 'tracker'));
+                        $template->uplink = html_writer::link($url, get_string('gototransfered', 'tracker'));
                     } else {
-                        $link = get_string('transferedticketnoaccess', 'tracker');
+                        $template->uplink = get_string('transferedticketnoaccess', 'tracker');
                     }
                 } else {
                     /*
@@ -102,98 +89,56 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     $DB->update_record('tracker_issue', $issue);
                 }
             } else {
-                $link = $this->remote_link($hostid, $instanceid, $issueid);
-            }
-
-            if (!empty($link)) {
-                $str .= '<tr valign="top">';
-                $str .= '<td colspan="4" align="left" class="tracker-issue-downlink">';
-                $str .= $link;
-                $str .= '</td>';
-                $str .= '</tr>';
+                $template->uplink = $this->remote_link($hostid, $instanceid, $issueid);
             }
         }
 
-        $str .= '<tr valign="top">';
-        $str .= '<td align="right" width="25%" class="tracker-issue-param">';
-        $str .= '<b>'.get_string('issuenumber', 'tracker').'</b><br />';
-        $str .= '</td>';
-        $str .= '<td width="25%" class="tracker-issue-value">';
-        $str .= $tracker->ticketprefix.$issue->id;
-        $str .= '</td>';
-        $str .= '<td align="right" width="25%" class="tracker-issue-param" >';
-        $str .= '<b>'.get_string('status', 'tracker').':</b>';
-        $str .= '</td>';
-        $str .= '<td width="25%" class="status-'.$statuscodes[$issue->status].' tracker-issue-value">';
-        $str .= '<b>'.$statuskeys[$issue->status].'</b>';
-        $str .= '</td>';
-        $str .= '</tr>';
+        $template->strissuenumber = get_string('issuenumber', 'tracker');
+        $template->fullid = $tracker->ticketprefix.$issue->id;
+        $template->strstzatus = get_string('status', 'tracker');
+        $template->statuscode = $statuscodes[$issue->status];
+        $template->status = $statuskeys[$issue->status];
 
-        $str .= '<tr valign="top">';
-        $str .= '<td align="right" width="25%" class="tracker-issue-param">';
-        $str .= '<b>'.get_string('reportedby', 'tracker').':</b>';
-        $str .= '</td>';
-        $str .= '<td width="25%" class="tracker-issue-value">';
-        $str .= $this->output->user_picture($issue->reporter);
-        $str .= '&nbsp;'.fullname($issue->reporter);
-        $str .= '</td>';
-        $str .= '<td align="right" width="25%" class="tracker-issue-param" >';
-        $str .= '<b>'.get_string('datereported', 'tracker').':</b>';
-        $str .= '</td>';
-        $str .= '<td width="25%" class="tracker-issue-value">';
-        $str .= userdate($issue->datereported);
-        $str .= '</td>';
-        $str .= '</tr>';
+        $template->strreportedby = get_string('reportedby', 'tracker');
+        $template->reporterpicture = $this->output->user_picture($issue->reporter);
+        $template->reportername = fullname($issue->reporter);
 
-        $str .= '<tr valign="top">';
-        $str .= '<td align="right" width="25%" class="tracker-issue-param">';
-        $str .= '<b>'.get_string('assignedto', 'tracker').':</b>';
-        $str .= '</td>';
-        $str .= '<td width="25%" class="tracker-issue-value">';
+        $template->strdatereported = get_string('datereported', 'tracker');
+        $template->datereported = userdate($issue->datereported);
+
+        $template->strassignedto = get_string('assignedto', 'tracker');
         if (!$issue->owner) {
-            $str .= get_string('unassigned', 'tracker');
+            $template->assignedto = get_string('unassigned', 'tracker');
         } else {
-            $str .= $this->output->user_picture($issue->owner, array('courseid' => $COURSE->id, 'size' => 35));
+            $str = $this->output->user_picture($issue->owner, array('courseid' => $COURSE->id, 'size' => 35));
             $str .= '&nbsp;'.fullname($issue->owner);
+            $template->assignedto = $str;
         }
-        $str .= '</td>';
-        $str .= '<td align="right" width="25%" class="tracker-issue-param">';
-        $str .= '<b>'.get_string('cced', 'tracker').':</b>';
-        $str .= '</td>';
-        $str .= '<td width="25%" class="tracker-issue-value">';
-        $str .= (empty($ccs) || count(array_keys($ccs)) == 0) ? 0 : count($ccs);
-        $str .= '</td>';
-        $str .= '</tr>';
+        $template->strcced = get_string('cced', 'tracker');
+        $template->ccscount = (empty($ccs) || count(array_keys($ccs)) == 0) ? 0 : count($ccs);
 
-        $str .= '<tr valign="top">';
-        $str .= '<td align="right" width="25%" class="tracker-issue-param">';
-        $str .= '<b>'.get_string('description').':</b>';
-        $str .= '</td>';
-        $str .= '<td align="left" colspan="3" width="75%" class="tracker-issue-value">';
-        $str .= format_text($issue->description);
-        $str .= '</td>';
-        $str .= '</tr>';
+        $template->strdescription = get_string('description');
+        $template->description = format_text($issue->description);
 
-        return $str;
+        return $this->render_from_template('mod_tracker/coreissue', $template);
     }
 
     public function edit_link($issue, $cm) {
 
-        $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'editanissue', 'issueid' => $issue->id);
 
-        $issueurl = new moodle_url('/mod/tracker/view.php', $params);
+        $issueurl = new moodle_url('/mod/tracker/view.php');
 
-        $str = '';
+        $template = new stdClass;
 
-        $str .= '<tr>';
-        $str .= '<td colspan="4" align="right">';
-        $str .= '<form method="post" action="'.$issueurl.'">';
-        $str .= '<input type="submit" name="go_btn" value="'.get_string('turneditingon', 'tracker').'">';
-        $str .= '</form>';
-        $str .= '</td>';
-        $str .= '</tr>';
+        $template->id= $cm->id;
+        $template->view = 'view';
+        $template->screen = 'editanissue';
+        $template->issueid = $issue->id;
 
-        return $str;
+        $template->issueurl = $issueurl;
+        $template->strturneditingon = get_string('turneditingon', 'tracker');
+
+        return $this->render_from_template('mod_tracker/editlink', $template);
     }
 
     public function remote_link($hostid, $instanceid, $issueid) {
@@ -496,12 +441,12 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 $str .= $this->user($bywhom);
                 $str .= '</td>';
                 $str .= '<td align="left">';
-                $str .= '<span class="status_'.$statuscodes[$state->statusfrom].'">'.$statuskeys[$state->statusfrom].'</span>';
+                $str .= '<span class="status-'.$statuscodes[$state->statusfrom].'">'.$statuskeys[$state->statusfrom].'</span>';
                 $str .= '</td>';
                 $str .= '<td align="left">';
                 $str .= '</td>';
                 $str .= '<td align="left">';
-                $str .= '<span class="status_'.$statuscodes[$state->statusto].'">'.$statuskeys[$state->statusto].'</span>';
+                $str .= '<span class="status-'.$statuscodes[$state->statusto].'">'.$statuskeys[$state->statusto].'</span>';
                 $str .= '</td>';
                 $str .= '</tr>';
             }
@@ -600,7 +545,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
                 if (tracker_has_assigned($tracker, false)) {
                     $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'mywork');
-                    $taburl = new moodle_url('/mod/trackeR/view.php', $params);
+                    $taburl = new moodle_url('/mod/tracker/view.php', $params);
                     $rows[1][] = new tabobject('mywork', $taburl, get_string('mywork', 'tracker'));
                 }
 
@@ -610,11 +555,13 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     $rows[1][] = new tabobject('browse', $taburl, get_string('browse', 'tracker'));
                 }
 
+                /*
                 if ($tracker->supportmode == 'bugtracker') {
                     $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'search');
                     $taburl = new moodle_url('/mod/tracker/view.php', $params);
                     $rows[1][] = new tabobject('search', $taburl, get_string('search', 'tracker'));
                 }
+                */
                 break;
             }
 

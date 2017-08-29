@@ -43,9 +43,9 @@ function tracker_compile_mail_template($template, $infomap, $lang = '') {
     }
     $lang = substr($lang, 0, 2); // Be sure we are in moodle 2.
 
-    $notification = implode('', tracker_get_mail_template($template, $lang));
+    $notification = tracker_get_mail_template($template, $lang);
     foreach ($infomap as $akey => $avalue) {
-        $notification = str_replace("<%%$akey%%>", $avalue, $notification);
+        $notification = str_replace("<%%{$akey}%%>", $avalue, $notification);
     }
     return $notification;
 }
