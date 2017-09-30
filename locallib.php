@@ -1048,8 +1048,6 @@ function tracker_submitanissue(&$tracker, &$data) {
         $issue->id = $DB->update_record('tracker_issue', $issue);
     }
 
-    tracker_recordelements($issue, $data);
-
     return $issue;
 }
 
@@ -1075,7 +1073,7 @@ function tracker_getownedissuesforresolve($trackerid, $userid = null) {
  * @param object $issue
  * @param object $data full form return
  */
-function tracker_recordelements(&$issue, &$data) {
+function tracker_recordelements(&$issue, $data) {
     global $DB;
 
     $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
