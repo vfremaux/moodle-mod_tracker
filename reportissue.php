@@ -15,55 +15,29 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package mod_tracker
- * @category mod
- * @author Clifford Tham, Valery Fremaux > 1.8
- * @date 02/12/2007
+ * @package     mod_tracker
+ * @category    mod
+ * @author      Clifford Tham, Valery Fremaux > 1.8
  */
 require('../../config.php');
 require_once($CFG->dirroot."/mod/tracker/lib.php");
 require_once($CFG->dirroot."/mod/tracker/locallib.php");
-require_once $CFG->dirroot.'/mod/tracker/forms/reportissue_form.php';
+require_once($CFG->dirroot.'/mod/tracker/forms/reportissue_form.php');
 
-$id = optional_param('id', 0, PARAM_INT); // Course Module ID, or
-$a  = optional_param('a', 0, PARAM_INT);  // tracker ID
+$id = optional_param('id', 0, PARAM_INT); // Course Module ID, or.
+$t  = optional_param('t', 0, PARAM_INT);  // tracker ID.
 
-if ($id) {
-    if (! $cm = get_coursemodule_from_id('tracker', $id)) {
-        print_error('errorcoursemodid', 'tracker');
-    }
-
-    if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
-        print_error('errorcoursemisconfigured', 'tracker');
-    }
-
-    if (! $tracker = $DB->get_record('tracker', array('id' => $cm->instance))) {
-        print_error('errormoduleincorrect', 'tracker');
-    }
-} else {
-
-    if (! $tracker = $DB->get_record('tracker', array('id' => $a))) {
-        print_error('errormoduleincorrect', 'tracker');
-    }
-
-    if (! $course = $DB->get_record('course', array('id' => $tracker->course))) {
-        print_error('errorcoursemisconfigured', 'tracker');
-    }
-    if (! $cm = get_coursemodule_from_instance("tracker", $tracker->id, $course->id)) {
-        print_error('errorcoursemodid', 'tracker');
-    }
-}
+list($cm, $tracker, $course) = tracker_get_context($id, $t);
 
 $screen = tracker_resolve_screen($tracker, $cm);
 $view = tracker_resolve_view($tracker, $cm);
 
 // Security.
-
 $context = context_module::instance($cm->id);
 require_course_login($course->id, false, $cm);
 require_capability('mod/tracker:report', $context);
 
-// setting page
+// Setting page.
 $url = new moodle_url('/mod/tracker/reportissue.php', array('id' => $id));
 $PAGE->set_url($url);
 $PAGE->set_context($context);
@@ -71,7 +45,10 @@ $PAGE->set_title(format_string($tracker->name));
 $PAGE->set_heading(format_string($tracker->name));
 $PAGE->set_button($OUTPUT->update_module_button($cm->id, 'tracker'));
 
-$form = new TrackerIssueForm(new moodle_url('/mod/tracker/reportissue.php'), array('trackerid' => $tracker->id, 'cmid' => $id));
+$renderer = $PAGE->get_renderer('mod_tracker');
+
+$params = array('tracker' => $tracker, 'cmid' => $id, 'mode' => 'add');
+$form = new TrackerIssueForm(new moodle_url('/mod/tracker/reportissue.php'), $params);
 
 if (!$form->is_cancelled()) {
     if ($data = $form->get_data()) {
@@ -80,16 +57,16 @@ if (!$form->is_cancelled()) {
             print_error('errorcannotsubmitticket', 'tracker');
         }
 
-        // add_to_log($course->id, 'tracker', "reportissue", "view.php?id={$cm->id}", "$tracker->id", $cm->id);
         $event = \mod_tracker\event\tracker_issuereported::create_from_issue($tracker, $issue->id);
         $event->trigger();
 
-        // stores files
-        $data = file_postupdate_standard_editor($data, 'description', $form->editoroptions, $context, 'mod_tracker', 'issuedescription', $data->issueid);
-        // update back reencoded field text content
+        // Stores files.
+        $data = file_postupdate_standard_editor($data, 'description', $form->editoroptions, $context, 'mod_tracker',
+                                                'issuedescription', $data->issueid);
+        // Update back reencoded field text content.
         $DB->set_field('tracker_issue', 'description', $data->description, array('id' => $issue->id));
 
-        // log state change
+        // Log state change.
         $stc = new StdClass;
         $stc->userid = $USER->id;
         $stc->issueid = $issue->id;
@@ -100,27 +77,31 @@ if (!$form->is_cancelled()) {
         $DB->insert_record('tracker_state_change', $stc);
         echo $OUTPUT->header();
         echo $OUTPUT->box_start('generalbox', 'tracker-acknowledge');
-        echo (empty($tracker->thanksmessage)) ? get_string('thanksdefault', 'tracker') : format_string($tracker->thanksmessage) ;
+        echo (empty($tracker->thanksmessage)) ? get_string('thanksdefault', 'tracker') : format_string($tracker->thanksmessage);
         echo $OUTPUT->box_end();
         echo $OUTPUT->continue_button(new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => 'view', 'screen' => 'browse')));
         echo $OUTPUT->footer();
 
-        // notify all admins
+        tracker_recordelements($issue, $data);
+
+        // Notify all admins.
         if ($tracker->allownotifications) {
             tracker_notify_submission($issue, $cm, $tracker);
             if ($issue->assignedto) {
                 tracker_notifyccs_changeownership($issue->id, $tracker);
             }
         }
-        die;
     }
 }
 
 echo $OUTPUT->header();
 
 $view = 'reportanissue';
-include_once($CFG->dirroot.'/mod/tracker/menus.php');
+echo $renderer->tabs($view, $screen, $tracker, $cm);
 
+$formdata = new StdClass;
+$formdata->id = $id;
+$form->set_data($formdata);
 $form->display();
 
 echo $OUTPUT->footer();

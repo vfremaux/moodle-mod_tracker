@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * This view allows checking deck states
  *
@@ -24,6 +22,8 @@ defined('MOODLE_INTERNAL') || die();
  * @author Valery Fremaux
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
 /**
@@ -31,14 +31,14 @@ require_once($CFG->dirroot.'/course/moodleform_mod.php');
  */
 class mod_tracker_mod_form extends moodleform_mod {
 
-    function definition() {
-        global $CFG, $COURSE, $DB;
+    public function definition() {
+        global $CFG, $DB;
 
         $mform    =& $this->_form;
-        //-------------------------------------------------------------------------------
+
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        $mform->addElement('text', 'name', get_string('name'), array('size'=>'64'));
+        $mform->addElement('text', 'name', get_string('name'), array('size' => '64'));
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
@@ -47,9 +47,8 @@ class mod_tracker_mod_form extends moodleform_mod {
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
-        $this->standard_intro_elements();
+        $this->standard_intro_elements(true, get_string('intro', 'tracker'));
 
-        // $mform->addRule('summary', get_string('required'), 'required', null, 'client');
         $modeoptions['bugtracker'] = get_string('mode_bugtracker', 'tracker');
         $modeoptions['ticketting'] = get_string('mode_ticketting', 'tracker');
         $modeoptions['taskspread'] = get_string('mode_taskspread', 'tracker');
@@ -77,7 +76,8 @@ class mod_tracker_mod_form extends moodleform_mod {
         $select->setMultiple(true);
         $mform->setAdvanced('stateprofile');
 
-        $mform->addElement('textarea', 'thanksmessage', get_string('thanksmessage', 'tracker'), array('cols' => 60, 'rows' => 10));
+        $attrs = array('cols' => 60, 'rows' => 10);
+        $mform->addElement('textarea', 'thanksmessage', get_string('thanksmessage', 'tracker'), $attrs);
         $mform->disabledIf('thanksmessage', 'supportmode', 'neq', 'customized');
         $mform->setType('thanksmessage', PARAM_TEXT);
         $mform->setAdvanced('thanksmessage');
@@ -91,15 +91,22 @@ class mod_tracker_mod_form extends moodleform_mod {
         $mform->addElement('checkbox', 'strictworkflow', get_string('strictworkflow', 'tracker'));
         $mform->addHelpButton('strictworkflow', 'strictworkflow', 'tracker');
 
-        if (isset($this->_cm->id) && $assignableusers = get_users_by_capability(context_module::instance($this->_cm->id), 'mod/tracker:resolve', 'u.id,'.get_all_user_name_fields(true, 'u'), 'lastname,firstname')) {
-            $useropts[0] = get_string('none');
-            foreach ($assignableusers as $assignable) {
-                $useropts[$assignable->id] = fullname($assignable);
+        if (isset($this->_cm->id)) {
+            $context = context_module::instance($this->_cm->id);
+            $fields = 'u.id,'.get_all_user_name_fields(true, 'u');
+            $order = 'lastname, firstname';
+            if ($assignableusers = get_users_by_capability($context, 'mod/tracker:resolve', $fields, $order)) {
+                $useropts[0] = get_string('none');
+                foreach ($assignableusers as $assignable) {
+                    $useropts[$assignable->id] = fullname($assignable);
+                }
+                $mform->addElement('select', 'defaultassignee', get_string('defaultassignee', 'tracker'), $useropts);
+                $mform->addHelpButton('defaultassignee', 'defaultassignee', 'tracker');
+                $mform->disabledIf('defaultassignee', 'supportmode', 'eq', 'taskspread');
+                $mform->setAdvanced('defaultassignee');
+            } else {
+                $mform->addElement('hidden', 'defaultassignee', 0);
             }
-            $mform->addElement('select', 'defaultassignee', get_string('defaultassignee', 'tracker'), $useropts);
-            $mform->addHelpButton('defaultassignee', 'defaultassignee', 'tracker');
-            $mform->disabledIf('defaultassignee', 'supportmode', 'eq', 'taskspread');
-            $mform->setAdvanced('defaultassignee');
         } else {
             $mform->addElement('hidden', 'defaultassignee', 0);
         }
@@ -109,9 +116,15 @@ class mod_tracker_mod_form extends moodleform_mod {
             $trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
             $subtrackersopts = array();
             foreach ($subtrackers as $st) {
+                if ($st->id == @$this->current->id) {
+                    continue;
+                }
                 if ($targetcm = $DB->get_record('course_modules', array('instance' => $st->id, 'module' => $trackermoduleid))) {
                     $targetcontext = context_module::instance($targetcm->id);
-                    if (has_any_capability(array('mod/tracker:manage', 'mod/tracker:develop', 'mod/tracker:resolve'), $targetcontext)) {
+                    $caps = array('mod/tracker:manage',
+                                  'mod/tracker:develop',
+                                  'mod/tracker:resolve');
+                    if (has_any_capability($caps, $targetcontext)) {
                         $trackercourseshort = $DB->get_field('course', 'shortname', array('id' => $st->course));
                         $subtrackersopts[$st->id] = $trackercourseshort.' - '.$st->name;
                     }
@@ -143,40 +156,52 @@ class mod_tracker_mod_form extends moodleform_mod {
         $this->add_action_buttons();
     }
 
-    function set_data($defaults) {
+    public function set_data($defaults) {
 
         if (!property_exists($defaults, 'enabledstates')) {
             $defaults->stateprofile = array();
 
-            $defaults->stateprofile[] = ENABLED_OPEN; // state when opened by the assigned
-            $defaults->stateprofile[] = ENABLED_RESOLVING; // state when asigned tells he starts processing
-            // $defaults->stateprofile[] = ENABLED_WAITING; // state when ticket is blocked by an external cause
-            $defaults->stateprofile[] = ENABLED_RESOLVED; // state when issue has an identified solution provided by assignee
-            $defaults->stateprofile[] = ENABLED_ABANDONNED; // state when issue is no more relevant by external cause
-            // $defaults->stateprofile[] = ENABLED_TESTING; // state when assignee submits issue to requirer and needs acknowledge
-            // $defaults->stateprofile[] = ENABLED_PUBLISHED; // state when solution is realy published in production (not testing)
-            // $defaults->stateprofile[] = ENABLED_VALIDATED; // state when all is clear and acknowledge from requirer in production
+            $defaults->stateprofile[] = ENABLED_OPEN; // State when opened by the assigned.
+            $defaults->stateprofile[] = ENABLED_RESOLVING; // State when asigned tells he starts processing.
+            $defaults->stateprofile[] = ENABLED_RESOLVED; // State when issue has an identified solution provided by assignee.
+            $defaults->stateprofile[] = ENABLED_ABANDONNED; // State when issue is no more relevant by external cause.
         } else {
             $defaults->stateprofile = array();
-            if ($defaults->enabledstates & ENABLED_OPEN) $defaults->stateprofile[] = ENABLED_OPEN;
-            if ($defaults->enabledstates & ENABLED_RESOLVING) $defaults->stateprofile[] = ENABLED_RESOLVING;
-            if ($defaults->enabledstates & ENABLED_WAITING) $defaults->stateprofile[] = ENABLED_WAITING;
-            if ($defaults->enabledstates & ENABLED_RESOLVED) $defaults->stateprofile[] = ENABLED_RESOLVED;
-            if ($defaults->enabledstates & ENABLED_ABANDONNED) $defaults->stateprofile[] = ENABLED_ABANDONNED;
-            if ($defaults->enabledstates & ENABLED_TESTING) $defaults->stateprofile[] = ENABLED_TESTING;
-            if ($defaults->enabledstates & ENABLED_PUBLISHED) $defaults->stateprofile[] = ENABLED_PUBLISHED;
-            if ($defaults->enabledstates & ENABLED_VALIDATED) $defaults->stateprofile[] = ENABLED_VALIDATED;
+            if ($defaults->enabledstates & ENABLED_OPEN) {
+                $defaults->stateprofile[] = ENABLED_OPEN;
+            }
+            if ($defaults->enabledstates & ENABLED_RESOLVING) {
+                $defaults->stateprofile[] = ENABLED_RESOLVING;
+            }
+            if ($defaults->enabledstates & ENABLED_WAITING) {
+                $defaults->stateprofile[] = ENABLED_WAITING;
+            }
+            if ($defaults->enabledstates & ENABLED_RESOLVED) {
+                $defaults->stateprofile[] = ENABLED_RESOLVED;
+            }
+            if ($defaults->enabledstates & ENABLED_ABANDONNED) {
+                $defaults->stateprofile[] = ENABLED_ABANDONNED;
+            }
+            if ($defaults->enabledstates & ENABLED_TESTING) {
+                $defaults->stateprofile[] = ENABLED_TESTING;
+            }
+            if ($defaults->enabledstates & ENABLED_PUBLISHED) {
+                $defaults->stateprofile[] = ENABLED_PUBLISHED;
+            }
+            if ($defaults->enabledstates & ENABLED_VALIDATED) {
+                $defaults->stateprofile[] = ENABLED_VALIDATED;
+            }
         }
 
         parent::set_data($defaults);
 
     }
 
-    function definition_after_data() {
-      $mform    =& $this->_form;
+    public function definition_after_data() {
+        $mform =& $this->_form;
     }
 
-    function validation($data, $files = null) {
+    public function validation($data, $files = null) {
         $errors = array();
         return $errors;
     }

@@ -21,19 +21,12 @@
  * @copyright  2013 Ankit Agarwal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace mod_tracker\event;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Event for when a tracker activity is viewed.
- *
- * @property-read array $other {
- *      Extra information about event.
- *
- *      @type int anonymous if flashcard is anonymous.
- *      @type int cmid course module id.
- * }
  *
  * @package    mod_tracker
  * @since      Moodle 2.7
@@ -52,4 +45,3 @@ class course_module_edited extends \core\event\course_module_viewed {
         $this->data['objecttable'] = 'tracker';
     }
 }
-
