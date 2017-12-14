@@ -108,7 +108,7 @@ if ($data = $form->get_data()) {
     }
 
     tracker_clearelements($issue->id);
-    tracker_recordelements($issue, $issue);
+    tracker_recordelements($issue, $data);
 
     $dependancies = optional_param_array('dependancies', null, PARAM_INT);
     if (is_array($dependancies)) {

@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->version  = 2017081700;  // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2016052300;
 $plugin->component = 'mod_tracker';   // Full name of the plugin (used for diagnostics).
-$plugin->maturity = MATURITY_BETA;
+$plugin->maturity = MATURITY_STABLE;
 $plugin->release = '3.1.0 (Build 2017081700)';
 $plugin->dependencies = array('local_vflibs' => 2016081100);
 
