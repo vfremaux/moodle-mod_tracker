@@ -41,7 +41,7 @@ $plugin->codeincrement = '3.2.0002';
 $plugin->version  = 2017081700;  // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2017050500;
 $plugin->component = 'mod_tracker';   // Full name of the plugin (used for diagnostics).
-$plugin->maturity = MATURITY_RC;
+$plugin->maturity = MATURITY_STABLE;
 $plugin->release = '3.3.0 (Build 2017081700)';
 $plugin->dependencies = array('local_vflibs' => 2016081100);
 
