@@ -621,7 +621,7 @@ Tracker : <%%TRACKERNAME%%>
 ------------------------------------------
 See the ticket : <%%ISSUEURL%%>
 Unregister from ticket : <%%UNCCURL%%>
-Unregister fromm all tickets in this tracker : <%%ALLUNCCURL%%>';
+Unregister from all tickets in this tracker : <%%ALLUNCCURL%%>';
 
 $string['addcomment_html_tpl'] = '
 <b>Cours :</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br/>
@@ -633,8 +633,8 @@ $string['addcomment_html_tpl'] = '
 <p><%%COMMENT%%></p>
 <hr/>
 <p><a href="<%%ISSUEURL%%>">See the ticket</a><br/>
-<a href="<%%UNCCURL%%>">Se désabonner du défaut</a><br/>
-<a href="<%%ALLUNCCURL%%>">Se désabonner de ce tracker</a></p>';
+<a href="<%%UNCCURL%%>">Unregister from this ticket</a><br/>
+<a href="<%%ALLUNCCURL%%>">Unregister from this tracker</a></p>';
 
 $string['issuemoved_tpl'] = '
 The following ticket:
