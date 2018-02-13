@@ -98,13 +98,10 @@ echo $OUTPUT->header();
 
 $view = 'reportanissue';
 echo $renderer->tabs($view, $screen, $tracker, $cm);
-<<<<<<< HEAD
-=======
 
 $formdata = new StdClass;
 $formdata->id = $id;
 $form->set_data($formdata);
->>>>>>> MOODLE_33_STABLE
 $form->display();
 
 echo $OUTPUT->footer();

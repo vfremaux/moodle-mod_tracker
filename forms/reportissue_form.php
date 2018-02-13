@@ -108,40 +108,6 @@ class TrackerIssueForm extends moodleform {
                 $mform->addElement('hidden', 'assignedto');
                 $mform->setType('assignedto', PARAM_INT);
             }
-<<<<<<< HEAD
-
-            // Status.
-            $statuskeys = tracker_get_statuskeys($tracker);
-            $mform->addElement('select', 'status', get_string('status', 'tracker'), $statuskeys);
-
-            // Dependencies.
-            $dependencies = tracker_getpotentialdependancies($tracker->id, $this->_customdata['issueid']);
-            if (!empty($dependencies)) {
-                foreach ($dependencies as $dependency) {
-                    $summary = shorten_text(format_string($dependency->summary));
-                    $dependenciesmenu[$dependency->id] = "{$tracker->ticketprefix}{$dependency->id} - ".$summary;
-                }
-                $select = &$mform->addElement('select', 'dependencies', get_string('dependson', 'tracker'), $dependenciesmenu);
-                $select->setMultiple(true);
-            } else {
-                $mform->addElement('static', 'dependenciesshadow', get_string('dependson', 'tracker'), get_string('nopotentialdeps', 'tracker'));
-            }
-
-            $mform->addelement('header', 'resolutionhdr', get_string('resolution', 'tracker'), '');
-            $mform->addElement('editor', 'resolution_editor', get_string('resolution', 'tracker'), $this->editoroptions);
-
-        }
-
-        $this->add_action_buttons();
-    }
-
-    public function set_data($defaults) {
-
-        $defaults->description_editor['text'] = $defaults->description;
-        $defaults->description_editor['format'] = $defaults->descriptionformat;
-        $defaults = file_prepare_standard_editor($defaults, 'description', $this->editoroptions, $this->context, 'mod_tracker',
-                                                 'issuedescription', $defaults->issueid);
-=======
 
             // Status.
             $statuskeys = tracker_get_statuskeys($tracker);
@@ -188,34 +154,6 @@ class TrackerIssueForm extends moodleform {
                                                  'issueresolution', @$defaults->issueid);
 
         parent::set_data($defaults);
-    }
-
-    public function validate($data, $files = array()) {
-
-        $errors = array();
->>>>>>> MOODLE_33_STABLE
-
-        // Something to prepare for each element ?
-        if (!empty($this->elements)) {
-            foreach ($this->elements as $element) {
-<<<<<<< HEAD
-                $element->set_data($defaults, $this->_customdata['issueid']);
-            }
-        }
-
-        $defaults->resolution_editor['text'] = $defaults->resolution;
-        $defaults->resolution_editor['format'] = $defaults->resolutionformat;
-        $defaults = file_prepare_standard_editor($defaults, 'resolution', $this->editoroptions, $this->context, 'mod_tracker',
-                                                 'issueresolution', $defaults->issueid);
-
-        parent::set_data($defaults);
-=======
-                $errors = array_merge($errors, $element->validate($data, $files));
-            }
-        }
-
-        return $errors;
->>>>>>> MOODLE_33_STABLE
     }
 
     public function validate($data, $files = array()) {

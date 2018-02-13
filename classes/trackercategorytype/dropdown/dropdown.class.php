@@ -98,11 +98,7 @@ class dropdownelement extends trackerelement {
                         }
                     }
                 } else {
-<<<<<<< HEAD
-                    $v = $values; // Single value.
-=======
                     $v = ''.$values; // Single value.
->>>>>>> MOODLE_33_STABLE
                     if (array_key_exists($v, $this->options)) {
                         // Check option still exists.
                         $defaults->$elementname = $v;

@@ -224,13 +224,8 @@ $string['manager'] = 'Mes ressources ';
 $string['me'] = 'Mon profil';
 $string['message_bugtracker'] = 'Merci pour votre contribution à l\'amélioration générale du service.';
 $string['message_taskspread'] = 'Vous venez de définir une tâche. Pour finaliser votre action, n\'oubliez pas de l\'assigner à un destinataire.';
-<<<<<<< HEAD
-$string['message_ticketting'] = 'Nous avons bien enregistré votre demande. Elle a été assignée à {$a}.';
-$string['message_ticketting_preassigned'] = 'Nous avons bien enregistré votre demande. Elle sera traitée très prochainement.';
-=======
 $string['message_ticketting'] = 'Nous avons bien enregistré votre demande.';
 $string['message_ticketting_preassigned'] = 'Nous avons bien enregistré votre demande. Elle sera traitée très prochainement. Elle a été assignée à {$a}.';
->>>>>>> MOODLE_33_STABLE
 $string['mode_bugtracker'] = 'Traqueur de défauts';
 $string['mode_customized'] = 'Gestionnaire customisé';
 $string['mode_taskspread'] = 'Distribution de tâches individuelles';
@@ -739,11 +734,7 @@ $string['statechanged_html_tpl'] = '
 <a href="<%%ALLUNCCURL%%>">Se désabonner de ce tracker</a></p>
 ';
 
-<<<<<<< HEAD
-$string['submission'] = '
-=======
 $string['submission_tpl'] = '
->>>>>>> MOODLE_33_STABLE
 Cours : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 Tracker : <%%TRACKERNAME%%>
 --------------------------------------

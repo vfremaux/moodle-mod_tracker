@@ -44,15 +44,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Update an issue ********************************************************************.
-<<<<<<< HEAD
-
-if ($action == 'updateanissue') {
-
-=======
 
 if ($action == 'updateanissue') {
     /* obsolete path
->>>>>>> MOODLE_33_STABLE
     $issue = new StdClass;
 
     $issue->id = required_param('issueid', PARAM_INT);
@@ -73,13 +67,10 @@ if ($action == 'updateanissue') {
     $issue->resolution = file_save_draft_area_files($issue->resolution_editor['itemid'], $context->id, 'mod_tracker',
                                                     'issueresolution', $issue->id, $editoroptions,
                                                     $issue->resolution_editor['text']);
-<<<<<<< HEAD
-=======
 
     if (!empty($issue->resolution)) {
         $issue->status = RESOLVED;
     }
->>>>>>> MOODLE_33_STABLE
 
     $issue->datereported = required_param('datereported', PARAM_INT);
 
@@ -152,11 +143,8 @@ if ($action == 'updateanissue') {
             }
         }
     }
-<<<<<<< HEAD
-=======
     */
     throw new coding_exception('This use case has been moved to editanissue.php. The code should never reach this point.');
->>>>>>> MOODLE_33_STABLE
 } else if ($action == 'delete') {
 
     // Delete an issue record ***************************************************************.

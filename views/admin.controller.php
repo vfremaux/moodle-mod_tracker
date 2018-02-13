@@ -180,15 +180,10 @@ if ($action == 'submitelementoption') {
     $out .= $OUTPUT->heading($caption . $OUTPUT->help_icon('options', 'tracker', false));
 
     $out .= $renderer->edit_option_form($cm, $form, 'submit', @$errors);
-<<<<<<< HEAD
-
-    return -1;
-=======
     echo $OUTPUT->header();
     echo $out;
     echo $OUTPUT->footer();
     die;
->>>>>>> MOODLE_33_STABLE
 }
 
 if ($action == 'viewelementoptions') {
@@ -255,14 +250,10 @@ if ($action == 'deleteelementoption') {
 
     $out .= $renderer->edit_option_form($cm, $form, @$errors);
 
-<<<<<<< HEAD
-    return -1;
-=======
     echo $OUTPUT->header();
     echo $out;
     echo $OUTPUT->footer();
     die;
->>>>>>> MOODLE_33_STABLE
 }
 
 if ($action == 'editelementoption') {
@@ -388,13 +379,10 @@ if ($action == 'moveelementoptionup') {
 
     $out .= $renderer->edit_option_form($cm, $form, 'submit', @$errors);
 
-<<<<<<< HEAD
-=======
     echo $OUTPUT->header();
     echo $out;
     echo $OUTPUT->footer();
     die;
->>>>>>> MOODLE_33_STABLE
     return -1;
 }
 
@@ -434,14 +422,11 @@ if ($action == 'moveelementoptiondown') {
 
     $out .= $renderer->edit_option_form($cm, $form, 'submit', @$errors);
 
-<<<<<<< HEAD
-=======
     echo $OUTPUT->header();
     echo $out;
     echo $OUTPUT->footer();
     die;
 
->>>>>>> MOODLE_33_STABLE
     return -1;
 }
 

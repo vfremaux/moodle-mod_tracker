@@ -89,23 +89,18 @@ if ($data = $form->get_data()) {
     $stc->statusto = POSTED;
     $DB->insert_record('tracker_state_change', $stc);
 
-<<<<<<< HEAD
-=======
     if ($stc->statusto == RESOLVED || $stc->statusto == PUBLISHED) {
         assert(1);
         // Check if was cascaded and needs backreported then backreport.
         // TODO : backreport to original.
     }
 
->>>>>>> MOODLE_33_STABLE
     // Notify all admins.
     if ($tracker->allownotifications) {
         tracker_notify_submission($issue, $cm, $tracker);
         if ($issue->assignedto) {
             tracker_notifyccs_changeownership($issue->id, $tracker);
         }
-<<<<<<< HEAD
-=======
 
         if (@$issue->oldstatus != $issue->status) {
             tracker_notifyccs_changestate($issue->id, $tracker);
@@ -132,7 +127,6 @@ if ($data = $form->get_data()) {
                 print_error('cannotwritedependancy', 'tracker');
             }
         }
->>>>>>> MOODLE_33_STABLE
     }
 
     $params = array('id' => $cm->id,
@@ -146,14 +140,8 @@ if ($data = $form->get_data()) {
 echo $output;
 
 // Transfer ids to proper form attributes.
-<<<<<<< HEAD
-$issue->issueid = $issue->id;
-$issue->id = $cm->id;
-$form->set_data($issue);
-=======
 $formdata = clone($issue);
 $formdata->issueid = $issue->id;
 $formdata->id = $cm->id;
 $form->set_data($formdata);
->>>>>>> MOODLE_33_STABLE
 $form->display();

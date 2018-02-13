@@ -251,22 +251,24 @@ if (!empty($issues)) {
         }
         $status = '<div class="status-'.$statuscodes[$issue->status].'" class="tracker-status">'.$status.'</div>';
         $hassolution = $issue->status == RESOLVED && !empty($issue->resolution);
-        $pixurl = $OUTPUT->pix_url('solution', 'tracker');
         $alt = get_string('hassolution', 'tracker');
-        $solution = ($hassolution) ? '<img src="'.$pixurl.'" height="15" alt="'.$alt.'" />' : '';
+        $pix = $OUTPUT->pix_icon('solution', $alt, 'mod_tracker');
+        $solution = ($hassolution) ? $pix : '';
         $actions = '';
         if (has_capability('mod/tracker:manage', $context) ||
                 has_capability('mod/tracker:resolve', $context)) {
             $params = array('id' => $cm->id, 'view' => 'resolved', 'issueid' => $issue->id, 'screen' => 'editanissue');
             $actionurl = new moodle_url('/mod/tracker/view.php', $params);
-            $pix = '<img src="'.$OUTPUT->pix_url('t/edit', 'core').'" />';
-            $actions = '<a href="'.$actionurl.'" title="'.get_string('update').'" >'.$pix.'</a>';
+            $alt = get_string('update');
+            $pix = $OUTPUT->pix_icon('t/edit', $alt, 'core');
+            $actions = '<a href="'.$actionurl.'" title="'.$alt.'" >'.$pix.'</a>';
         }
         if (has_capability('mod/tracker:manage', $context)) {
             $params = array('id' => $cm->id, 'view' => 'resolved', 'issueid' => $issue->id, 'what' => 'delete');
             $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
-            $pix = '<img src="'.$OUTPUT->pix_url('t/delete', 'core').'" />';
-            $actions .= '&nbsp;<a href="'.$deleteurl.'" title="'.get_string('delete').'" >'.$pix.'</a>';
+            $alt = get_string('delete');
+            $pix = $OUTPUT->pix_icon('t/delete', $alt, 'core');
+            $actions .= '&nbsp;<a href="'.$deleteurl.'" title="'.$alt.'" >'.$pix.'</a>';
         }
         // Ergo Report I3 2012 => self list displays owned tickets. Already registered.
         if (tracker_supports_feature('priority/askraise')) {
@@ -275,8 +277,9 @@ if (!empty($issues)) {
                             !has_capability('mod/tracker:managepriority', $context)) {
                 $params = array('id' => $cm->id, 'issueid' => $issue->id);
                 $raiseurl = new moodle_url('/mod/tracker/pro/raiserequest.php', $params);
-                $pix = '<img src="'.$OUTPUT->pix_url('askraise', 'mod_tracker').'" />';
-                $actions .= '&nbsp;<a href="'.$raiseurl.'" title="'.get_string('askraise', 'tracker').'" >'.$pix.'</a>';
+                $alt = get_string('askraise', 'tracker');
+                $pix = $OUTPUT->pix_icon('askraise', $alt, 'mod_tracker');
+                $actions .= '&nbsp;<a href="'.$raiseurl.'" title="'..'" >'.$pix.'</a>';
             }
         }
         if (!empty($tracker->parent)) {

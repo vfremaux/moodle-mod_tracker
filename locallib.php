@@ -1010,8 +1010,6 @@ function tracker_submitanissue(&$tracker, &$data) {
     $issue->summary = $data->summary;
     $issue->description = $data->description_editor['text'];
     $issue->descriptionformat = $data->description_editor['format'];
-<<<<<<< HEAD
-=======
     if (isset($data->resolution_editor)) {
         $issue->resolution = $data->resolution_editor['text'];
         $issue->resolutionformat = $data->resolution_editor['format'];
@@ -1019,23 +1017,12 @@ function tracker_submitanissue(&$tracker, &$data) {
         $issue->resolution = '';
         $issue->resolutionformat = FORMAT_MOODLE;
     }
->>>>>>> MOODLE_33_STABLE
 
     $issue->assignedto = $tracker->defaultassignee;
     $issue->bywhomid = 0;
     $issue->trackerid = $tracker->id;
     $issue->reportedby = $USER->id;
 
-<<<<<<< HEAD
-    if (empty($data->id)) {
-        $issue->status = POSTED;
-
-        // Fetch max actual priority.
-        $select = " trackerid = ? GROUP BY trackerid ";
-        $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', $select, array($tracker->id));
-        $issue->resolutionpriority = $maxpriority + 1;
-
-=======
     if (empty($data->issueid)) {
         $issue->status = POSTED;
 
@@ -1044,7 +1031,6 @@ function tracker_submitanissue(&$tracker, &$data) {
         $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', $select, array($tracker->id));
         $issue->resolutionpriority = $maxpriority + 1;
 
->>>>>>> MOODLE_33_STABLE
         $issue->id = $DB->insert_record('tracker_issue', $issue);
         $data->issueid = $issue->id;
 
@@ -1052,19 +1038,12 @@ function tracker_submitanissue(&$tracker, &$data) {
         tracker_register_cc($tracker, $issue, $issue->reportedby);
 
     } else {
-<<<<<<< HEAD
-        $issue->id = $data->id;
-        $issue->status = $data->status;
-        $issue->resolution = $data->resolution_editor['text'];
-        $issue->resolutionformat = $data->resolution_editor['format'];
-=======
         $issue->oldstatus = $DB->get_field('tracker_issue', 'status', array('id' => $data->issueid));
 
         $issue->id = $data->issueid;
         $issue->status = $data->status;
         $issue->resolution = @$data->resolution_editor['text'];
         $issue->resolutionformat = @$data->resolution_editor['format'];
->>>>>>> MOODLE_33_STABLE
 
         $issue->id = $DB->update_record('tracker_issue', $issue);
     }
@@ -1419,12 +1398,9 @@ function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = 
                 echo "Sending Raise Request Mail Notification to ".fullname($manager).'<br/>'.$notificationhtml;
             }
             $subject = get_string('raiserequestcaption', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
-<<<<<<< HEAD
-=======
             if ($CFG->debugsmtp) {
                 echo "Sending Raise Request Mail Notification to ".fullname($ccuser)."<br/><pre>Subject: $subject\n########\n".shorten_text($notification, 160).'</pre>';
             }
->>>>>>> MOODLE_33_STABLE
             email_to_user($manager, $USER, $subject, $notification, $notificationhtml);
         }
     }
@@ -1476,10 +1452,7 @@ function tracker_notify_submission($issue, &$cm, $tracker = null) {
                     'issueid' => $issue->id,
                     'what' => 'register');
     $ccurl = new moodle_url('/mod/tracker/view.php', $params);
-<<<<<<< HEAD
-=======
 
->>>>>>> MOODLE_33_STABLE
     if (!empty($managers)) {
         $vars = array('COURSE_SHORT' => $COURSE->shortname,
                       'COURSENAME' => format_string($COURSE->fullname),
@@ -1495,18 +1468,11 @@ function tracker_notify_submission($issue, &$cm, $tracker = null) {
         foreach ($managers as $manager) {
             $notification = tracker_compile_mail_template('submission', $vars, $manager->lang);
             $notificationhtml = tracker_compile_mail_template('submission_html', $vars, $manager->lang);
-<<<<<<< HEAD
-            if ($CFG->debugsmtp) {
-                echo "Sending Submission Mail Notification to ".fullname($manager).'<br/>'.$notificationhtml;
-            }
-            $subject = get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
-=======
             $subject = get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
 
             if ($CFG->debugsmtp) {
                 echo "Sending Submission Mail Notification to ".fullname($manager)."<br/><pre>Subject: $subject\n########\n".shorten_text($notification, 160).'</pre>';
             }
->>>>>>> MOODLE_33_STABLE
             email_to_user($manager, $USER, $subject, $notification, $notificationhtml);
         }
     }
@@ -1554,12 +1520,9 @@ function tracker_notifyccs_changeownership($issueid, $tracker = null) {
             $notification = tracker_compile_mail_template('ownershipchanged', $vars, $ccuser->lang);
             $notificationhtml = tracker_compile_mail_template('ownershipchanged_html', $vars, $ccuser->lang);
             $subject = get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
-<<<<<<< HEAD
-=======
             if ($CFG->debugsmtp) {
                 echo "Sending Ownership change Mail Notification to ".fullname($ccuser)."<br/><pre>Subject: $subject\n##############\n".shorten_text($notification, 160).'</pre>';
             }
->>>>>>> MOODLE_33_STABLE
             email_to_user($ccuser, $USER, $subject, $notification, $notificationhtml);
         }
     }
@@ -1608,12 +1571,9 @@ function tracker_notifyccs_moveissue($issueid, $tracker, $newtracker = null) {
             $notification = tracker_compile_mail_template('issuemoved', $vars, 'tracker', $ccuser->lang);
             $notificationhtml = tracker_compile_mail_template('issuemoved_html', $vars, 'tracker', $ccuser->lang);
             $subject = get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
-<<<<<<< HEAD
-=======
             if ($CFG->debugsmtp) {
                 echo "Sending CC Notification Mail to ".fullname($ccuser)."<br/><pre>Subject: $subject\n##############\n".shorten_text($notification, 160).'</pre>';
             }
->>>>>>> MOODLE_33_STABLE
             email_to_user($ccuser, $USER, $subject, $notification, $notificationhtml);
         }
     }
@@ -1743,12 +1703,9 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
 
             if (!empty($notification)) {
                 $subject = get_string('trackereventchanged', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
-<<<<<<< HEAD
-=======
                 if ($CFG->debugsmtp) {
                     echo "Sending State Change Mail Notification to ".fullname($ccuser)."<br/><pre>Subject: $subject\n#############\n".shorten_text($notification, 160).'</pre>';
                 }
->>>>>>> MOODLE_33_STABLE
                 email_to_user($ccuser, $USER, $subject, $notification, $notificationhtml);
             }
         }
@@ -1796,12 +1753,9 @@ function tracker_notifyccs_comment($issueid, $comment, $tracker = null) {
                 $notification = tracker_compile_mail_template('addcomment', $vars, $ccuser->lang);
                 $notificationhtml = tracker_compile_mail_template('addcomment_html', $vars, $ccuser->lang);
                 $subject = get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
-<<<<<<< HEAD
-=======
                 if ($CFG->debugsmtp) {
                     echo "Sending Comment Input Mail Notification to ".fullname($ccuser)."<br/><pre>Subject: $subject\n#############\n".shorten_text($notification, 160).'</pre>';
                 }
->>>>>>> MOODLE_33_STABLE
                 email_to_user($ccuser, $USER, $subject, $notification, $notificationhtml);
             }
         }

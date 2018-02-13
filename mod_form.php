@@ -47,7 +47,7 @@ class mod_tracker_mod_form extends moodleform_mod {
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
-        $this->standard_intro_elements(true, get_string('intro', 'tracker'));
+        $this->standard_intro_elements();
 
         $modeoptions['bugtracker'] = get_string('mode_bugtracker', 'tracker');
         $modeoptions['ticketting'] = get_string('mode_ticketting', 'tracker');
@@ -91,16 +91,6 @@ class mod_tracker_mod_form extends moodleform_mod {
         $mform->addElement('checkbox', 'strictworkflow', get_string('strictworkflow', 'tracker'));
         $mform->addHelpButton('strictworkflow', 'strictworkflow', 'tracker');
 
-<<<<<<< HEAD
-        $context = context_module::instance($this->_cm->id);
-        $fields = 'u.id,'.get_all_user_name_fields(true, 'u');
-        $order = 'lastname, firstname';
-        if (isset($this->_cm->id) &&
-                $assignableusers = get_users_by_capability($context, 'mod/tracker:resolve', $fields, $order)) {
-            $useropts[0] = get_string('none');
-            foreach ($assignableusers as $assignable) {
-                $useropts[$assignable->id] = fullname($assignable);
-=======
         if (isset($this->_cm->id)) {
             $context = context_module::instance($this->_cm->id);
             $fields = 'u.id,'.get_all_user_name_fields(true, 'u');
@@ -116,7 +106,6 @@ class mod_tracker_mod_form extends moodleform_mod {
                 $mform->setAdvanced('defaultassignee');
             } else {
                 $mform->addElement('hidden', 'defaultassignee', 0);
->>>>>>> MOODLE_33_STABLE
             }
         } else {
             $mform->addElement('hidden', 'defaultassignee', 0);

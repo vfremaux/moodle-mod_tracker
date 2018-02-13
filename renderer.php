@@ -29,19 +29,6 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
     public function core_issue(&$issue, &$tracker) {
         global $CFG, $COURSE, $DB;
-<<<<<<< HEAD
-
-        $statuskeys = tracker_get_statuskeys($tracker);
-        $statuscodes = tracker_get_statuscodes();
-
-        $str = '';
-
-        $str .= '<tr valign="top">';
-        $str .= '<td colspan="4" align="left" class="tracker-issue-summary">';
-        $str .= format_string($issue->summary);
-        $str .= '</td>';
-        $str .= '</tr>';
-=======
 
         $statuskeys = tracker_get_statuskeys($tracker);
         $statuscodes = tracker_get_statuscodes();
@@ -49,7 +36,6 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $template = new Stdclass;
 
         $template->summary = format_string($issue->summary);
->>>>>>> MOODLE_33_STABLE
 
         if ($issue->downlink) {
             $access = true;
@@ -71,19 +57,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     $DB->set_field('tracker_issue', 'downlink', '', array('id' => $issue->id));
                 }
             } else {
-<<<<<<< HEAD
-                $link = $this->remote_link($hostid, $instanceid, $issueid);
-            }
-
-            if (!empty($link)) {
-                $str .= '<tr valign="top">';
-                $str .= '<td colspan="4" align="left" class="tracker-issue-downlink">';
-                $str .= $link;
-                $str .= '</td>';
-                $str .= '</tr>';
-=======
                 $template->downlink = $this->remote_link($hostid, $instanceid, $issueid);
->>>>>>> MOODLE_33_STABLE
             }
         }
 
@@ -115,61 +89,6 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     $DB->update_record('tracker_issue', $issue);
                 }
             } else {
-<<<<<<< HEAD
-                $link = $this->remote_link($hostid, $instanceid, $issueid);
-            }
-
-            if (!empty($link)) {
-                $str .= '<tr valign="top">';
-                $str .= '<td colspan="4" align="left" class="tracker-issue-downlink">';
-                $str .= $link;
-                $str .= '</td>';
-                $str .= '</tr>';
-            }
-        }
-
-        $str .= '<tr valign="top">';
-        $str .= '<td align="right" width="25%" class="tracker-issue-param">';
-        $str .= '<b>'.get_string('issuenumber', 'tracker').'</b><br />';
-        $str .= '</td>';
-        $str .= '<td width="25%" class="tracker-issue-value">';
-        $str .= $tracker->ticketprefix.$issue->id;
-        $str .= '</td>';
-        $str .= '<td align="right" width="25%" class="tracker-issue-param" >';
-        $str .= '<b>'.get_string('status', 'tracker').':</b>';
-        $str .= '</td>';
-        $str .= '<td width="25%" class="status-'.$statuscodes[$issue->status].' tracker-issue-value">';
-        $str .= '<b>'.$statuskeys[$issue->status].'</b>';
-        $str .= '</td>';
-        $str .= '</tr>';
-
-        $str .= '<tr valign="top">';
-        $str .= '<td align="right" width="25%" class="tracker-issue-param">';
-        $str .= '<b>'.get_string('reportedby', 'tracker').':</b>';
-        $str .= '</td>';
-        $str .= '<td width="25%" class="tracker-issue-value">';
-        $str .= $this->output->user_picture($issue->reporter);
-        $str .= '&nbsp;'.fullname($issue->reporter);
-        $str .= '</td>';
-        $str .= '<td align="right" width="25%" class="tracker-issue-param" >';
-        $str .= '<b>'.get_string('datereported', 'tracker').':</b>';
-        $str .= '</td>';
-        $str .= '<td width="25%" class="tracker-issue-value">';
-        $str .= userdate($issue->datereported);
-        $str .= '</td>';
-        $str .= '</tr>';
-
-        $str .= '<tr valign="top">';
-        $str .= '<td align="right" width="25%" class="tracker-issue-param">';
-        $str .= '<b>'.get_string('assignedto', 'tracker').':</b>';
-        $str .= '</td>';
-        $str .= '<td width="25%" class="tracker-issue-value">';
-        if (!$issue->owner) {
-            $str .= get_string('unassigned', 'tracker');
-        } else {
-            $str .= $this->output->user_picture($issue->owner, array('courseid' => $COURSE->id, 'size' => 35));
-            $str .= '&nbsp;'.fullname($issue->owner);
-=======
                 $template->uplink = $this->remote_link($hostid, $instanceid, $issueid);
             }
         }
@@ -194,28 +113,14 @@ class mod_tracker_renderer extends plugin_renderer_base {
             $str = $this->output->user_picture($issue->owner, array('courseid' => $COURSE->id, 'size' => 35));
             $str .= '&nbsp;'.fullname($issue->owner);
             $template->assignedto = $str;
->>>>>>> MOODLE_33_STABLE
         }
         $template->strcced = get_string('cced', 'tracker');
         $template->ccscount = (empty($ccs) || count(array_keys($ccs)) == 0) ? 0 : count($ccs);
 
-<<<<<<< HEAD
-        $str .= '<tr valign="top">';
-        $str .= '<td align="right" width="25%" class="tracker-issue-param">';
-        $str .= '<b>'.get_string('description').':</b>';
-        $str .= '</td>';
-        $str .= '<td align="left" colspan="3" width="75%" class="tracker-issue-value">';
-        $str .= format_text($issue->description);
-        $str .= '</td>';
-        $str .= '</tr>';
-
-        return $str;
-=======
         $template->strdescription = get_string('description');
         $template->description = format_text($issue->description);
 
         return $this->render_from_template('mod_tracker/coreissue', $template);
->>>>>>> MOODLE_33_STABLE
     }
 
     public function edit_link($issue, $cm) {
@@ -390,11 +295,11 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 $jshandler = 'this.target=\'message\';';
                 $jshandler .= 'return openpopup(\'/message/discussion.php?id={$user->id}\', \'message\',';
                 $jshandler .= '\'menubar=0,location=0,scrollbars,status,resizable,width=400,height=500\', 0);';
-                $pix = '<img src="'.$this->output->pix_url('t/message', 'core').'">';
+                $pix = $this->output->pix_icon('t/message', '', 'core');
                 $str .= '&nbsp;<a href="" onclick="'.$jshandler.'" >'.$pix.'</a>';
             } else if (!$user->emailstop && $user->maildisplay) {
                 $str .= '&nbsp;<a href="'.$userurl.'">'.fullname($user).'</a>';
-                $str .= '&nbsp;<a href="mailto:'.$user->email.'"><img src="'.$this->output->pix_url('t/mail', 'core').'"></a>';
+                $str .= '&nbsp;<a href="mailto:'.$user->email.'">'.$this->output->pix_icon('t/mail', '', 'core').'</a>';
             } else {
                 $str .= '&nbsp;'.fullname($user);
             }
@@ -433,7 +338,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                                 'issueid' => $issue->id,
                                 'ccid' => $cc->userid);
                 $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$this->output->pix_url('t/delete', 'core').'" />';
+                $pix = $this->output->pix_icon('t/delete', '', 'core');
                 $str .= '&nbsp;<a href="'.$deleteurl.'" title="'.get_string('delete').'">'.$pix.'</a>';
             }
             $str .= '</td>';
@@ -536,20 +441,12 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 $str .= $this->user($bywhom);
                 $str .= '</td>';
                 $str .= '<td align="left">';
-<<<<<<< HEAD
-                $str .= '<span class="status_'.$statuscodes[$state->statusfrom].'">'.$statuskeys[$state->statusfrom].'</span>';
-=======
                 $str .= '<span class="status-'.$statuscodes[$state->statusfrom].'">'.$statuskeys[$state->statusfrom].'</span>';
->>>>>>> MOODLE_33_STABLE
                 $str .= '</td>';
                 $str .= '<td align="left">';
                 $str .= '</td>';
                 $str .= '<td align="left">';
-<<<<<<< HEAD
-                $str .= '<span class="status_'.$statuscodes[$state->statusto].'">'.$statuskeys[$state->statusto].'</span>';
-=======
                 $str .= '<span class="status-'.$statuscodes[$state->statusto].'">'.$statuskeys[$state->statusto].'</span>';
->>>>>>> MOODLE_33_STABLE
                 $str .= '</td>';
                 $str .= '</tr>';
             }
@@ -648,11 +545,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
                 if (tracker_has_assigned($tracker, false)) {
                     $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'mywork');
-<<<<<<< HEAD
-                    $taburl = new moodle_url('/mod/trackeR/view.php', $params);
-=======
                     $taburl = new moodle_url('/mod/tracker/view.php', $params);
->>>>>>> MOODLE_33_STABLE
                     $rows[1][] = new tabobject('mywork', $taburl, get_string('mywork', 'tracker'));
                 }
 
@@ -662,10 +555,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     $rows[1][] = new tabobject('browse', $taburl, get_string('browse', 'tracker'));
                 }
 
-<<<<<<< HEAD
-=======
                 /*
->>>>>>> MOODLE_33_STABLE
                 if ($tracker->supportmode == 'bugtracker') {
                     $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'search');
                     $taburl = new moodle_url('/mod/tracker/view.php', $params);
@@ -721,7 +611,6 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     $params = array('id' => $cm->id, 'view' => 'profile', 'screen' => 'myqueries');
                     $taburl = new moodle_url('/mod/tracker/view.php', $params);
                     $rows[1][] = new tabobject('myqueries', $taburl, get_string('myqueries', 'tracker'));
-<<<<<<< HEAD
                 }
                 break;
             }
@@ -742,28 +631,6 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     $taburl = new moodle_url('/mod/tracker/view.php', $params);
                     $rows[1][] = new tabobject('evolution', $taburl, get_string('evolution', 'tracker'));
                 }
-=======
-                }
-                break;
-            }
-
-            case 'reports': {
-                if (!preg_match("/status|evolution|print/", $screen)) {
-                    $screen = 'status';
-                }
-
-                if (tracker_supports_feature('reports/status')) {
-                    $params = array('id' => $cm->id, 'view' => 'reports', 'screen' => 'status');
-                    $taburl = new moodle_url('/mod/tracker/view.php', $params);
-                    $rows[1][] = new tabobject('status', $taburl, get_string('status', 'tracker'));
-                }
-
-                if (tracker_supports_feature('reports/evolution')) {
-                    $params = array('id' => $cm->id, 'view' => 'reports', 'screen' => 'evolution');
-                    $taburl = new moodle_url('/mod/tracker/view.php', $params);
-                    $rows[1][] = new tabobject('evolution', $taburl, get_string('evolution', 'tracker'));
-                }
->>>>>>> MOODLE_33_STABLE
 
                 if (tracker_supports_feature('reports/print')) {
                     $params = array('id' => $cm->id, 'view' => 'reports', 'screen' => 'print');
@@ -986,7 +853,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                                 'optionid' => $option->id,
                                 'elementid' => $option->elementid);
                 $editoptionurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$this->output->pix_url('/t/edit', 'core').'" />';
+                $pix = $this->output->pix_icon('/t/edit', '', 'core');
                 $actions  = '<a href="'.$editoptionurl.'" title="'.get_string('edit').'">'.$pix.'</a>&nbsp;';
 
                 $img = ($option->sortorder > 1) ? 'up' : 'up_shadow';
@@ -996,7 +863,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                                 'optionid' => $option->id,
                                 'elementid' => $option->elementid);
                 $moveurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$this->output->pix_url("{$img}", 'mod_tracker').'">';
+                $pix = $this->output->pix_icon("{$img}", '', 'mod_tracker');
                 $actions .= '<a href="'.$moveurl.'" title="'.get_string('up').'">'.$pix.'</a>&nbsp;';
 
                 $img = ($option->sortorder < $element->maxorder) ? 'down' : 'down_shadow';
@@ -1006,7 +873,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                                 'optionid' => $option->id,
                                 'elementid' => $option->elementid);
                 $moveurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$this->output->pix_url("{$img}", 'mod_tracker').'">';
+                $pix = $this->output->pix_icon("{$img}", '', 'mod_tracker');
                 $actions .= '<a href="'.$moveurl.'" title="'.get_string('down').'">'.$pix.'</a>&nbsp;';
 
                 $params = array('id' => $cm->id,
@@ -1015,7 +882,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                                 'optionid' => $option->id,
                                 'elementid' => $option->elementid);
                 $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$this->output->pix_url('/t/delete', 'core').'">';
+                $pix = $this->output->pix_icon('/t/delete', '', 'core');
                 $actions .= '<a href="'.$deleteurl.'" title="'.get_string('delete').'">'.$pix.'</a>';
 
                 $rowlabel = '<b> '.get_string('option', 'tracker').' '.$option->sortorder.':</b>';
