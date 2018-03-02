@@ -1570,7 +1570,7 @@ function tracker_notifyccs_moveissue($issueid, $tracker, $newtracker = null) {
             $vars['ALLUNCCURL'] = $allunccurl;
             $notification = tracker_compile_mail_template('issuemoved', $vars, 'tracker', $ccuser->lang);
             $notificationhtml = tracker_compile_mail_template('issuemoved_html', $vars, 'tracker', $ccuser->lang);
-            $subject = get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
+            $subject = get_string('moved', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
             if ($CFG->debugsmtp) {
                 echo "Sending CC Notification Mail to ".fullname($ccuser)."<br/><pre>Subject: $subject\n##############\n".shorten_text($notification, 160).'</pre>';
             }
@@ -1752,7 +1752,7 @@ function tracker_notifyccs_comment($issueid, $comment, $tracker = null) {
                 $vars['ALLUNCCURL'] = $allunccurl;
                 $notification = tracker_compile_mail_template('addcomment', $vars, $ccuser->lang);
                 $notificationhtml = tracker_compile_mail_template('addcomment_html', $vars, $ccuser->lang);
-                $subject = get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
+                $subject = get_string('commented', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
                 if ($CFG->debugsmtp) {
                     echo "Sending Comment Input Mail Notification to ".fullname($ccuser)."<br/><pre>Subject: $subject\n#############\n".shorten_text($notification, 160).'</pre>';
                 }

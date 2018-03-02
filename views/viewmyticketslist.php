@@ -105,7 +105,7 @@ if (isset($searchqueries)) {
 echo $output;
 echo $renderer->search_queries($cm);
 
-$formurl = new moodle_url('/mod/tracker.view.php');
+$formurl = new moodle_url('/mod/tracker/view.php');
 echo '<form name="manageform" action="'.$formurl.'" method="post">';
 echo '<input type="hidden" name="id" value="'.$cm->id.'" />';
 echo '<input type="hidden" name="what" value="updatelist" />';

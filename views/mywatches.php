@@ -54,7 +54,7 @@ if (empty($mywatches)) {
                         'ccid' => $awatch->userid);
         $unregisterurl = new moodle_url('/mod.tracker/view.php', $params);
         $pix = '<img src="'.$OUTPUT->pix_url('t/delete', 'core').'" />';
-        $actions = '<a href="'.$unregister.'" title="'.get_string('delete').'">'.$pix.'</a>';
+        $actions = '<a href="'.$unregisterurl.'" title="'.get_string('delete').'">'.$pix.'</a>';
 
         $params = array('id' => $cm->id, 'view' => 'profile', 'what' => 'editwatch', 'ccid' => $awatch->userid);
         $updateurl = new moodle_url('/mod/tracker/view.php', $params);

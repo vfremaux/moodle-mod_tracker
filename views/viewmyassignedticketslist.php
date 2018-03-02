@@ -120,7 +120,7 @@ if (isset($searchqueries)) {
 echo $output;
 echo $renderer->search_queries($cm);
 
-echo '<form name="manageform" action="view.php" method="post">';
+echo '<form name="manageform" action="'.$CFG->wwwroot.'/mod/tracker/view.php" method="post">';
 $checked = '';
 if ($alltracks) {
     $checked = 'checked="checked"';
