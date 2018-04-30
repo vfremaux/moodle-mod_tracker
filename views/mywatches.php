@@ -53,13 +53,15 @@ if (empty($mywatches)) {
                         'issueid' => $awatch->issueid,
                         'ccid' => $awatch->userid);
         $unregisterurl = new moodle_url('/mod.tracker/view.php', $params);
-        $pix = '<img src="'.$OUTPUT->pix_url('t/delete', 'core').'" />';
-        $actions = '<a href="'.$unregister.'" title="'.get_string('delete').'">'.$pix.'</a>';
+        $alt = get_string('delete');
+        $pix = $OUTPUT->pix_icon('t/delete', $alt, 'core');
+        $actions = '<a href="'.$unregister.'" title="'.$alt.'">'.$pix.'</a>';
 
         $params = array('id' => $cm->id, 'view' => 'profile', 'what' => 'editwatch', 'ccid' => $awatch->userid);
         $updateurl = new moodle_url('/mod/tracker/view.php', $params);
-        $pix = '<img src="'.$OUTPUT->pix_url('t/edit', 'core').'" />';
-        $actions .= '&nbsp;<a href="'.$updateurl.'" title="'.get_string('update').'">'.$pix.'</a>';
+        $alt = get_string('update');
+        $pix = $OUTPUT->pix_icon('t/edit', $alt, 'core');
+        $actions .= '&nbsp;<a href="'.$updateurl.'" title="'.$alt.'">'.$pix.'</a>';
 
         $states = array(
             ENABLED_OPEN => array('open', 'setwhenopens', 'unsetwhenopens'),
@@ -74,7 +76,7 @@ if (empty($mywatches)) {
 
         foreach ($states as $statekey => $state) {
             if ($tracker->enabledstates & $statekey) {
-                $pixurl = $OUTPUT->pix_url($state[0], 'mod_tracker');
+                $pixurl = $OUTPUT->image_url($state[0], 'mod_tracker');
                 if ($awatch->events & $statekey) {
                     $pix = '<img id="watch-'.$state[0].'-img" class="" src="'.$pixurl.'" />';
                     $seturl = 'javascript:updatewatch('.$cm->id.', '.$awatch->id.', \''.$state[0].'\', 0, \''.sesskey().'\')';

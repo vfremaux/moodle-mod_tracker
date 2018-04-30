@@ -289,22 +289,25 @@ if (!empty($issues)) {
 
         $status = '<div class="status-'.$statuscodes[$issue->status].'" class="tracker-status">'.$status.'</div>';
         $hassolution = $issue->status == RESOLVED && !empty($issue->resolution);
-        $pixurl = $OUTPUT->pix_url('solution', 'tracker');
-        $solution = ($hassolution) ? '<img src="'.$pixurl.'" height="15" alt="'.get_string('hassolution', 'tracker').'" />' : '';
+        $alt = get_string('hassolution', 'tracker');
+        $pix = $OUTPUT->pix_icon('solution', $alt, 'mod_tracker');
+        $solution = ($hassolution) ? $pix : '';
         $actions = '';
 
         if (has_capability('mod/tracker:manage', $context) || has_capability('mod/tracker:resolve', $context)) {
             $params = array('id' => $cm->id, 'view' => 'view', 'issueid' => $issue->id, 'screen' => 'editanissue');
             $updateurl = new moodle_url('/mod/tracker/view.php', $params);
-            $pix = '<img src="'.$OUTPUT->pix_url('t/edit', 'core').'" />';
-            $actions = '<a href="'.$updateurl.'" title="'.get_string('update').'" >'.$pix.'</a>';
+            $alt = get_string('update');
+            $pix = $OUTPUT->pix_icon('t/edit', $alt, 'core');
+            $actions = '<a href="'.$updateurl.'" title="'.$alt.'" >'.$pix.'</a>';
         }
 
         if (has_capability('mod/tracker:manage', $context)) {
             $params = array('id' => $cm->id, 'issueid' => $issue->id, 'what' => 'delete');
             $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
-            $pix = '<img src="'.$OUTPUT->pix_url('t/delete', 'core').'" />';
-            $actions .= '&nbsp;<a href="'.$deleteurl.'" title="'.get_string('delete').'" >'.$pix.'</a>';
+            $alt = get_string('delete');
+            $pix = $OUTPUT->pix_icon('t/delete', $alt, 'core');
+            $actions .= '&nbsp;<a href="'.$deleteurl.'" title="'.$alt.'" >'.$pix.'</a>';
         }
 
         if (!$DB->get_record('tracker_issuecc', array('userid' => $USER->id, 'issueid' => $issue->id))) {
@@ -314,8 +317,9 @@ if (!empty($issues)) {
                             'issueid' => $issue->id,
                             'what' => 'register');
             $registerurl = new moodle_url('/mod/tracker/view.php', $params);
-            $pix = '<img src="'.$OUTPUT->pix_url('register', 'mod_tracker').'" />';
-            $actions .= '&nbsp;<a href="'.$registerurl.'" title="'.get_string('register', 'tracker').'" >'.$pix.'</a>';
+            $alt = get_string('register', 'tracker');
+            $pix = $OUTPUT->pix_icon('register', $alt, 'mod_tracker');
+            $actions .= '&nbsp;<a href="'.$registerurl.'" title="'.$alt.'" >'.$pix.'</a>';
         }
 
         if (preg_match('/^resolutionpriority/', $sort) &&
@@ -324,31 +328,35 @@ if (!empty($issues)) {
             if ($issue->resolutionpriority < $maxpriority) {
                 $params = array('id' => $cm->id, 'issueid' => $issue->id, 'what' => 'raisetotop');
                 $raiseurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$OUTPUT->pix_url('totop', 'mod_tracker').'" />';
-                $actions .= '&nbsp;<a href="'.$raiseurl.'" title="'.get_string('raisetotop', 'tracker').'" >'.$pix.'</a>';
+                $alt = get_string('raisetotop', 'tracker');
+                $pix = $OUTPUT->pix_icon('totop', $alt, 'mod_tracker');
+                $actions .= '&nbsp;<a href="'.$raiseurl.'" title="'.$alt.'" >'.$pix.'</a>';
 
                 $params = array('id' => $cm->id, 'issueid' => $issue->id, 'what' => 'raisepriority');
                 $rpurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$OUTPUT->pix_url('up', 'mod_tracker').'" />';
-                $actions .= '&nbsp;<a href="'.$rpurl.'" title="'.get_string('raisepriority', 'tracker').'" >'.$pix.'</a>';
+                $alt = get_string('raisepriority', 'tracker');
+                $pix = $OUTPUT->pix_icon('up', $alt, 'mod_tracker');
+                $actions .= '&nbsp;<a href="'.$rpurl.'" title="'.$alt.'" >'.$pix.'</a>';
             } else {
-                $actions .= '&nbsp;<img src="'.$OUTPUT->pix_url('up_shadow', 'mod_tracker').'" />';
-                $actions .= '&nbsp;<img src="'.$OUTPUT->pix_url('totop_shadow', 'mod_tracker').'" />';
+                $actions .= '&nbsp;'.$OUTPUT->pix_icon('up_shadow', '', 'mod_tracker');
+                $actions .= '&nbsp;'.$OUTPUT->pix_icon('totop_shadow', '', 'mod_tracker');
             }
 
             if ($issue->resolutionpriority > 1) {
                 $params = array('id' => $cm->id, 'issueid' => $issue->id, 'what' => 'lowerpriority');
                 $lowerurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$OUTPUT->pix_url('down', 'mod_tracker').'" />';
-                $actions .= '&nbsp;<a href="'.$lowerurl.'" title="'.get_string('lowerpriority', 'tracker').'" >'.$pix.'</a>';
+                $alt = get_string('lowerpriority', 'tracker');
+                $pix = $OUTPUT->pix_icon('down', $alt, 'mod_tracker');
+                $actions .= '&nbsp;<a href="'.$lowerurl.'" title="'.$alt.'" >'.$pix.'</a>';
 
                 $params = array('id' => $cm->id, 'issueid' => $issue->id, 'what' => 'lowerpriority');
                 $lburl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$OUTPUT->pix_url('tobottom', 'mod_tracker').'" />';
-                $actions .= '&nbsp;<a href="'.$lburl.'" title="'.get_string('lowertobottom', 'tracker').'" ></a>';
+                $alt = get_string('lowertobottom', 'tracker');
+                $pix = $OUTPUT->pix_icon('tobottom', $alt, 'mod_tracker');
+                $actions .= '&nbsp;<a href="'.$lburl.'" title="'.$alt.'" ></a>';
             } else {
-                $actions .= '&nbsp;<img src="'.$OUTPUT->pix_url('down_shadow', 'mod_tracker').'" />';
-                $actions .= '&nbsp;<img src="'.$OUTPUT->pix_url('tobottom_shadow', 'mod_tracker').'" />';
+                $actions .= '&nbsp;'.$OUTPUT->pix_icon('down_shadow', '', 'mod_tracker');
+                $actions .= '&nbsp;'.$OUTPUT->pix_icon('tobottom_shadow', '', 'mod_tracker');
             }
         }
 

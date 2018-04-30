@@ -295,11 +295,11 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 $jshandler = 'this.target=\'message\';';
                 $jshandler .= 'return openpopup(\'/message/discussion.php?id={$user->id}\', \'message\',';
                 $jshandler .= '\'menubar=0,location=0,scrollbars,status,resizable,width=400,height=500\', 0);';
-                $pix = '<img src="'.$this->output->pix_url('t/message', 'core').'">';
+                $pix = $this->output->pix_icon('t/message', '', 'core');
                 $str .= '&nbsp;<a href="" onclick="'.$jshandler.'" >'.$pix.'</a>';
             } else if (!$user->emailstop && $user->maildisplay) {
                 $str .= '&nbsp;<a href="'.$userurl.'">'.fullname($user).'</a>';
-                $str .= '&nbsp;<a href="mailto:'.$user->email.'"><img src="'.$this->output->pix_url('t/mail', 'core').'"></a>';
+                $str .= '&nbsp;<a href="mailto:'.$user->email.'">'.$this->output->pix_icon('t/mail', '', 'core').'</a>';
             } else {
                 $str .= '&nbsp;'.fullname($user);
             }
@@ -338,7 +338,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                                 'issueid' => $issue->id,
                                 'ccid' => $cc->userid);
                 $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$this->output->pix_url('t/delete', 'core').'" />';
+                $pix = $this->output->pix_icon('t/delete', '', 'core');
                 $str .= '&nbsp;<a href="'.$deleteurl.'" title="'.get_string('delete').'">'.$pix.'</a>';
             }
             $str .= '</td>';
@@ -853,7 +853,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                                 'optionid' => $option->id,
                                 'elementid' => $option->elementid);
                 $editoptionurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$this->output->pix_url('/t/edit', 'core').'" />';
+                $pix = $this->output->pix_icon('/t/edit', '', 'core');
                 $actions  = '<a href="'.$editoptionurl.'" title="'.get_string('edit').'">'.$pix.'</a>&nbsp;';
 
                 $img = ($option->sortorder > 1) ? 'up' : 'up_shadow';
@@ -863,7 +863,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                                 'optionid' => $option->id,
                                 'elementid' => $option->elementid);
                 $moveurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$this->output->pix_url("{$img}", 'mod_tracker').'">';
+                $pix = $this->output->pix_icon("{$img}", '', 'mod_tracker');
                 $actions .= '<a href="'.$moveurl.'" title="'.get_string('up').'">'.$pix.'</a>&nbsp;';
 
                 $img = ($option->sortorder < $element->maxorder) ? 'down' : 'down_shadow';
@@ -873,7 +873,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                                 'optionid' => $option->id,
                                 'elementid' => $option->elementid);
                 $moveurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$this->output->pix_url("{$img}", 'mod_tracker').'">';
+                $pix = $this->output->pix_icon("{$img}", '', 'mod_tracker');
                 $actions .= '<a href="'.$moveurl.'" title="'.get_string('down').'">'.$pix.'</a>&nbsp;';
 
                 $params = array('id' => $cm->id,
@@ -882,7 +882,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                                 'optionid' => $option->id,
                                 'elementid' => $option->elementid);
                 $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$this->output->pix_url('/t/delete', 'core').'">';
+                $pix = $this->output->pix_icon('/t/delete', '', 'core');
                 $actions .= '<a href="'.$deleteurl.'" title="'.get_string('delete').'">'.$pix.'</a>';
 
                 $rowlabel = '<b> '.get_string('option', 'tracker').' '.$option->sortorder.':</b>';
