@@ -50,7 +50,6 @@ $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_title(format_string($tracker->name));
 $PAGE->set_heading(format_string($tracker->name));
-$PAGE->set_button($OUTPUT->update_module_button($cm->id, 'tracker'));
 
 $form = new addedit_comment_form(new moodle_url('/mod/tracker/comment.php'), array('issueid' => $issueid, 'cmid' => $id));
 
