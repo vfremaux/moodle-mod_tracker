@@ -126,6 +126,7 @@ $string['defaultassignee'] = 'Default assignee';
 $string['deleteattachedfile'] = 'Delete attachement';
 $string['dependancies'] = 'Dependencies';
 $string['dependson'] = 'Depends on ';
+$string['description'] = 'Description';
 $string['descriptionisempty'] = 'Description is empty';
 $string['distribute'] = 'Move the ticket to another tracker';
 $string['doaddelementautourl'] = 'Add an url collector'; // @DYNA
@@ -261,6 +262,7 @@ $string['issuenumber'] = 'Ticket';
 $string['issues'] = 'ticket records';
 $string['issuestoassign'] = 'Tickets to assign: {$a}';
 $string['issuestowatch'] = 'Tickets to watch: {$a}';
+$string['issueupdated'] = 'A ticket has been updated in tracker [{$a}]';
 $string['knownelements'] = 'Known tracker form elements';
 $string['listissues'] = 'List view';
 $string['local'] = 'Local';
@@ -411,6 +413,9 @@ $string['statehistory'] = 'States';
 $string['stateprofile'] = 'Ticket states';
 $string['status'] = 'Status';
 $string['strictworkflow'] = 'Strict workflow';
+$string['changedownership'] = 'A ticket has been reassigned in tracker [{$a}]';
+$string['commented'] = 'A ticket has been commented in tracker [{$a}]';
+$string['moved'] = 'A ticket has been moved in tracker [{$a}]';
 $string['submission'] = 'A new ticket is reported in tracker [{$a}]';
 $string['submitbug'] = 'Submit the ticket';
 $string['subtrackers'] = 'Subtrackers';
@@ -691,7 +696,7 @@ $string['ownershipchanged_tpl'] = '
 Course: [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 Tracker: <%%TRACKERNAME%%>
 --------------------------------------
-Issue: <%%ISSUE%%> / <%%SUMMARY%%>
+Ticket: <%%ISSUE%%> / <%%SUMMARY%%>
 has been reassigned to: <%%ASSIGNEDTO%%>
 By: <%%BY%%>
 
@@ -704,7 +709,7 @@ $string['ownershipchanged_html_tpl'] = '
 <b>Course:</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br />
 <b>Tracker:</b> <%%TRACKERNAME%%><br/>
 <hr/>
-<p><b>Issue:</b> <%%ISSUE%%> / <%%SUMMARY%%><br />
+<p><b>Ticket:</b> <%%ISSUE%%> / <%%SUMMARY%%><br />
 <b>has been reassigned to:</b> <%%ASSIGNEDTO%%> <br />
 <b>By:</b> <%%BY%%></p>
 <hr/>
@@ -755,7 +760,7 @@ $string['statechanged_tpl'] = '
 Course: [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 Tracker: <%%TRACKERNAME%%>
 --------------------------------------
-Bug entry: <%%ISSUE%%> / <%%SUMMARY%%>
+Ticket entry: <%%ISSUE%%> / <%%SUMMARY%%>
 status was changed to <%%EVENT%%>
 By: <%%BY%%>
 
@@ -781,7 +786,7 @@ $string['submission_tpl'] = '
 Course: [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 Tracker: <%%TRACKERNAME%%>
 --------------------------------------
-New bug entry: <%%ISSUE%%> / <%%SUMMARY%%>
+New ticket entry: <%%ISSUE%%> / <%%SUMMARY%%>
 By: <%%BY%%>
 
 Description : <%%DESCRIPTION%%>
@@ -798,6 +803,33 @@ $string['submission_html_tpl'] = '
 <b>By:</b> <%%BY%%></p>
 <hr/>
 <b>Description : </b><%%DESCRIPTION%%>
+<hr/>
+<p><a href="<%%ISSUEURL%%>">See the issue record</a><br/>
+<a href="<%%CCURL%%>">Register for watches on this record</a></p>
+';
+
+$string['update_tpl'] = '
+Course: [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+Tracker: <%%TRACKERNAME%%>
+--------------------------------------
+Ticket entry: <%%ISSUE%%> / <%%SUMMARY%%>
+By: <%%BY%%>
+Has been updated.
+
+URL for viewing the issue: <%%ISSUEURL%%>
+URL for registering for watches: <%%CCURL%%>
+';
+
+$string['update_html_tpl'] = '
+<b>Course:</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br/>
+<b>Tracker:</b> <%%TRACKERNAME%%><br/>
+<hr/>
+--------------------------------------
+<p><b>Ticket entry:</b> <%%ISSUE%%> / <%%SUMMARY%%><br/>
+<b>By:</b> <%%BY%%><br/>
+
+<p><b>Has been updated.</b></p>
+
 <hr/>
 <p><a href="<%%ISSUEURL%%>">See the issue record</a><br/>
 <a href="<%%CCURL%%>">Register for watches on this record</a></p>

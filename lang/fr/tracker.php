@@ -47,7 +47,7 @@ $string['administrators'] = 'Administrateurs';
 $string['alltracks'] = 'Voir mes travaux dans tous les gestionnaires';
 $string['any'] = 'Tous';
 $string['askraise'] = 'Demander à augmenter la priorité';
-$string['assignedto'] = 'Assigné à';
+$string['assignedto'] = 'Assigné à&nbsp;';
 $string['assignee'] = 'Assigné';
 $string['assignees'] = 'Responsables';
 $string['attributes'] = 'Attributs';
@@ -62,8 +62,8 @@ $string['captcha'] = 'Captcha';
 $string['cascade'] = 'Remonter au niveau supérieur';
 $string['cascadedticket'] = 'Ticket transmis';
 $string['categories'] = 'Catégories';
-$string['cced'] = 'Abonnés ';
-$string['ccs'] = 'Abonnements ';
+$string['cced'] = 'Abonnés&nbsp;';
+$string['ccs'] = 'Abonnements&nbsp;';
 $string['checkbox'] = 'Cases à cocher'; // @DYNA
 $string['checkboxhoriz'] = 'Cases à cocher horizontal'; // @DYNA
 $string['chooselocal'] = 'Choisir une instance locale ';
@@ -72,7 +72,7 @@ $string['chooseremoteparent'] = 'Choisir une instance distante ';
 $string['choosetarget'] = 'Choisir un sous-gestionnaire';
 $string['clearsearch'] = 'Effacer les critères de recherche';
 $string['comment'] = 'Commentaire';
-$string['commentedby'] = 'Commenté par';
+$string['commentedby'] = 'Commenté par&nbsp;';
 $string['comments'] = 'Commentaires';
 $string['component'] = 'Composant';
 $string['configinitiallyactive'] = 'Actif par défaut';
@@ -122,8 +122,9 @@ $string['database'] = 'Base de données';
 $string['datereported'] = 'Date d\'entrée';
 $string['defaultassignee'] = 'Assigné par défaut';
 $string['deleteattachedfile'] = 'Supprimer l\'attachement';
-$string['dependancies'] = 'Dépendances';
-$string['dependson'] = 'Dépends de ';
+$string['dependancies'] = 'Dépendances&nbsp;';
+$string['dependson'] = 'Dépends de&nbsp;';
+$string['description'] = 'Description&nbsp;';
 $string['descriptionisempty'] = 'La description ne peut pas être laissée vide.';
 $string['distribute'] = 'Déplacer le ticket';
 $string['doaddelementautourl'] = 'Ajouter une collecte d\'url'; // @DYNA
@@ -206,12 +207,13 @@ $string['isprivate'] = 'Donnée privée';
 $string['ispublic'] = 'Donnée publique';
 $string['isactive'] = 'Est visible sur le formulaire';
 $string['isinactive'] = 'Est caché sur le formulaire';
-$string['issueid'] = 'Ticket';
+$string['issueid'] = 'Ticket&nbsp;';
 $string['issuename'] = 'Libellé du ticket&nbsp;';
-$string['issuenumber'] = 'Ticket';
+$string['issuenumber'] = 'Ticket&nbsp;';
 $string['issues'] = 'tickets';
 $string['issuestoassign'] = 'Tickets à répartir&nbsp;: {$a}';
 $string['issuestowatch'] = 'Tickets à examiner&nbsp;: {$a}';
+$string['issueupdated'] = 'Un ticket a été mis à jour sur [{$a}]';
 $string['knownelements'] = 'Rubriques connues&nbsp;';
 $string['listissues'] = 'Liste de tickets';
 $string['local'] = 'Local';
@@ -356,6 +358,9 @@ $string['statehistory'] = 'Etats';
 $string['stateprofile'] = 'Etats de tickets';
 $string['status'] = 'Etat';
 $string['strictworkflow'] = 'Cycle de vie strict';
+$string['changedownership'] = 'Un ticket a été réattribué dans le tracker [{$a}]';
+$string['commented'] = 'Un ticket a été commenté dans le tracker [{$a}]';
+$string['moved'] = 'Un ticket a été déplacé dans le tracker [{$a}]';
 $string['submission'] = 'Un nouveau ticket a été ouvert dans le tracker [{$a}]';
 $string['submitbug'] = 'Soumettre le ticket';
 $string['subtrackers'] = 'Sous-gestionnaires ';
@@ -647,12 +652,12 @@ $string['ownershipchanged_tpl'] = '
 Cours : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 Tracker : <%%TRACKERNAME%%>
 --------------------------------------
-Le défaut : <%%ISSUE%%> : <%%SUMMARY%%>
+Le ticket : <%%ISSUE%%> : <%%SUMMARY%%>
 est réassigné à : <%%ASSIGNEDTO%%>
 par : <%%BY%%>
 
-Pour voir la fiche défaut : <%%ISSUEURL%%>
-Pour se désabonner des événements de cette fiche : <%%UNCCURL%%>
+Pour voir le ticket : <%%ISSUEURL%%>
+Pour se désabonner des événements de ce ticket : <%%UNCCURL%%>
 Pour se désabonner de ce tracker : <%%ALLUNCCURL%%>
 ';
 
@@ -660,12 +665,12 @@ $string['ownershipchanged_html_tpl'] = '
 <b>Cours :</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br />
 <b>Tracker :</b> <%%TRACKERNAME%%><br/>
 <hr/>
-<p><b>Le défaut :</b> <%%ISSUE%%> : <%%SUMMARY%%><br />
+<p><b>Le ticket :</b> <%%ISSUE%%> : <%%SUMMARY%%><br />
 <b>est réassigné à :</b> <%%ASSIGNEDTO%%> <br />
 <b>par :</b> <%%BY%%></p>
 <hr/>
-<p><a href="<%%ISSUEURL%%>">Voir la fiche défaut</a><br/>
-<a href="<%%UNCCURL%%>">Se désabonner des événements de cette fiche</a><br/>
+<p><a href="<%%ISSUEURL%%>">Voir le ticket</a><br/>
+<a href="<%%UNCCURL%%>">Se désabonner des événements de ce ticket</a><br/>
 <a href="<%%ALLUNCCURL%%>">Se désabonner de ce tracker</a></p>
 ';
 
@@ -687,7 +692,7 @@ la raison donnée est :
 ------------------------------------------
 <%%URGENT%%>
 ------------------------------------------
-Pour voir la fiche défaut : <%%ISSUEURL%%>
+Pour voir le ticket : <%%ISSUEURL%%>
 ';
 
 $string['raiserequest_html_tpl'] = '
@@ -705,19 +710,19 @@ $string['raiserequest_html_tpl'] = '
 <hr/>
 <%%URGENT%%>
 <hr/>
-<p><a href="<%%ISSUEURL%%>">Voir la fiche défaut</a><br/></p>
+<p><a href="<%%ISSUEURL%%>">Voir le ticket</a><br/></p>
 ';
 
 $string['statechanged_tpl'] = '
 Cours : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 Tracker : <%%TRACKERNAME%%>
 --------------------------------------
-Le défaut : <%%ISSUE%%> : <%%SUMMARY%%>
+Le ticket : <%%ISSUE%%> : <%%SUMMARY%%>
 a été passé à l\'état <%%EVENT%%>
 par : <%%BY%%>
 
-Pour voir la fiche défaut : <%%ISSUEURL%%>
-Pour se désabonner des événements de cette fiche : <%%UNCCURL%%>
+Pour voir le ticket : <%%ISSUEURL%%>
+Pour se désabonner des événements de ce ticket : <%%UNCCURL%%>
 Pour se désabonner de ce tracker : <%%ALLUNCCURL%%>
 ';
 
@@ -725,12 +730,12 @@ $string['statechanged_html_tpl'] = '
 <p><b>Cours :</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 <b>Tracker :</b> <%%TRACKERNAME%%>
 <hr/>
-<b>Le défaut :</b> <%%ISSUE%%> - <%%SUMMARY%%><br/>
+<b>Le ticket :</b> <%%ISSUE%%> - <%%SUMMARY%%><br/>
 <b>a été passé à l\'état</b> : <%%EVENT%%><br/>
 <b>par :</b> <%%BY%%></p>
 <hr/>
-<p><a href="<%%ISSUEURL%%>">Voir le défaut dans son contexte</a><br/>
-<a href="<%%UNCCURL%%>">Se désabonner du défaut</a><br/>
+<p><a href="<%%ISSUEURL%%>">Voir le ticket dans son contexte</a><br/>
+<a href="<%%UNCCURL%%>">Se désabonner du ticket</a><br/>
 <a href="<%%ALLUNCCURL%%>">Se désabonner de ce tracker</a></p>
 ';
 
@@ -738,23 +743,49 @@ $string['submission_tpl'] = '
 Cours : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 Tracker : <%%TRACKERNAME%%>
 --------------------------------------
-Nouveau défaut posté : <%%ISSUE%%> : <%%SUMMARY%%>
+Nouveau ticket posté : <%%ISSUE%%> : <%%SUMMARY%%>
 par : <%%BY%%>
 
 Description : <%%DESCRIPTION%%>
 
-Pour voir la fiche défaut : <%%ISSUEURL%%>
-Pour s\'abonner aux événements de cette fiche : <%%CCURL%%>
+Pour voir le ticket : <%%ISSUEURL%%>
+Pour s\'abonner aux événements du ticket : <%%CCURL%%>
 ';
 
 $string['submission_html_tpl'] = '
 <b>Cours :</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br/>
 <b>Tracker :</b> <%%TRACKERNAME%%><br/>
 <hr/>
-<p><b>Nouveau défaut posté :</b> <%%ISSUE%%> : <%%SUMMARY%%><br/>
+<p><b>Nouveau ticket posté :</b> <%%ISSUE%%> : <%%SUMMARY%%><br/>
 <b>par :</b> <%%BY%%></p>
 <hr/>
 <b>Description : </b><%%DESCRIPTION%%>
+<hr/>
+<p><a href="<%%ISSUEURL%%>">Voir la fiche défaut</a><br/>
+<a href="<%%CCURL%%>">S\'abonner aux événements de cette fiche</a></p>
+';
+
+$string['update_tpl'] = '
+Cours : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+Tracker : <%%TRACKERNAME%%>
+--------------------------------------
+Nouveau défaut posté : <%%ISSUE%%> : <%%SUMMARY%%>
+par : <%%BY%%>
+
+A été mis à jour.
+
+Pour voir la fiche défaut : <%%ISSUEURL%%>
+Pour s\'abonner aux événements de cette fiche : <%%CCURL%%>
+';
+
+$string['update_html_tpl'] = '
+<b>Cours :</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br/>
+<b>Tracker :</b> <%%TRACKERNAME%%><br/>
+<hr/>
+<p><b>Le ticket posté :</b> <%%ISSUE%%> : <%%SUMMARY%%><br/>
+<b>par :</b> <%%BY%%></p>
+<hr/>
+<b>A été mis à jour</b>
 <hr/>
 <p><a href="<%%ISSUEURL%%>">Voir la fiche défaut</a><br/>
 <a href="<%%CCURL%%>">S\'abonner aux événements de cette fiche</a></p>

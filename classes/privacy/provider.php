@@ -17,6 +17,7 @@
 namespace mod_tracker\privacy;
 
 use \core_privacy\local\request\writer;
+use \core_privacy\local\metadata\collection;
 
 defined('MOODLE_INTERNAL') || die();
 

@@ -141,7 +141,7 @@ if (isset($searchqueries)) {
 
 echo '</table>';
 echo '</center>';
-echo '<form name="manageform" action="view.php" method="post">';
+echo '<form name="manageform" action="'.$CFG->wwwroot.'/mod/tracker/view.php" method="post">';
 echo '<input type="hidden" name="id" value="'.$cm->id.'" />';
 echo '<input type="hidden" name="what" value="updatelist" />';
 echo '<input type="hidden" name="view" value="view" />';
