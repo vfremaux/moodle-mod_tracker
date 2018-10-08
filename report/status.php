@@ -23,6 +23,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+echo $output;
 echo $OUTPUT->heading(get_string('reports', 'tracker'), 1);
 echo $OUTPUT->heading(get_string('status', 'tracker'), 2);
 

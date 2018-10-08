@@ -55,26 +55,24 @@ tracker_loadelementsused($tracker, $elementsused);
 
 // Check for lower dependancies.
 
-$childtree = tracker_printchilds($tracker, $issue->id, true, 20);
-$parenttree = tracker_printparents($tracker, $issue->id, true, -20);
 $ccs = $DB->get_records('tracker_issuecc', array('issueid' => $issue->id));
 $cced = array();
 
 $select = " trackerid = ? AND issueid = ? ";
 $history = $DB->get_records_select('tracker_issueownership', $select, array($tracker->id, $issue->id), 'timeassigned DESC');
 
-$statehistory = $DB->get_records_select('tracker_state_change', $select, array($tracker->id, $issue->id), 'timechange ASC');
+$statehistory = $DB->get_records_select('tracker_state_change', $select, array($tracker->id, $issue->id), 'timechange DESC');
 
 $linklabel = get_string(($initialdepsviewmode == 'visiblediv') ? 'hidedependancies' : 'showdependancies', 'tracker');
-$link = '<a id="toggledependancieslink" href="javascript:toggledependancies()">'.$linklabel.'</a>&nbsp;-&nbsp;';
+$link = '<a id="tracker-issuedependancies-handle">'.$linklabel.'</a>&nbsp;-&nbsp;';
 $showdependancieslink = (!empty($childtree) || !empty($parenttree)) ? $link : '';
 
 $linklabel = get_string(($initialccsviewmode == 'visiblediv') ? 'hideccs' : 'showccs', 'tracker');
-$link = '<a id="toggleccslink" href="javascript:toggleccs()">'.$linklabel.'</a>&nbsp;-&nbsp;';
+$link = '<a id="tracker-issueccs-handle">'.$linklabel.'</a>&nbsp;-&nbsp;';
 $showccslink = (!empty($ccs)) ? $link : '';
 
 $linklabel = get_string(($initialhistoryviewmode == 'visiblediv') ? 'hidehistory' : 'showhistory', 'tracker');
-$link = '<a id="togglehistorylink" href="javascript:togglehistory()">'.$linklabel.'</a>&nbsp;-&nbsp;';
+$link = '<a id="tracker-issuehistory-handle">'.$linklabel.'</a>&nbsp;-&nbsp;';
 $showhistorylink = (!empty($history) || !empty($statehistory)) ? $link : '';
 
 // Fixing embeded files URLS.
@@ -87,15 +85,18 @@ $issue->resolution = file_rewrite_pluginfile_urls($issue->resolution, 'pluginfil
 // Get statuskeys labels.
 
 $statuskeys = tracker_get_statuskeys($tracker);
+$PAGE->requires->js_call_amd('mod_tracker/tracker', 'init');
 
 // Start printing.
+
 echo $output;
+
 echo $OUTPUT->box_start('generalbox', 'bugreport');
 
 echo $renderer->issue_js_init();
 
 echo '<!-- Print Bug Form -->';
-echo '<table cellpadding="5" class="tracker-issue">';
+echo '<table cellpadding="5" class="tracker-issue" width="100%">';
 
 if (tracker_can_workon($tracker, $context, $issue)) {
     // If I can resolve and I have seen, the bug is open.
@@ -140,8 +141,9 @@ if ($tracker->enablecomments) {
     }
     $showcommentslink = '';
     if ($commentscount) {
-        $label = get_string('showcomments', 'tracker');
-        $showcommentslink = '<a id="togglecommentlink" href="javascript:togglecomments()">'.$label.'</a>&nbsp;-&nbsp;';
+        $comments = $DB->get_records('tracker_issuecomment', array('issueid' => $issueid), 'datecreated');
+        $label = get_string('hidecomments', 'tracker');
+        $showcommentslink = '<a id="tracker-issuecomments-handle">'.$label.'</a>&nbsp;-&nbsp;';
     } else {
         $showcommentslink = '<i>'.get_string('nocomments', 'tracker').'</i>&nbsp;-&nbsp;';
     }
@@ -175,44 +177,15 @@ echo '</tr>';
 
 if ($tracker->enablecomments) {
     if (!empty($commentscount)) {
-?>
-    <tr>
-        <td colspan="4">
-            <div id="issuecomments" class="<?php echo $initialcommentsviewmode ?> comments">
-            <table width="100%">
-                <?php echo $renderer->comments($issue->id); ?>
-            </table>
-            </div>
-        </td>
-    </tr>
-<?php
+        echo $renderer->comments($comments, $initialcommentsviewmode);
     }
 }
-?>
-    <tr>
-        <td colspan="4" align="center" width="100%">
-            <table id="issuedependancytrees" class="<?php echo $initialdepsviewmode ?>">
-                <tr>
-                    <td>&nbsp;</td>
-                    <td align="left" style="white-space : nowrap">
-                    <?php
-                        echo $parenttree;
-                        echo $tracker->ticketprefix.$issue->id.' - '.format_string($issue->summary).'<br/>';
-                        echo $childtree;
-                    ?>
-                    </td>
-                    <td>&nbsp;</td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-<?php
+echo $renderer->dependencies($tracker, $issue, $initialdepsviewmode);
+
 if ($showccslink) {
     echo $renderer->ccs($ccs, $issue, $cm, $cced, $initialccsviewmode);
 }
-if (has_capability('mod/tracker:managewatches', $context)) {
-    echo $renderer->watches_form($issue, $cm, $cced);
-}
+
 if ($showhistorylink) {
     echo $renderer->history($tracker, $history, $statehistory, $initialhistoryviewmode);
 }

@@ -28,8 +28,8 @@ require('../../config.php');
 require_once($CFG->dirroot.'/mod/tracker/lib.php');
 require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 
-$PAGE->requires->js('/mod/tracker/js/trackerview.js');
 $PAGE->requires->jquery();
+$PAGE->requires->js_call_amd('mod_tracker/tracker', 'init');
 
 // Check for required parameters.
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID
@@ -43,7 +43,8 @@ $screen = tracker_resolve_screen($tracker, $cm);
 $view = tracker_resolve_view($tracker, $cm);
 tracker_requires($view, $screen);
 
-$url = new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => $view, 'screen' => $screen));
+$params = array('id' => $cm->id, 'view' => $view, 'screen' => $screen, 'issueid' => $issueid);
+$url = new moodle_url('/mod/tracker/view.php', $params);
 
 // Redirect (before outputting) traps.
 if ($view == "view" && (empty($screen) || $screen == 'viewanissue' || $screen == 'editanissue') && empty($issueid)) {
@@ -205,7 +206,8 @@ if ($view == 'view') {
             }
 
             case 'editanissue': {
-                if (!has_capability('mod/tracker:manage', $context)) {
+                $reporterid = $DB->get_field('tracker_issue', 'reportedby', array('id' => $issueid));
+                if (!has_capability('mod/tracker:manage', $context) && ($USER->id != $reporterid)) {
                     print_error('errornoaccessissue', 'tracker');
                 } else {
                     include($CFG->dirroot.'/mod/tracker/views/editanissue.php');

@@ -3,16 +3,17 @@
  */
 // jshint undef:false, unused:false
 
-function updatewatchs(cmid, watchid, event, state, sesskey) {
+function updatewatch(cmid, watchid, event, state, sesskey) {
 
-    url = M.cfg.wwwroot + '/mod/tracker/ajax/service.php';
-    url += '?id=' + cmid + '&what=updatewatch&ccid=' + watchid + '&event=' + event + '&state=' + state + '&sesskey' + sesskey;
+    var url = M.cfg.wwwroot + '/mod/tracker/ajax/service.php';
+    url += '?id=' + cmid + '&what=updatewatch&ccid=' + watchid + '&event=' + event + '&state=' + state + '&sesskey=' + sesskey;
 
     $.get(url, function(data, status) {
+        var elmid = '#watch-' + event + '-' + watchid + '-img';
         if (!state) {
-            $('#tracker-' + event + '-img').addClass('tracker-shadow');
+            $(elmid).addClass('tracker-shadow');
         } else {
-            $('#tracker-' + event + '-img').removeClass('tracker-shadow');
+            $(elmid).removeClass('tracker-shadow');
         }
-    });
+    }, 'html');
 }

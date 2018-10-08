@@ -64,6 +64,7 @@ echo $output;
 echo $OUTPUT->heading(get_string('mypreferences', 'tracker'));
 echo $OUTPUT->box_start('generalbox', 'tracker-preferences-form');
 
+$form->set_data(null);
 $form->display();
 
 echo $OUTPUT->box_end();

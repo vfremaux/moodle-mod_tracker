@@ -28,6 +28,14 @@ require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 require_once($CFG->dirroot.'/mod/tracker/extralib/lib.php');
 
 /**
+ * This function is not implemented in this plugin, but is needed to mark
+ * the vf documentation custom volume availability.
+ */
+function mod_tracker_supports_feature() {
+    assert(1);
+}
+
+/**
  * List of features supported in tracker module
  * @param string $feature FEATURE_xx constant for requested feature
  * @return mixed True if module supports feature, false if not, null if doesn't know

@@ -24,6 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $mywatches = tracker_getwatches($tracker->id, $USER->id);
+$PAGE->requires->js('/mod/tracker/js/watchsview.js');
 
 echo $output;
 echo $OUTPUT->heading(get_string('mywatches', 'tracker'));
@@ -74,23 +75,24 @@ if (empty($mywatches)) {
             ON_COMMENT => array('oncomment', 'setoncomment', 'unsetoncomment'),
         );
 
+        $notifications = '';
         foreach ($states as $statekey => $state) {
             if ($tracker->enabledstates & $statekey) {
                 $pixurl = $OUTPUT->image_url($state[0], 'mod_tracker');
                 if ($awatch->events & $statekey) {
-                    $pix = '<img id="watch-'.$state[0].'-img" class="" src="'.$pixurl.'" />';
+                    $pix = '<img id="watch-'.$state[0].'-'.$awatch->id.'-img" class="" src="'.$pixurl.'" />';
                     $seturl = 'javascript:updatewatch('.$cm->id.', '.$awatch->id.', \''.$state[0].'\', 0, \''.sesskey().'\')';
-                    $notifications = '&nbsp;<a href="'.$seturl.'" title="'.get_string($state[2], 'tracker').'">'.$pix.'</a>';
+                    $notifications .= '&nbsp;<a href="'.$seturl.'" title="'.get_string($state[2], 'tracker').'">'.$pix.'</a>';
                 } else {
-                    $pix = '<img id="watch-'.$state[0].'-img" class="tracker-shadow" src="'.$pixurl.'" />';
+                    $pix = '<img id="watch-'.$state[0].'-'.$awatch->id.'-img" class="tracker-shadow" src="'.$pixurl.'" />';
                     $seturl = 'javascript:updatewatch('.$cm->id.', '.$awatch->id.', \''.$state[0].'\', 1, \''.sesskey().'\')';
-                    $notifications = '&nbsp;<a href="'.$seturl.'" title="'.get_string($state[1], 'tracker').'\>'.$pix.'</a>';
+                    $notifications .= '&nbsp;<a href="'.$seturl.'" title="'.get_string($state[1], 'tracker').'\>'.$pix.'</a>';
                 }
             }
         }
 
         $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $awatch->issueid);
-        $watchurl = new moodle_url('/mod.tracker/view.php', $params);
+        $watchurl = new moodle_url('/mod/tracker/view.php', $params);
         $watchid = '<a href="'.$watchurl.'">'.$tracker->ticketprefix.$awatch->issueid.'</a>';
 
         $table->data[] = array($watchid, $awatch->summary, $awatch->people, $actions, $notifications);

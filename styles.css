@@ -26,66 +26,78 @@
     font-weight: bold;
 }
 
-.red{
+.red {
     color: red;
     font-weight: bold;
 }
 
-.status-resolved{
+.history-state {
+    padding: 3px;
+    border-radius: 8px;
+    margin:1px;
+}
+
+.status-validated {
+    background-color: #58E205;
+    color: white;
+    font-weight: bold;
+}
+
+.status-resolved {
     background-color: #2EAA20;
     color: white;
     font-weight: bold;
 }
 
-.status-posted{
+.status-posted {
     background-color: #D90000;
     color: white;
     font-weight: bold;
 }
 
-.status-open{
+.status-open {
     background-color: #FF8000;
     color: black;
     font-weight: bold;
 }
 
-.status-resolving{
+.status-resolving {
     background-color: #FCDD03;
     color: black;
     font-weight: bold;
 }
 
-.status-waiting{
+.status-waiting {
     background-color: #BAAB45;
     color: black;
     font-weight: bold;
 }
 
-.status-abandonned{
+.status-abandonned {
     background-color: #454747;
     color: white;
     font-weight: bold;
 }
 
-.status-transfered{
+.status-transfered {
     background-color: #E4E4E4;
     color: black;
     font-weight: normal;
 }
 
-.status-testing{
+.status-testing {
     background-color: #B8F079;
     color: black;
     font-weight: normal;
 }
 
-.status-published{
+.status-published {
     background-color: #58BCF1;
     color: black;
     font-weight: normal;
 }
 
-.comments{
+.comments {
     background-color: #E0E0E0;
     border: 1px solid #ACACAC;
     padding: 2px;
@@ -296,4 +308,16 @@
 .tracker-captcha {
     margin-left: 285px;
     margin-bottom: 10px;
+}
+
+.cc-user {
+    display: inline-block;
+    background: #eee;
+    border-radius: 8px;
+    padding:2px;
+    margin: 4px;
+}
+
+#tracker-cc-form {
+    padding-top: 5px;
 }

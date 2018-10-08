@@ -21,7 +21,7 @@
  *
  * Summary for administrators
  */
-defined('AJAX_SCRIPT', 1);
+define('AJAX_SCRIPT', 1);
 
 require('../../../config.php');
 require_once($CFG->dirroot.'/mod/tracker/locallib.php');
