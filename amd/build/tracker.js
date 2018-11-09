@@ -24,38 +24,18 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, cfg, str, 
                 moodletracker.strs = s;
             });
 
+            $('.watch-handle').off('click');
             $('.watch-handle').bind('click', this.togglewatch);
+            $('#tracker-issuehistory-handle').off('click');
             $('#tracker-issuehistory-handle').bind('click', this.togglehistory);
+            $('#tracker-issueccs-handle').off('click');
             $('#tracker-issueccs-handle').bind('click', this.toggleccs);
+            $('#tracker-issuedependancies-handle').off('click');
             $('#tracker-issuedependancies-handle').bind('click', this.toggledependancies);
+            $('#tracker-issuecomments-handle').off('click');
             $('#tracker-issuecomments-handle').bind('click', this.togglecomments);
 
             log.debug('AMD Tracker initialized');
-        },
-
-        togglewatch: function(e) {
-
-            var that = $(this);
-
-            var pattern = /#watch-(\w+)-(\d+)-img/;
-            var matches = that.attr('id').match(pattern);
-            var eventname = matches[1];
-            var watchid = matches[2];
-
-            var state = !that.hasClass('tracker-shadow');
-
-            var url = cfg.wwwroot + '/mod/tracker/ajax/service.php';
-            url += '?id=' + cmid + '&what=updatewatch&ccid=' + watchid + '&event=' + eventname;
-            url += '&state=' + state + '&sesskey=' + cfg.sesskey;
-
-            $.get(url, function(data, status) {}, 'html');
-
-            if (state) {
-                that.addClass('tracker-shadow');
-            } else {
-                that.removeClass('tracker-shadow');
-            }
-            e.stopPropagation();
         },
 
         togglehistory: function (e) {
@@ -69,6 +49,7 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, cfg, str, 
                 historylink.html(moodletracker.strs[7]);
             }
             e.stopPropagation();
+            e.preventDefault();
         },
 
         toggleccs: function (e) {
@@ -82,6 +63,7 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, cfg, str, 
                 ccslink.html(moodletracker.strs[1]);
             }
             e.stopPropagation();
+            e.preventDefault();
         },
 
         toggledependancies: function (e) {
@@ -95,6 +77,7 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, cfg, str, 
                 dependancieslink.html(moodletracker.strs[5]);
             }
             e.stopPropagation();
+            e.preventDefault();
         },
 
         togglecomments: function (e) {
@@ -108,6 +91,7 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, cfg, str, 
                 commentlink.html(moodletracker.strs[3]);
             }
             e.stopPropagation();
+            e.preventDefault();
         }
     };
 
