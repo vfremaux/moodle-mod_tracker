@@ -24,12 +24,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 $mywatches = tracker_getwatches($tracker->id, $USER->id);
-$PAGE->requires->js('/mod/tracker/js/watchsview.js');
+$PAGE->requires->js_call_amd('mod_tracker/tracker_watches', 'init');
 
 echo $output;
 echo $OUTPUT->heading(get_string('mywatches', 'tracker'));
 
-echo $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'bugreport');
+echo $OUTPUT->box_start('generalbox', 'tracker-watches');
 
 if (empty($mywatches)) {
     echo $OUTPUT->notification(get_string('nowatches', 'tracker'));
@@ -56,7 +56,7 @@ if (empty($mywatches)) {
         $unregisterurl = new moodle_url('/mod.tracker/view.php', $params);
         $alt = get_string('delete');
         $pix = $OUTPUT->pix_icon('t/delete', $alt, 'core');
-        $actions = '<a href="'.$unregister.'" title="'.$alt.'">'.$pix.'</a>';
+        $actions = '<a href="'.$unregisterurl.'" title="'.$alt.'">'.$pix.'</a>';
 
         $params = array('id' => $cm->id, 'view' => 'profile', 'what' => 'editwatch', 'ccid' => $awatch->userid);
         $updateurl = new moodle_url('/mod/tracker/view.php', $params);
@@ -80,13 +80,15 @@ if (empty($mywatches)) {
             if ($tracker->enabledstates & $statekey) {
                 $pixurl = $OUTPUT->image_url($state[0], 'mod_tracker');
                 if ($awatch->events & $statekey) {
-                    $pix = '<img id="watch-'.$state[0].'-'.$awatch->id.'-img" class="" src="'.$pixurl.'" />';
-                    $seturl = 'javascript:updatewatch('.$cm->id.', '.$awatch->id.', \''.$state[0].'\', 0, \''.sesskey().'\')';
-                    $notifications .= '&nbsp;<a href="'.$seturl.'" title="'.get_string($state[2], 'tracker').'">'.$pix.'</a>';
+                    $pixid = 'watch-'.$state[0].'-'.$awatch->id.'-img';
+                    $pix = '<img id="'.$pixid.'" class="" src="'.$pixurl.'" />';
+                    $setid = $cm->id.'-'.$awatch->id.'-'.$state[0].'-0';
+                    $notifications .= '&nbsp;<a id="'.$setid.'" class="tracker-events-prefs" title="'.get_string($state[2], 'tracker').'">'.$pix.'</a>';
                 } else {
-                    $pix = '<img id="watch-'.$state[0].'-'.$awatch->id.'-img" class="tracker-shadow" src="'.$pixurl.'" />';
-                    $seturl = 'javascript:updatewatch('.$cm->id.', '.$awatch->id.', \''.$state[0].'\', 1, \''.sesskey().'\')';
-                    $notifications .= '&nbsp;<a href="'.$seturl.'" title="'.get_string($state[1], 'tracker').'\>'.$pix.'</a>';
+                    $pixid = 'watch-'.$state[0].'-'.$awatch->id.'-img';
+                    $pix = '<img id="'.$pixid.'" class="tracker-shadow" src="'.$pixurl.'" />';
+                    $setid = $cm->id.'-'.$awatch->id.'-'.$state[0].'-1';
+                    $notifications .= '&nbsp;<a id="'.$setid.'" class="tracker-events-prefs" title="'.get_string($state[1], 'tracker').'">'.$pix.'</a>';
                 }
             }
         }

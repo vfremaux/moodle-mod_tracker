@@ -66,7 +66,7 @@ if (!empty($queries)) {
 echo $output;
 echo $OUTPUT->heading(get_string('myqueries', 'tracker'));
 
-echo $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'tracker-queries');
+echo $OUTPUT->box_start('generalbox', 'tracker-queries');
 
 echo '<center>';
 echo $tablehtml;

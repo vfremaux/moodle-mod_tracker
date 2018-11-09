@@ -38,7 +38,7 @@ define('TESTING', 7);
 define('PUBLISHED', 8);
 define('VALIDATED', 9);
 
-// Status defines.
+// Preference defines.
 define('ENABLED_POSTED', 1);
 define('ENABLED_OPEN', 2);
 define('ENABLED_RESOLVING', 4);
