@@ -31,7 +31,7 @@ echo $output;
 echo '<br/>';
 echo $OUTPUT->heading(get_string('me', 'tracker'));
 
-echo $OUTPUT->box_start('center', '90%', '', '', 'generalbox', 'bugreport');
+echo $OUTPUT->box_start('generalbox', 'tracker-profile');
 
 $table = new html_table();
 $table->head = array('', '');

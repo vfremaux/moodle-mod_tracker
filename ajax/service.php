@@ -34,38 +34,25 @@ if ($action == 'updatewatch') {
     require_sesskey();
     $cc = new StdClass();
     $cc->id = required_param('ccid', PARAM_INT);
-    $open = optional_param('open', '', PARAM_INT);
-    $resolving = optional_param('resolving', '', PARAM_INT);
-    $waiting = optional_param('waiting', '', PARAM_INT);
-    $testing = optional_param('testing', '', PARAM_INT);
-    $published = optional_param('published', '', PARAM_INT);
-    $resolved = optional_param('resolved', '', PARAM_INT);
-    $abandonned = optional_param('abandonned', '', PARAM_INT);
-    $oncomment = optional_param('oncomment', '', PARAM_INT);
+    $event = required_param('event', PARAM_TEXT);
+    $state = required_param('state', PARAM_INT);
     $cc->events = $DB->get_field('tracker_issuecc', 'events', array('id' => $cc->id));
-    if (is_numeric($open)) {
-        $cc->events = ($open === 1) ? $cc->events | EVENT_OPEN : $cc->events & ~EVENT_OPEN;
+
+    switch($event) {
+        case 'open' : $eventcode = ENABLED_OPEN; break;
+        case 'resolving' : $eventcode = ENABLED_RESOLVING; break;
+        case 'waiting' : $eventcode = ENABLED_WAITING; break;
+        case 'resolved' : $eventcode = ENABLED_RESOLVED; break;
+        case 'abandonned' : $eventcode = ENABLED_ABANDONNED; break;
+        case 'transfered' : $eventcode = ENABLED_TRANSFERED; break;
+        case 'testing' : $eventcode = ENABLED_TESTING; break;
+        case 'published' : $eventcode = ENABLED_PUBLISHED; break;
+        case 'validated' : $eventcode = ENABLED_VALIDATED; break;
     }
-    if (is_numeric($resolving)) {
-        $cc->events = ($resolving === 1) ? $cc->events | EVENT_RESOLVING : $cc->events & ~EVENT_RESOLVING;
-    }
-    if (is_numeric($waiting)) {
-        $cc->events = ($waiting === 1) ? $cc->events | EVENT_WAITING : $cc->events & ~EVENT_WAITING;
-    }
-    if (is_numeric($testing)) {
-        $cc->events = ($testing === 1) ? $cc->events | EVENT_TESTING : $cc->events & ~EVENT_TESTING;
-    }
-    if (is_numeric($published)) {
-        $cc->events = ($published === 1) ? $cc->events | EVENT_PUBLISHED : $cc->events & ~EVENT_PUBLISHED;
-    }
-    if (is_numeric($resolved)) {
-        $cc->events = ($resolved === 1) ? $cc->events | EVENT_RESOLVED : $cc->events & ~EVENT_RESOLVED;
-    }
-    if (is_numeric($abandonned)) {
-        $cc->events = ($abandonned === 1) ? $cc->events | EVENT_ABANDONNED : $cc->events & ~EVENT_ABANDONNED;
-    }
-    if (is_numeric($oncomment)) {
-        $cc->events = ($oncomment === 1) ? $cc->events | ON_COMMENT : $cc->events & ~ON_COMMENT;
+    if ($state) {
+        $cc->events = $cc->events | $eventcode;
+    } else {
+        $cc->events = $cc->events & ~$eventcode;
     }
 
     $DB->update_record('tracker_issuecc', $cc);

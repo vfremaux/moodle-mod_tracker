@@ -279,7 +279,7 @@ if (!empty($issues)) {
                 $raiseurl = new moodle_url('/mod/tracker/pro/raiserequest.php', $params);
                 $alt = get_string('askraise', 'tracker');
                 $pix = $OUTPUT->pix_icon('askraise', $alt, 'mod_tracker');
-                $actions .= '&nbsp;<a href="'.$raiseurl.'" title="'..'" >'.$pix.'</a>';
+                $actions .= '&nbsp;<a href="'.$raiseurl.'" title="'.$alt.'" >'.$pix.'</a>';
             }
         }
         if (!empty($tracker->parent)) {

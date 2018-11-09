@@ -60,7 +60,7 @@ if ($action == 'savequery') {
         $error->message = get_string('namecannotbeblank', 'tracker');
         $error->on = 'name';
         $errors[] = $error;
-        $form->description = stripslashes($query->description);
+        $form->description = $query->description;
         include($CFG->dirroot.'/mod/tracker/views/addaquery.html');
         return -1;
     }
