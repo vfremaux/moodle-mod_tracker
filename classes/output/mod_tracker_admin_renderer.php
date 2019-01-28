@@ -218,7 +218,7 @@ class mod_tracker_admin_renderer extends \plugin_renderer_base {
                         $url = new moodle_url('/mod/tracker/view.php', $params);
                         $alt = get_string('setprivate', 'tracker');
                         $pix = $this->output->pix_icon('t/lock', $alt, 'core');
-                        $actions .= '&nbsp;<a href="'.$url.'" title="'..'">'.$pix.'</a>';
+                        $actions .= '&nbsp;<a href="'.$url.'" title="'.$alt.'">'.$pix.'</a>';
                     }
                 } else {
                     if ($element->has_private_option()) {
