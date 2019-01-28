@@ -1788,10 +1788,18 @@ function tracker_notifyccs_comment($issueid, $comment, $tracker = null) {
                 $notificationhtml = tracker_compile_mail_template('addcomment_html', $vars, $ccuser->lang);
                 $subject = get_string('commented', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
                 if ($CFG->debugsmtp) {
-                    echo "Sending Comment Input Mail Notification to ".fullname($ccuser)."<br/><pre>Subject: $subject\n#############\n".shorten_text($notification, 160).'</pre>';
+                    echo "Sending Comment Input Mail Notification to ".fullname($ccuser)."<br/><pre>Subject: $subject\n#############\n".shorten_text($notification, 160).'</pre><br/>';
                 }
                 email_to_user($ccuser, $USER, $subject, $notification, $notificationhtml);
+            } else {
+                if ($CFG->debugsmtp) {
+                    echo $OUTPUT->notification(fullname($ccuser)." disabled for comment norifications <br/>", 'notifyproblem');
+                }
             }
+        }
+    } else {
+        if ($CFG->debugsmtp) {
+            echo $OUTPUT->notification("No ccs to notifify", 'notifyproblem');
         }
     }
 }
