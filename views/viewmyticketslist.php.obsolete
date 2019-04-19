@@ -28,15 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/tablelib.php');
 
-// Get search engine related information.
-// Fields can come from a stored query,or from the current query in the user's client environement cookie.
-if (!isset($fields)) {
-    $fields = tracker_extractsearchcookies();
-}
-if (!empty($fields)) {
-    $searchqueries = tracker_constructsearchqueries($tracker->id, $fields, true);
-}
-
 $limit = 20;
 $page = optional_param('page', 1, PARAM_INT);
 
@@ -44,66 +35,61 @@ if ($page <= 0) {
     $page = 1;
 }
 
-if (isset($searchqueries)) {
-    $sql = $searchqueries->search;
-    $numrecords = $DB->count_records_sql($searchqueries->count);
+if ($resolved) {
+    $resolvedclause = " AND
+       (status = ".RESOLVED." OR
+       status = ".ABANDONNED.")
+    ";
 } else {
-    if ($resolved) {
-        $resolvedclause = " AND
-           (status = ".RESOLVED." OR
-           status = ".ABANDONNED.")
-        ";
-    } else {
-        $resolvedclause = " AND
-           status <> ".RESOLVED." AND
-           status <> ".ABANDONNED."
-        ";
-    }
-
-    $sql = "
-        SELECT
-            i.id,
-            i.summary,
-            i.datereported,
-            i.assignedto,
-            i.status,
-            i.resolutionpriority,
-            COUNT(ic.issueid) AS watches
-        FROM
-            {tracker_issue} i
-        LEFT JOIN
-            {tracker_issuecc} ic
-        ON
-            ic.issueid = i.id
-        WHERE
-            i.reportedby = {$USER->id} AND
-            i.trackerid = {$tracker->id}
-            $resolvedclause
-        GROUP BY
-            i.id,
-            i.summary,
-            i.datereported,
-            i.assignedto,
-            i.status,
-            i.resolutionpriority
+    $resolvedclause = " AND
+       status <> ".RESOLVED." AND
+       status <> ".ABANDONNED."
     ";
-
-    $sqlcount = "
-        SELECT
-            COUNT(*)
-        FROM
-            {tracker_issue} i
-        WHERE
-            i.reportedby = {$USER->id} AND
-            i.trackerid = {$tracker->id}
-            $resolvedclause
-    ";
-    $numrecords = $DB->count_records_sql($sqlcount);
 }
+
+$sql = "
+    SELECT
+        i.id,
+        i.summary,
+        i.datereported,
+        i.reportedby,
+        i.assignedto,
+        i.status,
+        i.resolutionpriority,
+        COUNT(ic.issueid) AS watches
+    FROM
+        {tracker_issue} i
+    LEFT JOIN
+        {tracker_issuecc} ic
+    ON
+        ic.issueid = i.id
+    WHERE
+        i.reportedby = {$USER->id} AND
+        i.trackerid = {$tracker->id}
+        $resolvedclause
+    GROUP BY
+        i.id,
+        i.summary,
+        i.datereported,
+        i.assignedto,
+        i.status,
+        i.resolutionpriority
+";
+
+$sqlcount = "
+    SELECT
+        COUNT(*)
+    FROM
+        {tracker_issue} i
+    WHERE
+        i.reportedby = {$USER->id} AND
+        i.trackerid = {$tracker->id}
+        $resolvedclause
+";
+$numrecords = $DB->count_records_sql($sqlcount);
 
 // Display list of my issues.
 echo $output;
-echo $renderer->search_queries($cm);
 
 $formurl = new moodle_url('/mod/tracker/view.php');
 echo '<form name="manageform" action="'.$formurl.'" method="post">';
@@ -204,10 +190,14 @@ if (!empty($issues)) {
     foreach ($issues as $issue) {
 
         $statusthin = '<div class="status-'.$statuscodes[$issue->status].' tracker-status-thin"></div>';
-
-        $params = array('id' => $cm->id, 'view' => 'view', 'issueid' => $issue->id);
-        $ticketurl = new moodle_url('/mod/tracker/view.php', $params);
-        $issuenumber = '<a href="'.$ticketurl.'">'.$tracker->ticketprefix.$issue->id.'</a>';
+        if (has_any_capability(array('mod/tracker:manage', 'mod/tracker:develop'), $context) ||
+            ($issue->reportedby == $USER->id)) {
+            $params = array('id' => $cm->id, 'view' => 'view', 'issueid' => $issue->id);
+            $ticketurl = new moodle_url('/mod/tracker/view.php', $params);
+            $issuenumber = '<a href="'.$ticketurl.'">'.$tracker->ticketprefix.$issue->id.'</a>';
+        } else {
+            $issuenumber = $tracker->ticketprefix.$issue->id;
+        }
 
         $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issue->id);
         $summaryurl = new moodle_url('/mod/tracker/view.php', $params);
@@ -232,8 +222,8 @@ if (!empty($issues)) {
             $nochoose = array('' => get_string('unassigned', 'tracker'));
             $assignedto = html_writer::select($developersmenu, 'assignedto'.$issue->id, $issue->assignedto, $nochoose, $attrs);
 
-        } else if (has_capability('mod/tracker:resolve', $context)) {
-            // Resolvers can give a bug back to managers.
+        } else if (has_capability('mod/tracker:develop', $context)) {
+            // Developers can give a bug back to managers.
             $status = $fullstatuskeys[0 + $issue->status].'<br/>';
             $attrs = array('onchange' => 'document.forms[\'manageform\'].schanged'.$issue->id.'.value = 1;');
             $status .= html_writer::select($statuskeys, 'status'.$issue->id, 0, array(), $attrs);
@@ -255,14 +245,7 @@ if (!empty($issues)) {
         $pix = $OUTPUT->pix_icon('solution', $alt, 'mod_tracker');
         $solution = ($hassolution) ? $pix : '';
         $actions = '';
-        if (has_capability('mod/tracker:manage', $context) ||
-                has_capability('mod/tracker:resolve', $context)) {
-            $params = array('id' => $cm->id, 'view' => 'resolved', 'issueid' => $issue->id, 'screen' => 'editanissue');
-            $actionurl = new moodle_url('/mod/tracker/view.php', $params);
-            $alt = get_string('update');
-            $pix = $OUTPUT->pix_icon('t/edit', $alt, 'core');
-            $actions = '<a href="'.$actionurl.'" title="'.$alt.'" >'.$pix.'</a>';
-        }
+
         if (has_capability('mod/tracker:manage', $context)) {
             $params = array('id' => $cm->id, 'view' => 'resolved', 'issueid' => $issue->id, 'what' => 'delete');
             $deleteurl = new moodle_url('/mod/tracker/view.php', $params);

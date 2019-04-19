@@ -35,6 +35,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
         $template = new Stdclass;
 
+        $template->id = $issue->id;
         $template->summary = format_string($issue->summary);
 
         if ($issue->downlink) {
@@ -252,10 +253,11 @@ class mod_tracker_renderer extends plugin_renderer_base {
      * prints comments for the given issue
      * @param int $issueid
      */
-    public function comments($comments, $initialviewmode) {
+    public function comments($comments, $initialviewmode, $addcommentlink = '') {
         global $OUTPUT, $DB;
 
         $template = new StdClass;
+        $template->addcommentlink = $addcommentlink;
 
         $template->initialcommentsviewmode = $initialviewmode;
 
@@ -900,7 +902,8 @@ class mod_tracker_renderer extends plugin_renderer_base {
         return html_writer::table($table);
     }
 
-    public function add_query_form(&$cm, $form) {
+    /*
+    public function add_query_form_obsolete(&$cm, $form) {
 
         $str = '';
 
@@ -967,6 +970,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
         return $str;
     }
+    */
 
     public function issue_js_init() {
         $str = '<script type="text/javascript">';
@@ -981,5 +985,334 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= '</script>';
 
         return $str;
+    }
+
+    public function status_listform_part(&$tracker, &$cm, &$issue, &$context) {
+
+        static $fullstatuskeys;
+        static $statuskeys;
+        static $statuscodes;
+
+        if (!isset($fullstatuskeys)) {
+            $fullstatuskeys = tracker_get_statuskeys($tracker);
+            $statuskeys = tracker_get_statuskeys($tracker, $cm);
+            $statuskeys[0] = get_string('nochange', 'tracker');
+            $statuscodes = tracker_get_statuscodes();
+        }
+
+        $template = new Stdclass;
+        $template->code = $statuscodes[$issue->status];
+        $template->static = $fullstatuskeys[0 + $issue->status];
+
+        if (has_capability('mod/tracker:manage', $context)) {
+            $template->editlink = true;
+        } else if (has_capability('mod/tracker:develop', $context)) {
+            $template->editlink = true;
+        } else if (has_capability('mod/tracker:resolve', $context)) {
+            $template->button = true;
+        }
+
+        /*
+        $rendered = $this->output->render_from_template('mod_tracker/listformstatuspart', $template);
+        return array($template->code, $rendered);
+        */
+        return $template;
+    }
+
+    public function assignedto_listform_part(&$issue, &$context) {
+        global $DB;
+
+        $template = new StdClass;
+
+        if (empty($issue->assignedto)) {
+            $template->unassigned = true;
+        } else {
+            $user = $DB->get_record('user', array('id' => $issue->assignedto));
+            $template->assignedto = fullname($user);
+        }
+
+        $systemcontext = context_system::instance();
+
+        if (has_capability('moodle/site:config', $systemcontext)) {
+            $template->editlink = true;
+            $template->giveto = 'all';
+        } else if (has_capability('mod/tracker:manage', $context)) {
+            $template->editlink = true;
+            $template->giveto = 'developers';
+        } else if (has_capability('mod/tracker:develop', $context)) {
+            $template->editlink = true;
+            $template->giveto = 'managers';
+        }
+        return $template;
+    }
+
+    public function controls_listform_part(&$cm, &$issue, &$context) {
+        global $DB, $USER;
+
+        $screen = optional_param('screen', '', PARAM_TEXT);
+
+        $actions = '';
+        if (has_capability('mod/tracker:manage', $context)) {
+            $params = array('id' => $cm->id, 'issueid' => $issue->id, 'what' => 'delete');
+            $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
+            $alt = get_string('delete');
+            $pix = $this->output->pix_icon('t/delete', $alt, 'core');
+            $actions .= '&nbsp;<a href="'.$deleteurl.'" title="'.$alt.'" >'.$pix.'</a>';
+        }
+
+        if (!$DB->get_record('tracker_issuecc', array('userid' => $USER->id, 'issueid' => $issue->id))) {
+            $params = array('id' => $cm->id,
+                            'view' => 'profile',
+                            'screen' => $screen,
+                            'issueid' => $issue->id,
+                            'what' => 'register');
+            $registerurl = new moodle_url('/mod/tracker/view.php', $params);
+            $alt = get_string('register', 'tracker');
+            $pix = $this->output->pix_icon('register', $alt, 'mod_tracker');
+            $actions .= '&nbsp;<a href="'.$registerurl.'" title="'.$alt.'" >'.$pix.'</a>';
+        }
+
+        $sort = optional_param('sort', 'resolutionpriority', PARAM_TEXT);
+        if (preg_match('/^resolutionpriority/', $sort)) {
+            $actions .= $this->prioritycontrols_listform_part($cm, $issue, $context);
+        }
+
+        return $actions;
+    }
+
+    public function prioritycontrols_listform_part(&$cm, &$issue, &$context) {
+
+        $actions = '';
+
+        if (has_capability('mod/tracker:managepriority', $context)) {
+
+            if ($issue->resolutionpriority < $issue->maxpriority) {
+                $params = array('id' => $cm->id, 'issueid' => $issue->id, 'what' => 'raisetotop');
+                $raiseurl = new moodle_url('/mod/tracker/view.php', $params);
+                $alt = get_string('raisetotop', 'tracker');
+                $pix = $this->output->pix_icon('totop', $alt, 'mod_tracker');
+                $actions .= '&nbsp;<a href="'.$raiseurl.'" title="'.$alt.'" >'.$pix.'</a>';
+
+                $params = array('id' => $cm->id, 'issueid' => $issue->id, 'what' => 'raisepriority');
+                $rpurl = new moodle_url('/mod/tracker/view.php', $params);
+                $alt = get_string('raisepriority', 'tracker');
+                $pix = $this->output->pix_icon('up', $alt, 'mod_tracker');
+                $actions .= '&nbsp;<a href="'.$rpurl.'" title="'.$alt.'" >'.$pix.'</a>';
+            } else {
+                $actions .= '&nbsp;'.$this->output->pix_icon('up_shadow', '', 'mod_tracker');
+                $actions .= '&nbsp;'.$this->output->pix_icon('totop_shadow', '', 'mod_tracker');
+            }
+
+            if ($issue->resolutionpriority > 1) {
+                $params = array('id' => $cm->id, 'issueid' => $issue->id, 'what' => 'lowerpriority');
+                $lowerurl = new moodle_url('/mod/tracker/view.php', $params);
+                $alt = get_string('lowerpriority', 'tracker');
+                $pix = $this->output->pix_icon('down', $alt, 'mod_tracker');
+                $actions .= '&nbsp;<a href="'.$lowerurl.'" title="'.$alt.'" >'.$pix.'</a>';
+
+                $params = array('id' => $cm->id, 'issueid' => $issue->id, 'what' => 'lowerpriority');
+                $lburl = new moodle_url('/mod/tracker/view.php', $params);
+                $alt = get_string('lowertobottom', 'tracker');
+                $pix = $this->output->pix_icon('tobottom', $alt, 'mod_tracker');
+                $actions .= '&nbsp;<a href="'.$lburl.'" title="'.$alt.'" ></a>';
+            } else {
+                $actions .= '&nbsp;'.$this->output->pix_icon('down_shadow', '', 'mod_tracker');
+                $actions .= '&nbsp;'.$this->output->pix_icon('tobottom_shadow', '', 'mod_tracker');
+            }
+        }
+
+        return $actions;
+    }
+
+    public function list_edit_form($args) {
+        global $DB;
+
+        static $fullstatuskeys;
+        static $statuskeys;
+        static $statuscodes;
+
+        $cmid = $DB->get_field('context', 'instanceid', array('id' => $args->ctx));
+        $context = context_module::instance($cmid);
+        if (!$context) {
+            throw new MoodleException('Unkown context ID '.$args->ctx);
+        }
+        $systemcontext = context_system::instance();
+
+        if ($args->mode == 'assignedto') {
+            $usermenu = array();
+            if (has_capability('moodle/site:config', $systemcontext)) {
+                if ($developers = tracker_getdevelopers($context)) {
+                    foreach ($developers as $developer) {
+                        $usersmenu[$developer->id] = fullname($developer);
+                    }
+                }
+                $managers = tracker_getadministrators($context);
+                if ($developers = tracker_getdevelopers($context)) {
+                    foreach ($managers as $manager) {
+                        $usersmenu[$manager->id] = fullname($manager);
+                    }
+                }
+            } else if (has_capability('mod/tracker:manage', $context)) {
+                // Managers can assign bugs to any developer.
+                if ($developers = tracker_getdevelopers($context)) {
+                    foreach ($developers as $developer) {
+                        $usersmenu[$developer->id] = fullname($developer);
+                    }
+                }
+            } else if (has_capability('mod/tracker:develop', $context)) {
+                // Developers can giveback a bug back to managers.
+                $managers = tracker_getadministrators($context);
+                if ($developers = tracker_getdevelopers($context)) {
+                    foreach ($managers as $manager) {
+                        $usersmenu[$manager->id] = fullname($manager);
+                    }
+                }
+            }
+
+            if (!empty($usersmenu)) {
+                $issue = $DB->get_record('tracker_issue', array('id' => $args->id));
+
+                $template->select = '<select id="assignedto-select-'.$issue->id.'" name="assignedto-'.$issue->id.'" class="select selectpicker">'."\n";
+                $selected = (empty($issue->assignedto)) ? 'selected="selected"' : '';
+                $template->select .= '<option value="0" '.$selected.'>'.get_string('unassigned', 'tracker').'</option>'."\n";
+                foreach ($usersmenu as $k => $v) {
+                    $selected = ($issue->assignedto == $k) ? 'selected="selected"' : '';
+                    $template->select .= '<option value="'.$k.'" '.$selected.'>'.$v.'</option>'."\n";
+                }
+                $template->select .= '</select>'."\n";
+            }
+        } else if ($args->mode == 'status') {
+
+            $cm = $DB->get_record('course_modules', array('id' => $context->instanceid));
+            $tracker = $DB->get_record('tracker', array('id' => $cm->instance));
+            $issue = $DB->get_record('tracker_issue', array('id' => $args->id));
+
+            if (!isset($fullstatuskeys)) {
+                $fullstatuskeys = tracker_get_statuskeys($tracker);
+                $statuskeys = tracker_get_statuskeys($tracker, $cm);
+                $statuscodes = tracker_get_statuscodes();
+            }
+
+            $template = new Stdclass;
+            $template->code = $statuscodes[$issue->status];
+            $template->static = $fullstatuskeys[0 + $issue->status];
+
+            if (has_capability('mod/tracker:manage', $context) ||
+                    has_capability('mod/tracker:develop', $context)) {
+                $hasselect = true;
+            }
+            if ($hasselect) {
+                $template->select = '<select id="status-select-'.$issue->id.'" name="status-'.$issue->id.'" class="select selectpicker">'."\n";
+                foreach ($statuskeys as $k => $v) {
+                    $selected = ($issue->status == $k) ? 'selected="selected"' : '';
+                    $template->select .= '<option value="'.$k.'" '.$selected.' data-content="<span class=\'status-'.$statuscodes[$k].'\'>'.$v.'</span>">'.$v.'</option>'."\n";
+                }
+                $template->select .= '</select>'."\n";
+            }
+        }
+
+        $str = $this->output->render_from_template('mod_tracker/listeditform', $template);
+        return $str;
+    }
+
+    public static function select(array $options,
+                                  $name,
+                                  $selected = '',
+                                  $nothing = array('' => 'choosedots'),
+                                  array $attributes = null,
+                                  $classprefix = '',
+                                  $classvaluemapping = null) {
+
+        $attributes = (array)$attributes;
+        if (is_array($nothing)) {
+            foreach ($nothing as $k=>$v) {
+                if ($v === 'choose' or $v === 'choosedots') {
+                    $nothing[$k] = get_string('choosedots');
+                }
+            }
+            $options = $nothing + $options; // keep keys, do not override
+
+        } else if (is_string($nothing) and $nothing !== '') {
+            // BC
+            $options = array(''=>$nothing) + $options;
+        }
+
+        // we may accept more values if multiple attribute specified
+        $selected = (array)$selected;
+        foreach ($selected as $k=>$v) {
+            $selected[$k] = (string)$v;
+        }
+
+        if (!isset($attributes['id'])) {
+            $id = 'menu'.$name;
+            // name may contaion [], which would make an invalid id. e.g. numeric question type editing form, assignment quickgrading
+            $id = str_replace('[', '', $id);
+            $id = str_replace(']', '', $id);
+            $attributes['id'] = $id;
+        }
+
+        if (!isset($attributes['class'])) {
+            $class = 'menu'.$name;
+            // name may contaion [], which would make an invalid class. e.g. numeric question type editing form, assignment quickgrading
+            $class = str_replace('[', '', $class);
+            $class = str_replace(']', '', $class);
+            $attributes['class'] = $class;
+        }
+        $attributes['class'] = 'select ' . $attributes['class']; // Add 'select' selector always
+
+        $attributes['name'] = $name;
+
+        if (!empty($attributes['disabled'])) {
+            $attributes['disabled'] = 'disabled';
+        } else {
+            unset($attributes['disabled']);
+        }
+
+        $output = '';
+        foreach ($options as $value=>$label) {
+            if (is_array($label)) {
+                // ignore key, it just has to be unique
+                $output .= html_writer::select_optgroup(key($label), current($label), $selected);
+            } else {
+                if (is_array($classvaluemapping) && array_key_exists($value, $classvaluemapping)) {
+                    $optionclass = $classprefix.$classvaluemapping[$value];
+                } else {
+                    $optionclass = $classprefix.$value;
+                }
+                $output .= self::select_option($label, $value, $selected, $optionclass);
+            }
+        }
+        return html_writer::tag('select', $output, $attributes);
+    }
+
+    /**
+     * Returns HTML to display a select box option.
+     *
+     * @param string $label The label to display as the option.
+     * @param string|int $value The value the option represents
+     * @param array $selected An array of selected options
+     * @return string HTML fragment
+     */
+    private static function select_option($label, $value, array $selected, $optionclass = '') {
+        $attributes = array();
+        $value = (string)$value;
+        if (in_array($value, $selected, true)) {
+            $attributes['selected'] = 'selected';
+        }
+        $attributes['value'] = $value;
+        $attributes['class'] = $optionsclass;
+        return html_writer::tag('option', $label, $attributes);
+    }
+
+    public function last_comment($lastcomment) {
+        global $DB;
+
+        $commentuser = $DB->get_record('user', array('id' => $lastcomment->userid));
+
+        $template = new StdClass;
+        $template->comment = format_text($lastcomment->comment, $lastcomment->commentformat);
+        $template->by = fullname($commentuser).' '.$this->output->user_picture($commentuser);
+
+        return $this->output->render_from_template('mod_tracker/lastcomment', $template);
     }
 }

@@ -30,10 +30,11 @@ require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 
 $PAGE->requires->jquery();
 $PAGE->requires->js_call_amd('mod_tracker/tracker', 'init');
+$PAGE->requires->jquery_plugin('mod-tracker-bootstrapselect', 'mod_tracker', true);
 
 // Check for required parameters.
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID
-$t  = optional_param('t', 0, PARAM_INT);  // Tracker instance ID.
+$t = optional_param('t', 0, PARAM_INT);  // Tracker instance ID.
 $issueid = optional_param('issueid', '', PARAM_INT);  // Ticket number.
 $action = optional_param('what', '', PARAM_ALPHA);
 
@@ -175,7 +176,7 @@ if ($view == 'view') {
         switch ($screen) {
             case 'mywork': {
                 $resolved = 0;
-                include($CFG->dirroot.'/mod/tracker/views/viewmyassignedticketslist.php');
+                include($CFG->dirroot.'/mod/tracker/views/viewissuelist.php');
                 break;
             }
 
@@ -218,7 +219,7 @@ if ($view == 'view') {
             case 'mytickets':
             default:
                 $resolved = 0;
-                include($CFG->dirroot.'/mod/tracker/views/viewmyticketslist.php');
+                include($CFG->dirroot.'/mod/tracker/views/viewissuelist.php');
         }
     }
 } else if ($view == 'resolved') {
@@ -226,7 +227,7 @@ if ($view == 'view') {
         switch ($screen) {
             case 'mywork':
                 $resolved = 1;
-                include($CFG->dirroot.'/mod/tracker/views/viewmyassignedticketslist.php');
+                include($CFG->dirroot.'/mod/tracker/views/viewissuelist.php');
                 break;
 
             case 'browse':
@@ -296,11 +297,6 @@ if ($view == 'view') {
 
             case 'mywatches': {
                 include($CFG->dirroot.'/mod/tracker/views/mywatches.php');
-                break;
-            }
-
-            case 'myqueries': {
-                include($CFG->dirroot.'/mod/tracker/views/myqueries.php');
                 break;
             }
 

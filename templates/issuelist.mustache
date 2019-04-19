@@ -1,0 +1,26 @@
+
+
+
+<!-- mod_tracker/issuelistform -->
+<form name="manageform" action="{{{formurl}}}" method="post">
+<input type="hidden" name="id" value="{{cmid}}" />
+<input type="hidden" name="what" value="updatelist" />
+<input type="hidden" name="view" value="view" />
+<input type="hidden" name="screen" value="browse" />
+
+{{#emptylist}}
+{{{emptynotification}}}
+{{/emptylist}}
+
+{{^emptylist}}
+{{{listtable}}}
+
+{{#cansubmit}}
+<center>
+<p><input type="submit" name="go_btn" value="{{#str}}savechanges, core{{/str}}" /></p>
+</center>
+{{/cansubmit}}
+{{/emptylist}}
+
+</form>
+<!-- /mod_tracker/issuelistform -->

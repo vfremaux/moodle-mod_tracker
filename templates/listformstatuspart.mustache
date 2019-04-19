@@ -1,0 +1,21 @@
+
+
+
+<!-- mod_tracker/listformstatuspart -->
+<div class="tracker-status-{{status.code}} tracker-status">
+
+    {{#status.static}}
+    <span id="tracker-status-{{id}}">
+    {{{status.static}}}
+    </span>
+    {{/status.static}}
+
+    {{#status.editlink}}
+    <span class="fa fa-edit icon tracker-issue-edit-handle" data-toggle="modal" data-target="#issuelist-edit-form" data-mode="status" data-context="{{contextid}}" id="issue-edit-status-handle-{{id}}"></span>
+    {{/status.editlink}}
+
+    {{#status.button}}
+    <button id="resolve-{{id}}">{{#str}}solve, mod_tracker{{/str}}</button>
+    {{/status.button}}
+</div>
+<!-- /mod_tracker/listformstatuspart -->

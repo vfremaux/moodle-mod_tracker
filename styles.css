@@ -37,60 +37,70 @@
     margin:1px;
 }
 
+.generaltable tbody > tr:nth-child(2n+1) > td.status-validated,
 .status-validated {
     background-color: #58E205;
     color: white;
     font-weight: bold;
 }
 
+.generaltable tbody > tr:nth-child(2n+1) > .status-resolved,
 .status-resolved {
     background-color: #2EAA20;
     color: white;
     font-weight: bold;
 }
 
+.generaltable tbody > tr:nth-child(2n+1) > .status-posted,
 .status-posted {
     background-color: #D90000;
     color: white;
     font-weight: bold;
 }
 
+.generaltable tbody > tr:nth-child(2n+1) > .status-open,
 .status-open {
     background-color: #FF8000;
     color: black;
     font-weight: bold;
 }
 
+.generaltable tbody > tr:nth-child(2n+1) > .status-resolving,
 .status-resolving {
     background-color: #FCDD03;
     color: black;
     font-weight: bold;
 }
 
+.generaltable tbody > tr:nth-child(2n+1) > .status-waiting,
 .status-waiting {
     background-color: #BAAB45;
     color: black;
     font-weight: bold;
 }
 
+.generaltable tbody > tr:nth-child(2n+1) > .status-abandonned,
 .status-abandonned {
     background-color: #454747;
     color: white;
     font-weight: bold;
 }
 
+.generaltable tbody > tr:nth-child(2n+1) > .status-transfered,
 .status-transfered {
     background-color: #E4E4E4;
     color: black;
     font-weight: normal;
 }
 
+.generaltable tbody > tr:nth-child(2n+1) > .status-testing,
 .status-testing {
     background-color: #B8F079;
     color: black;
     font-weight: normal;
 }
 
+.generaltable tbody > tr:nth-child(2n+1) > .status-published,
 .status-published {
     background-color: #58BCF1;
     color: black;
@@ -320,4 +330,16 @@
 
 #tracker-cc-form {
     padding-top: 5px;
+}
+
+#tracker-post-addcomment-link {
+    text-align: right;
+}
+
+.tracker-issue-lastcomment {
+    margin: 20px 0px 20px 150px;
+    padding: 20px;
+    background-color: #fdfbdb;
+    border: solid 1px #888;
+    border-radius: 10px;
 }

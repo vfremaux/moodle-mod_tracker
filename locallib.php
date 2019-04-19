@@ -38,7 +38,7 @@ define('TESTING', 7);
 define('PUBLISHED', 8);
 define('VALIDATED', 9);
 
-// Preference defines.
+// Status defines.
 define('ENABLED_POSTED', 1);
 define('ENABLED_OPEN', 2);
 define('ENABLED_RESOLVING', 4);
@@ -1155,7 +1155,7 @@ function tracker_register_cc(&$tracker, &$issue, $userid) {
     if ($userid && !$DB->get_record('tracker_issuecc', $params)) {
         // Add new the assignee as new CC !!
         // We do not discard the old one as he may be still concerned.
-        $eventmask = 127;
+        $eventmask = ALL_EVENTS;
         $params = array('trackerid' => $tracker->id, 'userid' => $userid, 'name' => 'eventmask');
         if ($userprefs = $DB->get_record('tracker_preferences', $params)) {
             $eventmask = $userprefs->value;
@@ -1167,6 +1167,102 @@ function tracker_register_cc(&$tracker, &$issue, $userid) {
         $cc->events = $eventmask;
         $DB->insert_record('tracker_issuecc', $cc);
     }
+}
+
+function tracker_get_issues(&$tracker, $resolved, $screen, $sort, $limitfrom, $pagesize) {
+    global $DB, $USER;
+
+    $params = array($tracker->id);
+
+    // Check we display only resolved tickets or working.
+    if ($resolved) {
+        $resolvedclause = " AND
+           (status = ".RESOLVED." OR
+           status = ".ABANDONNED.")
+        ";
+    } else {
+        $resolvedclause = " AND
+           status <> ".RESOLVED." AND
+           status <> ".ABANDONNED."
+        ";
+    }
+
+    $userclause = '';
+    switch ($screen) {
+        case 'mytickets': {
+            $userclause = " AND reportedby = ? ";
+            $params[] = $USER->id;
+            break;
+        }
+        case 'mywork': {
+            $userclause = " AND assignedto = ? ";
+            $params[] = $USER->id;
+            break;
+        }
+    }
+
+    $sql = "
+        SELECT
+            i.id,
+            i.summary,
+            i.datereported,
+            i.reportedby,
+            i.assignedto,
+            i.status,
+            i.resolutionpriority,
+            u.firstname firstname,
+            u.lastname lastname,
+            COUNT(ic.issueid) watches
+        FROM
+            {tracker_issue} i
+        LEFT JOIN
+            {tracker_issuecc} ic
+        ON
+            ic.issueid = i.id
+        LEFT JOIN
+            {user} u
+        ON
+            i.reportedby = u.id
+        WHERE
+            i.reportedby = u.id AND
+            i.trackerid = ?
+            $resolvedclause
+            $userclause
+        GROUP BY
+            i.id,
+            i.summary,
+            i.datereported,
+            i.reportedby,
+            i.assignedto,
+            i.status,
+            i.resolutionpriority,
+            u.firstname,
+            u.lastname
+    ";
+
+    $sqlcount = "
+        SELECT
+            COUNT(*)
+        FROM
+            {tracker_issue} i,
+            {user} u
+        WHERE
+            i.reportedby = u.id AND
+            i.trackerid = ?
+            $resolvedclause
+            $userclause
+    ";
+    $numrecords = $DB->count_records_sql($sqlcount, $params);
+
+    if (!empty($sort)) {
+        $sql .= " ORDER BY $sort";
+    } else {
+        $sql .= " ORDER BY resolutionpriority ASC";
+    }
+
+    $issues = $DB->get_records_sql($sql, $params, $limitfrom, $pagesize);
+
+    return array($issues, $numrecords);
 }
 
 /**
