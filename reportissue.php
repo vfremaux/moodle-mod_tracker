@@ -50,46 +50,53 @@ $renderer = $PAGE->get_renderer('mod_tracker');
 $params = array('tracker' => $tracker, 'cmid' => $id, 'mode' => 'add');
 $form = new TrackerIssueForm(new moodle_url('/mod/tracker/reportissue.php'), $params);
 
-if (!$form->is_cancelled()) {
-    if ($data = $form->get_data()) {
+if ($form->is_cancelled()) {
+    redirect(new moodle_url('/mod/tracker/view.php', array('id' => $id)));
+}
 
-        if (!$issue = tracker_submitanissue($tracker, $data)) {
-            print_error('errorcannotsubmitticket', 'tracker');
-        }
+if ($data = $form->get_data()) {
 
-        $event = \mod_tracker\event\tracker_issuereported::create_from_issue($tracker, $issue->id);
-        $event->trigger();
+    if (!$issue = tracker_submitanissue($tracker, $data)) {
+        print_error('errorcannotsubmitticket', 'tracker');
+    }
 
-        // Stores files.
-        $data = file_postupdate_standard_editor($data, 'description', $form->editoroptions, $context, 'mod_tracker',
-                                                'issuedescription', $data->issueid);
-        // Update back reencoded field text content.
-        $DB->set_field('tracker_issue', 'description', $data->description, array('id' => $issue->id));
+    $event = \mod_tracker\event\tracker_issuereported::create_from_issue($tracker, $issue->id);
+    $event->trigger();
 
-        // Log state change.
-        $stc = new StdClass;
-        $stc->userid = $USER->id;
-        $stc->issueid = $issue->id;
-        $stc->trackerid = $tracker->id;
-        $stc->timechange = time();
-        $stc->statusfrom = POSTED;
-        $stc->statusto = POSTED;
-        $DB->insert_record('tracker_state_change', $stc);
-        echo $OUTPUT->header();
-        echo $OUTPUT->box_start('generalbox', 'tracker-acknowledge');
-        echo (empty($tracker->thanksmessage)) ? get_string('thanksdefault', 'tracker') : format_string($tracker->thanksmessage);
-        echo $OUTPUT->box_end();
-        echo $OUTPUT->continue_button(new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => 'view', 'screen' => 'browse')));
-        echo $OUTPUT->footer();
+    // Stores files.
+    $data = file_postupdate_standard_editor($data, 'description', $form->editoroptions, $context, 'mod_tracker',
+                                            'issuedescription', $data->issueid);
+    // Update back reencoded field text content.
+    $DB->set_field('tracker_issue', 'description', $data->description, array('id' => $issue->id));
 
-        // Notify all admins.
-        if ($tracker->allownotifications) {
-            tracker_notify_submission($issue, $cm, $tracker);
-            if ($issue->assignedto) {
-                tracker_notifyccs_changeownership($issue->id, $tracker);
-            }
+    // Log state change.
+    $stc = new StdClass;
+    $stc->userid = $USER->id;
+    $stc->issueid = $issue->id;
+    $stc->trackerid = $tracker->id;
+    $stc->timechange = time();
+    $stc->statusfrom = POSTED;
+    $stc->statusto = POSTED;
+    $DB->insert_record('tracker_state_change', $stc);
+
+    echo $OUTPUT->header();
+
+    echo $OUTPUT->box_start('generalbox', 'tracker-acknowledge');
+    echo (empty($tracker->thanksmessage)) ? get_string('thanksdefault', 'tracker') : format_string($tracker->thanksmessage);
+    echo $OUTPUT->box_end();
+    echo $OUTPUT->continue_button(new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => 'view', 'screen' => 'browse')));
+
+    tracker_recordelements($issue, $data);
+
+    // Notify all admins.
+    if ($tracker->allownotifications) {
+        tracker_notify_submission($issue, $cm, $tracker);
+        if ($issue->assignedto) {
+            tracker_notifyccs_changeownership($issue->id, $tracker);
         }
     }
+    echo $OUTPUT->footer();
+    die;
 }
 
 echo $OUTPUT->header();
@@ -99,6 +106,9 @@ echo $renderer->tabs($view, $screen, $tracker, $cm);
 
 $formdata = new StdClass;
 $formdata->id = $id;
+if (!empty($tracker->defaultassignee)) {
+    $formdata->assignedto = $tracker->defaultassignee;
+}
 $form->set_data($formdata);
 $form->display();
 

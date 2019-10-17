@@ -35,6 +35,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
         $template = new Stdclass;
 
+        $template->id = $issue->id;
         $template->summary = format_string($issue->summary);
 
         if ($issue->downlink) {
@@ -93,31 +94,25 @@ class mod_tracker_renderer extends plugin_renderer_base {
             }
         }
 
-        $template->strissuenumber = get_string('issuenumber', 'tracker');
         $template->fullid = $tracker->ticketprefix.$issue->id;
-        $template->strstzatus = get_string('status', 'tracker');
         $template->statuscode = $statuscodes[$issue->status];
         $template->status = $statuskeys[$issue->status];
 
-        $template->strreportedby = get_string('reportedby', 'tracker');
         $template->reporterpicture = $this->output->user_picture($issue->reporter);
         $template->reportername = fullname($issue->reporter);
 
-        $template->strdatereported = get_string('datereported', 'tracker');
         $template->datereported = userdate($issue->datereported);
 
-        $template->strassignedto = get_string('assignedto', 'tracker');
-        if (!$issue->owner) {
+        if (!$issue->assignedto) {
             $template->assignedto = get_string('unassigned', 'tracker');
         } else {
-            $str = $this->output->user_picture($issue->owner, array('courseid' => $COURSE->id, 'size' => 35));
+            $owner = $DB->get_record('user', array('id' => $issue->assignedto));
+            $str = $this->output->user_picture($owner, array('courseid' => $COURSE->id, 'size' => 35));
             $str .= '&nbsp;'.fullname($issue->owner);
             $template->assignedto = $str;
         }
-        $template->strcced = get_string('cced', 'tracker');
         $template->ccscount = (empty($ccs) || count(array_keys($ccs)) == 0) ? 0 : count($ccs);
 
-        $template->strdescription = get_string('description');
         $template->description = format_text($issue->description);
 
         return $this->render_from_template('mod_tracker/coreissue', $template);
@@ -163,7 +158,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
     public function issue_attributes($issue, $elementsused) {
 
-        $str = '';
+        $template = new StdClass;
 
         $cm = get_coursemodule_from_instance('tracker', $issue->trackerid);
         $context = context_module::instance($cm->id);
@@ -179,23 +174,18 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     continue;
                 }
 
+                $attributetpl = new Stdclass;
                 // Print first category in one column.
-                $str .= '<tr valign="top">';
-                $str .= '<td colspan="1" class="tracker-issue-description">';
-                $str .= '<b>';
-                $str .= format_string($elementsused[$key]->description);
-                $str .= ':</b><br />';
-                $str .= '</td>';
-
-                $str .= '<td colspan="3" class="tracker-issue-value">';
-                $str .= $elementsused[$key]->view($issue->id);
-                $str .= '</td>';
-                $str .= '</tr>';
+                $attributetpl->name = format_string($elementsused[$key]->description);
+                $attributetpl->value = $elementsused[$key]->view($issue->id);
+                $attributetpl->isprivate = $elementsused[$key]->private;
                 $i++;
+
+                $template-> attributes[] = $attributetpl;
             }
         }
 
-        return $str;
+        return $this->output->render_from_template('mod_tracker/issueattributes', $template);
     }
 
     public function resolution($issue) {
@@ -251,29 +241,92 @@ class mod_tracker_renderer extends plugin_renderer_base {
      * prints comments for the given issue
      * @param int $issueid
      */
-    public function comments($issueid) {
-        global $DB;
+    public function comments($comments, $initialviewmode, $addcommentlink = '') {
+        global $OUTPUT, $DB;
 
-        $str = '';
+        $template = new StdClass;
+        $template->addcommentlink = $addcommentlink;
 
-        $comments = $DB->get_records('tracker_issuecomment', array('issueid' => $issueid), 'datecreated');
+        $template->initialcommentsviewmode = $initialviewmode;
+
         if ($comments) {
             foreach ($comments as $comment) {
+                $commenttpl = new StdClass;
                 $user = $DB->get_record('user', array('id' => $comment->userid));
-                $str .= '<tr>';
-                $str .= '<td valign="top" class="commenter" width="30%">';
-                $str .= $this->user($user);
-                $str .= '<br/>';
-                $str .= '<span class="timelabel">'.userdate($comment->datecreated).'</span>';
-                $str .= '</td>';
-                $str .= '<td colspan="3" valign="top" align="left" class="comment">';
-                $str .= $comment->comment;
-                $str .= '</td>';
-                $str .= '</tr>';
+                $commenttpl->user = $this->user($user);
+                $commenttpl->datecreated = userdate($comment->datecreated);
+                $commenttpl->comment = format_text($comment->comment);
+                $template->comments[] = $commenttpl;
             }
         }
 
-        return $str;
+        return $OUTPUT->render_from_template('mod_tracker/comments', $template);
+    }
+
+    public function dependencies($tracker, $issue, $initialviewmode) {
+
+
+        $template = new StdClass;
+        $template->initialviewmode = $initialviewmode;
+
+        $template->parents = $this->parents($tracker, $issue->id, -20);
+        $template->this = $tracker->ticketprefix.$issue->id.' - '.format_string($issue->summary).'<br/>';
+        $template->childs = $this->childs($tracker, $issue->id, 20);
+
+        return $this->output->render_from_template('mod_tracker/dependencies', $tracker);
+    }
+
+    protected function childs(&$tracker, $issueid, $indent) {
+
+        $statuskeys = tracker_get_statuskeys($tracker);
+        $statuscodes = tracker_get_statuscodes();
+
+        $res = tracker_get_children($tracker, $issueid);
+        $childs = array();
+        if ($res) {
+            foreach ($res as $asub) {
+                $tpl = new StdClass;
+                $params = array('t' => $tracker->id, 'what' => 'viewanissue', 'issueid' => $asub->childid);
+                $issueurl = new moodle_url('/mod/tracker/view.php', $params);
+                $link = '<a href="'.$issueurl.'">'.$tracker->ticketprefix.$asub->childid.' - '.format_string($asub->summary).'</a>';
+                $tpl->link = $link;
+                $tpl->indent = $indent;
+                $tpl->status = $statuscodes[$asub->status];
+                $tpl->key = $statuskeys[$asub->status];
+                $childs[] = $tpl;
+                $indent = $indent + 20;
+                $subs = $this->childs($tracker, $asub->childid, true, $indent);
+                $childs = $childs + $subs;
+                $indent = $indent - 20;
+            }
+        }
+        return $childs;
+    }
+
+    protected function parents(&$tracker, $issueid, $indent) {
+
+        $statuskeys = tracker_get_statuskeys($tracker);
+        $statuscodes = tracker_get_statuscodes();
+
+        $res = tracker_get_parents($tracker, $issueid);
+        $parents = array();
+        if ($res) {
+            foreach ($res as $asub) {
+                $indent = $indent - 20;
+                $parents = $this->parents($tracker, $asub->parentid, $indent);
+                $indent = $indent + 20;
+                $tpl = new StdClass;
+                $params = array('t' => $tracker->id, 'what' => 'viewanissue', 'issueid' => $asub->childid);
+                $issueurl = new moodle_url('/mod/tracker/view.php', $params);
+                $link = '<a href="'.$issueurl.'">'.$tracker->ticketprefix.$asub->childid.' - '.format_string($asub->summary).'</a>';
+                $tpl->link = $link;
+                $tpl->indent = $indent;
+                $tpl->status = $statuscodes[$asub->status];
+                $tpl->key = $statuskeys[$asub->status];
+                $parents[] = $tpl;
+            }
+        }
+        return $parents;
     }
 
     /**
@@ -295,11 +348,11 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 $jshandler = 'this.target=\'message\';';
                 $jshandler .= 'return openpopup(\'/message/discussion.php?id={$user->id}\', \'message\',';
                 $jshandler .= '\'menubar=0,location=0,scrollbars,status,resizable,width=400,height=500\', 0);';
-                $pix = '<img src="'.$this->output->pix_url('t/message', 'core').'">';
+                $pix = $this->output->pix_icon('t/message', '', 'core');
                 $str .= '&nbsp;<a href="" onclick="'.$jshandler.'" >'.$pix.'</a>';
             } else if (!$user->emailstop && $user->maildisplay) {
                 $str .= '&nbsp;<a href="'.$userurl.'">'.fullname($user).'</a>';
-                $str .= '&nbsp;<a href="mailto:'.$user->email.'"><img src="'.$this->output->pix_url('t/mail', 'core').'"></a>';
+                $str .= '&nbsp;<a href="mailto:'.$user->email.'">'.$this->output->pix_icon('t/mail', '', 'core').'</a>';
             } else {
                 $str .= '&nbsp;'.fullname($user);
             }
@@ -311,26 +364,16 @@ class mod_tracker_renderer extends plugin_renderer_base {
     public function ccs(&$ccs, &$issue, &$cm, &$cced, $initialviewmode) {
         global $DB;
 
-        $str = '';
+        $template = new StdClass;
 
-        $str .= '<tr>';
-        $str .= '<td colspan="4" width="100%" class="tracker-ccs">';
-        $str .= '<table id="tracker-issueccs" class="'.$initialviewmode.'" width="100%">';
-        $str .= '<tr valign="top">';
-        $str .= '<td colspan="3">';
-        $str .= $this->output->heading(get_string('cced', 'tracker'));
-        $str .= '</td>';
-        $str .= '</tr>';
+        $template->initialviewmode = $initialviewmode;
+        $template->ccedstr = get_string('cced', 'tracker');
 
         foreach ($ccs as $cc) {
-            $str .= '<tr valign="top">';
-            $str .= '<td width="20%" valign="top">&nbsp;</td>';
-            $str .= '<td align="left" style="white-space : nowrap" valign="top">';
+            $cctpl = new StdClass;
             $user = $DB->get_record('user', array('id' => $cc->userid));
-            $str .= $this->user($user);
+            $cctpl->ccuser = $this->user($user);
             $cced[] = $cc->userid;
-            $str .= '</td>';
-            $str .= '<td align="right">';
             if (has_capability('mod/tracker:managewatches', context_module::instance($cm->id))) {
                 $params = array('id' => $cm->id,
                                 'view' => 'view',
@@ -338,52 +381,37 @@ class mod_tracker_renderer extends plugin_renderer_base {
                                 'issueid' => $issue->id,
                                 'ccid' => $cc->userid);
                 $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$this->output->pix_url('t/delete', 'core').'" />';
-                $str .= '&nbsp;<a href="'.$deleteurl.'" title="'.get_string('delete').'">'.$pix.'</a>';
+                $pix = $this->output->pix_icon('t/delete', get_string('delete'), 'core');
+                $cctpl->deletelink = '&nbsp;<a href="'.$deleteurl.'">'.$pix.'</a>';
             }
-            $str .= '</td>';
-            $str .= '</tr>';
+            $template->ccs[] = $cctpl;
         }
-        $str .= '</table>';
-        $str .= '</td>';
-        $str .= '</tr>';
 
-        return $str;
-    }
-
-    public function watches_form(&$issue, &$cm, &$cced) {
-
-        $str = '';
-
-        $str .= '<tr>';
-        $str .= '<td>&nbsp;</td>';
-        $str .= '<td colspan="3" align="right">';
-        $issueurl = new moodle_url('/mod/tracker/view.php');
-        $str .= '<form name="addccform" method="get" action="'.$issueurl.'">';
-        $str .= '<input type="hidden" name="id" value="'.$cm->id.'" />';
-        $str .= '<input type="hidden" name="what" value="register" />';
-        $str .= '<input type="hidden" name="view" value="view" />';
-        $str .= '<input type="hidden" name="issueid" value="'.$issue->id.'" />';
-        $str .= get_string('addawatcher', 'tracker').':&nbsp;';
-        $contextmodule = context_module::instance($cm->id);
-        $fields = 'u.id,'.get_all_user_name_fields(true, 'u');
-        $potentials = get_users_by_capability($contextmodule, 'mod/tracker:canbecced', $fields.',picture,imagealt');
-        $potentialsmenu = array();
-        if ($potentials) {
-            foreach ($potentials as $potential) {
-                if (in_array($potential->id, $cced)) {
-                    continue;
+        $context = context_module::instance($cm->id);
+        if (has_capability('mod/tracker:managewatches', $context)) {
+            $template->canmanagewatchers = true;
+            $issueurl = new moodle_url('/mod/tracker/view.php');
+            $template->issueurl = $issueurl;
+            $template->cmid = $cm->id;
+            $template->issueid = $issue->id;
+            $template->addwatcherstr = get_string('addawatcher', 'tracker');
+            $contextmodule = context_module::instance($cm->id);
+            $fields = 'u.id,'.get_all_user_name_fields(true, 'u');
+            $potentials = get_users_by_capability($contextmodule, 'mod/tracker:canbecced', $fields.',picture,imagealt');
+            $potentialsmenu = array();
+            if ($potentials) {
+                foreach ($potentials as $potential) {
+                    if (in_array($potential->id, $cced)) {
+                        continue;
+                    }
+                    $potentialsmenu[$potential->id] = fullname($potential);
                 }
-                $potentialsmenu[$potential->id] = fullname($potential);
             }
+            $template->select = html_writer::select($potentialsmenu, 'ccid');
+            $template->addstr = get_string('add');
         }
-        $str .= html_writer::select($potentialsmenu, 'ccid');
-        $str .= '<input type="submit" name="go_btn" value="'.get_string('add').'" />';
-        $str .= '</form>';
-        $str .= '</td>';
-        $str .= '</tr>';
 
-        return $str;
+        return $this->output->render_from_template('mod_tracker/ccs', $template);
     }
 
     public function history(&$tracker, $history, $statehistory, $initialviewmode) {
@@ -392,73 +420,43 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $statuskeys = tracker_get_statuskeys($tracker);
         $statuscodes = tracker_get_statuscodes();
 
-        $str = '';
+        $template = new Stdclass;
 
-        $str .= '<tr>';
-        $str .= '<td colspan="4" width="100%">';
-        $str .= '<div id="tracker-issuehistory" class="'.$initialviewmode.'">';
-        $str .= $this->output->heading(get_string('history', 'tracker'), 2);
-        $str .= '<div class="row-fluid">'; // Row
-        $str .= '<div class="span6 col-6">'; // Cell
+        $template->initialviewmode = $initialviewmode;
+        $template->historystr = get_string('history', 'tracker');
+        $template->assigneesstr = get_string('assignees', 'tracker');
+        $template->bystr = get_string('by', 'tracker');
 
-        $str .= $this->output->heading(get_string('assignees', 'tracker'), 3);
-
-        $str .= '<table width="100%">';
         if (!empty($history)) {
             foreach ($history as $owner) {
+                $histtpl = new StdClass;
                 $user = $DB->get_record('user', array('id' => $owner->userid));
                 $bywhom = $DB->get_record('user', array('id' => $owner->bywhomid));
 
-                $str .= '<tr>';
-                $str .= '<td align="left">';
-                $str .= userdate($owner->timeassigned);
-                $str .= '</td>';
-                $str .= '<td align="left">';
-                $str .= $this->user($user);
-                $str .= '</td>';
-                $str .= '<td align="left">';
-                $str .= get_string('by', 'tracker') . ' ' . fullname($bywhom);
-                $str .= '</td>';
-                $str .= '</tr>';
+                $histtpl->date = userdate($owner->timeassigned);
+                $histtpl->user = $this->user($user);
+                $histtpl->username = fullname($bywhom);
+                $teplate->history[] = $histtpl;
             }
         }
-        $str .= '</table>';
 
-        $str .= '</div>'; // Cell
-        $str .= '<div class="span6 col-6">'; // Cell
+        $template->statehistorystr = get_string('statehistory', 'tracker');
 
-        $str .= $this->output->heading(get_string('statehistory', 'tracker'), 3);
-
-        $str .= '<table width="100%">';
         if (!empty($statehistory)) {
             foreach ($statehistory as $state) {
+                $histtpl = new Stdclass;
                 $bywhom = $DB->get_record('user', array('id' => $state->userid));
-                $str .= '<tr valign="top">';
-                $str .= '<td align="left">';
-                $str .= userdate($state->timechange);
-                $str .= '</td>';
-                $str .= '<td align="left">';
-                $str .= $this->user($bywhom);
-                $str .= '</td>';
-                $str .= '<td align="left">';
-                $str .= '<span class="status-'.$statuscodes[$state->statusfrom].'">'.$statuskeys[$state->statusfrom].'</span>';
-                $str .= '</td>';
-                $str .= '<td align="left">';
-                $str .= '</td>';
-                $str .= '<td align="left">';
-                $str .= '<span class="status-'.$statuscodes[$state->statusto].'">'.$statuskeys[$state->statusto].'</span>';
-                $str .= '</td>';
-                $str .= '</tr>';
+                $histtpl->statedate = userdate($state->timechange);
+                $histtpl->changer = $this->user($bywhom);
+                $histtpl->codefrom = $statuscodes[$state->statusfrom];
+                $histtpl->keyfrom = $statuskeys[$state->statusfrom];
+                $histtpl->codeto = $statuscodes[$state->statusto];
+                $histtpl->keyto = $statuskeys[$state->statusto];
+                $template->statehistory[] = $histtpl;
             }
         }
-        $str .= '</table>';
-        $str .= '</div>'; // Cell.
-        $str .= '</div>'; // Row.
-        $str .= '</div>'; // Div.
-        $str .= '</tr>';
-        $str .= '</table>';
 
-        return $str;
+        return $this->output->render_from_template('mod_tracker/history', $template);
     }
 
     public function tabs($view, $screen, &$tracker, &$cm) {
@@ -607,11 +605,6 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 $taburl = new moodle_url('/mod/tracker/view.php', $params);
                 $rows[1][] = new tabobject('mywatches', $taburl, get_string('mywatches', 'tracker'));
 
-                if ($tracker->supportmode == 'bugtracker') {
-                    $params = array('id' => $cm->id, 'view' => 'profile', 'screen' => 'myqueries');
-                    $taburl = new moodle_url('/mod/tracker/view.php', $params);
-                    $rows[1][] = new tabobject('myqueries', $taburl, get_string('myqueries', 'tracker'));
-                }
                 break;
             }
 
@@ -853,7 +846,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                                 'optionid' => $option->id,
                                 'elementid' => $option->elementid);
                 $editoptionurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$this->output->pix_url('/t/edit', 'core').'" />';
+                $pix = $this->output->pix_icon('/t/edit', '', 'core');
                 $actions  = '<a href="'.$editoptionurl.'" title="'.get_string('edit').'">'.$pix.'</a>&nbsp;';
 
                 $img = ($option->sortorder > 1) ? 'up' : 'up_shadow';
@@ -863,7 +856,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                                 'optionid' => $option->id,
                                 'elementid' => $option->elementid);
                 $moveurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$this->output->pix_url("{$img}", 'mod_tracker').'">';
+                $pix = $this->output->pix_icon("{$img}", '', 'mod_tracker');
                 $actions .= '<a href="'.$moveurl.'" title="'.get_string('up').'">'.$pix.'</a>&nbsp;';
 
                 $img = ($option->sortorder < $element->maxorder) ? 'down' : 'down_shadow';
@@ -873,7 +866,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                                 'optionid' => $option->id,
                                 'elementid' => $option->elementid);
                 $moveurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$this->output->pix_url("{$img}", 'mod_tracker').'">';
+                $pix = $this->output->pix_icon("{$img}", '', 'mod_tracker');
                 $actions .= '<a href="'.$moveurl.'" title="'.get_string('down').'">'.$pix.'</a>&nbsp;';
 
                 $params = array('id' => $cm->id,
@@ -882,7 +875,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                                 'optionid' => $option->id,
                                 'elementid' => $option->elementid);
                 $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = '<img src="'.$this->output->pix_url('/t/delete', 'core').'">';
+                $pix = $this->output->pix_icon('/t/delete', '', 'core');
                 $actions .= '<a href="'.$deleteurl.'" title="'.get_string('delete').'">'.$pix.'</a>';
 
                 $rowlabel = '<b> '.get_string('option', 'tracker').' '.$option->sortorder.':</b>';
@@ -890,74 +883,6 @@ class mod_tracker_renderer extends plugin_renderer_base {
             }
         }
         return html_writer::table($table);
-    }
-
-    public function add_query_form(&$cm, $form) {
-
-        $str = '';
-
-        $str .= $this->output->heading(get_string('addaquerytomemo', 'tracker'));
-        $str .= $this->output->box_start('center', '100%', '', '', 'generalbox', 'bugreport');
-
-        $str .= '<center>';
-
-        $formurl = new moodle_url('/mod/tracker/view.php');
-        $str .= '<form name="addqueryform" action="'.$formurl.'" method="post">';
-        $str .= '<input type="hidden" name="what" value="'.$form->action.'">';
-        $str .= '<input type="hidden" name="view" value="profile">';
-        $str .= '<input type="hidden" name="screen" value="myqueries">';
-        $str .= '<input type="hidden" name="fields" value="'.$form->fields.'">';
-        $str .= '<input type="hidden" name="id" value="'.$cm->id.'">';
-
-        $str .= '<table border="0" cellpadding="5" width="100%">';
-        $str .= '<tr>';
-        $str .= '<td align="right" width="200">';
-        $str .= '<b>'.get_string('name').':</b>';
-        $str .= '</td>';
-        $str .= '<td align="left">';
-        $str .= '<input type="text" name="name" value="" style="width:100%" />';
-        $str .= '</td>';
-        $str .= '</tr>';
-        $str .= '<tr>';
-        $str .= '<td align="right" width="200" valign="top">';
-        $str .= '<b>'.get_string('description').':</b>';
-        $str .= '</td>';
-        $str .= '<td valign="top" align="left">';
-
-        print_textarea($usehtmleditor, 20, 60, 680, 400, 'description', $form->description);
-        if ($usehtmleditor) {
-            $strr .= '<input type="hidden" name="format" value="'.FORMAT_HTML.'" />';
-        } else {
-            $str .= '<p align="right">';
-            $str .= $this->output->help_icon('textformat', 'tracker');
-            $str .= get_string('formattexttype');
-            $str .= ':&nbsp;';
-            if (empty($form->format)) {
-                $form->format = FORMAT_MOODLE;
-            }
-            $str .= html_writer::select(format_text_menu(), 'format', $form->format);
-            $str .= '</p>';
-        }
-        $str .= '</td>';
-        $str .= '</tr>';
-        $str .= '<tr>';
-        $str .= '<td colspan="2">';
-        $onsubmitcall = ($usehtmleditor) ? "document.forms['addqueryform'].onsubmit();" : '';
-        $str .= '<input type="submit" name="save" value="'.get_string('continue').'" />';
-        $jshandler = 'document.forms[\'addqueryform\'].what.value = \'\';';
-        $jshandler .= 'document.forms[\'addqueryform\'].screen.value = \'search\';';
-        $jshandler .= $onsubmitcall;
-        $jshandler .= 'document.forms[\'addqueryform\'].submit();';
-        $str .= '<input type="button" name="cancel_btn" value="'.get_string('cancel').'" onclick="'.$jshandler.'" />';
-        $str .= '</td>';
-        $str .= '</tr>';
-        $str .= '</table>';
-        $str .= '</form>';
-
-        $str .= $this->output->box_end();
-        $str .= '</center>';
-
-        return $str;
     }
 
     public function issue_js_init() {
@@ -973,5 +898,334 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $str .= '</script>';
 
         return $str;
+    }
+
+    public function status_listform_part(&$tracker, &$cm, &$issue, &$context) {
+
+        static $fullstatuskeys;
+        static $statuskeys;
+        static $statuscodes;
+
+        if (!isset($fullstatuskeys)) {
+            $fullstatuskeys = tracker_get_statuskeys($tracker);
+            $statuskeys = tracker_get_statuskeys($tracker, $cm);
+            $statuskeys[0] = get_string('nochange', 'tracker');
+            $statuscodes = tracker_get_statuscodes();
+        }
+
+        $template = new Stdclass;
+        $template->code = $statuscodes[$issue->status];
+        $template->static = $fullstatuskeys[0 + $issue->status];
+
+        if (has_capability('mod/tracker:manage', $context)) {
+            $template->editlink = true;
+        } else if (has_capability('mod/tracker:develop', $context)) {
+            $template->editlink = true;
+        } else if (has_capability('mod/tracker:resolve', $context)) {
+            $template->button = true;
+        }
+
+        /*
+        $rendered = $this->output->render_from_template('mod_tracker/listformstatuspart', $template);
+        return array($template->code, $rendered);
+        */
+        return $template;
+    }
+
+    public function assignedto_listform_part(&$issue, &$context) {
+        global $DB;
+
+        $template = new StdClass;
+
+        if (empty($issue->assignedto)) {
+            $template->unassigned = true;
+        } else {
+            $user = $DB->get_record('user', array('id' => $issue->assignedto));
+            $template->assignedto = fullname($user);
+        }
+
+        $systemcontext = context_system::instance();
+
+        if (has_capability('moodle/site:config', $systemcontext)) {
+            $template->editlink = true;
+            $template->giveto = 'all';
+        } else if (has_capability('mod/tracker:manage', $context)) {
+            $template->editlink = true;
+            $template->giveto = 'developers';
+        } else if (has_capability('mod/tracker:develop', $context)) {
+            $template->editlink = true;
+            $template->giveto = 'managers';
+        }
+        return $template;
+    }
+
+    public function controls_listform_part(&$cm, &$issue, &$context) {
+        global $DB, $USER;
+
+        $screen = optional_param('screen', '', PARAM_TEXT);
+
+        $actions = '';
+        if (has_capability('mod/tracker:manage', $context)) {
+            $params = array('id' => $cm->id, 'issueid' => $issue->id, 'what' => 'delete');
+            $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
+            $alt = get_string('delete');
+            $pix = $this->output->pix_icon('t/delete', $alt, 'core');
+            $actions .= '&nbsp;<a href="'.$deleteurl.'" title="'.$alt.'" >'.$pix.'</a>';
+        }
+
+        if (!$DB->get_record('tracker_issuecc', array('userid' => $USER->id, 'issueid' => $issue->id))) {
+            $params = array('id' => $cm->id,
+                            'view' => 'profile',
+                            'screen' => $screen,
+                            'issueid' => $issue->id,
+                            'what' => 'register');
+            $registerurl = new moodle_url('/mod/tracker/view.php', $params);
+            $alt = get_string('register', 'tracker');
+            $pix = $this->output->pix_icon('register', $alt, 'mod_tracker');
+            $actions .= '&nbsp;<a href="'.$registerurl.'" title="'.$alt.'" >'.$pix.'</a>';
+        }
+
+        $sort = optional_param('sort', 'resolutionpriority', PARAM_TEXT);
+        if (preg_match('/^resolutionpriority/', $sort)) {
+            $actions .= $this->prioritycontrols_listform_part($cm, $issue, $context);
+        }
+
+        return $actions;
+    }
+
+    public function prioritycontrols_listform_part(&$cm, &$issue, &$context) {
+
+        $actions = '';
+
+        if (has_capability('mod/tracker:managepriority', $context)) {
+
+            if ($issue->resolutionpriority < $issue->maxpriority) {
+                $params = array('id' => $cm->id, 'issueid' => $issue->id, 'what' => 'raisetotop');
+                $raiseurl = new moodle_url('/mod/tracker/view.php', $params);
+                $alt = get_string('raisetotop', 'tracker');
+                $pix = $this->output->pix_icon('totop', $alt, 'mod_tracker');
+                $actions .= '&nbsp;<a href="'.$raiseurl.'" title="'.$alt.'" >'.$pix.'</a>';
+
+                $params = array('id' => $cm->id, 'issueid' => $issue->id, 'what' => 'raisepriority');
+                $rpurl = new moodle_url('/mod/tracker/view.php', $params);
+                $alt = get_string('raisepriority', 'tracker');
+                $pix = $this->output->pix_icon('up', $alt, 'mod_tracker');
+                $actions .= '&nbsp;<a href="'.$rpurl.'" title="'.$alt.'" >'.$pix.'</a>';
+            } else {
+                $actions .= '&nbsp;'.$this->output->pix_icon('up_shadow', '', 'mod_tracker');
+                $actions .= '&nbsp;'.$this->output->pix_icon('totop_shadow', '', 'mod_tracker');
+            }
+
+            if ($issue->resolutionpriority > 1) {
+                $params = array('id' => $cm->id, 'issueid' => $issue->id, 'what' => 'lowerpriority');
+                $lowerurl = new moodle_url('/mod/tracker/view.php', $params);
+                $alt = get_string('lowerpriority', 'tracker');
+                $pix = $this->output->pix_icon('down', $alt, 'mod_tracker');
+                $actions .= '&nbsp;<a href="'.$lowerurl.'" title="'.$alt.'" >'.$pix.'</a>';
+
+                $params = array('id' => $cm->id, 'issueid' => $issue->id, 'what' => 'lowerpriority');
+                $lburl = new moodle_url('/mod/tracker/view.php', $params);
+                $alt = get_string('lowertobottom', 'tracker');
+                $pix = $this->output->pix_icon('tobottom', $alt, 'mod_tracker');
+                $actions .= '&nbsp;<a href="'.$lburl.'" title="'.$alt.'" ></a>';
+            } else {
+                $actions .= '&nbsp;'.$this->output->pix_icon('down_shadow', '', 'mod_tracker');
+                $actions .= '&nbsp;'.$this->output->pix_icon('tobottom_shadow', '', 'mod_tracker');
+            }
+        }
+
+        return $actions;
+    }
+
+    public function list_edit_form($args) {
+        global $DB;
+
+        static $fullstatuskeys;
+        static $statuskeys;
+        static $statuscodes;
+
+        $cmid = $DB->get_field('context', 'instanceid', array('id' => $args->ctx));
+        $context = context_module::instance($cmid);
+        if (!$context) {
+            throw new MoodleException('Unkown context ID '.$args->ctx);
+        }
+        $systemcontext = context_system::instance();
+
+        if ($args->mode == 'assignedto') {
+            $usermenu = array();
+            if (has_capability('moodle/site:config', $systemcontext)) {
+                if ($developers = tracker_getdevelopers($context)) {
+                    foreach ($developers as $developer) {
+                        $usersmenu[$developer->id] = fullname($developer);
+                    }
+                }
+                $managers = tracker_getadministrators($context);
+                if ($developers = tracker_getdevelopers($context)) {
+                    foreach ($managers as $manager) {
+                        $usersmenu[$manager->id] = fullname($manager);
+                    }
+                }
+            } else if (has_capability('mod/tracker:manage', $context)) {
+                // Managers can assign bugs to any developer.
+                if ($developers = tracker_getdevelopers($context)) {
+                    foreach ($developers as $developer) {
+                        $usersmenu[$developer->id] = fullname($developer);
+                    }
+                }
+            } else if (has_capability('mod/tracker:develop', $context)) {
+                // Developers can giveback a bug back to managers.
+                $managers = tracker_getadministrators($context);
+                if ($developers = tracker_getdevelopers($context)) {
+                    foreach ($managers as $manager) {
+                        $usersmenu[$manager->id] = fullname($manager);
+                    }
+                }
+            }
+
+            if (!empty($usersmenu)) {
+                $issue = $DB->get_record('tracker_issue', array('id' => $args->id));
+
+                $template->select = '<select id="assignedto-select-'.$issue->id.'" name="assignedto-'.$issue->id.'" class="select selectpicker">'."\n";
+                $selected = (empty($issue->assignedto)) ? 'selected="selected"' : '';
+                $template->select .= '<option value="0" '.$selected.'>'.get_string('unassigned', 'tracker').'</option>'."\n";
+                foreach ($usersmenu as $k => $v) {
+                    $selected = ($issue->assignedto == $k) ? 'selected="selected"' : '';
+                    $template->select .= '<option value="'.$k.'" '.$selected.'>'.$v.'</option>'."\n";
+                }
+                $template->select .= '</select>'."\n";
+            }
+        } else if ($args->mode == 'status') {
+
+            $cm = $DB->get_record('course_modules', array('id' => $context->instanceid));
+            $tracker = $DB->get_record('tracker', array('id' => $cm->instance));
+            $issue = $DB->get_record('tracker_issue', array('id' => $args->id));
+
+            if (!isset($fullstatuskeys)) {
+                $fullstatuskeys = tracker_get_statuskeys($tracker);
+                $statuskeys = tracker_get_statuskeys($tracker, $cm);
+                $statuscodes = tracker_get_statuscodes();
+            }
+
+            $template = new Stdclass;
+            $template->code = $statuscodes[$issue->status];
+            $template->static = $fullstatuskeys[0 + $issue->status];
+
+            if (has_capability('mod/tracker:manage', $context) ||
+                    has_capability('mod/tracker:develop', $context)) {
+                $hasselect = true;
+            }
+            if ($hasselect) {
+                $template->select = '<select id="status-select-'.$issue->id.'" name="status-'.$issue->id.'" class="select selectpicker">'."\n";
+                foreach ($statuskeys as $k => $v) {
+                    $selected = ($issue->status == $k) ? 'selected="selected"' : '';
+                    $template->select .= '<option value="'.$k.'" '.$selected.' data-content="<span class=\'status-'.$statuscodes[$k].'\'>'.$v.'</span>">'.$v.'</option>'."\n";
+                }
+                $template->select .= '</select>'."\n";
+            }
+        }
+
+        $str = $this->output->render_from_template('mod_tracker/listeditform', $template);
+        return $str;
+    }
+
+    public static function select(array $options,
+                                  $name,
+                                  $selected = '',
+                                  $nothing = array('' => 'choosedots'),
+                                  array $attributes = null,
+                                  $classprefix = '',
+                                  $classvaluemapping = null) {
+
+        $attributes = (array)$attributes;
+        if (is_array($nothing)) {
+            foreach ($nothing as $k=>$v) {
+                if ($v === 'choose' or $v === 'choosedots') {
+                    $nothing[$k] = get_string('choosedots');
+                }
+            }
+            $options = $nothing + $options; // keep keys, do not override
+
+        } else if (is_string($nothing) and $nothing !== '') {
+            // BC
+            $options = array(''=>$nothing) + $options;
+        }
+
+        // we may accept more values if multiple attribute specified
+        $selected = (array)$selected;
+        foreach ($selected as $k=>$v) {
+            $selected[$k] = (string)$v;
+        }
+
+        if (!isset($attributes['id'])) {
+            $id = 'menu'.$name;
+            // name may contaion [], which would make an invalid id. e.g. numeric question type editing form, assignment quickgrading
+            $id = str_replace('[', '', $id);
+            $id = str_replace(']', '', $id);
+            $attributes['id'] = $id;
+        }
+
+        if (!isset($attributes['class'])) {
+            $class = 'menu'.$name;
+            // name may contaion [], which would make an invalid class. e.g. numeric question type editing form, assignment quickgrading
+            $class = str_replace('[', '', $class);
+            $class = str_replace(']', '', $class);
+            $attributes['class'] = $class;
+        }
+        $attributes['class'] = 'select ' . $attributes['class']; // Add 'select' selector always
+
+        $attributes['name'] = $name;
+
+        if (!empty($attributes['disabled'])) {
+            $attributes['disabled'] = 'disabled';
+        } else {
+            unset($attributes['disabled']);
+        }
+
+        $output = '';
+        foreach ($options as $value=>$label) {
+            if (is_array($label)) {
+                // ignore key, it just has to be unique
+                $output .= html_writer::select_optgroup(key($label), current($label), $selected);
+            } else {
+                if (is_array($classvaluemapping) && array_key_exists($value, $classvaluemapping)) {
+                    $optionclass = $classprefix.$classvaluemapping[$value];
+                } else {
+                    $optionclass = $classprefix.$value;
+                }
+                $output .= self::select_option($label, $value, $selected, $optionclass);
+            }
+        }
+        return html_writer::tag('select', $output, $attributes);
+    }
+
+    /**
+     * Returns HTML to display a select box option.
+     *
+     * @param string $label The label to display as the option.
+     * @param string|int $value The value the option represents
+     * @param array $selected An array of selected options
+     * @return string HTML fragment
+     */
+    private static function select_option($label, $value, array $selected, $optionclass = '') {
+        $attributes = array();
+        $value = (string)$value;
+        if (in_array($value, $selected, true)) {
+            $attributes['selected'] = 'selected';
+        }
+        $attributes['value'] = $value;
+        $attributes['class'] = $optionsclass;
+        return html_writer::tag('option', $label, $attributes);
+    }
+
+    public function last_comment($lastcomment) {
+        global $DB;
+
+        $commentuser = $DB->get_record('user', array('id' => $lastcomment->userid));
+
+        $template = new StdClass;
+        $template->comment = format_text($lastcomment->comment, $lastcomment->commentformat);
+        $template->by = fullname($commentuser).' '.$this->output->user_picture($commentuser);
+
+        return $this->output->render_from_template('mod_tracker/lastcomment', $template);
     }
 }

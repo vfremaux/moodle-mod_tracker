@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 $string['pluginname'] = 'Ticket Tracker/User support';
+$string['modulename'] = 'Ticket Tracker/User support';
 $string['pluginadministration'] = 'Tracker administration';
 
 // Capabilities.
@@ -44,7 +45,6 @@ $string['active'] = 'Active in form';
 $string['activeplural'] = 'Actives';
 $string['addacomment'] = 'Add a comment';
 $string['addanoption'] = 'Add an option';
-$string['addaquerytomemo'] = 'Add this search query to "my queries"';
 $string['addawatcher'] = 'Add a watcher';
 $string['addtothetracker'] = 'Add to this tracker';
 $string['administration'] = 'Administration';
@@ -126,6 +126,7 @@ $string['defaultassignee'] = 'Default assignee';
 $string['deleteattachedfile'] = 'Delete attachement';
 $string['dependancies'] = 'Dependencies';
 $string['dependson'] = 'Depends on ';
+$string['description'] = 'Description';
 $string['descriptionisempty'] = 'Description is empty';
 $string['distribute'] = 'Move the ticket to another tracker';
 $string['doaddelementautourl'] = 'Add an url collector'; // @DYNA
@@ -150,7 +151,6 @@ $string['dropdown'] = 'Dropdown';
 $string['editelement'] = 'Update Form Element';
 $string['editoptions'] = 'Update options';
 $string['editproperties'] = 'Update properties';
-$string['editquery'] = 'Change a stored query';
 $string['editwatch'] = 'Change a cc registering';
 $string['elementcode'] = 'Element code';
 $string['elements'] = 'Available elements';
@@ -163,10 +163,10 @@ $string['emulatecommunity'] = 'Emulate community version';
 $string['emulatecommunity_desc'] = 'If enabled, the plugin will behave as the public community version. This might loose features !';
 $string['enablecomments'] = 'Allow comments';
 $string['enablecomments_help'] = 'When this option is enabled, readers of issue records can add comments in the tracker.';
+$string['enlarge'] = 'Enlarge';
 $string['erroraddissueattribute'] = 'Could not submit issue(s) attribute(s). Case {$a} ';
 $string['erroralreadyinuse'] = 'Element already in use';
 $string['errorannotdeletecarboncopies'] = 'Cannot delete carbon copies for user : {$a}';
-$string['errorannotdeletequeryid'] = 'Cannot delete query id: {$a]';
 $string['errorbadlistformat'] = 'Only numbers (or a list of numbers seperated by a comma (",") allowed in the issue number field';
 $string['errorcannotaddelementtouse'] = 'Cannot add element to list of elements to use for this tracker';
 $string['errorcannotclearelementsforissue'] = 'Could not clear elements for issue {$a}';
@@ -213,8 +213,6 @@ $string['errorrecordissue'] = 'Could not submit issue';
 $string['errorremote'] = 'Error on remote side<br/> {$a} ';
 $string['errorremote'] = 'Remote error: {$a}';
 $string['errorremotesendingcascade'] = 'Error on sending cascade :<br/> {$a}';
-$string['errorunabletosabequery'] = 'Unable to save query as query';
-$string['errorunabletosavequeryid'] = 'Unable to update query id {$a}';
 $string['errorupdateelement'] = 'Could not update element';
 $string['event_tracker_issue_commented'] = 'Tracker Issue commented';
 $string['event_tracker_issue_reported'] = 'Tracker Issue reported';
@@ -247,7 +245,6 @@ $string['icanresolve'] = 'I can assign and close tickets';
 $string['id'] = 'Identifier';
 $string['intest'] = 'Testing';
 $string['intro'] = 'Description';
-$string['invalidquery'] = 'Invalid query id: {$a}';
 $string['inworkinmonth'] = 'Still in work';
 $string['isactive'] = 'Is available on submission form';
 $string['isinactive'] = 'Is hidden in submission form';
@@ -261,7 +258,9 @@ $string['issuenumber'] = 'Ticket';
 $string['issues'] = 'ticket records';
 $string['issuestoassign'] = 'Tickets to assign: {$a}';
 $string['issuestowatch'] = 'Tickets to watch: {$a}';
+$string['issueupdated'] = '[{$a->tracker} § {$a->issueid}] Ticket updated';
 $string['knownelements'] = 'Known tracker form elements';
+$string['lastcomment'] = 'Last comment: ';
 $string['listissues'] = 'List view';
 $string['local'] = 'Local';
 $string['localtracker'] = 'Local tracker';
@@ -273,9 +272,9 @@ $string['manager'] = 'Manager';
 $string['mandatory'] = 'Mandatory answer';
 $string['me'] = 'My profile';
 $string['message_bugtracker'] = 'Thanks for your contribution and helping making this service more reliable.';
-$string['message_taskspread'] = 'You just defined a task. Don\'t foget assigning it to some recepient in the nxt screns to distribute it.';
-$string['message_ticketting'] = 'We have registered your query.';
-$string['message_ticketting_preassigned'] = 'We have registered your query. It will be assigned and handled as soon as possible. It has been assigned to {$a}.';
+$string['message_taskspread'] = 'You just defined a task. Don\'t forget assigning it to some recepient in the nxt screns to distribute it.';
+$string['message_ticketting'] = 'We have registered your submmission.';
+$string['message_ticketting_preassigned'] = 'We have registered your submission. It will be assigned and handled as soon as possible. It has been assigned to {$a}.';
 $string['mode_bugtracker'] = 'Team bug tracker';
 $string['mode_customized'] = 'Customized tracker';
 $string['mode_taskspread'] = 'Task distributor';
@@ -287,7 +286,6 @@ $string['myassignees'] = 'Resolver I assigned';
 $string['myissues'] = 'Tickets I resolve';
 $string['mypreferences'] = 'My preferences';
 $string['myprofile'] = 'My profile';
-$string['myqueries'] = 'My queries';
 $string['mytasks'] = 'My tickets';
 $string['mytickets'] = 'My tickets';
 $string['mywatches'] = 'My watches';
@@ -312,7 +310,6 @@ $string['nolocalcandidate'] = 'No local candidate for cascading';
 $string['nomnet'] = 'Moodle network seems disabled';
 $string['nooptions'] = 'No option';
 $string['nopotentialdeps'] = 'No tickets to depend on';
-$string['noqueryssaved'] = 'No stored query';
 $string['noremotehosts'] = 'No network host available';
 $string['noremotetrackers'] = 'No remote tracker available';
 $string['noreporters'] = 'No reporters, there are probably no issues entered here.';
@@ -348,9 +345,6 @@ $string['priorityid'] = 'Priority';
 $string['private'] = 'Private info';
 $string['profile'] = 'User settings';
 $string['published'] = 'Published';
-$string['queries'] = 'Queries';
-$string['query'] = 'Query';
-$string['queryname'] = 'Query label';
 $string['radio'] = 'Radio buttons'; // @DYNA
 $string['radiohoriz'] = 'Horizontal radio buttons'; // @DYNA
 $string['raisepriority'] = 'Raise priority';
@@ -373,13 +367,10 @@ $string['resolver'] = 'My issues';
 $string['resolvers'] = 'Resolvers';
 $string['resolving'] = 'Resolving';
 $string['runninginmonth'] = 'Running in current month';
-$string['saveasquery'] = 'Save a query';
-$string['savequery'] = 'Save the query';
 $string['search'] = 'Search';
 $string['searchbyid'] = 'Search by ID';
 $string['searchcriteria'] = 'Search criteria';
 $string['searchresults'] = 'Search results';
-$string['searchwiththat'] = 'Launch this query again';
 $string['selectparent'] = 'Parent selection';
 $string['sendrequest'] = 'Send request';
 $string['setactive'] = 'Turn active ';
@@ -404,6 +395,7 @@ $string['showcomments'] = 'Show comments';
 $string['showdependancies'] = 'Show dependancies';
 $string['showhistory'] = 'Show history';
 $string['site'] = 'Site';
+$string['solve'] = 'Mark Solved';
 $string['solution'] = 'Solution';
 $string['sortorder'] = 'Order';
 $string['standalone'] = 'Standalone tracker (top level support).';
@@ -411,13 +403,17 @@ $string['statehistory'] = 'States';
 $string['stateprofile'] = 'Ticket states';
 $string['status'] = 'Status';
 $string['strictworkflow'] = 'Strict workflow';
-$string['submission'] = 'A new ticket is reported in tracker [{$a}]';
+$string['changedownership'] = '[{$a->tracker} § {$a->issueid}]  A ticket has been reassigned ';
+$string['commented'] = '[{$a->tracker} § {$a->issueid}] A ticket has been commented ';
+$string['moved'] = '[{$a->tracker} § {$a->issueid}] Ticket has been moved';
+$string['submission'] = '[{$a->tracker} § {$a->issueid}] A new ticket has been reported';
 $string['submitbug'] = 'Submit the ticket';
 $string['subtrackers'] = 'Subtrackers';
 $string['sum_opened'] = 'Opened';
 $string['sum_posted'] = 'Waiting';
 $string['sum_reported'] = 'Reported';
 $string['sum_resolved'] = 'Solved';
+$string['shrink'] = 'Shrink';
 $string['summary'] = 'Summary';
 $string['supportmode'] = 'Support mode';
 $string['testing'] = 'Being tested';
@@ -431,7 +427,7 @@ $string['tracker-levelaccess'] = 'My capabilities in this tracker';
 $string['tracker_name'] = 'Tracker module services';
 $string['tracker_service_name'] = 'Tracker module services';
 $string['trackerelements'] = 'Tracker\'s definition';
-$string['trackereventchanged'] = 'Issue state change in tracker [{$a}]';
+$string['trackereventchanged'] = '[{$a->tracker} § {$a->issueid}] Issue state change to {$a->event}';
 $string['trackerhost'] = 'Parent host for tracker';
 $string['trackername'] = 'Tracker name';
 $string['transfer'] = 'Transfered';
@@ -456,6 +452,7 @@ $string['unsetwhenworks'] = 'Advise me when got working';
 $string['urgentraiserequestcaption'] = 'A user has requested an urgent priority demand';
 $string['urgentsignal'] = 'URGENT QUERY';
 $string['userdefaultpreferences'] = 'User default notification preferences';
+$string['updateattribute'] = 'Update attribute';
 $string['validated'] = 'Validated';
 $string['view'] = 'Views';
 $string['vieworiginal'] = 'See original';
@@ -463,6 +460,7 @@ $string['visiblename'] = 'Visible name';
 $string['voter'] = 'Vote';
 $string['waiting'] = 'Waiting';
 $string['watches'] = 'Watches';
+$string['writtenby'] = '<i>written by</i>';
 $string['youneedanaccount'] = 'You need an authorized account here to report a ticket';
 
 $string['plugindist_desc'] = '
@@ -621,7 +619,7 @@ Tracker : <%%TRACKERNAME%%>
 ------------------------------------------
 See the ticket : <%%ISSUEURL%%>
 Unregister from ticket : <%%UNCCURL%%>
-Unregister fromm all tickets in this tracker : <%%ALLUNCCURL%%>';
+Unregister from all tickets in this tracker : <%%ALLUNCCURL%%>';
 
 $string['addcomment_html_tpl'] = '
 <b>Cours :</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br/>
@@ -633,8 +631,8 @@ $string['addcomment_html_tpl'] = '
 <p><%%COMMENT%%></p>
 <hr/>
 <p><a href="<%%ISSUEURL%%>">See the ticket</a><br/>
-<a href="<%%UNCCURL%%>">Se d�sabonner du d�faut</a><br/>
-<a href="<%%ALLUNCCURL%%>">Se d�sabonner de ce tracker</a></p>';
+<a href="<%%UNCCURL%%>">Unregister from this ticket</a><br/>
+<a href="<%%ALLUNCCURL%%>">Unregister from this tracker</a></p>';
 
 $string['issuemoved_tpl'] = '
 The following ticket:
@@ -691,7 +689,7 @@ $string['ownershipchanged_tpl'] = '
 Course: [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 Tracker: <%%TRACKERNAME%%>
 --------------------------------------
-Issue: <%%ISSUE%%> / <%%SUMMARY%%>
+Ticket: <%%ISSUE%%> / <%%SUMMARY%%>
 has been reassigned to: <%%ASSIGNEDTO%%>
 By: <%%BY%%>
 
@@ -704,7 +702,7 @@ $string['ownershipchanged_html_tpl'] = '
 <b>Course:</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br />
 <b>Tracker:</b> <%%TRACKERNAME%%><br/>
 <hr/>
-<p><b>Issue:</b> <%%ISSUE%%> / <%%SUMMARY%%><br />
+<p><b>Ticket:</b> <%%ISSUE%%> / <%%SUMMARY%%><br />
 <b>has been reassigned to:</b> <%%ASSIGNEDTO%%> <br />
 <b>By:</b> <%%BY%%></p>
 <hr/>
@@ -755,7 +753,7 @@ $string['statechanged_tpl'] = '
 Course: [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 Tracker: <%%TRACKERNAME%%>
 --------------------------------------
-Bug entry: <%%ISSUE%%> / <%%SUMMARY%%>
+Ticket entry: <%%ISSUE%%> / <%%SUMMARY%%>
 status was changed to <%%EVENT%%>
 By: <%%BY%%>
 
@@ -781,7 +779,7 @@ $string['submission_tpl'] = '
 Course: [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 Tracker: <%%TRACKERNAME%%>
 --------------------------------------
-New bug entry: <%%ISSUE%%> / <%%SUMMARY%%>
+New ticket entry: <%%ISSUE%%> / <%%SUMMARY%%>
 By: <%%BY%%>
 
 Description : <%%DESCRIPTION%%>
@@ -798,6 +796,33 @@ $string['submission_html_tpl'] = '
 <b>By:</b> <%%BY%%></p>
 <hr/>
 <b>Description : </b><%%DESCRIPTION%%>
+<hr/>
+<p><a href="<%%ISSUEURL%%>">See the issue record</a><br/>
+<a href="<%%CCURL%%>">Register for watches on this record</a></p>
+';
+
+$string['update_tpl'] = '
+Course: [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+Tracker: <%%TRACKERNAME%%>
+--------------------------------------
+Ticket entry: <%%ISSUE%%> / <%%SUMMARY%%>
+By: <%%BY%%>
+Has been updated.
+
+URL for viewing the issue: <%%ISSUEURL%%>
+URL for registering for watches: <%%CCURL%%>
+';
+
+$string['update_html_tpl'] = '
+<b>Course:</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br/>
+<b>Tracker:</b> <%%TRACKERNAME%%><br/>
+<hr/>
+--------------------------------------
+<p><b>Ticket entry:</b> <%%ISSUE%%> / <%%SUMMARY%%><br/>
+<b>By:</b> <%%BY%%><br/>
+
+<p><b>Has been updated.</b></p>
+
 <hr/>
 <p><a href="<%%ISSUEURL%%>">See the issue record</a><br/>
 <a href="<%%CCURL%%>">Register for watches on this record</a></p>

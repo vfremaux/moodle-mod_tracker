@@ -28,12 +28,13 @@ require('../../config.php');
 require_once($CFG->dirroot.'/mod/tracker/lib.php');
 require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 
-$PAGE->requires->js('/mod/tracker/js/trackerview.js');
 $PAGE->requires->jquery();
+$PAGE->requires->js_call_amd('mod_tracker/tracker', 'init');
+$PAGE->requires->css('/mod/tracker/css/bootstrap-select.css');
 
 // Check for required parameters.
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID
-$t  = optional_param('t', 0, PARAM_INT);  // Tracker instance ID.
+$t = optional_param('t', 0, PARAM_INT);  // Tracker instance ID.
 $issueid = optional_param('issueid', '', PARAM_INT);  // Ticket number.
 $action = optional_param('what', '', PARAM_ALPHA);
 
@@ -43,7 +44,8 @@ $screen = tracker_resolve_screen($tracker, $cm);
 $view = tracker_resolve_view($tracker, $cm);
 tracker_requires($view, $screen);
 
-$url = new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => $view, 'screen' => $screen));
+$params = array('id' => $cm->id, 'view' => $view, 'screen' => $screen, 'issueid' => $issueid);
+$url = new moodle_url('/mod/tracker/view.php', $params);
 
 // Redirect (before outputting) traps.
 if ($view == "view" && (empty($screen) || $screen == 'viewanissue' || $screen == 'editanissue') && empty($issueid)) {
@@ -175,7 +177,7 @@ if ($view == 'view') {
         switch ($screen) {
             case 'mywork': {
                 $resolved = 0;
-                include($CFG->dirroot.'/mod/tracker/views/viewmyassignedticketslist.php');
+                include($CFG->dirroot.'/mod/tracker/views/viewissuelist.php');
                 break;
             }
 
@@ -206,7 +208,8 @@ if ($view == 'view') {
             }
 
             case 'editanissue': {
-                if (!has_capability('mod/tracker:manage', $context)) {
+                $reporterid = $DB->get_field('tracker_issue', 'reportedby', array('id' => $issueid));
+                if (!has_capability('mod/tracker:manage', $context) && ($USER->id != $reporterid)) {
                     print_error('errornoaccessissue', 'tracker');
                 } else {
                     include($CFG->dirroot.'/mod/tracker/views/editanissue.php');
@@ -217,7 +220,7 @@ if ($view == 'view') {
             case 'mytickets':
             default:
                 $resolved = 0;
-                include($CFG->dirroot.'/mod/tracker/views/viewmyticketslist.php');
+                include($CFG->dirroot.'/mod/tracker/views/viewissuelist.php');
         }
     }
 } else if ($view == 'resolved') {
@@ -225,7 +228,7 @@ if ($view == 'view') {
         switch ($screen) {
             case 'mywork':
                 $resolved = 1;
-                include($CFG->dirroot.'/mod/tracker/views/viewmyassignedticketslist.php');
+                include($CFG->dirroot.'/mod/tracker/views/viewissuelist.php');
                 break;
 
             case 'browse':
@@ -240,7 +243,7 @@ if ($view == 'view') {
             case 'mytickets':
             default:
                 $resolved = 1;
-                include($CFG->dirroot.'/mod/tracker/views/viewmyticketslist.php');
+                include($CFG->dirroot.'/mod/tracker/views/viewissuelist.php');
         }
     }
 } else if ($view == 'reports') {
@@ -295,11 +298,6 @@ if ($view == 'view') {
 
             case 'mywatches': {
                 include($CFG->dirroot.'/mod/tracker/views/mywatches.php');
-                break;
-            }
-
-            case 'myqueries': {
-                include($CFG->dirroot.'/mod/tracker/views/myqueries.php');
                 break;
             }
 

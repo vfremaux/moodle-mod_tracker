@@ -26,6 +26,8 @@ require_once($CFG->dirroot.'/mod/tracker/forms/reportissue_form.php');
 $issueid = required_param('issueid', PARAM_INT);
 
 $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
+$oldstate = $issue->status;
+$oldassignee = $issue->assignedto;
 
 if (tracker_can_edit($tracker, $context, $issue)) {
     // Opens the issue if I have capability to resolve.
@@ -82,11 +84,11 @@ if ($data = $form->get_data()) {
     // Log state change.
     $stc = new StdClass;
     $stc->userid = $USER->id;
-    $stc->issueid = $issue->id;
+    $stc->issueid = $data->issueid;
     $stc->trackerid = $tracker->id;
     $stc->timechange = time();
-    $stc->statusfrom = POSTED;
-    $stc->statusto = POSTED;
+    $stc->statusfrom = $oldstate;
+    $stc->statusto = $data->status;
     $DB->insert_record('tracker_state_change', $stc);
 
     if ($stc->statusto == RESOLVED || $stc->statusto == PUBLISHED) {
@@ -97,7 +99,13 @@ if ($data = $form->get_data()) {
 
     // Notify all admins.
     if ($tracker->allownotifications) {
-        tracker_notify_submission($issue, $cm, $tracker);
+
+        if (empty($data->id)) {
+            tracker_notify_submission($issue, $cm, $tracker);
+        } else {
+            tracker_notify_update($issue, $cm, $tracker);
+        }
+
         if ($issue->assignedto) {
             tracker_notifyccs_changeownership($issue->id, $tracker);
         }
@@ -108,7 +116,7 @@ if ($data = $form->get_data()) {
     }
 
     tracker_clearelements($issue->id);
-    tracker_recordelements($issue, $issue);
+    tracker_recordelements($issue, $data);
 
     $dependancies = optional_param_array('dependancies', null, PARAM_INT);
     if (is_array($dependancies)) {

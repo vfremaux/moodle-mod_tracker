@@ -104,7 +104,17 @@ echo $OUTPUT->heading('['.$tracker->ticketprefix.$issue->id.'] '.$issue->summary
 
 $description = file_rewrite_pluginfile_urls($issue->description, 'pluginfile.php', $context->id, 'mod_tracker',
                                             'issuedescription', $issue->id);
+
+if ($lastcomments = $DB->get_records('tracker_issuecomment', array('issueid' => $issue->id), 'datecreated DESC', '*', 0, 1)) {
+    $lastcomment = array_shift($lastcomments);
+}
+
 echo $OUTPUT->box(format_text($description, $issue->descriptionformat), 'tracker-issue-description');
+
+$renderer = $PAGE->get_renderer('mod_tracker');
+if (!empty($lastcomment)) {
+    echo $renderer->last_comment($lastcomment);
+}
 
 echo $OUTPUT->heading(get_string('addacomment', 'tracker'));
 

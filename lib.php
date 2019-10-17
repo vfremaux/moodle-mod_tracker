@@ -28,6 +28,55 @@ require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 require_once($CFG->dirroot.'/mod/tracker/extralib/lib.php');
 
 /**
+ * This function is not implemented in this plugin, but is needed to mark
+ * the vf documentation custom volume availability.
+ */
+function mod_tracker_supports_feature() {
+    global $CFG;
+    static $supports;
+
+    $config = get_config('mtracker');
+
+    if (!isset($supports)) {
+        $supports = array(
+            'pro' => array(
+                'workflow' => array('strict', 'subtrackers', 'priority', 'customized'),
+                'fields' => array('custom', 'mandatory', 'hidden'),
+                'cascade' => array('mnet'),
+            ),
+            'community' => array(
+            ),
+        );
+    }
+
+    // Check existance of the 'pro' dir in plugin.
+    if (is_dir(__DIR__.'/pro')) {
+        if ($feature == 'emulate/community') {
+            return 'pro';
+        }
+        if (empty($config->emulatecommunity)) {
+            $versionkey = 'pro';
+        } else {
+            $versionkey = 'community';
+        }
+    } else {
+        $versionkey = 'community';
+    }
+
+    list($feat, $subfeat) = explode('/', $feature);
+
+    if (!array_key_exists($feat, $supports[$versionkey])) {
+        return false;
+    }
+
+    if (!in_array($subfeat, $supports[$versionkey][$feat])) {
+        return false;
+    }
+
+    return $versionkey;
+}
+
+/**
  * List of features supported in tracker module
  * @param string $feature FEATURE_xx constant for requested feature
  * @return mixed True if module supports feature, false if not, null if doesn't know

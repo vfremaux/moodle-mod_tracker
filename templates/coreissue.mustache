@@ -21,6 +21,7 @@
     * none
 
 }}
+<!-- coreissue -->
     <tr valign="top">
         <td colspan="4" align="left" class="tracker-issue-summary">
             {{{summary}}}
@@ -45,7 +46,7 @@
 
     <tr valign="top">
         <td align="right" width="25%" class="tracker-issue-param">
-            <b>{{strissuenumber}}:</b>
+            <b>{{#str}}issuenumber, tracker{{/str}}:</b>
         </td>
 
         <td width="25%" class="tracker-issue-value">
@@ -53,7 +54,7 @@
         </td>
 
         <td align="right" width="25%" class="tracker-issue-param" >
-            <b>{{strstatus}}:</b>
+            <b>{{#str}}status, tracker{{/str}}:</b>
         </td>
 
         <td width="25%" class="status-{{statuscode}} tracker-issue-value">
@@ -63,7 +64,7 @@
 
     <tr valign="top">
         <td align="right" width="25%" class="tracker-issue-param">
-            <b>{{strreportedby}}:</b>
+            <b>{{#str}}reportedby, tracker{{/str}}:</b>
         </td>
 
         <td width="25%" class="tracker-issue-value">
@@ -71,7 +72,7 @@
         </td>
 
         <td align="right" width="25%" class="tracker-issue-param" >
-            <b>{{strdatereported}}:</b>
+            <b>{{#str}}datereported, tracker{{/str}}:</b>
         </td>
 
         <td width="25%" class="tracker-issue-value">
@@ -82,15 +83,15 @@
     <tr valign="top">
 
         <td align="right" width="25%" class="tracker-issue-param">
-            <b>{{strassignedto}}:</b>
+            <b>{{#str}}assignedto, tracker{{/str}}:</b>
         </td>
 
         <td width="25%" class="tracker-issue-value">
-            {{assigneduser}}
+            {{{assignedto}}}
         </td>
 
         <td align="right" width="25%" class="tracker-issue-param">
-            <b>{{strcced}}:</b>
+            <b>{{#str}}cced, tracker{{/str}}:</b>
         </td>
 
         <td width="25%" class="tracker-issue-value">
@@ -100,10 +101,11 @@
 
     <tr valign="top">
         <td align="right" width="25%" class="tracker-issue-param">
-            <b>{{strdescription}}:</b>
+            <b>{{#str}}description{{/str}}:</b>
         </td>
 
         <td align="left" colspan="3" width="75%" class="tracker-issue-value">
             {{{description}}}
         </td>
     </tr>
+<!-- /coreissue -->

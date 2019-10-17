@@ -68,7 +68,9 @@ class fileelement extends trackerelement {
             $fileurl = $CFG->wwwroot."/pluginfile.php/{$this->context->id}/mod_tracker/{$filearea}/{$itemid}/{$filename}";
 
             if (preg_match("/\.(jpg|gif|png|jpeg)$/i", $filename)) {
-                return "<img style=\"max-width:600px\" src=\"{$fileurl}\" class=\"tracker_image_attachment\" />";
+                $viewstr = '<img id="issue-image-'.$this->id.'" style="max-width:600px" src="'.$fileurl.'" class="tracker_image_attachment" />';
+                $viewstr .= '<a href="" id="image-enlarge-'.$this->id.'" class="image-enlarge-handle">'.get_string('enlarge', 'tracker').'</a>';
+                return $viewstr;
             } else {
                 return html_writer::link($fileurl, $filename);
             }
@@ -144,12 +146,23 @@ class fileelement extends trackerelement {
     }
 
     public function set_data(&$defaults, $issueid = 0) {
-        global $COURSE;
+        global $COURSE, $DB;
+
+        if ($issueid) {
+            if ($attribute = $DB->get_record('tracker_issueattribute', array('issueid' => $issueid, 'elementid' => $this->id))) {
+                $itemid = $attribute->id;
+            } else {
+                $itemid = 0;
+            }
+        } else {
+            $itemid = 0;
+        }
 
         $elmname = 'element'.$this->name;
         $draftitemid = file_get_submitted_draft_itemid($elmname);
+
         file_prepare_draft_area($draftitemid, $this->context->id, 'mod_tracker', 'issueattribute',
-                                $this->id, $this->filemanageroptions);
+                                $itemid, $this->filemanageroptions);
         $defaults->$elmname = $draftitemid;
     }
 

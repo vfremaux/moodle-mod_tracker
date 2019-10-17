@@ -16,7 +16,7 @@
 
 // Capabilities
 $string['tracker:addinstance'] = 'Ajouter un gestionnaire de tickets';
-$string['tracker:canbecced'] = 'Peut être observateur';
+$string['tracker:canbecced'] = 'Peut s\'abonner';
 $string['tracker:comment'] = 'Commenter les tickets';
 $string['tracker:configure'] = 'Configurer le gestionnaire';
 $string['tracker:configurenetwork'] = 'Configurer les fonctions réseau';
@@ -39,15 +39,14 @@ $string['action'] = 'Action';
 $string['activeplural'] = 'Actifs';
 $string['addacomment'] = 'Ajouter un commentaire';
 $string['addanoption'] = 'Ajouter une option';
-$string['addaquerytomemo'] = 'Ajouter cette recherche à "mes recherches"';
-$string['addawatcher'] = 'Ajouter un observateur ';
+$string['addawatcher'] = 'Ajouter un abonné';
 $string['addtothetracker'] = 'Ajouter à ce traqueur';
 $string['administration'] = 'Administration';
 $string['administrators'] = 'Administrateurs';
 $string['alltracks'] = 'Voir mes travaux dans tous les gestionnaires';
 $string['any'] = 'Tous';
 $string['askraise'] = 'Demander à augmenter la priorité';
-$string['assignedto'] = 'Assigné à';
+$string['assignedto'] = 'Assigné à&nbsp;';
 $string['assignee'] = 'Assigné';
 $string['assignees'] = 'Responsables';
 $string['attributes'] = 'Attributs';
@@ -62,8 +61,8 @@ $string['captcha'] = 'Captcha';
 $string['cascade'] = 'Remonter au niveau supérieur';
 $string['cascadedticket'] = 'Ticket transmis';
 $string['categories'] = 'Catégories';
-$string['cced'] = 'Abonnés ';
-$string['ccs'] = 'Abonnements ';
+$string['cced'] = 'Abonnés&nbsp;';
+$string['ccs'] = 'Abonnements&nbsp;';
 $string['checkbox'] = 'Cases à cocher'; // @DYNA
 $string['checkboxhoriz'] = 'Cases à cocher horizontal'; // @DYNA
 $string['chooselocal'] = 'Choisir une instance locale ';
@@ -72,7 +71,7 @@ $string['chooseremoteparent'] = 'Choisir une instance distante ';
 $string['choosetarget'] = 'Choisir un sous-gestionnaire';
 $string['clearsearch'] = 'Effacer les critères de recherche';
 $string['comment'] = 'Commentaire';
-$string['commentedby'] = 'Commenté par';
+$string['commentedby'] = 'Commenté par&nbsp;';
 $string['comments'] = 'Commentaires';
 $string['component'] = 'Composant';
 $string['configinitiallyactive'] = 'Actif par défaut';
@@ -81,10 +80,10 @@ $string['configinitiallymandatory'] = 'Obligatoire par défaut';
 $string['configinitiallymandatory_desc'] = 'Si actif, tout nouvel élément utilisé dans un formulaire sera obligatoire par défaut.';
 $string['configinitiallyprivate'] = 'Privé par défaut';
 $string['configinitiallyprivate_desc'] = 'Si actif, tout nouvel élément utilisé dans un formulaire sera privé par défaut.';
-$string['configinitialviewccs'] = 'Panneau des observateurs';
-$string['configinitialviewccs_desc'] = 'Définit l\'état initial du panneau observateurs, lorsqu\'un ticket est ouvert.';
+$string['configinitialviewccs'] = 'Panneau des abonnés';
+$string['configinitialviewccs_desc'] = 'Définit l\'état initial du panneau des abonnés, lorsqu\'un ticket est ouvert.';
 $string['configinitialviewcomments'] = 'Panneau des commentaires';
-$string['configinitialviewcomments_desc'] = 'Définit l\'état initial du panneau observateurs, lorsqu\'un ticket est ouvert.';
+$string['configinitialviewcomments_desc'] = 'Définit l\'état initial du panneau des abonnés, lorsqu\'un ticket est ouvert.';
 $string['configinitialviewdeps'] = 'Panneau des dépendances';
 $string['configinitialviewdeps_desc'] = 'Définit l\'état initial du panneau des dépendances, lorsqu\'un ticket est ouvert.';
 $string['configinitialviewhistory'] = 'Panneau des historiques';
@@ -122,8 +121,9 @@ $string['database'] = 'Base de données';
 $string['datereported'] = 'Date d\'entrée';
 $string['defaultassignee'] = 'Assigné par défaut';
 $string['deleteattachedfile'] = 'Supprimer l\'attachement';
-$string['dependancies'] = 'Dépendances';
-$string['dependson'] = 'Dépends de ';
+$string['dependancies'] = 'Dépendances&nbsp;';
+$string['dependson'] = 'Dépends de&nbsp;';
+$string['description'] = 'Description&nbsp;';
 $string['descriptionisempty'] = 'La description ne peut pas être laissée vide.';
 $string['distribute'] = 'Déplacer le ticket';
 $string['doaddelementautourl'] = 'Ajouter une collecte d\'url'; // @DYNA
@@ -148,7 +148,6 @@ $string['dropdown'] = 'Menu déroulant';
 $string['editelement'] = 'Modifier un élément de formulaire';
 $string['editoptions'] = 'Editer les options';
 $string['editproperties'] = 'Editer les propriétés';
-$string['editquery'] = 'Modifier une requête mémorisée';
 $string['editwatch'] = 'Modifier un abonnement';
 $string['elements'] = 'Critères disponibles';
 $string['elementsused'] = 'Critères utilisés';
@@ -160,6 +159,7 @@ $string['emulatecommunity'] = 'Emuler la version communautaire';
 $string['emulatecommunity_desc'] = 'Si elle est activée, cette option force le composant à fonctionner en version communautaire.
 Certaines fonctionnalités ne seront plus disponibles.';
 $string['enablecomments'] = 'Autoriser les commentaires';
+$string['enlarge'] = 'Agrandir';
 $string['errorcaptcha'] = 'Vous n\'avez pas fourni la bonne réponse. Ou peut être êtes vous un robot ?';
 $string['errorcoursemisconfigured'] = 'Ce cours est mal configuré';
 $string['errorcoursemodid'] = 'L\'ID de module de cours est incrorrect';
@@ -183,36 +183,37 @@ $string['generaltrend'] = 'Tendance';
 $string['gotooriginal'] = 'Voir le ticket original';
 $string['gototransfered'] = 'Voir le ticket transféré';
 $string['hassolution'] = 'Ce bug a une solution publiée';
-$string['hideccs'] = 'Cacher les observateurs';
+$string['hideccs'] = 'Cacher les abonnés';
 $string['hidecomments'] = 'Cacher les commentaires';
 $string['hidedependancies'] = 'Cacher les dépendances';
 $string['hidehistory'] = 'Cacher l\'historique';
 $string['history'] = 'Historique';
-$string['iamadeveloper'] = 'Je peux travailler sur des tickets';
-$string['iamnotadeveloper'] = 'Je ne peux pas tavailler sur des tickets';
-$string['icanmanage'] = 'Je peux gérer les tickets';
-$string['icannotmanage'] = 'Je ne gère pas les tickets';
+$string['iamadeveloper'] = 'Je peux travailler sur des tickets (changer l\'état, réassigner...)';
+$string['iamnotadeveloper'] = 'Je ne peux pas travailler sur des tickets (changer l\'état, réassigner...)';
+$string['icanmanage'] = 'Je peux gérer les tickets (assigner, supprimer, déplacer...)';
+$string['icannotmanage'] = 'Je ne gère pas les tickets (assigner, supprimer, déplacer...)';
 $string['icannotreport'] = 'Je ne peux pas créer des tickets';
-$string['icannotresolve'] = 'Je ne peux pas prendre en charge des tickets';
+$string['icannotresolve'] = 'Je ne peux pas fermer des tickets';
 $string['icanreport'] = 'Je peux créer des tickets';
-$string['icanresolve'] = 'Je suis assigné sur certains tickets';
+$string['icanresolve'] = 'Je peux fermer les tickets';
 $string['id'] = 'Identifiant';
 $string['intest'] = 'En test';
 $string['inworkinmonth'] = 'A resoudre';
-$string['invalidquery'] = 'Requete non trouvée&nbsp;: {$a}';
 $string['ismandatory'] = 'Obligatoire';
 $string['isoptional'] = 'Optionnel';
 $string['isprivate'] = 'Donnée privée';
 $string['ispublic'] = 'Donnée publique';
 $string['isactive'] = 'Est visible sur le formulaire';
 $string['isinactive'] = 'Est caché sur le formulaire';
-$string['issueid'] = 'Ticket';
+$string['issueid'] = 'Ticket&nbsp;';
 $string['issuename'] = 'Libellé du ticket&nbsp;';
-$string['issuenumber'] = 'Ticket';
+$string['issuenumber'] = 'Ticket&nbsp;';
 $string['issues'] = 'tickets';
 $string['issuestoassign'] = 'Tickets à répartir&nbsp;: {$a}';
 $string['issuestowatch'] = 'Tickets à examiner&nbsp;: {$a}';
+$string['issueupdated'] = '[{$a->tracker} § {$a->issueid}] Ticket mis à jour';
 $string['knownelements'] = 'Rubriques connues&nbsp;';
+$string['lastcomment'] = 'Dernier commentaire&nbsp;: ';
 $string['listissues'] = 'Liste de tickets';
 $string['local'] = 'Local';
 $string['localtracker'] = 'Gestionnaire local';
@@ -237,7 +238,6 @@ $string['myassignees'] = 'Les personnes que j\'ai assignées';
 $string['myissues'] = 'Les tickets que je gère ';
 $string['mypreferences'] = 'Mes préférences';
 $string['myprofile'] = 'Mon profil';
-$string['myqueries'] = 'Mes recherches';
 $string['mytasks'] = 'Mes demandes';
 $string['mytickets'] = 'Mon support ';
 $string['mywatches'] = 'Mes abonnements';
@@ -262,7 +262,6 @@ $string['nolocalcandidate'] = 'Aucun tracker local disponible';
 $string['nomnet'] = 'Le réseau Moodle semble désactivé';
 $string['nopotentialdeps'] = 'Aucun ticket disponible';
 $string['nooptions'] = 'Pas d\'option';
-$string['noqueryssaved'] = 'Aucune recherche actuellement mémorisée';
 $string['noremotehosts'] = 'Aucun hôte réseau disponible';
 $string['noremotetrackers'] = 'Aucun tracker distant disponible';
 $string['noreporters'] = 'Pas de rapporteurs, il n\'y a probablement pas de ticket dans ce gestionnaire.';
@@ -275,7 +274,7 @@ $string['notrackeradmins'] = 'Pas d\'administrateurs';
 $string['notrackers'] = 'Pas de gestionnaire dans ce cours.';
 $string['nowatches'] = 'Pas d\'abonnements';
 $string['numberofissues'] = 'Nombre de tickets';
-$string['observers'] = 'Observateurs';
+$string['observers'] = 'Abonnés';
 $string['open'] = 'Ouvert';
 $string['on'] = ' le ';
 $string['option'] = 'Option ';
@@ -294,9 +293,6 @@ $string['priority'] = 'Prior.';
 $string['priorityid'] = 'Priorité';
 $string['profile'] = 'Mes réglages';
 $string['published'] = 'Publié';
-$string['queries'] = 'Requêtes';
-$string['query'] = 'Requête';
-$string['queryname'] = 'Label de la requête';
 $string['radio'] = 'Boutons radio'; // @DYNA
 $string['radiohoriz'] = 'Boutons radio horizontal'; // @DYNA
 $string['raisepriority'] = 'Augmenter la priorité';
@@ -319,8 +315,6 @@ $string['resolver'] = 'Mes tickets (résolution) ';
 $string['resolvers'] = 'Résolveurs';
 $string['resolving'] = 'En travail';
 $string['runninginmonth'] = 'En cours dans le mois';
-$string['saveasquery'] = 'Sauvegarder une requête ';
-$string['savequery'] = 'Sauvegarder la requête';
 $string['search'] = 'Recherche';
 $string['searchbyid'] = 'Recherche par ID';
 $string['searchcriteria'] = 'Critères de recherche';
@@ -344,19 +338,24 @@ $string['setwhenwaits'] = 'Les avis de mise en sommeil ne me sont pas envoyés';
 $string['setwhenworks'] = 'Les avis de prise en charge ne me sont pas envoyés';
 $string['sharethiselement'] = 'Rendre ce critère global';
 $string['sharing'] = 'Partage';
-$string['showccs'] = 'Montrer les observateurs';
+$string['shrink'] = 'Rétrécir';
+$string['showccs'] = 'Montrer les abonnés';
 $string['showcomments'] = 'Montrer les commentaires';
 $string['showdependancies'] = 'Montrer les dépendances';
 $string['showhistory'] = 'Montrer l\'historique';
 $string['site'] = 'Site';
 $string['solution'] = 'Solution';
+$string['solve'] = 'Marquer résolu';
 $string['sortorder'] = 'Ordre';
 $string['standalone'] = 'Traqueur autonome.';
 $string['statehistory'] = 'Etats';
 $string['stateprofile'] = 'Etats de tickets';
 $string['status'] = 'Etat';
 $string['strictworkflow'] = 'Cycle de vie strict';
-$string['submission'] = 'Un nouveau ticket a été ouvert dans le tracker [{$a}]';
+$string['changedownership'] = '[{$a->tracker} § {$a->issueid}]  Le ticket a été réattribué ';
+$string['commented'] = '[{$a->tracker} § {$a->issueid}]  Le ticket a été commenté ';
+$string['moved'] = '[{$a->tracker} § {$a->issueid}]  Un ticket a été déplacé ';
+$string['submission'] = '[{$a->tracker} § {$a->issueid}] Un nouveau ticket a été ouvert';
 $string['submitbug'] = 'Soumettre le ticket';
 $string['subtrackers'] = 'Sous-gestionnaires ';
 $string['sum_opened'] = 'Ouverts ';
@@ -376,7 +375,7 @@ $string['tracker-levelaccess'] = 'Mes possibilités dans ce gestionnaire';
 $string['tracker_name'] = 'Services du gestionnaire de tickets';
 $string['tracker_service_name'] = 'Services du gestionnaire de tickets';
 $string['trackerelements'] = 'Définition du trackeur ';
-$string['trackereventchanged'] = 'Changement d\'état du ticket dans le tracker [{$a}]';
+$string['trackereventchanged'] = '[{$a->tracker} § {$a->issueid}] Changement d\'état : {$a->event}';
 $string['trackerhost'] = 'Hôte du trackeur parent ';
 $string['trackername'] = 'Nom du gestionnaire ';
 $string['transfer'] = 'Transféré';
@@ -398,6 +397,7 @@ $string['unsetwhentesting'] = 'Les avis de solution me sont envoyés';
 $string['unsetwhenthrown'] = 'L\'avis d\'abandon m\'est envoyé';
 $string['unsetwhenwaits'] = 'Les avis de mise en sommeil me sont envoyés';
 $string['unsetwhenworks'] = 'Les avis de prise en charge me sont envoyés';
+$string['updateattribute'] = 'Modifier un attribut';
 $string['urgentraiserequestcaption'] = 'Un utilisateur demande une priorité d\'urgence';
 $string['urgentsignal'] = 'DEMANDE URGENTE';
 $string['userdefaultpreferences'] = 'Préférences par défaut des notifications';
@@ -407,6 +407,7 @@ $string['vieworiginal'] = 'Voir l\'orginal';
 $string['voter'] = 'Votes';
 $string['waiting'] = 'Bloqué';
 $string['watches'] = 'Obs.';
+$string['writtenby'] = '<i>Ecrit par</i>';
 $string['youneedanaccount'] = 'Vous devez posséder un compte dans cet espace pour pouvoir poster';
 $string['elementcode'] = 'Code élément';
 $string['opcode'] = 'Code option';
@@ -647,12 +648,12 @@ $string['ownershipchanged_tpl'] = '
 Cours : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 Tracker : <%%TRACKERNAME%%>
 --------------------------------------
-Le défaut : <%%ISSUE%%> : <%%SUMMARY%%>
+Le ticket : <%%ISSUE%%> : <%%SUMMARY%%>
 est réassigné à : <%%ASSIGNEDTO%%>
 par : <%%BY%%>
 
-Pour voir la fiche défaut : <%%ISSUEURL%%>
-Pour se désabonner des événements de cette fiche : <%%UNCCURL%%>
+Pour voir le ticket : <%%ISSUEURL%%>
+Pour se désabonner des événements de ce ticket : <%%UNCCURL%%>
 Pour se désabonner de ce tracker : <%%ALLUNCCURL%%>
 ';
 
@@ -660,12 +661,12 @@ $string['ownershipchanged_html_tpl'] = '
 <b>Cours :</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br />
 <b>Tracker :</b> <%%TRACKERNAME%%><br/>
 <hr/>
-<p><b>Le défaut :</b> <%%ISSUE%%> : <%%SUMMARY%%><br />
+<p><b>Le ticket :</b> <%%ISSUE%%> : <%%SUMMARY%%><br />
 <b>est réassigné à :</b> <%%ASSIGNEDTO%%> <br />
 <b>par :</b> <%%BY%%></p>
 <hr/>
-<p><a href="<%%ISSUEURL%%>">Voir la fiche défaut</a><br/>
-<a href="<%%UNCCURL%%>">Se désabonner des événements de cette fiche</a><br/>
+<p><a href="<%%ISSUEURL%%>">Voir le ticket</a><br/>
+<a href="<%%UNCCURL%%>">Se désabonner des événements de ce ticket</a><br/>
 <a href="<%%ALLUNCCURL%%>">Se désabonner de ce tracker</a></p>
 ';
 
@@ -687,7 +688,7 @@ la raison donnée est :
 ------------------------------------------
 <%%URGENT%%>
 ------------------------------------------
-Pour voir la fiche défaut : <%%ISSUEURL%%>
+Pour voir le ticket : <%%ISSUEURL%%>
 ';
 
 $string['raiserequest_html_tpl'] = '
@@ -705,19 +706,19 @@ $string['raiserequest_html_tpl'] = '
 <hr/>
 <%%URGENT%%>
 <hr/>
-<p><a href="<%%ISSUEURL%%>">Voir la fiche défaut</a><br/></p>
+<p><a href="<%%ISSUEURL%%>">Voir le ticket</a><br/></p>
 ';
 
 $string['statechanged_tpl'] = '
 Cours : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 Tracker : <%%TRACKERNAME%%>
 --------------------------------------
-Le défaut : <%%ISSUE%%> : <%%SUMMARY%%>
+Le ticket : <%%ISSUE%%> : <%%SUMMARY%%>
 a été passé à l\'état <%%EVENT%%>
 par : <%%BY%%>
 
-Pour voir la fiche défaut : <%%ISSUEURL%%>
-Pour se désabonner des événements de cette fiche : <%%UNCCURL%%>
+Pour voir le ticket : <%%ISSUEURL%%>
+Pour se désabonner des événements de ce ticket : <%%UNCCURL%%>
 Pour se désabonner de ce tracker : <%%ALLUNCCURL%%>
 ';
 
@@ -725,12 +726,12 @@ $string['statechanged_html_tpl'] = '
 <p><b>Cours :</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 <b>Tracker :</b> <%%TRACKERNAME%%>
 <hr/>
-<b>Le défaut :</b> <%%ISSUE%%> - <%%SUMMARY%%><br/>
+<b>Le ticket :</b> <%%ISSUE%%> - <%%SUMMARY%%><br/>
 <b>a été passé à l\'état</b> : <%%EVENT%%><br/>
 <b>par :</b> <%%BY%%></p>
 <hr/>
-<p><a href="<%%ISSUEURL%%>">Voir le défaut dans son contexte</a><br/>
-<a href="<%%UNCCURL%%>">Se désabonner du défaut</a><br/>
+<p><a href="<%%ISSUEURL%%>">Voir le ticket dans son contexte</a><br/>
+<a href="<%%UNCCURL%%>">Se désabonner du ticket</a><br/>
 <a href="<%%ALLUNCCURL%%>">Se désabonner de ce tracker</a></p>
 ';
 
@@ -738,23 +739,49 @@ $string['submission_tpl'] = '
 Cours : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
 Tracker : <%%TRACKERNAME%%>
 --------------------------------------
-Nouveau défaut posté : <%%ISSUE%%> : <%%SUMMARY%%>
+Nouveau ticket posté : <%%ISSUE%%> : <%%SUMMARY%%>
 par : <%%BY%%>
 
 Description : <%%DESCRIPTION%%>
 
-Pour voir la fiche défaut : <%%ISSUEURL%%>
-Pour s\'abonner aux événements de cette fiche : <%%CCURL%%>
+Pour voir le ticket : <%%ISSUEURL%%>
+Pour s\'abonner aux événements du ticket : <%%CCURL%%>
 ';
 
 $string['submission_html_tpl'] = '
 <b>Cours :</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br/>
 <b>Tracker :</b> <%%TRACKERNAME%%><br/>
 <hr/>
-<p><b>Nouveau défaut posté :</b> <%%ISSUE%%> : <%%SUMMARY%%><br/>
+<p><b>Nouveau ticket posté :</b> <%%ISSUE%%> : <%%SUMMARY%%><br/>
 <b>par :</b> <%%BY%%></p>
 <hr/>
 <b>Description : </b><%%DESCRIPTION%%>
+<hr/>
+<p><a href="<%%ISSUEURL%%>">Voir la fiche défaut</a><br/>
+<a href="<%%CCURL%%>">S\'abonner aux événements de cette fiche</a></p>
+';
+
+$string['update_tpl'] = '
+Cours : [<%%COURSE_SHORT%%>] <%%COURSENAME%%>
+Tracker : <%%TRACKERNAME%%>
+--------------------------------------
+Nouveau défaut posté : <%%ISSUE%%> : <%%SUMMARY%%>
+par : <%%BY%%>
+
+A été mis à jour.
+
+Pour voir la fiche défaut : <%%ISSUEURL%%>
+Pour s\'abonner aux événements de cette fiche : <%%CCURL%%>
+';
+
+$string['update_html_tpl'] = '
+<b>Cours :</b> [<%%COURSE_SHORT%%>] <%%COURSENAME%%><br/>
+<b>Tracker :</b> <%%TRACKERNAME%%><br/>
+<hr/>
+<p><b>Le ticket posté :</b> <%%ISSUE%%> : <%%SUMMARY%%><br/>
+<b>par :</b> <%%BY%%></p>
+<hr/>
+<b>A été mis à jour</b>
 <hr/>
 <p><a href="<%%ISSUEURL%%>">Voir la fiche défaut</a><br/>
 <a href="<%%CCURL%%>">S\'abonner aux événements de cette fiche</a></p>

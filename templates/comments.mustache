@@ -1,0 +1,29 @@
+
+
+<!-- mod_tracker/comments -->
+    <tr>
+        <td colspan="4">
+            <div id="tracker-issuecomments" class="{{initialcommentsviewmode}} comments">
+            <table width="100%">
+                {{#comments}}
+                <tr>
+                    <td valign="top" class="commenter" width="30%">
+                        {{{user}}}
+                        <br/>
+                        <span class="timelabel">{{datecreated}}</span>
+                    </td>
+                    <td colspan="3" valign="top" align="left" class="comment">
+                        {{{comment}}}
+                    </td>
+                </tr>
+                {{/comments}}
+            </table>
+            {{#addcommentlink}}
+            <div id="tracker-post-addcomment-link">
+            {{{addcommentlink}}}
+            </div>
+            {{/addcommentlink}}
+            </div>
+        </td>
+    </tr>
+<!-- /mod_tracker/comments -->
