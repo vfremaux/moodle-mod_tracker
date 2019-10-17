@@ -102,12 +102,12 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, cfg, str, 
 
             var imageid = that.attr('id').replace('image-enlarge-', 'issue-image-');
 
-            var currentwidth = ('#' + imageid).css('max-width');
+            var currentwidth = $('#' + imageid).css('max-width');
             if (currentwidth == '600px') {
-                ('#' + imageid).css('max-width', null);
+                $('#' + imageid).css('max-width', null);
                 that.attr('id').html(moodletracker.strs[9]);
             } else {
-                ('#' + imageid).css('max-width', '600px');
+                $('#' + imageid).css('max-width', '600px');
                 that.attr('id').html(moodletracker.strs[8]);
             }
         }

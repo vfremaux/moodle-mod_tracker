@@ -69,7 +69,7 @@ class fileelement extends trackerelement {
 
             if (preg_match("/\.(jpg|gif|png|jpeg)$/i", $filename)) {
                 $viewstr = '<img id="issue-image-'.$this->id.'" style="max-width:600px" src="'.$fileurl.'" class="tracker_image_attachment" />';
-                $viewstr .= '<a href="" id="image-enlarge-'.$this->id.'" class="image-enlarge-handle">'.get_string('enlarge', 'tracker').'</a>';
+                $viewstr .= '<button role="button" id="image-enlarge-'.$this->id.'" class="image-enlarge-handle">'.get_string('enlarge', 'tracker').'</button>';
                 return $viewstr;
             } else {
                 return html_writer::link($fileurl, $filename);
