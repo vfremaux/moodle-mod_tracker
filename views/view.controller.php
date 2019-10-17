@@ -46,105 +46,40 @@ defined('MOODLE_INTERNAL') || die();
 // Update an issue ********************************************************************.
 
 if ($action == 'updateanissue') {
-    /* obsolete path
-    $issue = new StdClass;
-
-    $issue->id = required_param('issueid', PARAM_INT);
-    $issue->issueid = $issue->id;
-    $issue->status = required_param('status', PARAM_INT);
-    $issue->assignedto = required_param('assignedto', PARAM_INT);
-    $issue->summary = required_param('summary', PARAM_TEXT);
-    $issue->description_editor = required_param_array('description_editor', PARAM_CLEANHTML);
-    $issue->descriptionformat = $issue->description_editor['format'];
-    $editoroptions = array('maxfiles' => 99, 'maxbytes' => $COURSE->maxbytes, 'context' => $context);
-
-    $issue->resolution_editor = required_param_array('resolution_editor', PARAM_CLEANHTML);
-    $issue->resolutionformat = $issue->resolution_editor['format'];
-
-    $issue->description = file_save_draft_area_files($issue->description_editor['itemid'], $context->id, 'mod_tracker',
-                                                     'issuedescription', $issue->id, $editoroptions,
-                                                     $issue->description_editor['text']);
-    $issue->resolution = file_save_draft_area_files($issue->resolution_editor['itemid'], $context->id, 'mod_tracker',
-                                                    'issueresolution', $issue->id, $editoroptions,
-                                                    $issue->resolution_editor['text']);
-
-    if (!empty($issue->resolution)) {
-        $issue->status = RESOLVED;
-    }
-
-    $issue->datereported = required_param('datereported', PARAM_INT);
-
-    $issue->trackerid = $tracker->id;
-
-    // If ownership has changed, prepare logging.
-
-    $oldrecord = $DB->get_record('tracker_issue', array('id' => $issue->id));
-    if ($oldrecord->assignedto != $issue->assignedto) {
-        $ownership = new StdClass;
-        $ownership->trackerid = $tracker->id;
-        $ownership->issueid = $oldrecord->id;
-        $ownership->userid = $oldrecord->assignedto;
-        $ownership->bywhomid = $oldrecord->bywhomid;
-        $ownership->timeassigned = ($oldrecord->timeassigned) ? $oldrecord->timeassigned : time();
-        if (!$DB->insert_record('tracker_issueownership', $ownership)) {
-            print_error('errorcannotlogoldownership', 'tracker');
-        }
-        tracker_notifyccs_changeownership($issue->id, $tracker);
-    }
-    $issue->bywhomid = $USER->id;
-    $issue->timeassigned = time();
-
-    if (!$DB->update_record('tracker_issue', $issue)) {
-        print_error('errorcannotupdateissue', 'tracker');
-    }
-
-    // If not CCed, the assignee should be.
-    tracker_register_cc($tracker, $issue, $issue->assignedto);
-
-    // Send state change notification.
-    if ($oldrecord->status != $issue->status) {
-        tracker_notifyccs_changestate($issue->id, $tracker);
-
-        // Log state change.
-        $stc = new StdClass;
-        $stc->userid = $USER->id;
-        $stc->issueid = $issue->id;
-        $stc->trackerid = $tracker->id;
-        $stc->timechange = time();
-        $stc->statusfrom = $oldrecord->status;
-        $stc->statusto = $issue->status;
-        $DB->insert_record('tracker_state_change', $stc);
-
-        if ($stc->statusto == RESOLVED || $stc->statusto == PUBLISHED) {
-            assert(1);
-            // Check if was cascaded and needs backreported then backreport.
-            // TODO : backreport to original.
-        }
-    }
-
-    tracker_clearelements($issue->id);
-    tracker_recordelements($issue, $issue);
-    // TODO : process dependancies.
-    $dependancies = optional_param_array('dependancies', null, PARAM_INT);
-    if (is_array($dependancies)) {
-        // Cleanup previous depdendancies.
-        if (!$DB->delete_records('tracker_issuedependancy', array('childid' => $issue->id))) {
-            print_error('errorcannotdeleteolddependancy', 'tracker');
-        }
-        // Install back new one.
-        foreach ($dependancies as $dependancy) {
-            $dependancyrec = new StdClass;
-            $dependancyrec->trackerid = $tracker->id;
-            $dependancyrec->parentid = $dependancy;
-            $dependancyrec->childid = $issue->id;
-            $dependancyrec->comment = '';
-            if (!$DB->insert_record('tracker_issuedependancy', $dependancyrec)) {
-                print_error('cannotwritedependancy', 'tracker');
-            }
-        }
-    }
-    */
     throw new coding_exception('This use case has been moved to editanissue.php. The code should never reach this point.');
+} else if ($action == 'solve') {
+    $issueid = required_param('issueid', PARAM_INT);
+
+    $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
+    $oldstate = $issue->status;
+    $issue->status = RESOLVED;
+    $DB->update_record('tracker_issue', $issue);
+
+    // Log state change.
+    $stc = new StdClass;
+    $stc->userid = $USER->id;
+    $stc->issueid = $issueid;
+    $stc->trackerid = $tracker->id;
+    $stc->timechange = time();
+    $stc->statusfrom = $oldstate;
+    $stc->statusto = RESOLVED;
+    $DB->insert_record('tracker_state_change', $stc);
+
+    // Check if was cascaded and needs backreported then backreport.
+    // TODO : backreport to original.
+
+    // Notify all admins.
+    if ($tracker->allownotifications) {
+
+        tracker_notify_update($issue, $cm, $tracker);
+
+        if ($oldstate != RESOLVED) {
+            tracker_notifyccs_changestate($issueid, $tracker);
+        }
+    }
+    $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'mytickets');
+    redirect(new moodle_url('/mod/tracker/view.php', $params));
+
 } else if ($action == 'delete') {
 
     // Delete an issue record ***************************************************************.
@@ -491,7 +426,9 @@ if ($action == 'updateanissue') {
     $DB->set_field_select('tracker_issuecc', 'trackerid', $newtracker->id, " issueid = $issue->id ");
 
     // We must stay in our own tracker to continue distributing.
-    redirect($CFG->wwwroot."/mod/tracker/view.php?id={$cm->id}&view=view&screen=browse");
+    $params = array('id' => $cm->id, 'view' => 'view', 'screen' => tracker_resolve_screen($tracker, $cm, true));
+    $trackerurl = new moodle_url('/mod/tracker/view.php', $params);
+    redirect($trackerurl);
     // TODO : if watchers do not have capability in the new tracker, discard them.
 
 } else if ($action == 'raisepriority') {

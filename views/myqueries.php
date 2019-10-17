@@ -39,18 +39,21 @@ if (!empty($queries)) {
         $query->description = tracker_printsearchfields($fields);
         $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'browse', 'what' => 'usequery', 'queryid' => $query->id);
         $searchurl = new moodle_url('/mod/tracker/view.php', $params);
-        $pix = '<img src="'.$OUTPUT->pix_url('search', 'mod_tracker').'" />';
-        $searchlink = '<a href="'.$searchurl.'" title="'.get_string('searchwiththat', 'tracker').'">'.$pix.'</a>';
+        $alt = get_string('searchwiththat', 'tracker');
+        $pix = $OUTPUT->pix_icon('search', $alt, 'mod_tracker');
+        $searchlink = '<a href="'.$searchurl.'" title="'.$alt.'">'.$pix.'</a>';
 
         $params = array('id' => $cm->id, 'what' => 'editquery', 'queryid' => $query->id);
         $editurl = new moodle_url('/mod/tracker/view.php', $params);
-        $pix = '<img src="'.$OUTPUT->pix_url('t/edit', 'core').'" />';
-        $action = '<a href="'.$editurl.'" title="'.get_string('update').'" >'.$pix.'</a>';
+        $alt = get_string('update');
+        $pix = $OUTPUT->pix_icon('t/edit', $alt, 'core');
+        $action = '<a href="'.$editurl.'" title="'.$alt.'" >'.$pix.'</a>';
 
         $params = array('id' => $cm->id, 'what' => 'deletequery', 'queryid' => $query->id);
         $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
-        $pix = '<img src="'.$OUTPUT->pix_url('t/delete', 'core').'" />';
-        $action .= '&nbsp;<a href="'.$deleteurl.'" title="'.get_string('delete').'" >'.$pix.'</a>';
+        $alt = get_string('delete');
+        $pix = $OUTPUT->pix_icon('t/delete', $alt, 'core');
+        $action .= '&nbsp;<a href="'.$deleteurl.'" title="'.$alt.'" >'.$pix.'</a>';
         $table->data[] = array($searchlink, "&nbsp;{$query->name}", format_string($query->description), $action);
     }
     $tablehtml = html_writer::table($table);
@@ -63,7 +66,7 @@ if (!empty($queries)) {
 echo $output;
 echo $OUTPUT->heading(get_string('myqueries', 'tracker'));
 
-echo $OUTPUT->box_start('center', '80%', '', '', 'generalbox', 'tracker-queries');
+echo $OUTPUT->box_start('generalbox', 'tracker-queries');
 
 echo '<center>';
 echo $tablehtml;

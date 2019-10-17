@@ -31,7 +31,7 @@ echo $output;
 echo '<br/>';
 echo $OUTPUT->heading(get_string('me', 'tracker'));
 
-echo $OUTPUT->box_start('center', '90%', '', '', 'generalbox', 'bugreport');
+echo $OUTPUT->box_start('generalbox', 'tracker-profile');
 
 $table = new html_table();
 $table->head = array('', '');
@@ -84,7 +84,7 @@ if ($manager) {
     $assignees = tracker_getassignees($USER->id);
     if ($assignees) {
         foreach ($assignees as $assignee) {
-            tracker_print_user($assignee);
+            $str .= $renderer->user($assignee);
             $str .= ' ('.$assignee->issues.')<br />';
         }
     } else {
@@ -111,7 +111,7 @@ if ($resolver) {
     $assignees = tracker_getassignees($USER->id);
     if ($assignees) {
         foreach ($assignees as $assignee) {
-            $str .= tracker_print_user($assignee, true);
+            $str .= $renderer->user($assignee, true);
             $str .= ' ('.$assignee->issues.')<br />';
         }
     } else {

@@ -52,7 +52,9 @@ class mod_tracker_mod_form extends moodleform_mod {
         $modeoptions['bugtracker'] = get_string('mode_bugtracker', 'tracker');
         $modeoptions['ticketting'] = get_string('mode_ticketting', 'tracker');
         $modeoptions['taskspread'] = get_string('mode_taskspread', 'tracker');
-        $modeoptions['customized'] = get_string('mode_customized', 'tracker');
+        if (mod_tracker_supports_feature('workflow/customized')) {
+            $modeoptions['customized'] = get_string('mode_customized', 'tracker');
+        }
         $mform->addElement('select', 'supportmode', get_string('supportmode', 'tracker'), $modeoptions);
         $mform->addHelpButton('supportmode', 'supportmode', 'tracker');
 
@@ -60,21 +62,23 @@ class mod_tracker_mod_form extends moodleform_mod {
         $mform->setType('ticketprefix', PARAM_TEXT);
         $mform->setAdvanced('ticketprefix');
 
-        $stateprofileopts = array(
-            ENABLED_OPEN => get_string('open', 'tracker'),
-            ENABLED_RESOLVING => get_string('resolving', 'tracker'),
-            ENABLED_WAITING => get_string('waiting', 'tracker'),
-            ENABLED_RESOLVED => get_string('resolved', 'tracker'),
-            ENABLED_ABANDONNED => get_string('abandonned', 'tracker'),
-            ENABLED_TESTING => get_string('testing', 'tracker'),
-            ENABLED_PUBLISHED => get_string('published', 'tracker'),
-            ENABLED_VALIDATED => get_string('validated', 'tracker'),
-        );
-        $select = &$mform->addElement('select', 'stateprofile', get_string('stateprofile', 'tracker'), $stateprofileopts);
-        $mform->setType('stateprofile', PARAM_INT);
-        $mform->disabledIf('stateprofile', 'supportmode', 'neq', 'customized');
-        $select->setMultiple(true);
-        $mform->setAdvanced('stateprofile');
+        if (mod_tracker_supports_feature('workflow/customized')) {
+            $stateprofileopts = array(
+                ENABLED_OPEN => get_string('open', 'tracker'),
+                ENABLED_RESOLVING => get_string('resolving', 'tracker'),
+                ENABLED_WAITING => get_string('waiting', 'tracker'),
+                ENABLED_RESOLVED => get_string('resolved', 'tracker'),
+                ENABLED_ABANDONNED => get_string('abandonned', 'tracker'),
+                ENABLED_TESTING => get_string('testing', 'tracker'),
+                ENABLED_PUBLISHED => get_string('published', 'tracker'),
+                ENABLED_VALIDATED => get_string('validated', 'tracker'),
+            );
+            $select = &$mform->addElement('select', 'stateprofile', get_string('stateprofile', 'tracker'), $stateprofileopts);
+            $mform->setType('stateprofile', PARAM_INT);
+            $mform->disabledIf('stateprofile', 'supportmode', 'neq', 'customized');
+            $select->setMultiple(true);
+            $mform->setAdvanced('stateprofile');
+        }
 
         $attrs = array('cols' => 60, 'rows' => 10);
         $mform->addElement('textarea', 'thanksmessage', get_string('thanksmessage', 'tracker'), $attrs);
@@ -88,8 +92,10 @@ class mod_tracker_mod_form extends moodleform_mod {
         $mform->addElement('checkbox', 'allownotifications', get_string('notifications', 'tracker'));
         $mform->addHelpButton('allownotifications', 'notifications', 'tracker');
 
-        $mform->addElement('checkbox', 'strictworkflow', get_string('strictworkflow', 'tracker'));
-        $mform->addHelpButton('strictworkflow', 'strictworkflow', 'tracker');
+        if (mod_tracker_supports_feature('workflow/strict')) {
+            $mform->addElement('checkbox', 'strictworkflow', get_string('strictworkflow', 'tracker'));
+            $mform->addHelpButton('strictworkflow', 'strictworkflow', 'tracker');
+        }
 
         if (isset($this->_cm->id)) {
             $context = context_module::instance($this->_cm->id);
@@ -112,29 +118,31 @@ class mod_tracker_mod_form extends moodleform_mod {
         }
         $mform->setType('defaultassignee', PARAM_INT);
 
-        if ($subtrackers = $DB->get_records_select('tracker', " id != 0 " )) {
-            $trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
-            $subtrackersopts = array();
-            foreach ($subtrackers as $st) {
-                if ($st->id == @$this->current->id) {
-                    continue;
-                }
-                if ($targetcm = $DB->get_record('course_modules', array('instance' => $st->id, 'module' => $trackermoduleid))) {
-                    $targetcontext = context_module::instance($targetcm->id);
-                    $caps = array('mod/tracker:manage',
-                                  'mod/tracker:develop',
-                                  'mod/tracker:resolve');
-                    if (has_any_capability($caps, $targetcontext)) {
-                        $trackercourseshort = $DB->get_field('course', 'shortname', array('id' => $st->course));
-                        $subtrackersopts[$st->id] = $trackercourseshort.' - '.$st->name;
+        if (mod_tracker_supports_feature('workflow/subtrackers')) {
+            if ($subtrackers = $DB->get_records_select('tracker', " id != 0 " )) {
+                $trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
+                $subtrackersopts = array();
+                foreach ($subtrackers as $st) {
+                    if ($st->id == @$this->current->id) {
+                        continue;
+                    }
+                    if ($targetcm = $DB->get_record('course_modules', array('instance' => $st->id, 'module' => $trackermoduleid))) {
+                        $targetcontext = context_module::instance($targetcm->id);
+                        $caps = array('mod/tracker:manage',
+                                      'mod/tracker:develop',
+                                      'mod/tracker:resolve');
+                        if (has_any_capability($caps, $targetcontext)) {
+                            $trackercourseshort = $DB->get_field('course', 'shortname', array('id' => $st->course));
+                            $subtrackersopts[$st->id] = $trackercourseshort.' - '.$st->name;
+                        }
                     }
                 }
-            }
-            if (!empty($subtrackersopts)) {
-                $select = &$mform->addElement('select', 'subtrackers', get_string('subtrackers', 'tracker'), $subtrackersopts);
-                $mform->setType('subtrackers', PARAM_INT);
-                $mform->setAdvanced('subtrackers');
-                $select->setMultiple(true);
+                if (!empty($subtrackersopts)) {
+                    $select = &$mform->addElement('select', 'subtrackers', get_string('subtrackers', 'tracker'), $subtrackersopts);
+                    $mform->setType('subtrackers', PARAM_INT);
+                    $mform->setAdvanced('subtrackers');
+                    $select->setMultiple(true);
+                }
             }
         }
 

@@ -84,8 +84,16 @@ class TrackerIssueForm extends moodleform {
                     // Avoid captcha when updating issue data.
                     continue;
                 }
-                if (($element->active == true) && ($element->private == false)) {
-                    $element->add_form_element($mform);
+                if ($this->_customdata['mode'] == 'add') {
+                    if (($element->active == true) && ($element->private == false)) {
+                        $element->add_form_element($mform);
+                    }
+                } else {
+                    // We are updating.
+                    $caps = array('mod/tracker:manage', 'mod/tracker:develop');
+                    if ($element->private == false || has_any_capability($caps, $this-> context)) {
+                        $element->add_form_element($mform);
+                    }
                 }
             }
         }
@@ -98,7 +106,7 @@ class TrackerIssueForm extends moodleform {
             $context = context_module::instance($this->_customdata['cmid']);
             $resolvers = tracker_getresolvers($context);
             $resolversmenu[0] = '---- '. get_string('unassigned', 'tracker').' -----';
-            if ($resolvers) {
+            if ($resolvers && has_any_capability(array('mod/tracker:develop', 'mod/tracker:manage'), $this->context)) {
                 foreach ($resolvers as $resolver) {
                     $resolversmenu[$resolver->id] = fullname($resolver);
                 }

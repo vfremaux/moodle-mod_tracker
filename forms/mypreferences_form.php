@@ -74,14 +74,22 @@ class my_preferences_form extends moodleform {
         global $USER;
 
         if (!empty($USER->trackerprefs)) {
-            $defaults['open'] = @$USER->trackerprefs->eventmask & EVENT_OPEN;
-            $defaults['resolving'] = @$USER->trackerprefs->eventmask & EVENT_RESOLVING;
-            $defaults['waiting'] = @$USER->trackerprefs->eventmask & EVENT_WAITING;
-            $defaults['testing'] = @$USER->trackerprefs->eventmask & EVENT_TESTING;
-            $defaults['published'] = @$USER->trackerprefs->eventmask & EVENT_PUBLISHED;
-            $defaults['resolved'] = @$USER->trackerprefs->eventmask & EVENT_RESOLVED;
-            $defaults['abandonned'] = @$USER->trackerprefs->eventmask & EVENT_ABANDONNED;
-            $defaults['oncomment'] = @$USER->trackerprefs->eventmask & ON_COMMENT;
+            $result = @$USER->trackerprefs->eventmask & EVENT_OPEN;
+            $defaults['open'] = !empty($result);
+            $result = @$USER->trackerprefs->eventmask & EVENT_RESOLVING;
+            $defaults['resolving'] = !empty($result);
+            $result = @$USER->trackerprefs->eventmask & EVENT_WAITING;
+            $defaults['waiting'] = !empty($result);
+            $result = @$USER->trackerprefs->eventmask & EVENT_TESTING;
+            $defaults['testing'] = !empty($result);
+            $result = @$USER->trackerprefs->eventmask & EVENT_PUBLISHED;
+            $defaults['published'] = !empty($result);
+            $result = @$USER->trackerprefs->eventmask & EVENT_RESOLVED;
+            $defaults['resolved'] = !empty($result);
+            $result = @$USER->trackerprefs->eventmask & EVENT_ABANDONNED;
+            $defaults['abandonned'] = !empty($result);
+            $result = @$USER->trackerprefs->eventmask & ON_COMMENT;
+            $defaults['oncomment'] = $result;
         } else {
             $config = get_config('mod_tracker');
             $defaults['open'] = $config->useropendefault;
