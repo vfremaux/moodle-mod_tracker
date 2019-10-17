@@ -85,7 +85,6 @@ $issue->resolution = file_rewrite_pluginfile_urls($issue->resolution, 'pluginfil
 // Get statuskeys labels.
 
 $statuskeys = tracker_get_statuskeys($tracker);
-$PAGE->requires->js_call_amd('mod_tracker/tracker', 'init');
 
 // Start printing.
 

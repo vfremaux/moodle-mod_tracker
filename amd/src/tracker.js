@@ -97,19 +97,24 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, cfg, str, 
             e.preventDefault();
         },
 
-        enlargeswitch : function() {
+        enlargeswitch : function(e) {
+
             var that = $(this);
 
             var imageid = that.attr('id').replace('image-enlarge-', 'issue-image-');
 
             var currentwidth = $('#' + imageid).css('max-width');
             if (currentwidth == '600px') {
-                $('#' + imageid).css('max-width', null);
                 that.html(moodletracker.strs[9]);
+                $('#' + imageid).css('max-width', '');
             } else {
-                $('#' + imageid).css('max-width', '600px');
                 that.html(moodletracker.strs[8]);
+                $('#' + imageid).css('max-width', '600px');
             }
+
+            e.stopPropagation();
+            e.preventDefault();
+            return false;
         }
     };
 
