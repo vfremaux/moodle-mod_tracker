@@ -105,10 +105,10 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, cfg, str, 
             var currentwidth = $('#' + imageid).css('max-width');
             if (currentwidth == '600px') {
                 $('#' + imageid).css('max-width', null);
-                this.html(moodletracker.strs[9]);
+                that.html(moodletracker.strs[9]);
             } else {
                 $('#' + imageid).css('max-width', '600px');
-                this.html(moodletracker.strs[8]);
+                that.html(moodletracker.strs[8]);
             }
         }
     };
