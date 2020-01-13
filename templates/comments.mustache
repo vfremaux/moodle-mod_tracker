@@ -1,6 +1,6 @@
 
 
-
+<!-- mod_tracker/comments -->
     <tr>
         <td colspan="4">
             <div id="tracker-issuecomments" class="{{initialcommentsviewmode}} comments">
@@ -18,6 +18,12 @@
                 </tr>
                 {{/comments}}
             </table>
+            {{#addcommentlink}}
+            <div id="tracker-post-addcomment-link">
+            {{{addcommentlink}}}
+            </div>
+            {{/addcommentlink}}
             </div>
         </td>
     </tr>
+<!-- /mod_tracker/comments -->

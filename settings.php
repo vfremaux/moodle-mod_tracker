@@ -23,7 +23,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/mod/tracker/locallib.php');
+require_once($CFG->dirroot.'/mod/tracker/lib.php');
 
 /*
  * Global settings for the learningtimecheck
@@ -74,17 +74,12 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configselect($key, $label, $desc, 0, $yesnoopts));
 
 
-    if (tracker_supports_feature('emulate/community')) {
-        // This will accept any.
-        $settings->add(new admin_setting_heading('plugindisthdr', get_string('plugindist', 'tracker'), ''));
-
-        $key = 'mod_tracker/emulatecommunity';
-        $label = get_string('emulatecommunity', 'tracker');
-        $desc = get_string('emulatecommunity_desc', 'tracker');
-        $settings->add(new admin_setting_configcheckbox($key, $label, $desc, 0));
+    if (tracker_supports_feature('emulate/community') == 'pro') {
+        include_once($CFG->dirroot.'/mod/tracker/pro/prolib.php');
+        \mod_tracker\pro_manager::add_settings($ADMIN, $settings);
     } else {
-        $label = get_string('plugindist', 'tracker');
-        $desc = get_string('plugindist_desc', 'tracker');
+        $label = get_string('plugindist', 'mod_tracker');
+        $desc = get_string('plugindist_desc', 'mod_tracker');
         $settings->add(new admin_setting_heading('plugindisthdr', $label, $desc));
     }
 

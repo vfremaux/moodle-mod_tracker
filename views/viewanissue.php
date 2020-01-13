@@ -177,7 +177,7 @@ echo '</tr>';
 
 if ($tracker->enablecomments) {
     if (!empty($commentscount)) {
-        echo $renderer->comments($comments, $initialcommentsviewmode);
+        echo $renderer->comments($comments, $initialcommentsviewmode, $addcommentlink);
     }
 }
 echo $renderer->dependencies($tracker, $issue, $initialdepsviewmode);

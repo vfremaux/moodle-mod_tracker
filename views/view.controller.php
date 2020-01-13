@@ -47,6 +47,39 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($action == 'updateanissue') {
     throw new coding_exception('This use case has been moved to editanissue.php. The code should never reach this point.');
+} else if ($action == 'solve') {
+    $issueid = required_param('issueid', PARAM_INT);
+
+    $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
+    $oldstate = $issue->status;
+    $issue->status = RESOLVED;
+    $DB->update_record('tracker_issue', $issue);
+
+    // Log state change.
+    $stc = new StdClass;
+    $stc->userid = $USER->id;
+    $stc->issueid = $issueid;
+    $stc->trackerid = $tracker->id;
+    $stc->timechange = time();
+    $stc->statusfrom = $oldstate;
+    $stc->statusto = RESOLVED;
+    $DB->insert_record('tracker_state_change', $stc);
+
+    // Check if was cascaded and needs backreported then backreport.
+    // TODO : backreport to original.
+
+    // Notify all admins.
+    if ($tracker->allownotifications) {
+
+        tracker_notify_update($issue, $cm, $tracker);
+
+        if ($oldstate != RESOLVED) {
+            tracker_notifyccs_changestate($issueid, $tracker);
+        }
+    }
+    $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'mytickets');
+    redirect(new moodle_url('/mod/tracker/view.php', $params));
+
 } else if ($action == 'delete') {
 
     // Delete an issue record ***************************************************************.

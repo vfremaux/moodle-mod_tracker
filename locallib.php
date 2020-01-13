@@ -38,7 +38,7 @@ define('TESTING', 7);
 define('PUBLISHED', 8);
 define('VALIDATED', 9);
 
-// Preference defines.
+// Status defines.
 define('ENABLED_POSTED', 1);
 define('ENABLED_OPEN', 2);
 define('ENABLED_RESOLVING', 4);
@@ -50,71 +50,6 @@ define('ENABLED_TESTING', 128);
 define('ENABLED_PUBLISHED', 256);
 define('ENABLED_VALIDATED', 512);
 define('ENABLED_ALL', 1023);
-
-/**
- * Tells wether a feature is supported or not. Gives back the
- * implementation path where to fetch resources.
- * @param string $feature a feature key to be tested.
- */
-function tracker_supports_feature($feature) {
-    static $supports;
-
-    $config = get_config('mod_tracker');
-
-    if (!isset($supports)) {
-        $supports = array(
-            'pro' => array(
-                'emulate' => array('community'),
-                'cascade' => array('mnet'),
-                'reports' => array('status', 'evolution', 'print'),
-                'remote' => array('ws'),
-                'priority' => array('askraise')
-            ),
-            'community' => array(
-                'reports' => array('status', 'evolution'),
-            ),
-        );
-        $prefer = array();
-    }
-
-    // Check existance of the 'pro' dir in plugin.
-    if (is_dir(__DIR__.'/pro')) {
-        if ($feature == 'emulate/community') {
-            return 'pro';
-        }
-        if (empty($config->emulatecommunity)) {
-            $versionkey = 'pro';
-        } else {
-            $versionkey = 'community';
-        }
-    } else {
-        $versionkey = 'community';
-    }
-
-    list($feat, $subfeat) = explode('/', $feature);
-
-    if (!array_key_exists($feat, $supports[$versionkey])) {
-        return false;
-    }
-
-    if (!in_array($subfeat, $supports[$versionkey][$feat])) {
-        return false;
-    }
-
-    if (array_key_exists($feat, $supports['community'])) {
-        if (in_array($subfeat, $supports['community'][$feat])) {
-            // If community exists, default path points community code.
-            if (isset($prefer[$feat][$subfeat])) {
-                // Configuration tells which location to prefer if explicit.
-                $versionkey = $prefer[$feat][$subfeat];
-            } else {
-                $versionkey = 'community';
-            }
-        }
-    }
-
-    return $versionkey;
-}
 
 function tracker_get_context($cmid, $instanceid) {
     global $DB;
@@ -1155,7 +1090,7 @@ function tracker_register_cc(&$tracker, &$issue, $userid) {
     if ($userid && !$DB->get_record('tracker_issuecc', $params)) {
         // Add new the assignee as new CC !!
         // We do not discard the old one as he may be still concerned.
-        $eventmask = 127;
+        $eventmask = ALL_EVENTS;
         $params = array('trackerid' => $tracker->id, 'userid' => $userid, 'name' => 'eventmask');
         if ($userprefs = $DB->get_record('tracker_preferences', $params)) {
             $eventmask = $userprefs->value;
@@ -1167,6 +1102,100 @@ function tracker_register_cc(&$tracker, &$issue, $userid) {
         $cc->events = $eventmask;
         $DB->insert_record('tracker_issuecc', $cc);
     }
+}
+
+function tracker_get_issues(&$tracker, $resolved, $screen, $sort, $limitfrom, $pagesize) {
+    global $DB, $USER;
+
+    $params = array($tracker->id);
+
+    // Check we display only resolved tickets or working.
+    if ($resolved) {
+        $resolvedclause = " AND
+           (status = ".RESOLVED." OR
+           status = ".ABANDONNED.")
+        ";
+    } else {
+        $resolvedclause = " AND
+           status <> ".RESOLVED." AND
+           status <> ".ABANDONNED."
+        ";
+    }
+
+    $userclause = '';
+    switch ($screen) {
+        case 'mytickets': {
+            $userclause = " AND reportedby = ? ";
+            $params[] = $USER->id;
+            break;
+        }
+        case 'mywork': {
+            $userclause = " AND assignedto = ? ";
+            $params[] = $USER->id;
+            break;
+        }
+    }
+
+    $sql = "
+        SELECT
+            i.id,
+            i.summary,
+            i.datereported,
+            i.reportedby,
+            i.assignedto,
+            i.status,
+            i.resolutionpriority,
+            u.firstname firstname,
+            u.lastname lastname,
+            COUNT(ic.issueid) watches
+        FROM
+            {tracker_issue} i
+        LEFT JOIN
+            {tracker_issuecc} ic
+        ON
+            ic.issueid = i.id
+        LEFT JOIN
+            {user} u
+        ON
+            i.reportedby = u.id
+        WHERE
+            i.reportedby = u.id AND
+            i.trackerid = ?
+            $resolvedclause
+            $userclause
+        GROUP BY
+            i.id,
+            i.summary,
+            i.datereported,
+            i.reportedby,
+            i.assignedto,
+            i.status,
+            i.resolutionpriority,
+            u.firstname,
+            u.lastname
+    ";
+
+    $sqlcount = "
+        SELECT
+            COUNT(*)
+        FROM
+            {tracker_issue} i
+        WHERE
+            i.trackerid = ?
+            $resolvedclause
+            $userclause
+    ";
+    $numrecords = $DB->count_records_sql($sqlcount, $params);
+
+    if (!empty($sort)) {
+        $sql .= " ORDER BY $sort";
+    } else {
+        $sql .= " ORDER BY resolutionpriority ASC";
+    }
+
+    $issues = $DB->get_records_sql($sql, $params, $limitfrom, $pagesize);
+
+    return array($issues, $numrecords);
 }
 
 /**
@@ -1439,7 +1468,10 @@ function tracker_notify_submission($issue, &$cm, $tracker = null) {
         foreach ($managers as $manager) {
             $notification = tracker_compile_mail_template('submission', $vars, $manager->lang);
             $notificationhtml = tracker_compile_mail_template('submission_html', $vars, $manager->lang);
-            $subject = get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
+            $a = new StdClass;
+            $a->tracker = $SITE->shortname.':'.format_string($tracker->name);
+            $a->issueid = $vars['ISSUE'];
+            $subject = get_string('submission', 'tracker', $a);
 
             if ($CFG->debugsmtp) {
                 echo "Sending Submission Mail Notification to ".fullname($manager)."<br/><pre>Subject: $subject\n########\n".shorten_text($notification, 160).'</pre>';
@@ -1499,7 +1531,10 @@ function tracker_notify_update($issue, &$cm, $tracker = null) {
         foreach ($managers as $manager) {
             $notification = tracker_compile_mail_template('update', $vars, $manager->lang);
             $notificationhtml = tracker_compile_mail_template('update_html', $vars, $manager->lang);
-            $subject = get_string('issueupdated', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
+            $a = new StdClass;
+            $a->tracker = $SITE->shortname.':'.format_string($tracker->name);
+            $a->issueid = $vars['ISSUE'];
+            $subject = get_string('issueupdated', 'tracker', $a);
 
             if ($CFG->debugsmtp) {
                 echo "Sending Submission Mail Notification to ".fullname($manager)."<br/>";
@@ -1552,7 +1587,10 @@ function tracker_notifyccs_changeownership($issueid, $tracker = null) {
             $vars['ALLUNCCURL'] = $allunccurl;
             $notification = tracker_compile_mail_template('ownershipchanged', $vars, $ccuser->lang);
             $notificationhtml = tracker_compile_mail_template('ownershipchanged_html', $vars, $ccuser->lang);
-            $subject = get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
+            $a = new StdClass;
+            $a->tracker = $SITE->shortname.':'.format_string($tracker->name);
+            $a->issueid = $vars['ISSUE'];
+            $subject = get_string('changedownership', 'tracker', $a);
             if ($CFG->debugsmtp) {
                 echo "Sending Ownership change Mail Notification to ".fullname($ccuser).'<br/>';
                 echo "<pre>Subject: $subject\n##############\n".shorten_text($notification, 160).'</pre>';
@@ -1604,7 +1642,10 @@ function tracker_notifyccs_moveissue($issueid, $tracker, $newtracker = null) {
             $vars['ALLUNCCURL'] = $allunccurl;
             $notification = tracker_compile_mail_template('issuemoved', $vars, 'tracker', $ccuser->lang);
             $notificationhtml = tracker_compile_mail_template('issuemoved_html', $vars, 'tracker', $ccuser->lang);
-            $subject = get_string('moved', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
+            $a = new StdClass;
+            $a->tracker = $SITE->shortname.':'.format_string($tracker->name);
+            $a->issueid = $vars['ISSUE'];
+            $subject = get_string('moved', 'tracker', $a);
             if ($CFG->debugsmtp) {
                 echo "Sending CC Notification Mail to ".fullname($ccuser)."<br/><pre>Subject: $subject\n##############\n".shorten_text($notification, 160).'</pre>';
             }
@@ -1736,7 +1777,11 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
             }
 
             if (!empty($notification)) {
-                $subject = get_string('trackereventchanged', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
+                $a = new StdClass;
+                $a->tracker = $SITE->shortname.':'.format_string($tracker->name);
+                $a->event = $vars['EVENT'];
+                $a->issueid = $vars['ISSUE'];
+                $subject = get_string('trackereventchanged', 'tracker', $a);
                 if ($CFG->debugsmtp) {
                     echo "Sending State Change Mail Notification to ".fullname($ccuser)."<br/><pre>Subject: $subject\n#############\n".shorten_text($notification, 160).'</pre>';
                 }
@@ -1753,7 +1798,7 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
  * @param object $tracker
  */
 function tracker_notifyccs_comment($issueid, $comment, $tracker = null) {
-    global $COURSE, $SITE, $CFG, $USER, $DB;
+    global $COURSE, $SITE, $CFG, $USER, $DB, $OUTPUT;
 
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
     if (empty($tracker)) {
@@ -1786,7 +1831,10 @@ function tracker_notifyccs_comment($issueid, $comment, $tracker = null) {
                 $vars['ALLUNCCURL'] = $allunccurl;
                 $notification = tracker_compile_mail_template('addcomment', $vars, $ccuser->lang);
                 $notificationhtml = tracker_compile_mail_template('addcomment_html', $vars, $ccuser->lang);
-                $subject = get_string('commented', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
+                $a = new StdClass;
+                $a->tracker = $SITE->shortname.':'.format_string($tracker->name);
+                $a->issueid = $vars['ISSUE'];
+                $subject = get_string('commented', 'tracker', $a);
                 if ($CFG->debugsmtp) {
                     echo "Sending Comment Input Mail Notification to ".fullname($ccuser)."<br/><pre>Subject: $subject\n#############\n".shorten_text($notification, 160).'</pre><br/>';
                 }
