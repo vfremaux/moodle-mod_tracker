@@ -144,12 +144,23 @@ class fileelement extends trackerelement {
     }
 
     public function set_data(&$defaults, $issueid = 0) {
-        global $COURSE;
+        global $COURSE, $DB;
+
+        if ($issueid) {
+            if ($attribute = $DB->get_record('tracker_issueattribute', array('issueid' => $issueid, 'elementid' => $this->id))) {
+                $itemid = $attribute->id;
+            } else {
+                $itemid = 0;
+            }
+        } else {
+            $itemid = 0;
+        }
 
         $elmname = 'element'.$this->name;
         $draftitemid = file_get_submitted_draft_itemid($elmname);
+
         file_prepare_draft_area($draftitemid, $this->context->id, 'mod_tracker', 'issueattribute',
-                                $this->id, $this->filemanageroptions);
+                                $itemid, $this->filemanageroptions);
         $defaults->$elmname = $draftitemid;
     }
 
