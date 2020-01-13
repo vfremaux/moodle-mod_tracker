@@ -1,12 +1,12 @@
 
 
 
-<!-- mod_tracker/issuelistform -->
+<!-- mod_tracker/issuelist -->
 <form name="manageform" action="{{{formurl}}}" method="post">
 <input type="hidden" name="id" value="{{cmid}}" />
 <input type="hidden" name="what" value="updatelist" />
 <input type="hidden" name="view" value="view" />
-<input type="hidden" name="screen" value="browse" />
+<input type="hidden" name="screen" value="{{screen}}" />
 
 {{#emptylist}}
 {{{emptynotification}}}
@@ -23,4 +23,4 @@
 {{/emptylist}}
 
 </form>
-<!-- /mod_tracker/issuelistform -->
+<!-- /mod_tracker/issuelist -->

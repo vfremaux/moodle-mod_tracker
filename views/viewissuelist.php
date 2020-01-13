@@ -28,7 +28,7 @@ $PAGE->requires->js_call_amd('mod_tracker/trackerlist', 'init');
 
 $pagesize = 20;
 $page = optional_param('page', 1, PARAM_INT);
-$sort = optional_param('sort', '', PARAM_TEXT);
+$sort = optional_param('sort', 'datereported DESC', PARAM_TEXT);
 
 if ($page <= 0) {
     $page = 1;
@@ -43,6 +43,13 @@ $select = " trackerid = ? GROUP BY trackerid ";
 $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', $select, array($tracker->id));
 
 $template = new Stdclass;
+$template->cmid = $cm->id;
+$template->screen = $screen;
+
+if ($totalcount > $pagesize) {
+    $template->pager = $OUTPUT->paging_bar($totalcount, $page - 1 , $pagesize, $url, 'page');
+}
+
 $template->formurl = new moodle_url('/mod/tracker/view.php');
 if ($resolved) {
     $template->priority = false;

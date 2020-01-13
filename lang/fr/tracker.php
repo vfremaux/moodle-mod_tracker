@@ -210,9 +210,13 @@ $string['issuenumber'] = 'Ticket&nbsp;';
 $string['issues'] = 'tickets';
 $string['issuestoassign'] = 'Tickets à répartir&nbsp;: {$a}';
 $string['issuestowatch'] = 'Tickets à examiner&nbsp;: {$a}';
-$string['issueupdated'] = 'Un ticket a été mis à jour sur [{$a}]';
+$string['issueupdated'] = '[{$a->tracker}:{$a->issueid}] Ticket mis à jour';
 $string['knownelements'] = 'Rubriques connues&nbsp;';
 $string['lastcomment'] = 'Dernier commentaire&nbsp;: ';
+$string['licenseprovider'] = 'Fournisseur version Pro';
+$string['licenseprovider_desc'] = 'Entrez la clef de votre distributeur.';
+$string['licensekey'] = 'Clef de license pro';
+$string['licensekey_desc'] = 'Entrez ici la clef de produit que vous avez reçu de votre distributeur.';
 $string['listissues'] = 'Liste de tickets';
 $string['local'] = 'Local';
 $string['localtracker'] = 'Gestionnaire local';
@@ -291,6 +295,7 @@ $string['print'] = 'Impression';
 $string['priority'] = 'Prior.';
 $string['priorityid'] = 'Priorité';
 $string['profile'] = 'Mes réglages';
+$string['plugindist'] = 'Distribution du plugin';
 $string['published'] = 'Publié';
 $string['radio'] = 'Boutons radio'; // @DYNA
 $string['radiohoriz'] = 'Boutons radio horizontal'; // @DYNA
@@ -343,16 +348,17 @@ $string['showdependancies'] = 'Montrer les dépendances';
 $string['showhistory'] = 'Montrer l\'historique';
 $string['site'] = 'Site';
 $string['solution'] = 'Solution';
+$string['solve'] = 'Marquer résolu';
 $string['sortorder'] = 'Ordre';
 $string['standalone'] = 'Traqueur autonome.';
 $string['statehistory'] = 'Etats';
 $string['stateprofile'] = 'Etats de tickets';
 $string['status'] = 'Etat';
 $string['strictworkflow'] = 'Cycle de vie strict';
-$string['changedownership'] = 'Un ticket a été réattribué dans le tracker [{$a}]';
-$string['commented'] = 'Un ticket a été commenté dans le tracker [{$a}]';
-$string['moved'] = 'Un ticket a été déplacé dans le tracker [{$a}]';
-$string['submission'] = 'Un nouveau ticket a été ouvert dans le tracker [{$a}]';
+$string['changedownership'] = '[{$a->tracker}:{$a->issueid}]  Le ticket a été réattribué ';
+$string['commented'] = '[{$a->tracker}:{$a->issueid}]  Le ticket a été commenté ';
+$string['moved'] = '[{$a->tracker}:{$a->issueid}]  Un ticket a été déplacé ';
+$string['submission'] = '[{$a->tracker}:{$a->issueid}] Un nouveau ticket a été ouvert';
 $string['submitbug'] = 'Soumettre le ticket';
 $string['subtrackers'] = 'Sous-gestionnaires ';
 $string['sum_opened'] = 'Ouverts ';
@@ -372,7 +378,7 @@ $string['tracker-levelaccess'] = 'Mes possibilités dans ce gestionnaire';
 $string['tracker_name'] = 'Services du gestionnaire de tickets';
 $string['tracker_service_name'] = 'Services du gestionnaire de tickets';
 $string['trackerelements'] = 'Définition du trackeur ';
-$string['trackereventchanged'] = 'Changement d\'état du ticket dans le tracker [{$a}]';
+$string['trackereventchanged'] = '[{$a->tracker}:{$a->issueid}] Changement d\'état : {$a->event}';
 $string['trackerhost'] = 'Hôte du trackeur parent ';
 $string['trackername'] = 'Nom du gestionnaire ';
 $string['transfer'] = 'Transféré';
@@ -409,15 +415,6 @@ $string['youneedanaccount'] = 'Vous devez posséder un compte dans cet espace po
 $string['elementcode'] = 'Code élément';
 $string['opcode'] = 'Code option';
 $string['visiblename'] = 'Nom visible';
-
-$string['plugindist_desc'] = '
-<p>Ce plugin est distribué dans la communauté Moodle pour l\'évaluation de ses fonctions centrales
-correspondant à une utilisation courante du plugin. Une version "professionnelle" de ce plugn existe et est distribuée
-sous certaines conditions, afin de soutenir l\'effort de développement, amélioration; documentation et suivi des versions.</p>
-<p>Contactez un distributeur pour obtenir la version "Pro" et son support.</p>
-<ul><li><a href="http://www.activeprolearn.com/plugin.php?plugin=mod_tracker">ActiveProLearn SAS</a></li>
-<li><a href="http://www.edunao.com">Edunao SAS</a></li></ul>
-';
 
 // help strings
 
@@ -783,3 +780,10 @@ $string['update_html_tpl'] = '
 <p><a href="<%%ISSUEURL%%>">Voir la fiche défaut</a><br/>
 <a href="<%%CCURL%%>">S\'abonner aux événements de cette fiche</a></p>
 ';
+
+$string['plugindist_desc'] = '
+<p>Ce plugin est distribué dans la communauté Moodle pour l\'évaluation de ses fonctions centrales
+correspondant à une utilisation courante du plugin. Une version "professionnelle" de ce plugin existe et est distribuée
+sous certaines conditions, afin de soutenir l\'effort de développement, amélioration; documentation et suivi des versions.</p>
+<p>Contactez un distributeur pour obtenir la version "Pro" et son support.</p>
+<p><a href="http://www.mylearningfactory.com/index.php/documentation/Distributeurs?lang=fr_utf8">Distributeurs MyLF</a></p>';

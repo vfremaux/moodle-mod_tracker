@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 $string['pluginname'] = 'Ticket Tracker/User support';
+$string['modulename'] = 'Ticket Tracker/User support';
 $string['pluginadministration'] = 'Tracker administration';
 
 // Capabilities.
@@ -256,9 +257,13 @@ $string['issuenumber'] = 'Ticket';
 $string['issues'] = 'ticket records';
 $string['issuestoassign'] = 'Tickets to assign: {$a}';
 $string['issuestowatch'] = 'Tickets to watch: {$a}';
-$string['issueupdated'] = 'A ticket has been updated in tracker [{$a}]';
+$string['issueupdated'] = '[{$a->tracker}:{$a->issueid}] Ticket updated';
 $string['knownelements'] = 'Known tracker form elements';
 $string['lastcomment'] = 'Last comment: ';
+$string['licenseprovider'] = 'Pro License provider';
+$string['licenseprovider_desc'] = 'Input here your provider key';
+$string['licensekey'] = 'Pro license key';
+$string['licensekey_desc'] = 'Input here the product license key you got from your provider';
 $string['listissues'] = 'List view';
 $string['local'] = 'Local';
 $string['localtracker'] = 'Local tracker';
@@ -343,6 +348,7 @@ $string['priorityid'] = 'Priority';
 $string['private'] = 'Private info';
 $string['profile'] = 'User settings';
 $string['published'] = 'Published';
+$string['plugindist'] = 'Plugin distribution';
 $string['radio'] = 'Radio buttons'; // @DYNA
 $string['radiohoriz'] = 'Horizontal radio buttons'; // @DYNA
 $string['raisepriority'] = 'Raise priority';
@@ -393,6 +399,7 @@ $string['showcomments'] = 'Show comments';
 $string['showdependancies'] = 'Show dependancies';
 $string['showhistory'] = 'Show history';
 $string['site'] = 'Site';
+$string['solve'] = 'Mark Solved';
 $string['solution'] = 'Solution';
 $string['sortorder'] = 'Order';
 $string['standalone'] = 'Standalone tracker (top level support).';
@@ -400,10 +407,10 @@ $string['statehistory'] = 'States';
 $string['stateprofile'] = 'Ticket states';
 $string['status'] = 'Status';
 $string['strictworkflow'] = 'Strict workflow';
-$string['changedownership'] = 'A ticket has been reassigned in tracker [{$a}]';
-$string['commented'] = 'A ticket has been commented in tracker [{$a}]';
-$string['moved'] = 'A ticket has been moved in tracker [{$a}]';
-$string['submission'] = 'A new ticket is reported in tracker [{$a}]';
+$string['changedownership'] = '[{$a->tracker}:{$a->issueid}]  A ticket has been reassigned ';
+$string['commented'] = '[{$a->tracker}:{$a->issueid}] A ticket has been commented ';
+$string['moved'] = '[{$a->tracker}:{$a->issueid}] Ticket has been moved';
+$string['submission'] = '[{$a->tracker}:{$a->issueid}] A new ticket has been reported';
 $string['submitbug'] = 'Submit the ticket';
 $string['subtrackers'] = 'Subtrackers';
 $string['sum_opened'] = 'Opened';
@@ -423,7 +430,7 @@ $string['tracker-levelaccess'] = 'My capabilities in this tracker';
 $string['tracker_name'] = 'Tracker module services';
 $string['tracker_service_name'] = 'Tracker module services';
 $string['trackerelements'] = 'Tracker\'s definition';
-$string['trackereventchanged'] = 'Issue state change in tracker [{$a}]';
+$string['trackereventchanged'] = '[{$a->tracker}:{$a->issueid}] Issue state change to {$a->event}';
 $string['trackerhost'] = 'Parent host for tracker';
 $string['trackername'] = 'Tracker name';
 $string['transfer'] = 'Transfered';
@@ -458,15 +465,6 @@ $string['waiting'] = 'Waiting';
 $string['watches'] = 'Watches';
 $string['writtenby'] = '<i>written by</i>';
 $string['youneedanaccount'] = 'You need an authorized account here to report a ticket';
-
-$string['plugindist_desc'] = '
-<p>This plugin is the community version and is published for anyone to use as is and check the plugin\'s
-core application. A "pro" version of this plugin exists and is distributed under conditions to feed the life cycle, upgrade, documentation
-and improvement effort.</p>
-<p>Please contact one of our distributors to get "Pro" version support.</p>
-<ul><li><a href="http://www.activeprolearn.com/plugin.php?plugin=mod_tracker">ActiveProLearn SAS</a></li>
-<li><a href="http://www.edunao.com">Edunao SAS</a></li></ul>
-';
 
 // help strings
 
@@ -823,3 +821,10 @@ $string['update_html_tpl'] = '
 <p><a href="<%%ISSUEURL%%>">See the issue record</a><br/>
 <a href="<%%CCURL%%>">Register for watches on this record</a></p>
 ';
+
+$string['plugindist_desc'] = '
+<p>This plugin is the community version and is published for anyone to use as is and check the plugin\'s
+core application. A "pro" version of this plugin exists and is distributed under conditions to feed the life cycle, upgrade, documentation
+and improvement effort.</p>
+<p>Please contact one of our distributors to get "Pro" version support.</p>
+<p><a href="http://www.mylearningfactory.com/index.php/documentation/Distributeurs?lang=en_utf8">MyLF Distributors</a></p>';

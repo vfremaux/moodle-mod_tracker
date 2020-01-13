@@ -94,20 +94,15 @@ class mod_tracker_renderer extends plugin_renderer_base {
             }
         }
 
-        $template->issuenumberstr = get_string('issuenumber', 'tracker');
         $template->fullid = $tracker->ticketprefix.$issue->id;
-        $template->statusstr = get_string('status', 'tracker');
         $template->statuscode = $statuscodes[$issue->status];
         $template->status = $statuskeys[$issue->status];
 
-        $template->strreportedby = get_string('reportedby', 'tracker');
         $template->reporterpicture = $this->output->user_picture($issue->reporter);
         $template->reportername = fullname($issue->reporter);
 
-        $template->datereportedstr = get_string('datereported', 'tracker');
         $template->datereported = userdate($issue->datereported);
 
-        $template->assignedtostr = get_string('assignedto', 'tracker');
         if (!$issue->assignedto) {
             $template->assignedto = get_string('unassigned', 'tracker');
         } else {
@@ -116,13 +111,11 @@ class mod_tracker_renderer extends plugin_renderer_base {
             $str .= '&nbsp;'.fullname($issue->owner);
             $template->assignedto = $str;
         }
-        $template->ccedstr = get_string('cced', 'tracker');
         $template->ccscount = (empty($ccs) || count(array_keys($ccs)) == 0) ? 0 : count($ccs);
 
-        $template->descriptionstr = get_string('description', 'tracker');
         $template->description = format_text($issue->description);
 
-        return $this->render_from_template('mod_tracker/coreissue', $template);
+        return $this->output->render_from_template('mod_tracker/coreissue', $template);
     }
 
     public function edit_link($issue, $cm) {
@@ -140,7 +133,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $template->issueurl = $issueurl;
         $template->strturneditingon = get_string('turneditingon', 'tracker');
 
-        return $this->render_from_template('mod_tracker/editlink', $template);
+        return $this->output->render_from_template('mod_tracker/editlink', $template);
     }
 
     public function remote_link($hostid, $instanceid, $issueid) {
@@ -165,7 +158,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
     public function issue_attributes($issue, $elementsused) {
 
-        $str = '';
+        $template = new StdClass;
 
         $cm = get_coursemodule_from_instance('tracker', $issue->trackerid);
         $context = context_module::instance($cm->id);
@@ -181,54 +174,35 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     continue;
                 }
 
+                $attributetpl = new Stdclass;
                 // Print first category in one column.
-                $str .= '<tr valign="top">';
-                $str .= '<td colspan="1" class="tracker-issue-description">';
-                $str .= '<b>';
-                $str .= format_string($elementsused[$key]->description);
-                $str .= ':</b><br />';
-                $str .= '</td>';
-
-                $str .= '<td colspan="3" class="tracker-issue-value">';
-                $str .= $elementsused[$key]->view($issue->id);
-                $str .= '</td>';
-                $str .= '</tr>';
+                $attributetpl->name = format_string($elementsused[$key]->description);
+                $attributetpl->value = $elementsused[$key]->view($issue->id);
+                $attributetpl->isprivate = $elementsused[$key]->private;
                 $i++;
+
+                $template-> attributes[] = $attributetpl;
             }
         }
 
-        return $str;
+        return $this->output->render_from_template('mod_tracker/issueattributes', $template);
     }
 
     public function resolution($issue) {
 
-        $str = '';
+        $template = new StdClass;
+        $template->resolution = format_text($issue->resolution, $issue->resolutionformat);
 
-        $str .= '<tr valign="top">';
-        $str .= '<td align="right" height="25%" class="tracker-issue-param">';
-        $str .= '<b>'.get_string('resolution', 'tracker').':</b>';
-        $str .= '</td>';
-        $str .= '<td align="left" colspan="3" width="75%">';
-        $str .= format_text($issue->resolution, $issue->resolutionformat);
-        $str .= '</td>';
-        $str .= '</tr>';
-
-        return $str;
+        return $this->output->render_from_template('mod_tracker/resolution', $template);
     }
 
     public function distribution_form($tracker, $issue, $cm) {
         global $DB;
 
-        $str = '';
+        $template = new StdClass;
 
-        $choosetargetstr = get_string('choosetarget', 'tracker');
-        $str .= ' <form name="distribute" style="display:inline">';
-        $str .= '<input type="hidden" name="view" value="view" >';
-        $str .= '<input type="hidden" name="what" value="distribute" >';
-        $str .= '<input type="hidden" name="issueid" value="'.$issue->id.'" >';
-        $str .= '<input type="hidden" name="id" value="'.$cm->id.'" >';
-        $str .= '<select name="target">';
-        $str .= '<option value="0">'.$choosetargetstr.'</option>';
+        $template->id = $issue->id;
+        $template->cmid = $cm->id;
         $trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
         if ($subtrackers = $DB->get_records('tracker', array('id' => $tracker->subtrackers), 'name', 'id,name,course')) {
             foreach ($subtrackers as $st) {
@@ -237,16 +211,17 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     $targetcontext = context_module::instance($targetcm->id);
                     $caps = array('mod/tracker:manage', 'mod/tracker:develop', 'mod/tracker:resolve');
                     if (has_any_capability($caps, $targetcontext)) {
-                        $str .= '<option value="'.$st->id.'">'.$courseshort.' - '.$st->name.'</option>';
+                        $subtrackertpl = new StdClass;
+                        $subtrackertpl->id = $st->id;
+                        $subtrackertpl->name = $st->name;
+                        $subtrackertpl->courseshort = $courseshort;
+                        $template->subtrackers[] = $subtrackertpl;
                     }
                 }
             }
         }
-        $str .= '</select>';
-        $str .= '</form>';
-        $str .= " <a href=\"Javascript:document.forms['distribute'].submit();\">".get_string('distribute', 'tracker').'</a>';
 
-        return $str;
+        return $this->output->render_form_template('mod_tracker/distribution_form', $template);
     }
 
     /**
@@ -617,11 +592,6 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 $taburl = new moodle_url('/mod/tracker/view.php', $params);
                 $rows[1][] = new tabobject('mywatches', $taburl, get_string('mywatches', 'tracker'));
 
-                if ($tracker->supportmode == 'bugtracker') {
-                    $params = array('id' => $cm->id, 'view' => 'profile', 'screen' => 'myqueries');
-                    $taburl = new moodle_url('/mod/tracker/view.php', $params);
-                    $rows[1][] = new tabobject('myqueries', $taburl, get_string('myqueries', 'tracker'));
-                }
                 break;
             }
 
@@ -690,155 +660,27 @@ class mod_tracker_renderer extends plugin_renderer_base {
         return $str;
     }
 
-    public function edit_element_obsolete(&$cm, $form) {
-
-        $context = context_module::instance($cm->id);
-
-        $str = '';
-
-        $str .= $this->output->heading(get_string("{$form->action}{$form->type}", 'tracker'));
-
-        $str .= '<center>';
-        $formurl = new moodle_url('/mod/tracker/view.php');
-        $str .= '<form name="editelementform" method="post" action="'.$formurl.'">';
-        $str .= '<input type="hidden" name="id" value="'.$cm->id.'" />';
-        $str .= '<input type="hidden" name="view" value="admin" />';
-        $str .= '<input type="hidden" name="what" value="'.s($form->action).'" />';
-        $str .= '<input type="hidden" name="type" value="'.s($form->type).'" />';
-
-        if ($form->action == 'editelement') {
-            $str .= '<input type="hidden" name="elementid" value="'.$form->elementid.'" />';
-        }
-        if (!has_capability('mod/tracker:shareelements', $context)) {
-            $str .= '<input type="hidden" name="shared" value="0" />';
-        }
-
-        $str .= '<table width="100%" class="tracker-edit-element" cellpadding="5">';
-        $str .= '<tr valign="top" >';
-        $str .= '<td align="right"><b>'.get_string('name').':</b></td>';
-        $str .= '<td align="left">';
-        $str .= '<input type="text" name="name" value="'.@$form->name.'" size="32" maxlength="32" />';
-        $str .= $this->output->help_icon('elements', 'tracker');
-        $str .= '</td>';
-        $str .= '</tr>';
-        $str .= '<tr>';
-        $str .= '<td valign="top" align="right"><b>'.get_string('description').':</b></td>';
-        $str .= '<td colspan="3" align="left">';
-        $str .= '<input type="text"
-                        name="description"
-                        value="'.htmlspecialchars(stripslashes(@$form->description)).'"
-                        size="80"
-                        maxlength="255" />';
-        $str .= $this->output->help_icon('elements', 'tracker');
-        $str .= '</td>';
-        $str .= '</tr>';
-
-        if (has_capability('mod/tracker:shareelements', $context)) {
-
-            $str .= '<tr>';
-            $str .= '<td valign="top" align="right">';
-            $str .= '<b>'.get_string('sharing', 'tracker').':</b>';
-            $str .= '</td>';
-            $str .= '<td align="left">';
-            $checked = (@$form->shared) ? 'checked="checked"' : '';
-            $str .= '<input type="checkbox" name="shared" value="1" '.$checked.' /> '.get_string('sharethiselement', 'tracker');
-            $str .= '</td>';
-            $str .= '</tr>';
-
-        }
-
-        $str .= '<tr>';
-        $str .= '<td colspan="2" align="center">';
-        $str .= '<input type="submit" name="go_btn" value="'.get_string('submit').'" />&nbsp;';
-        $jshandler = 'document.forms[\'editelementform\'].what.value = \'\';document.forms[\'editelementform\'].submit();';
-        $str .= '<input type="button" name="cancel_btn" value="'.get_string('cancel').'" onclick="'.$jshandler.'" /><br/>';
-        $str .= '<br/>';
-        $str .= '</td>';
-        $str .= '</tr>';
-        $str .= '</table>';
-        $str .= '</form>';
-        $str .= '</center>';
-
-        return $str;
-    }
-
-    public function search_queries(&$cm) {
-
-        $str = '';
-
-        $str .= '<center>';
-        $str .= '<table class="tracker-search-queries" width="100%">';
-        if (isset($searchqueries)) {
-            $str .= '<tr>';
-            $str .= '<td>';
-            $str .= get_string('searchresults', 'tracker').': '.$numrecords.' <br/>';
-            $str .= '</td>';
-            $str .= '<td align="right">';
-            $params = array('id' => $cm->id, 'what' => 'clearsearch');
-            $clearsearchurl = new moodle_url('/mod/tracker/view.php', $params);
-            $str .= '<a href="'.$clearsearchurl.'">'.get_string('clearsearch', 'tracker').'</a>';
-            $str .= '</td>';
-            $str .= '</tr>';
-        }
-        $str .= '</table>';
-        $str .= '</center>';
-
-        return $str;
-    }
 
     public function edit_option_form(&$cm, &$form, $action, $errors = null) {
 
-        $str = '';
+        $template = new StdClass;
 
-        $strname = get_string('opcode', 'tracker');
-        $strdescription = get_string('visiblename', 'tracker');
-        $straction = get_string('action');
+        $template->formurl = new moodle_url('/mod/tracker/view.php');
+        $template->id = $cm->id;
+        $template->action = $action;
+        $template->type = $form->type;
+        $template->elementid = $form->elementid;
+        $template->optionsid = @$form->optionid;
 
-        $formurl = new moodle_url('/mod/tracker/view.php');
-        $str .= '<form name="editoptionform" method="post" action="'.$formurl.'">';
-        $str .= '<input type="hidden" name="id" value="'.$cm->id.'" />';
-        $str .= '<input type="hidden" name="what" value="'.$action.'elementoption" />';
-        $str .= '<input type="hidden" name="view" value="admin" />';
-        $str .= '<input type="hidden" name="type" value="'.$form->type.'" />';
-        $str .= '<input type="hidden" name="elementid" value="'.$form->elementid.'" />';
-        $str .= '<input type="hidden" name="optionid" value="'.@$form->optionid.'" />';
-        $str .= '<table width="90%">';
+        $template->errorclassname = print_error_class($errors, 'name');
+        $template->name = @$form->name;
+        $template->errorclassdescription = print_error_class($errors, 'description');
+        $template->filtereddesc = htmlspecialchars(stripslashes(@$form->description));
 
-        $str .= '<tr>';
-        $str .= '<td width="100">&nbsp;</td>';
-        $str .= '<td width="110" align="center">';
-        $str .= '<b>'.$strname.'</b>';
-        $str .= '</td>';
-        $str .= '<td width="240" align="center">';
-        $str .= '<b>'.$strdescription.'</b></td>';
-        $str .= '<td width="75" align="center"><b>'.$straction.'</b></td>';
-        $str .= '</tr>';
+        $template->jshandler = 'document.forms[\'editoptionform\'].what.value = \'\';';
+        $template->jshandler .= 'document.forms[\'editoptionform\'].submit();';
 
-        $str .= '<tr>';
-        $str .= '<td>&nbsp;</td>';
-        $str .= '<td align="center" '.print_error_class($errors, 'name').' >';
-        $str .= '<input type="text" name="name" value="'.@$form->name.'" size="20" maxlength="32" />';
-        $str .= '</td>';
-        $str .= '<td align="center" '.print_error_class($errors, 'description').' >';
-        $filtereddesc = htmlspecialchars(stripslashes(@$form->description));
-        $str .= '<input type="text" name="description" value="'.$filtereddesc.'" size="60" maxlength="255" />';
-        $str .= '</td>';
-        $str .= '<td align="center">';
-        $str .= '<input type="submit" name="add_btn" value="'.get_string('add').'" />';
-        $str .= '</td>';
-        $str .= '</tr>';
-
-        $str .= '</table>';
-
-        $str .= '<br/>';
-        $jshandler = 'document.forms[\'editoptionform\'].what.value = \'\';';
-        $jshandler .= 'document.forms[\'editoptionform\'].submit();';
-        $str .= '<input type="button" name="cancel_btn" value="'.get_string('continue').'" onclick="'.$jshandler.'" />';
-        $str .= '<br/>';
-        $str .= '</form>';
-        $str .= '<br/>';
-
-        return $str;
+        return $this->output->render_from_template('mod_tracker:editoroptions', $template);
     }
 
     public function option_list_view(&$cm, &$element) {
@@ -901,76 +743,6 @@ class mod_tracker_renderer extends plugin_renderer_base {
         }
         return html_writer::table($table);
     }
-
-    /*
-    public function add_query_form_obsolete(&$cm, $form) {
-
-        $str = '';
-
-        $str .= $this->output->heading(get_string('addaquerytomemo', 'tracker'));
-        $str .= $this->output->box_start('center', '100%', '', '', 'generalbox', 'bugreport');
-
-        $str .= '<center>';
-
-        $formurl = new moodle_url('/mod/tracker/view.php');
-        $str .= '<form name="addqueryform" action="'.$formurl.'" method="post">';
-        $str .= '<input type="hidden" name="what" value="'.$form->action.'">';
-        $str .= '<input type="hidden" name="view" value="profile">';
-        $str .= '<input type="hidden" name="screen" value="myqueries">';
-        $str .= '<input type="hidden" name="fields" value="'.$form->fields.'">';
-        $str .= '<input type="hidden" name="id" value="'.$cm->id.'">';
-
-        $str .= '<table border="0" cellpadding="5" width="100%">';
-        $str .= '<tr>';
-        $str .= '<td align="right" width="200">';
-        $str .= '<b>'.get_string('name').':</b>';
-        $str .= '</td>';
-        $str .= '<td align="left">';
-        $str .= '<input type="text" name="name" value="" style="width:100%" />';
-        $str .= '</td>';
-        $str .= '</tr>';
-        $str .= '<tr>';
-        $str .= '<td align="right" width="200" valign="top">';
-        $str .= '<b>'.get_string('description').':</b>';
-        $str .= '</td>';
-        $str .= '<td valign="top" align="left">';
-
-        print_textarea($usehtmleditor, 20, 60, 680, 400, 'description', $form->description);
-        if ($usehtmleditor) {
-            $strr .= '<input type="hidden" name="format" value="'.FORMAT_HTML.'" />';
-        } else {
-            $str .= '<p align="right">';
-            $str .= $this->output->help_icon('textformat', 'tracker');
-            $str .= get_string('formattexttype');
-            $str .= ':&nbsp;';
-            if (empty($form->format)) {
-                $form->format = FORMAT_MOODLE;
-            }
-            $str .= html_writer::select(format_text_menu(), 'format', $form->format);
-            $str .= '</p>';
-        }
-        $str .= '</td>';
-        $str .= '</tr>';
-        $str .= '<tr>';
-        $str .= '<td colspan="2">';
-        $onsubmitcall = ($usehtmleditor) ? "document.forms['addqueryform'].onsubmit();" : '';
-        $str .= '<input type="submit" name="save" value="'.get_string('continue').'" />';
-        $jshandler = 'document.forms[\'addqueryform\'].what.value = \'\';';
-        $jshandler .= 'document.forms[\'addqueryform\'].screen.value = \'search\';';
-        $jshandler .= $onsubmitcall;
-        $jshandler .= 'document.forms[\'addqueryform\'].submit();';
-        $str .= '<input type="button" name="cancel_btn" value="'.get_string('cancel').'" onclick="'.$jshandler.'" />';
-        $str .= '</td>';
-        $str .= '</tr>';
-        $str .= '</table>';
-        $str .= '</form>';
-
-        $str .= $this->output->box_end();
-        $str .= '</center>';
-
-        return $str;
-    }
-    */
 
     public function issue_js_init() {
         $str = '<script type="text/javascript">';

@@ -2,7 +2,11 @@
     width: 100%;
 }
 
-.timelabel{
+#issuelist-edit-inner-form.modal-body {
+    overflow-y: visible;
+}
+
+.timelabel {
     color: #808080;
     font-size : 0.9em;
     text-align: left;
@@ -15,13 +19,13 @@
     border: red 1px solid;
 }
 
-.errorbox{
+.errorbox {
     border: 1px solid red;
     color: red;
     padding: 1px;
 }
 
-.green{
+.green {
     color: green;
     font-weight: bold;
 }
@@ -342,4 +346,9 @@
     background-color: #fdfbdb;
     border: solid 1px #888;
     border-radius: 10px;
+}
+
+.tracker-attribute-modifier {
+    display:inline-block;
+    float: right;
 }

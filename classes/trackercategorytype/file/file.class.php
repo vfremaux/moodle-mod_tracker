@@ -146,16 +146,18 @@ class fileelement extends trackerelement {
     public function set_data(&$defaults, $issueid = 0) {
         global $COURSE, $DB;
 
-        if ($attribute = $DB->get_record('tracker_issueattribute', array('issueid' => $issueid, 'elementid' => $this->id))) {
-            $itemid = $attribute->id;
+        if ($issueid) {
+            if ($attribute = $DB->get_record('tracker_issueattribute', array('issueid' => $issueid, 'elementid' => $this->id))) {
+                $itemid = $attribute->id;
+            } else {
+                $itemid = 0;
+            }
         } else {
             $itemid = 0;
         }
 
         $elmname = 'element'.$this->name;
         $draftitemid = file_get_submitted_draft_itemid($elmname);
-
-        echo "Item id : {$this->context->id} / {$this->id} $issueid ";
 
         file_prepare_draft_area($draftitemid, $this->context->id, 'mod_tracker', 'issueattribute',
                                 $itemid, $this->filemanageroptions);

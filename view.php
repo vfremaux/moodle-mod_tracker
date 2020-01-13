@@ -30,7 +30,7 @@ require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 
 $PAGE->requires->jquery();
 $PAGE->requires->js_call_amd('mod_tracker/tracker', 'init');
-$PAGE->requires->jquery_plugin('mod-tracker-bootstrapselect', 'mod_tracker', true);
+$PAGE->requires->css('/mod/tracker/css/bootstrap-select.css');
 
 // Check for required parameters.
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID
@@ -242,7 +242,7 @@ if ($view == 'view') {
             case 'mytickets':
             default:
                 $resolved = 1;
-                include($CFG->dirroot.'/mod/tracker/views/viewmyticketslist.php');
+                include($CFG->dirroot.'/mod/tracker/views/viewissuelist.php');
         }
     }
 } else if ($view == 'reports') {
