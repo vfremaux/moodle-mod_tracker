@@ -1,16 +1,14 @@
 language: php
 
-sudo: true
+sudo: false
 
 addons:
   firefox: "47.0.1"
-  postgresql: "9.4"
+  postgresql: "9.3"
   apt:
     packages:
-      - openjdk-8-jre-headless
-
-services:
-  - mysql
+      - oracle-java8-installer
+      - oracle-java8-set-default
 
 cache:
   directories:
@@ -18,14 +16,13 @@ cache:
     - $HOME/.npm
 
 php:
- - 7.1
- - 7.2
+ - 7.3
 
 env:
   global:
-    - MOODLE_BRANCH=MOODLE_35_STABLE
+    - MOODLE_BRANCH=MOODLE_37_STABLE
   matrix:
-    - DB=mariadb
+    - DB=mysqli
     - DB=pgsql
 
 before_install:
@@ -33,7 +30,7 @@ before_install:
   - nvm install 8.9
   - nvm use 8.9
   - cd ../..
-  - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2
+  - composer create-project -n --no-dev moodlerooms/moodle-plugin-ci ci ^2
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 
 install:
@@ -48,6 +45,5 @@ script:
   - moodle-plugin-ci savepoints
   - moodle-plugin-ci mustache
   - moodle-plugin-ci grunt
-#  - moodle-plugin-ci phpdoc
   - moodle-plugin-ci phpunit
 #  - moodle-plugin-ci behat

@@ -115,7 +115,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
         $template->description = format_text($issue->description);
 
-        return $this->render_from_template('mod_tracker/coreissue', $template);
+        return $this->output->render_from_template('mod_tracker/coreissue', $template);
     }
 
     public function edit_link($issue, $cm) {
@@ -133,7 +133,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $template->issueurl = $issueurl;
         $template->strturneditingon = get_string('turneditingon', 'tracker');
 
-        return $this->render_from_template('mod_tracker/editlink', $template);
+        return $this->output->render_from_template('mod_tracker/editlink', $template);
     }
 
     public function remote_link($hostid, $instanceid, $issueid) {
@@ -190,33 +190,19 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
     public function resolution($issue) {
 
-        $str = '';
+        $template = new StdClass;
+        $template->resolution = format_text($issue->resolution, $issue->resolutionformat);
 
-        $str .= '<tr valign="top">';
-        $str .= '<td align="right" height="25%" class="tracker-issue-param">';
-        $str .= '<b>'.get_string('resolution', 'tracker').':</b>';
-        $str .= '</td>';
-        $str .= '<td align="left" colspan="3" width="75%">';
-        $str .= format_text($issue->resolution, $issue->resolutionformat);
-        $str .= '</td>';
-        $str .= '</tr>';
-
-        return $str;
+        return $this->output->render_from_template('mod_tracker/resolution', $template);
     }
 
     public function distribution_form($tracker, $issue, $cm) {
         global $DB;
 
-        $str = '';
+        $template = new StdClass;
 
-        $choosetargetstr = get_string('choosetarget', 'tracker');
-        $str .= ' <form name="distribute" style="display:inline">';
-        $str .= '<input type="hidden" name="view" value="view" >';
-        $str .= '<input type="hidden" name="what" value="distribute" >';
-        $str .= '<input type="hidden" name="issueid" value="'.$issue->id.'" >';
-        $str .= '<input type="hidden" name="id" value="'.$cm->id.'" >';
-        $str .= '<select name="target">';
-        $str .= '<option value="0">'.$choosetargetstr.'</option>';
+        $template->id = $issue->id;
+        $template->cmid = $cm->id;
         $trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
         if ($subtrackers = $DB->get_records('tracker', array('id' => $tracker->subtrackers), 'name', 'id,name,course')) {
             foreach ($subtrackers as $st) {
@@ -225,16 +211,17 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     $targetcontext = context_module::instance($targetcm->id);
                     $caps = array('mod/tracker:manage', 'mod/tracker:develop', 'mod/tracker:resolve');
                     if (has_any_capability($caps, $targetcontext)) {
-                        $str .= '<option value="'.$st->id.'">'.$courseshort.' - '.$st->name.'</option>';
+                        $subtrackertpl = new StdClass;
+                        $subtrackertpl->id = $st->id;
+                        $subtrackertpl->name = $st->name;
+                        $subtrackertpl->courseshort = $courseshort;
+                        $template->subtrackers[] = $subtrackertpl;
                     }
                 }
             }
         }
-        $str .= '</select>';
-        $str .= '</form>';
-        $str .= " <a href=\"Javascript:document.forms['distribute'].submit();\">".get_string('distribute', 'tracker').'</a>';
 
-        return $str;
+        return $this->output->render_form_template('mod_tracker/distribution_form', $template);
     }
 
     /**
