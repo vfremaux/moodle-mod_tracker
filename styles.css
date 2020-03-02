@@ -1,4 +1,4 @@
-.issuelist{
+.issuelist {
     width: 100%;
 }
 
@@ -15,7 +15,7 @@
 }
 
 .formerror{
-    background-color: #F8E4E4;
+    background-color: #f8e4e4;
     border: red 1px solid;
 }
 
@@ -38,47 +38,47 @@
 .history-state {
     padding: 3px;
     border-radius: 8px;
-    margin:1px;
+    margin: 1px;
 }
 
 .generaltable tbody > tr:nth-child(2n+1) > td.status-validated,
 .status-validated {
-    background-color: #58E205;
+    background-color: #58e205;
     color: white;
     font-weight: bold;
 }
 
 .generaltable tbody > tr:nth-child(2n+1) > .status-resolved,
 .status-resolved {
-    background-color: #2EAA20;
+    background-color: #2eaa20;
     color: white;
     font-weight: bold;
 }
 
 .generaltable tbody > tr:nth-child(2n+1) > .status-posted,
 .status-posted {
-    background-color: #D90000;
+    background-color: #d90000;
     color: white;
     font-weight: bold;
 }
 
 .generaltable tbody > tr:nth-child(2n+1) > .status-open,
 .status-open {
-    background-color: #FF8000;
+    background-color: #ff8000;
     color: black;
     font-weight: bold;
 }
 
 .generaltable tbody > tr:nth-child(2n+1) > .status-resolving,
 .status-resolving {
-    background-color: #FCDD03;
+    background-color: #fcdd03;
     color: black;
     font-weight: bold;
 }
 
 .generaltable tbody > tr:nth-child(2n+1) > .status-waiting,
 .status-waiting {
-    background-color: #BAAB45;
+    background-color: #baab45;
     color: black;
     font-weight: bold;
 }
@@ -92,192 +92,192 @@
 
 .generaltable tbody > tr:nth-child(2n+1) > .status-transfered,
 .status-transfered {
-    background-color: #E4E4E4;
+    background-color: #e4e4e4;
     color: black;
     font-weight: normal;
 }
 
 .generaltable tbody > tr:nth-child(2n+1) > .status-testing,
 .status-testing {
-    background-color: #B8F079;
+    background-color: #b8f079;
     color: black;
     font-weight: normal;
 }
 
 .generaltable tbody > tr:nth-child(2n+1) > .status-published,
 .status-published {
-    background-color: #58BCF1;
+    background-color: #58bcf1;
     color: black;
     font-weight: normal;
 }
 
 .comments {
-    background-color: #E0E0E0;
-    border: 1px solid #ACACAC;
+    background-color: #e0e0e0;
+    border: 1px solid #acacac;
     padding: 2px;
 }
 
-.comment{
-    border: 1px solid #FFFFFF;
+.comment {
+    border: 1px solid #fff;
 }
 
-.visiblediv{
+.visiblediv {
     display: block;
-    visibility: visible; 
+    visibility: visible;
 }
 
-.hiddendiv{
+.hiddendiv {
     display: none;
-    visibility: hidden; 
+    visibility: hidden;
 }
 
-.list-priority{
+.list-priority {
     font-size: 0.9em;
     text-align: center;
     vertical-align: bottom;
 }
 
-.list-issuenumber{
+.list-issuenumber {
     font-size: 0.9em;
     text-align: left;
     vertical-align: bottom;
 }
 
-.list-summary{
+.list-summary {
     font-size: 0.9em;
     padding: 2px;
-    text-align: left ;
+    text-align: left;
     vertical-align: bottom;
     width: 40%;
 }
 
-.list-reportedby{
-    color: #4D4D4D;
-    font-size: 0.9em ;
-    text-align: left;
-    vertical-align: bottom;
-    width:10%;
-}
-
-.list-assignedto{
-    color: #4D4D4D;
+.list-reportedby {
+    color: #4d4d4d;
     font-size: 0.9em;
     text-align: left;
     vertical-align: bottom;
     width: 10%;
 }
 
-.list-watches{
+.list-assignedto {
+    color: #4d4d4d;
+    font-size: 0.9em;
+    text-align: left;
+    vertical-align: bottom;
+    width: 10%;
+}
+
+.list-watches {
     text-align: center;
     vertical-align: bottom;
     width: 5%;
 }
 
-.list-status{
+.list-status {
     text-align: center;
     vertical-align: bottom;
     width: 5%;
 }
 
-.list-transfered{
+.list-transfered {
     text-align: center;
     vertical-align: bottom;
     width: 5%;
 }
 
-.list-testing{
+.list-testing {
     text-align: center;
     vertical-align: bottom;
     width: 5%;
 }
 
-.list-action{
+.list-action {
     text-align: center;
-    min-width:120px;
+    min-width: 120px;
     vertical-align: bottom;
     width: 5%;
 }
 
-.tracker-image-attachment{
-    max-width:570px;
+.tracker-image-attachment {
+    max-width: 570px;
 }
 
-.flexible .r0{
-    background-color:#F0F0F0;
+.flexible .r0 {
+    background-color: #f0f0f0;
 }
 
-.flexible .r1{
-    background-color:#F8F8F8;
+.flexible .r1 {
+    background-color: #f8f8f8;
 }
 
-.nullclass{
-    color:#D0D0D0;
+.nullclass {
+    color: #d0d0d0;
 }
 
-.redtext{
-    color:#800000;
+.redtext {
+    color: #800000;
 }
 
-.tracker-printtable{
-    border:1px #808080 solid;
-    margin-top:10px;
+.tracker-printtable {
+    border: 1px #808080 solid;
+    margin-top: 10px;
 }
 
 .tracker-printtable.title,
-.tracker-printtable.ticketid{
-    background-color:#E0E0E0;
-    border:1px #808080 solid
+.tracker-printtable.ticketid {
+    background-color: #e0e0e0;
+    border: 1px #808080 solid;
 }
 
-.tracker-printtable.ticketid{
-    font-weight:bolder;
+.tracker-printtable.ticketid {
+    font-weight: bolder;
 }
 
-.tracker-printtable.summary{
-    border:1px #808080 solid
+.tracker-printtable.summary {
+    border: 1px #808080 solid
 }
 
 .tracker-issue-editor {
-    width:100%;
+    width: 100%;
 }
 
-.tracker-issue-editor td{
-    border:1px solid #D0D0D0;
+.tracker-issue-editor td {
+    border: 1px solid #d0d0d0;
 }
 
-.tracker-issue-param{
-    background-color:#D0D0D0;
-    border:1px solid #F0F0F0;
-    padding:4px 15px 4px 4px;
+.tracker-issue-param {
+    background-color: #d0d0d0;
+    border: 1px solid #f0f0f0;
+    padding: 4px 15px 4px 4px;
 }
 
-.tracker-issue-summary{
-    background-color:#fcfcfc;
-    border:1px solid #f0f0f0;
-    font-size:1.9em;
-    padding:10px;
+.tracker-issue-summary {
+    background-color: #fcfcfc;
+    border:1px solid  #f0f0f0;
+    font-size: 1.9em;
+    padding: 10px;
 }
 
-.tracker-issue-value{
-    border-bottom:1px solid #f0f0f0;
-    padding:4px 4px 4px 15px;
+.tracker-issue-value {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 4px 4px 4px 15px;
 }
 
-.tracker-issue-description{
-    background-color:#F0F0F0;
-    border:1px solid #D0D0D0;
-    padding:5px;
+.tracker-issue-description {
+    background-color: #f0f0f0;
+    border: 1px solid #d0d0d0;
+    padding: 5px;
 }
 
-.tracker-file-item-notice{
-    font-style:italic;
+.tracker-file-item-notice {
+    font-style: italic;
 }
 
-#tracker-acknowledge{
-    border:1px #c0c0c0 solid;
-    font-size:1.2em;
-    margin:50px;
-    padding:30px;
+#tracker-acknowledge {
+    border: 1px #c0c0c0 solid;
+    font-size: 1.2em;
+    margin: 50px;
+    padding: 30px;
 }
 
 .tracker-issue-value {
@@ -289,34 +289,34 @@
 }
 
 .tracker-status-thin {
-    min-width:4px;
-    height:100%;
+    min-width: 4px;
+    height: 100%;
 }
 
 .tracker-status {
     height: 102%;
-    text-align:center;
+    text-align: center;
     width: 105%;
 }
 
 .tracker-filepicker {
-    border:1px solid #000;
-    height:160px;
-    width:600px;
+    border: 1px solid #000;
+    height: 160px;
+    width: 600px;
 }
 
 .tracker-shadow {
-    -moz-opacity:0.5;
-    opacity:0.5;
+    -moz-opacity: 0.5;
+    opacity: 0.5;
 }
 
 .tracker-report-assignee {
-    font-weight:bolder;
-    font-size:1.3em;
+    font-weight: bolder;
+    font-size: 1.3em;
 }
 
 #tracker-preferences-form div.fitemtitle {
-    width:600px;
+    width: 600px;
 }
 
 .tracker-captcha {
@@ -325,11 +325,11 @@
 }
 
 .cc-user {
-    display: inline-block;
     background: #eee;
     border-radius: 8px;
-    padding:2px;
+    display: inline-block;
     margin: 4px;
+    padding:2px;
 }
 
 #tracker-cc-form {
@@ -341,7 +341,7 @@
 }
 
 .tracker-issue-lastcomment {
-    margin: 20px 0px 20px 150px;
+    margin: 20px 0 20px 150px;
     padding: 20px;
     background-color: #fdfbdb;
     border: solid 1px #888;
@@ -349,6 +349,6 @@
 }
 
 .tracker-attribute-modifier {
-    display:inline-block;
+    display: inline-block;
     float: right;
 }

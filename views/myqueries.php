@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Obsolete file
  * @package      mod_tracker
  * @category     mod
  * @author       Clifford Tham, Valery Fremaux > 1.8
