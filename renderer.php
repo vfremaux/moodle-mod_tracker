@@ -115,17 +115,16 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
         $template->description = format_text($issue->description);
 
-        return $this->render_from_template('mod_tracker/coreissue', $template);
+        return $this->output->render_from_template('mod_tracker/coreissue', $template);
     }
 
     public function edit_link($issue, $cm) {
-
 
         $issueurl = new moodle_url('/mod/tracker/view.php');
 
         $template = new stdClass;
 
-        $template->id= $cm->id;
+        $template->id = $cm->id;
         $template->view = 'view';
         $template->screen = 'editanissue';
         $template->issueid = $issue->id;
@@ -133,7 +132,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $template->issueurl = $issueurl;
         $template->strturneditingon = get_string('turneditingon', 'tracker');
 
-        return $this->render_from_template('mod_tracker/editlink', $template);
+        return $this->output->render_from_template('mod_tracker/editlink', $template);
     }
 
     public function remote_link($hostid, $instanceid, $issueid) {
@@ -181,7 +180,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 $attributetpl->isprivate = $elementsused[$key]->private;
                 $i++;
 
-                $template-> attributes[] = $attributetpl;
+                $template->attributes[] = $attributetpl;
             }
         }
 
@@ -190,33 +189,19 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
     public function resolution($issue) {
 
-        $str = '';
+        $template = new StdClass;
+        $template->resolution = format_text($issue->resolution, $issue->resolutionformat);
 
-        $str .= '<tr valign="top">';
-        $str .= '<td align="right" height="25%" class="tracker-issue-param">';
-        $str .= '<b>'.get_string('resolution', 'tracker').':</b>';
-        $str .= '</td>';
-        $str .= '<td align="left" colspan="3" width="75%">';
-        $str .= format_text($issue->resolution, $issue->resolutionformat);
-        $str .= '</td>';
-        $str .= '</tr>';
-
-        return $str;
+        return $this->output->render_from_template('mod_tracker/resolution', $template);
     }
 
     public function distribution_form($tracker, $issue, $cm) {
         global $DB;
 
-        $str = '';
+        $template = new StdClass;
 
-        $choosetargetstr = get_string('choosetarget', 'tracker');
-        $str .= ' <form name="distribute" style="display:inline">';
-        $str .= '<input type="hidden" name="view" value="view" >';
-        $str .= '<input type="hidden" name="what" value="distribute" >';
-        $str .= '<input type="hidden" name="issueid" value="'.$issue->id.'" >';
-        $str .= '<input type="hidden" name="id" value="'.$cm->id.'" >';
-        $str .= '<select name="target">';
-        $str .= '<option value="0">'.$choosetargetstr.'</option>';
+        $template->id = $issue->id;
+        $template->cmid = $cm->id;
         $trackermoduleid = $DB->get_field('modules', 'id', array('name' => 'tracker'));
         if ($subtrackers = $DB->get_records('tracker', array('id' => $tracker->subtrackers), 'name', 'id,name,course')) {
             foreach ($subtrackers as $st) {
@@ -225,16 +210,17 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     $targetcontext = context_module::instance($targetcm->id);
                     $caps = array('mod/tracker:manage', 'mod/tracker:develop', 'mod/tracker:resolve');
                     if (has_any_capability($caps, $targetcontext)) {
-                        $str .= '<option value="'.$st->id.'">'.$courseshort.' - '.$st->name.'</option>';
+                        $subtrackertpl = new StdClass;
+                        $subtrackertpl->id = $st->id;
+                        $subtrackertpl->name = $st->name;
+                        $subtrackertpl->courseshort = $courseshort;
+                        $template->subtrackers[] = $subtrackertpl;
                     }
                 }
             }
         }
-        $str .= '</select>';
-        $str .= '</form>';
-        $str .= " <a href=\"Javascript:document.forms['distribute'].submit();\">".get_string('distribute', 'tracker').'</a>';
 
-        return $str;
+        return $this->output->render_form_template('mod_tracker/distribution_form', $template);
     }
 
     /**
@@ -264,7 +250,6 @@ class mod_tracker_renderer extends plugin_renderer_base {
     }
 
     public function dependencies($tracker, $issue, $initialviewmode) {
-
 
         $template = new StdClass;
         $template->initialviewmode = $initialviewmode;
@@ -553,13 +538,6 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     $rows[1][] = new tabobject('browse', $taburl, get_string('browse', 'tracker'));
                 }
 
-                /*
-                if ($tracker->supportmode == 'bugtracker') {
-                    $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'search');
-                    $taburl = new moodle_url('/mod/tracker/view.php', $params);
-                    $rows[1][] = new tabobject('search', $taburl, get_string('search', 'tracker'));
-                }
-                */
                 break;
             }
 
@@ -1010,27 +988,27 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
         $attributes = (array)$attributes;
         if (is_array($nothing)) {
-            foreach ($nothing as $k=>$v) {
-                if ($v === 'choose' or $v === 'choosedots') {
+            foreach ($nothing as $k => $v) {
+                if ($v === 'choose' || $v === 'choosedots') {
                     $nothing[$k] = get_string('choosedots');
                 }
             }
-            $options = $nothing + $options; // keep keys, do not override
+            $options = $nothing + $options; // Keep keys, do not override.
 
-        } else if (is_string($nothing) and $nothing !== '') {
+        } else if (is_string($nothing) && $nothing !== '') {
             // BC
-            $options = array(''=>$nothing) + $options;
+            $options = array('' => $nothing) + $options;
         }
 
-        // we may accept more values if multiple attribute specified
+        // We may accept more values if multiple attribute specified.
         $selected = (array)$selected;
-        foreach ($selected as $k=>$v) {
+        foreach ($selected as $k => $v) {
             $selected[$k] = (string)$v;
         }
 
         if (!isset($attributes['id'])) {
             $id = 'menu'.$name;
-            // name may contaion [], which would make an invalid id. e.g. numeric question type editing form, assignment quickgrading
+            // Name may contain [], which would make an invalid id. e.g. numeric question type editing form, assignment quickgrading.
             $id = str_replace('[', '', $id);
             $id = str_replace(']', '', $id);
             $attributes['id'] = $id;
@@ -1038,12 +1016,12 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
         if (!isset($attributes['class'])) {
             $class = 'menu'.$name;
-            // name may contaion [], which would make an invalid class. e.g. numeric question type editing form, assignment quickgrading
+            // Name may contaion [], which would make an invalid class. e.g. numeric question type editing form, assignment quickgrading.
             $class = str_replace('[', '', $class);
             $class = str_replace(']', '', $class);
             $attributes['class'] = $class;
         }
-        $attributes['class'] = 'select ' . $attributes['class']; // Add 'select' selector always
+        $attributes['class'] = 'select ' . $attributes['class']; // Add 'select' selector always.
 
         $attributes['name'] = $name;
 
@@ -1054,9 +1032,9 @@ class mod_tracker_renderer extends plugin_renderer_base {
         }
 
         $output = '';
-        foreach ($options as $value=>$label) {
+        foreach ($options as $value => $label) {
             if (is_array($label)) {
-                // ignore key, it just has to be unique
+                // Ignore key, it just has to be unique.
                 $output .= html_writer::select_optgroup(key($label), current($label), $selected);
             } else {
                 if (is_array($classvaluemapping) && array_key_exists($value, $classvaluemapping)) {

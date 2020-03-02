@@ -35,7 +35,7 @@ $plugin->release = '3.5.0 (Build 2019072900)';
 $plugin->dependencies = array('local_vflibs' => 2016081100);
 
 // Non Moodle attributes.
-$plugin->codeincrement = '3.5.004';
+$plugin->codeincrement = '3.5.005';
 $plugin->privacy = 'dualrelease';
 $plugin->prolocations = array(
     'classes/trackercategorytype/autourl',
