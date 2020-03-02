@@ -86,25 +86,8 @@ tracker_loadpreferences($tracker->id, $USER->id);
 // Search controller - special implementation.
 // TODO : consider incorporing this controller back into standard MVC.
 
-if ($action == 'searchforissues') {
-    $search = optional_param('search', null, PARAM_CLEANHTML);
-    $saveasreport = optional_param('saveasreport', null, PARAM_CLEANHTML);
-
-    // Search for issues.
-    if (!empty($search)) {
-        tracker_searchforissues($tracker, $cm->id);
-    } else if (!empty ($saveasreport)) {
-        // Save search as a report.
-        tracker_saveasreport($tracker->id);
-    }
-} else if ($action == 'viewreport') {
+if ($action == 'viewreport') {
     tracker_viewreport($tracker->id);
-} else if ($action == 'clearsearch') {
-    if (tracker_clearsearchcookies($tracker->id)) {
-        $returnview = ($tracker->supportmode == 'bugtracker') ? 'browse' : 'mytickets';
-        $params = array('id' => $cm->id, 'view' => 'view', 'screen' => $returnview);
-        redirect(new moodle_url('/mod/tracker/view.php', $params));
-    }
 }
 
 $strtrackers = get_string('modulenameplural', 'tracker');
