@@ -37,7 +37,7 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2008091900, 'tracker');
     }
 
-    if ($result && $oldversion < 2008092400) {
+    if ($oldversion < 2008092400) {
 
         // Setup XML-RPC services for tracker.
         tracker_install();
@@ -46,7 +46,7 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2008092400, 'tracker');
     }
 
-    if ($result && $oldversion < 2008092602) {
+    if ($oldversion < 2008092602) {
 
         // Define field supportmode to be added to tracker.
         $table = new xmldb_table('tracker');
@@ -60,7 +60,7 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2008092602, 'tracker');
     }
 
-    if ($result && $oldversion < 2009042500) {
+    if ($oldversion < 2009042500) {
 
         // Define field supportmode to be added to tracker.
         $table = new xmldb_table('tracker_issue');
@@ -74,7 +74,7 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2009042500, 'tracker');
     }
 
-    if ($result && $oldversion < 2009042503) {
+    if ($oldversion < 2009042503) {
 
         // Reassign all priorities.
         require_once($CFG->dirroot.'/mod/tracker/locallib.php');
@@ -110,7 +110,7 @@ function xmldb_tracker_upgrade($oldversion = 0) {
     }
 
     // Fix field size for parent encoding in remote cascade. (long wwwroots).
-    if ($result && $oldversion < 2009090800) {
+    if ($oldversion < 2009090800) {
 
         // Changing precision of field parent on table tracker to (80).
         $table = new xmldb_table('tracker');
@@ -124,7 +124,7 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2009090800, 'tracker');
     }
 
-    if ($result && $oldversion < 2010061000) {
+    if ($oldversion < 2010061000) {
 
         // Define field defaultassignee to be added to tracker.
         $table = new xmldb_table('tracker');
@@ -138,7 +138,7 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2010061000, 'tracker');
     }
 
-    if ($result && $oldversion < 2011070400) {
+    if ($oldversion < 2011070400) {
 
         // Define field subtrackers to be added to tracker.
         $table = new xmldb_table('tracker');
@@ -166,7 +166,7 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         $dbman->rename_field($table, $formatfield, 'introformat', false);
     }
 
-    if ($result && $oldversion < 2013092200) {
+    if ($oldversion < 2013092200) {
 
         // Define field subtrackers to be added to tracker.
         $table = new xmldb_table('tracker_issue');
@@ -179,7 +179,7 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2013092200, 'tracker');
     }
 
-    if ($result && $oldversion < 2013092300) {
+    if ($oldversion < 2013092300) {
 
         // Define field subtrackers to be added to tracker.
         $table = new xmldb_table('tracker');
@@ -191,7 +191,7 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2013092300, 'tracker');
     }
 
-    if ($result && $oldversion < 2013092400) {
+    if ($oldversion < 2013092400) {
 
         // Define field subtrackers to be added to tracker.
         $table = new xmldb_table('tracker');
@@ -203,7 +203,7 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2013092400, 'tracker');
     }
 
-    if ($result && $oldversion < 2014010100) {
+    if ($oldversion < 2014010100) {
 
         // Define field strictworkflow to be added to tracker.
         $table = new xmldb_table('tracker');
@@ -222,7 +222,7 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2014010100, 'tracker');
     }
 
-    if ($result && $oldversion < 2015072300) {
+    if ($oldversion < 2015072300) {
 
         // Define field uplink to be added to tracker.
         $table = new xmldb_table('tracker_issue');
@@ -241,7 +241,7 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2015072300, 'tracker');
     }
 
-    if ($result && $oldversion < 2015080400) {
+    if ($oldversion < 2015080400) {
 
         // Define field uplink to be added to tracker.
         $table = new xmldb_table('tracker');
@@ -254,7 +254,7 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2015080400, 'tracker');
     }
 
-    if ($result && $oldversion < 2015080500) {
+    if ($oldversion < 2015080500) {
 
         // Define field uplink to be added to tracker.
         $table = new xmldb_table('tracker_elementused');
@@ -272,7 +272,7 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2015080500, 'tracker');
     }
 
-    if ($result && $oldversion < 2015080600) {
+    if ($oldversion < 2015080600) {
 
         // Define field uplink to be added to tracker.
         $table = new xmldb_table('tracker_element');
@@ -300,6 +300,6 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2015080600, 'tracker');
     }
 
-    return $result;
+    return true;
 }
 

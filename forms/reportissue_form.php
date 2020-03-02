@@ -91,7 +91,7 @@ class TrackerIssueForm extends moodleform {
                 } else {
                     // We are updating.
                     $caps = array('mod/tracker:manage', 'mod/tracker:develop');
-                    if ($element->private == false || has_any_capability($caps, $this-> context)) {
+                    if ($element->private == false || has_any_capability($caps, $this->context)) {
                         $element->add_form_element($mform);
                     }
                 }

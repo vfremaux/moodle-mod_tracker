@@ -7,4 +7,11 @@
     <version>v3</version>
     <licenseversion>v3</licenseversion>
   </library>
+  <library>
+    <location>css</location>
+    <name>Extra css libs</name>
+    <license>GPL</license>
+    <version>v3</version>
+    <licenseversion>v3</licenseversion>
+  </library>
 </libraries>
