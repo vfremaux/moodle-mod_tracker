@@ -203,12 +203,6 @@ if ($action == 'updateanissue') {
     // Reorder priority field and discard newly resolved or abandonned.
     tracker_update_priority_stack($tracker);
 
-} else if ($action == 'usequery') {
-
-    // Reactivates a stored search *************************************************************.
-
-    $queryid = required_param('queryid', PARAM_INT);
-    $fields = tracker_extractsearchparametersfromdb($queryid);
 } else if ($action == 'unregister') {
 
     // Unregister administratively a user ******************************************************.

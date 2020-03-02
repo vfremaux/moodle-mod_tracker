@@ -120,12 +120,11 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
     public function edit_link($issue, $cm) {
 
-
         $issueurl = new moodle_url('/mod/tracker/view.php');
 
         $template = new stdClass;
 
-        $template->id= $cm->id;
+        $template->id = $cm->id;
         $template->view = 'view';
         $template->screen = 'editanissue';
         $template->issueid = $issue->id;
@@ -181,7 +180,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 $attributetpl->isprivate = $elementsused[$key]->private;
                 $i++;
 
-                $template-> attributes[] = $attributetpl;
+                $template->attributes[] = $attributetpl;
             }
         }
 
@@ -251,7 +250,6 @@ class mod_tracker_renderer extends plugin_renderer_base {
     }
 
     public function dependencies($tracker, $issue, $initialviewmode) {
-
 
         $template = new StdClass;
         $template->initialviewmode = $initialviewmode;
@@ -540,13 +538,6 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     $rows[1][] = new tabobject('browse', $taburl, get_string('browse', 'tracker'));
                 }
 
-                /*
-                if ($tracker->supportmode == 'bugtracker') {
-                    $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'search');
-                    $taburl = new moodle_url('/mod/tracker/view.php', $params);
-                    $rows[1][] = new tabobject('search', $taburl, get_string('search', 'tracker'));
-                }
-                */
                 break;
             }
 
@@ -997,27 +988,27 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
         $attributes = (array)$attributes;
         if (is_array($nothing)) {
-            foreach ($nothing as $k=>$v) {
-                if ($v === 'choose' or $v === 'choosedots') {
+            foreach ($nothing as $k => $v) {
+                if ($v === 'choose' || $v === 'choosedots') {
                     $nothing[$k] = get_string('choosedots');
                 }
             }
             $options = $nothing + $options; // keep keys, do not override
 
-        } else if (is_string($nothing) and $nothing !== '') {
+        } else if (is_string($nothing) && $nothing !== '') {
             // BC
             $options = array(''=>$nothing) + $options;
         }
 
-        // we may accept more values if multiple attribute specified
+        // We may accept more values if multiple attribute specified.
         $selected = (array)$selected;
-        foreach ($selected as $k=>$v) {
+        foreach ($selected as $k => $v) {
             $selected[$k] = (string)$v;
         }
 
         if (!isset($attributes['id'])) {
             $id = 'menu'.$name;
-            // name may contaion [], which would make an invalid id. e.g. numeric question type editing form, assignment quickgrading
+            // Name may contain [], which would make an invalid id. e.g. numeric question type editing form, assignment quickgrading.
             $id = str_replace('[', '', $id);
             $id = str_replace(']', '', $id);
             $attributes['id'] = $id;
@@ -1041,7 +1032,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         }
 
         $output = '';
-        foreach ($options as $value=>$label) {
+        foreach ($options as $value => $label) {
             if (is_array($label)) {
                 // ignore key, it just has to be unique
                 $output .= html_writer::select_optgroup(key($label), current($label), $selected);
