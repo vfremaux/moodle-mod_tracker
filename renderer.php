@@ -993,11 +993,11 @@ class mod_tracker_renderer extends plugin_renderer_base {
                     $nothing[$k] = get_string('choosedots');
                 }
             }
-            $options = $nothing + $options; // keep keys, do not override
+            $options = $nothing + $options; // Keep keys, do not override.
 
         } else if (is_string($nothing) && $nothing !== '') {
             // BC
-            $options = array(''=>$nothing) + $options;
+            $options = array('' => $nothing) + $options;
         }
 
         // We may accept more values if multiple attribute specified.
@@ -1016,12 +1016,12 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
         if (!isset($attributes['class'])) {
             $class = 'menu'.$name;
-            // name may contaion [], which would make an invalid class. e.g. numeric question type editing form, assignment quickgrading
+            // Name may contaion [], which would make an invalid class. e.g. numeric question type editing form, assignment quickgrading.
             $class = str_replace('[', '', $class);
             $class = str_replace(']', '', $class);
             $attributes['class'] = $class;
         }
-        $attributes['class'] = 'select ' . $attributes['class']; // Add 'select' selector always
+        $attributes['class'] = 'select ' . $attributes['class']; // Add 'select' selector always.
 
         $attributes['name'] = $name;
 
@@ -1034,7 +1034,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $output = '';
         foreach ($options as $value => $label) {
             if (is_array($label)) {
-                // ignore key, it just has to be unique
+                // Ignore key, it just has to be unique.
                 $output .= html_writer::select_optgroup(key($label), current($label), $selected);
             } else {
                 if (is_array($classvaluemapping) && array_key_exists($value, $classvaluemapping)) {
