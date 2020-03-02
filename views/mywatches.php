@@ -72,13 +72,13 @@ if (empty($mywatches)) {
             ENABLED_PUBLISHED => array('published', 'setwhenpublished', 'unsetwhenpublished'),
             ENABLED_RESOLVED => array('resolved', 'setwhenpublished', 'unsetwhenpublished'),
             ENABLED_ABANDONNED => array('abandonned', 'setwhenthrown', 'unsetwhenthrown'),
-            ON_COMMENT => array('oncomment', 'setoncomment', 'unsetoncomment'),
+            ON_COMMENT => array('comments', 'setoncomment', 'unsetoncomment'),
         );
 
         $notifications = '';
         foreach ($states as $statekey => $state) {
-            if ($tracker->enabledstates & $statekey) {
-                $pixurl = $OUTPUT->image_url($state[0], 'mod_tracker');
+            if (($tracker->enabledstates) & $statekey || ($statekey == ON_COMMENT)) {
+                $pixurl = $OUTPUT->pix_url($state[0], 'mod_tracker');
                 if ($awatch->events & $statekey) {
                     $pixid = 'watch-'.$state[0].'-'.$awatch->id.'-img';
                     $pix = '<img id="'.$pixid.'" class="" src="'.$pixurl.'" />';

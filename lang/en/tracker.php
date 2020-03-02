@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 $string['pluginname'] = 'Ticket Tracker/User support';
+$string['modulename'] = 'Ticket Tracker/User support';
 $string['pluginadministration'] = 'Tracker administration';
 
 // Capabilities.
@@ -44,7 +45,6 @@ $string['active'] = 'Active in form';
 $string['activeplural'] = 'Actives';
 $string['addacomment'] = 'Add a comment';
 $string['addanoption'] = 'Add an option';
-$string['addaquerytomemo'] = 'Add this search query to "my queries"';
 $string['addawatcher'] = 'Add a watcher';
 $string['addtothetracker'] = 'Add to this tracker';
 $string['administration'] = 'Administration';
@@ -151,7 +151,6 @@ $string['dropdown'] = 'Dropdown';
 $string['editelement'] = 'Update Form Element';
 $string['editoptions'] = 'Update options';
 $string['editproperties'] = 'Update properties';
-$string['editquery'] = 'Change a stored query';
 $string['editwatch'] = 'Change a cc registering';
 $string['elementcode'] = 'Element code';
 $string['elements'] = 'Available elements';
@@ -167,7 +166,6 @@ $string['enablecomments_help'] = 'When this option is enabled, readers of issue 
 $string['erroraddissueattribute'] = 'Could not submit issue(s) attribute(s). Case {$a} ';
 $string['erroralreadyinuse'] = 'Element already in use';
 $string['errorannotdeletecarboncopies'] = 'Cannot delete carbon copies for user : {$a}';
-$string['errorannotdeletequeryid'] = 'Cannot delete query id: {$a]';
 $string['errorbadlistformat'] = 'Only numbers (or a list of numbers seperated by a comma (",") allowed in the issue number field';
 $string['errorcannotaddelementtouse'] = 'Cannot add element to list of elements to use for this tracker';
 $string['errorcannotclearelementsforissue'] = 'Could not clear elements for issue {$a}';
@@ -214,8 +212,6 @@ $string['errorrecordissue'] = 'Could not submit issue';
 $string['errorremote'] = 'Error on remote side<br/> {$a} ';
 $string['errorremote'] = 'Remote error: {$a}';
 $string['errorremotesendingcascade'] = 'Error on sending cascade :<br/> {$a}';
-$string['errorunabletosabequery'] = 'Unable to save query as query';
-$string['errorunabletosavequeryid'] = 'Unable to update query id {$a}';
 $string['errorupdateelement'] = 'Could not update element';
 $string['event_tracker_issue_commented'] = 'Tracker Issue commented';
 $string['event_tracker_issue_reported'] = 'Tracker Issue reported';
@@ -248,7 +244,6 @@ $string['icanresolve'] = 'I can assign and close tickets';
 $string['id'] = 'Identifier';
 $string['intest'] = 'Testing';
 $string['intro'] = 'Description';
-$string['invalidquery'] = 'Invalid query id: {$a}';
 $string['inworkinmonth'] = 'Still in work';
 $string['isactive'] = 'Is available on submission form';
 $string['isinactive'] = 'Is hidden in submission form';
@@ -262,8 +257,13 @@ $string['issuenumber'] = 'Ticket';
 $string['issues'] = 'ticket records';
 $string['issuestoassign'] = 'Tickets to assign: {$a}';
 $string['issuestowatch'] = 'Tickets to watch: {$a}';
-$string['issueupdated'] = 'A ticket has been updated in tracker [{$a}]';
+$string['issueupdated'] = '[{$a->tracker}:{$a->issueid}] Ticket updated';
 $string['knownelements'] = 'Known tracker form elements';
+$string['lastcomment'] = 'Last comment: ';
+$string['licenseprovider'] = 'Pro License provider';
+$string['licenseprovider_desc'] = 'Input here your provider key';
+$string['licensekey'] = 'Pro license key';
+$string['licensekey_desc'] = 'Input here the product license key you got from your provider';
 $string['listissues'] = 'List view';
 $string['local'] = 'Local';
 $string['localtracker'] = 'Local tracker';
@@ -275,9 +275,9 @@ $string['manager'] = 'Manager';
 $string['mandatory'] = 'Mandatory answer';
 $string['me'] = 'My profile';
 $string['message_bugtracker'] = 'Thanks for your contribution and helping making this service more reliable.';
-$string['message_taskspread'] = 'You just defined a task. Don\'t foget assigning it to some recepient in the nxt screns to distribute it.';
-$string['message_ticketting'] = 'We have registered your query.';
-$string['message_ticketting_preassigned'] = 'We have registered your query. It will be assigned and handled as soon as possible. It has been assigned to {$a}.';
+$string['message_taskspread'] = 'You just defined a task. Don\'t forget assigning it to some recepient in the nxt screns to distribute it.';
+$string['message_ticketting'] = 'We have registered your submmission.';
+$string['message_ticketting_preassigned'] = 'We have registered your submission. It will be assigned and handled as soon as possible. It has been assigned to {$a}.';
 $string['mode_bugtracker'] = 'Team bug tracker';
 $string['mode_customized'] = 'Customized tracker';
 $string['mode_taskspread'] = 'Task distributor';
@@ -289,7 +289,6 @@ $string['myassignees'] = 'Resolver I assigned';
 $string['myissues'] = 'Tickets I resolve';
 $string['mypreferences'] = 'My preferences';
 $string['myprofile'] = 'My profile';
-$string['myqueries'] = 'My queries';
 $string['mytasks'] = 'My tickets';
 $string['mytickets'] = 'My tickets';
 $string['mywatches'] = 'My watches';
@@ -314,7 +313,6 @@ $string['nolocalcandidate'] = 'No local candidate for cascading';
 $string['nomnet'] = 'Moodle network seems disabled';
 $string['nooptions'] = 'No option';
 $string['nopotentialdeps'] = 'No tickets to depend on';
-$string['noqueryssaved'] = 'No stored query';
 $string['noremotehosts'] = 'No network host available';
 $string['noremotetrackers'] = 'No remote tracker available';
 $string['noreporters'] = 'No reporters, there are probably no issues entered here.';
@@ -350,9 +348,7 @@ $string['priorityid'] = 'Priority';
 $string['private'] = 'Private info';
 $string['profile'] = 'User settings';
 $string['published'] = 'Published';
-$string['queries'] = 'Queries';
-$string['query'] = 'Query';
-$string['queryname'] = 'Query label';
+$string['plugindist'] = 'Plugin distribution';
 $string['radio'] = 'Radio buttons'; // @DYNA
 $string['radiohoriz'] = 'Horizontal radio buttons'; // @DYNA
 $string['raisepriority'] = 'Raise priority';
@@ -375,13 +371,10 @@ $string['resolver'] = 'My issues';
 $string['resolvers'] = 'Resolvers';
 $string['resolving'] = 'Resolving';
 $string['runninginmonth'] = 'Running in current month';
-$string['saveasquery'] = 'Save a query';
-$string['savequery'] = 'Save the query';
 $string['search'] = 'Search';
 $string['searchbyid'] = 'Search by ID';
 $string['searchcriteria'] = 'Search criteria';
 $string['searchresults'] = 'Search results';
-$string['searchwiththat'] = 'Launch this query again';
 $string['selectparent'] = 'Parent selection';
 $string['sendrequest'] = 'Send request';
 $string['setactive'] = 'Turn active ';
@@ -406,6 +399,7 @@ $string['showcomments'] = 'Show comments';
 $string['showdependancies'] = 'Show dependancies';
 $string['showhistory'] = 'Show history';
 $string['site'] = 'Site';
+$string['solve'] = 'Mark Solved';
 $string['solution'] = 'Solution';
 $string['sortorder'] = 'Order';
 $string['standalone'] = 'Standalone tracker (top level support).';
@@ -413,10 +407,10 @@ $string['statehistory'] = 'States';
 $string['stateprofile'] = 'Ticket states';
 $string['status'] = 'Status';
 $string['strictworkflow'] = 'Strict workflow';
-$string['changedownership'] = 'A ticket has been reassigned in tracker [{$a}]';
-$string['commented'] = 'A ticket has been commented in tracker [{$a}]';
-$string['moved'] = 'A ticket has been moved in tracker [{$a}]';
-$string['submission'] = 'A new ticket is reported in tracker [{$a}]';
+$string['changedownership'] = '[{$a->tracker}:{$a->issueid}]  A ticket has been reassigned ';
+$string['commented'] = '[{$a->tracker}:{$a->issueid}] A ticket has been commented ';
+$string['moved'] = '[{$a->tracker}:{$a->issueid}] Ticket has been moved';
+$string['submission'] = '[{$a->tracker}:{$a->issueid}] A new ticket has been reported';
 $string['submitbug'] = 'Submit the ticket';
 $string['subtrackers'] = 'Subtrackers';
 $string['sum_opened'] = 'Opened';
@@ -436,7 +430,7 @@ $string['tracker-levelaccess'] = 'My capabilities in this tracker';
 $string['tracker_name'] = 'Tracker module services';
 $string['tracker_service_name'] = 'Tracker module services';
 $string['trackerelements'] = 'Tracker\'s definition';
-$string['trackereventchanged'] = 'Issue state change in tracker [{$a}]';
+$string['trackereventchanged'] = '[{$a->tracker}:{$a->issueid}] Issue state change to {$a->event}';
 $string['trackerhost'] = 'Parent host for tracker';
 $string['trackername'] = 'Tracker name';
 $string['transfer'] = 'Transfered';
@@ -461,6 +455,7 @@ $string['unsetwhenworks'] = 'Advise me when got working';
 $string['urgentraiserequestcaption'] = 'A user has requested an urgent priority demand';
 $string['urgentsignal'] = 'URGENT QUERY';
 $string['userdefaultpreferences'] = 'User default notification preferences';
+$string['updateattribute'] = 'Update attribute';
 $string['validated'] = 'Validated';
 $string['view'] = 'Views';
 $string['vieworiginal'] = 'See original';
@@ -468,16 +463,8 @@ $string['visiblename'] = 'Visible name';
 $string['voter'] = 'Vote';
 $string['waiting'] = 'Waiting';
 $string['watches'] = 'Watches';
+$string['writtenby'] = '<i>written by</i>';
 $string['youneedanaccount'] = 'You need an authorized account here to report a ticket';
-
-$string['plugindist_desc'] = '
-<p>This plugin is the community version and is published for anyone to use as is and check the plugin\'s
-core application. A "pro" version of this plugin exists and is distributed under conditions to feed the life cycle, upgrade, documentation
-and improvement effort.</p>
-<p>Please contact one of our distributors to get "Pro" version support.</p>
-<ul><li><a href="http://www.activeprolearn.com/plugin.php?plugin=mod_tracker">ActiveProLearn SAS</a></li>
-<li><a href="http://www.edunao.com">Edunao SAS</a></li></ul>
-';
 
 // help strings
 
@@ -834,3 +821,10 @@ $string['update_html_tpl'] = '
 <p><a href="<%%ISSUEURL%%>">See the issue record</a><br/>
 <a href="<%%CCURL%%>">Register for watches on this record</a></p>
 ';
+
+$string['plugindist_desc'] = '
+<p>This plugin is the community version and is published for anyone to use as is and check the plugin\'s
+core application. A "pro" version of this plugin exists and is distributed under conditions to feed the life cycle, upgrade, documentation
+and improvement effort.</p>
+<p>Please contact one of our distributors to get "Pro" version support.</p>
+<p><a href="http://www.mylearningfactory.com/index.php/documentation/Distributeurs?lang=en_utf8">MyLF Distributors</a></p>';
