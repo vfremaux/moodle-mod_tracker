@@ -40,7 +40,6 @@ $plugin->privacy = 'dualrelease';
 $plugin->prolocations = array(
     'classes/trackercategorytype/autourl',
     'classes/trackercategorytype/constant',
-    'classes/trackercategorytype/constant',
     'classes/trackercategorytype/checkboxhoriz',
     'classes/trackercategorytype/radiohoriz',
     'classes/trackercategorytype/captcha',
