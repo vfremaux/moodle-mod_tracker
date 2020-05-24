@@ -50,7 +50,6 @@ $PAGE->set_title($strtrackers);
 $PAGE->set_heading($strtrackers);
 $PAGE->navbar->add($strtrackers);
 $PAGE->set_cacheable(true);
-$PAGE->set_button('');
 $PAGE->set_headingmenu(navmenu($course));
 echo $OUTPUT->header();
 

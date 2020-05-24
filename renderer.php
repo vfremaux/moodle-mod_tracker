@@ -671,7 +671,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $template->jshandler = 'document.forms[\'editoptionform\'].what.value = \'\';';
         $template->jshandler .= 'document.forms[\'editoptionform\'].submit();';
 
-        return $this->output->render_from_template('mod_tracker:editoroptions', $template);
+        return $this->output->render_from_template('mod_tracker/editoptionsform', $template);
     }
 
     public function option_list_view(&$cm, &$element) {
