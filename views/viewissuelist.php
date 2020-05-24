@@ -27,13 +27,13 @@ defined('MOODLE_INTERNAL') || die();
 $PAGE->requires->js_call_amd('mod_tracker/trackerlist', 'init');
 
 $pagesize = 20;
-$page = optional_param('page', 1, PARAM_INT);
+$page = optional_param('page', 0, PARAM_INT);
 $sort = optional_param('sort', 'datereported DESC', PARAM_TEXT);
 
-if ($page <= 0) {
-    $page = 1;
+if ($page < 0) {
+    $page = 0;
 }
-$limitfrom = ($page - 1) * $pagesize;
+$limitfrom = ($page) * $pagesize;
 
 list($issues, $totalcount) = tracker_get_issues($tracker, $resolved, $screen, $sort, $limitfrom, $pagesize);
 
@@ -47,7 +47,7 @@ $template->cmid = $cm->id;
 $template->screen = $screen;
 
 if ($totalcount > $pagesize) {
-    $template->pager = $OUTPUT->paging_bar($totalcount, $page - 1 , $pagesize, $url, 'page');
+    $template->pager = $OUTPUT->paging_bar($totalcount, $page , $pagesize, $url, 'page');
 }
 
 $template->formurl = new moodle_url('/mod/tracker/view.php');
