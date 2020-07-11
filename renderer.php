@@ -220,7 +220,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
             }
         }
 
-        return $this->output->render_form_template('mod_tracker/distribution_form', $template);
+        return $this->output->render_from_template('mod_tracker/distribution_form', $template);
     }
 
     /**

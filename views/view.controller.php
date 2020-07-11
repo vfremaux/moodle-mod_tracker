@@ -141,6 +141,7 @@ if ($action == 'updateanissue') {
     $assignedtokeys = preg_grep('/assignedto./' , $keys);      // Filter out only the assigned updating.
     $newassignedtokeys = preg_grep('/assignedtoi./' , $keys);  // Filter out only the new assigned.
     foreach ($statuskeys as $akey) {
+        $akey = clean_param($akey, PARAM_TEXT); // Ensure we are secure.
         $issueid = str_replace('status', '', $akey);
         $haschanged = optional_param('schanged'.$issueid, 0, PARAM_INT);
         if ($haschanged) {
@@ -169,6 +170,7 @@ if ($action == 'updateanissue') {
 
     // Always add a record for history.
     foreach ($assignedtokeys as $akey) {
+        $akey = clean_param($akey, PARAM_TEXT); // Ensure we are secure.
         $issueid = str_replace('assignedto', '', $akey);
         // New ownership is triggered only when a change occured.
         $haschanged = optional_param('changed'.$issueid, 0, PARAM_INT);

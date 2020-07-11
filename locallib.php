@@ -588,6 +588,8 @@ function tracker_clearelements($issueid, $withfiles = false) {
 
     // delete issue attribute fields
     if ($withfiles && !empty($attributeids)) {
+        $cm = get_coursemodule_from_instance('tracker', $issue->trackerid);
+        $context = context_module::intance($cm->id);
         $fs = get_file_storage();
         foreach ($attributeids as $attid => $void) {
             $fs->delete_area_files($context->id, 'mod_tracker', 'issueattribute', $attid);
@@ -941,7 +943,7 @@ function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = 
             }
             $subject = get_string('raiserequestcaption', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
             if ($CFG->debugsmtp) {
-                $msg = "Sending Raise Request Mail Notification to ".fullname($ccuser).'<br/>';
+                $msg = "Sending Raise Request Mail Notification to ".fullname($manager).'<br/>';
                 $msg .= "<pre>Subject: $subject\n########\n".shorten_text($notification, 160).'</pre>';
                 mtrace($msg);
             }
@@ -1534,7 +1536,7 @@ function tracker_add_cascade_backlink(&$cm, &$issue) {
     $str = get_string('cascadedticket', 'tracker', $SITE->shortname);
     $str .= '<br/>';
     $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issue->id);
-    $ticketur = new moodle_url('/mod/tracker/view.php', $params);
+    $ticketurl = new moodle_url('/mod/tracker/view.php', $params);
     $str .= '<a href="'.$ticketurl.'">'.$vieworiginalstr.'</a><br/>';
 
     return $str;
@@ -1588,6 +1590,7 @@ function tracker_get_stats(&$tracker, $from = null, $to = null) {
             status
     ";
     if ($results = $DB->get_records_sql($sql)) {
+        $stats = [];
         foreach ($results as $r) {
             $stats[$r->status] = $r->value;
         }
@@ -1984,7 +1987,7 @@ function tracker_print_direct_editor($attributes, $values, $options) {
                            'width' => 600,
                            'style' => 'border:1px solid #000');
             $str .= html_writer::tag('object', '', $attrs);
-            $sr .= '</div>';
+            $str .= '</div>';
             $str .= '</noscript>';
         }
     }
