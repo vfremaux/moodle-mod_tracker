@@ -1,0 +1,149 @@
+
+
+
+<!-- mod_tracker/issuelistform -->
+
+<div class="tracker-ticket-quick-search">
+<form id="id-quick-find-form" name="quickfindform" action="{{{formurl}}}" method="post">
+<input type="hidden" name="id" value="{{cmid}}" />
+<input type="hidden" name="what" value="quickfind" />
+<input type="hidden" name="view" value="view" />
+<input type="hidden" name="screen" value="{{screen}}" />
+<b>{{#str}}quickfind, tracker{{/str}}: </b></b>{{prefix}}{{trackerid}}_<input id="tracker-quick-find-input" type="text" size="6" maxlength="6" name="findissueid" value="" placeholder="IID" /> {{{notfoundissuesignal}}}
+</form>
+</div>
+
+<form name="manageform" action="{{{formurl}}}" method="post">
+<input type="hidden" name="id" value="{{cmid}}" />
+<input type="hidden" name="what" value="updatelist" />
+<input type="hidden" name="view" value="view" />
+<input type="hidden" name="screen" value="{{screen}}" />
+
+{{#emptylist}}
+{{{emptynotification}}}
+{{/emptylist}}
+
+{{^emptylist}}
+
+{{{pager}}}
+
+<table class="mod-tracker-issuelist generaltable">
+<tr>
+    <th id="issue-list-id" style="width:2%;min-width:90px">
+        {{#str}}issueid, tracker{{/str}} {{#sortby}}id{{/sortby}}<br/>
+        {{#str}}priority, tracker{{/str}} {{#sortby}}resolutionpriority{{/sortby}}
+    </th>
+
+    <th id="issue-list-summary" width="*">
+        {{#str}}summary, tracker{{/str}}
+    </th>
+
+    <th id="issue-list-datereported">
+        {{#str}}datereported, tracker{{/str}} {{#sortby}}datereported{{/sortby}}
+    </th>
+
+    {{^ismytickets}}
+    <th id="issue-list-reportedby">
+        {{#str}}reportedby, tracker{{/str}}
+    </th>
+    {{/ismytickets}}
+
+    <th id="issue-list-assignedto">
+        {{#str}}assignedto, tracker{{/str}} {{#sortby}}assignedto{{/sortby}}
+    </th>
+
+    <th id="issue-list-status" style="max-width: 100px;width:100px">
+        {{#str}}status, tracker{{/str}} {{#sortby}}status{{/sortby}}
+    </th>
+
+    <th id="issue-list-watches" style="width:2%">
+        {{#str}}watches, tracker{{/str}}
+    </th>
+
+    {{#transferable}}
+    <th id="issue-list-transfered" style="width:2%">
+        {{#str}}transfer, tracker{{/str}}
+    </th>
+    {{/transferable}}
+
+    <th id="issue-list-action" style="width:2%:min-width:50px">
+        {{#str}}action, tracker{{/str}}
+    </th>
+</tr>
+
+{{#issues}}
+<tr valign="top">
+    <td class="issue-list-id" width="1%" data-source="fullid">
+        {{fullid}}
+
+        {{#priority}}
+        <div class="tracker-priority">
+        P{{priority}}
+        </div>
+        {{/priority}}
+    </td>
+
+    <td class="issue-list-summary">
+        <a href="{{{issueurl}}}">{{{summary}}}</a>
+    </td>
+
+    <td class="issue-list-datereported">
+        {{{datereported}}}
+    </td>
+
+    {{^ismytickets}}
+    <td class="issue-list-reportedby">
+        {{{reportedby}}}
+    </td>
+    {{/ismytickets}}
+
+    <td class="issue-list-assignedto">
+        {{> mod_tracker/listformassignedtopart }}
+    </td>
+
+    <td class="issue-list-status-{{id}} status-{{{status.code}}}"  style="max-width: 120px;width:120px">
+        {{> mod_tracker/listformstatuspart }}
+    </td>
+
+    <td class="issue-list-watches">
+        {{{watches}}}
+    </td>
+
+    {{#transferable}}
+    <td class="issue-list-transfered">
+        {{{transfered}}}
+    </td>
+    {{/transferable}}
+
+    <td class="issue-list-action">
+        {{{controls}}}
+    </td>
+</tr>
+{{/issues}}
+</table>
+
+{{{pager}}}
+
+{{/emptylist}}
+
+</form>
+
+<div id="issuelist-edit-form" class="modal fade" tabindex="-1" aria-labelledby="issuelist-edit-formLabel" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{#str}}updateattribute, tracker{{/str}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="{{#str}}cancel{{/str}}">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="issuelist-edit-inner-form"></div>
+      <div class="modal-footer">
+        <button id="modal-status-save" data-issue="" type="button" class="btn btn-primary">{{#str}}update{{/str}}</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{#str}}cancel{{/str}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- /mod_tracker/issuelistform -->
