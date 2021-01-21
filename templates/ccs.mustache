@@ -1,0 +1,29 @@
+
+
+
+<!-- ccs -->
+<tr>
+    <td colspan="4" width="100%" class="tracker-ccs">
+        <div id="tracker-issueccs" class="{{initialviewmode}}">
+            <h2>{{{ccedstr}}}</h2>
+
+            {{#ccs}}
+                <div class="cc-user">{{{ccuser}}}    {{#canmanagewatchers}}{{{deletelink}}}{{/canmanagewatchers}}</div>
+            {{/ccs}}
+
+            {{#canmanagewatchers}}
+            <div id="tracker-cc-form">
+                <form name="addccform" method="get" action="{{{issueurl}}}">
+                    <input type="hidden" name="id" value="{{cmid}}" />
+                    <input type="hidden" name="what" value="register" />
+                    <input type="hidden" name="view" value="view" />
+                    <input type="hidden" name="issueid" value="{{issueid}}" />
+                    {{addwatcherstr}} {{{select}}}
+                    <input type="submit" name="go_btn" value="{{addstr}}" />
+                </form>
+            </div>
+            {{/canmanagewatchers}}
+        </div>
+    </td>
+</tr>
+<!-- /ccs -->
