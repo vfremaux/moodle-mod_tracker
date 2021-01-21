@@ -21,6 +21,10 @@
  *
  * A class implementing a textarea element and all its representations
  */
+namespace mod_tracker;
+
+use html_writer;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/text/text.class.php');
