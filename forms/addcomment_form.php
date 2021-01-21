@@ -42,13 +42,16 @@ class addedit_comment_form extends moodleform {
                                      'maxbytes' => $maxbytes,
                                      'context' => $this->context);
 
-        $mform->addElement('hidden', 'id', $this->_customdata['cmid']); // Issue id.
+        $mform->addElement('hidden', 'id', $this->_customdata['cmid']); // Cm id.
         $mform->setType('id', PARAM_INT);
+
+        $mform->addElement('hidden', 'commentid'); // Cm id.
+        $mform->setType('commentid', PARAM_INT);
 
         $mform->addElement('hidden', 'issueid', $this->_customdata['issueid']); // Issue id.
         $mform->setType('issueid', PARAM_INT);
 
-        $mform->addElement('editor', 'comment_editor', get_string('comment', 'tracker'), $this->editoroptions);
+        $mform->addElement('editor', 'comment_editor', get_string('comment', 'tracker'), null, $this->editoroptions);
 
         $this->add_action_buttons(true);
 
@@ -56,10 +59,16 @@ class addedit_comment_form extends moodleform {
 
     public function set_data($defaults) {
 
-        $defaults->comment_editor['text'] = $defaults->comment;
-        $defaults->comment_editor['format'] = $defaults->commentformat;
+        $context = context_module::instance($defaults->id);
+
+        $draftideditor = file_get_submitted_draft_itemid('comment_editor');
+        $currenttext = file_prepare_draft_area($draftideditor, $context->id, 'mod_tracker', 'comment_editor',
+                                               $defaults->commentid, $this->editoroptions, $defaults->comment);
         $defaults = file_prepare_standard_editor($defaults, 'comment', $this->editoroptions, $this->context, 'mod_tracker',
-                                                 'issuecomment', $defaults->id);
+                                                 'issuecomment', $defaults->commentid);
+        $defaults->comment = array('text' => $currenttext,
+                                       'format' => $defaults->commentformat,
+                                       'itemid' => $draftideditor);
 
         parent::set_data($defaults);
     }

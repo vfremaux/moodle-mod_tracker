@@ -32,15 +32,18 @@ require_once($CFG->dirroot.'/mod/tracker/extralib/lib.php');
  * implementation path where to fetch resources.
  * @param string $feature a feature key to be tested.
  */
-function tracker_supports_feature($feature) {
+function tracker_supports_feature($feature = null, $getsupported = false) {
     static $supports;
 
-    $config = get_config('mod_tracker');
+    if (!during_initial_install()) {
+        $config = get_config('mod_tracker');
+    }
 
     if (!isset($supports)) {
         $supports = array(
             'pro' => array(
                 'emulate' => array('community'),
+                'comment' => array('branch'),
                 'cascade' => array('mnet'),
                 'reports' => array('status', 'evolution', 'print'),
                 'remote' => array('ws'),
@@ -66,6 +69,11 @@ function tracker_supports_feature($feature) {
         }
     } else {
         $versionkey = 'community';
+    }
+
+    if (empty($feature)) {
+        // Just return version.
+        return $versionkey;
     }
 
     list($feat, $subfeat) = explode('/', $feature);
@@ -576,7 +584,7 @@ function tracker_uninstall() {
     return $return;
 }
 
-function tracker_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload) {
+function mod_tracker_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload) {
     global $DB;
 
     if ($context->contextlevel != CONTEXT_MODULE) {

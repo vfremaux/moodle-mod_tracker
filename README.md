@@ -40,3 +40,7 @@ It provides a complete ticket tracking activity with following features :
 - Notification service (parametric)
 - Full backup/restore implementation
 - Tracking activity reports
+
+Release note : XX.0008
+========================
+Much better control of enrolled status on notification and user lists.

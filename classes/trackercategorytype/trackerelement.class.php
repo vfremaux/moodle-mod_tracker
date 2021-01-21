@@ -23,6 +23,11 @@
 /**
  * A generic class for collecting all that is common to all elements
  */
+namespace mod_tracker;
+
+use context_module;
+use moodle_exception;
+
 defined('MOODLE_INTERNAL') || die();
 
 abstract class trackerelement {
@@ -305,7 +310,7 @@ abstract class trackerelement {
 
         if ($element = $DB->get_record_sql($sql, array($usedid))) {
 
-            $eltypeconstructor = $element->type.'element';
+            $eltypeconstructor = '\\mod_tracker\\'.$element->type.'element';
             include_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/'.$element->type.'/'.$element->type.'.class.php');
             $instance = new $eltypeconstructor($tracker, $usedid, true);
             return $instance;
@@ -324,7 +329,7 @@ abstract class trackerelement {
         global $DB, $CFG;
 
         if ($element = $DB->get_record('tracker_element', array('id' => $id), 'id, type', 'id')) {
-            $eltypeconstructor = $element->type.'element';
+            $eltypeconstructor = '\\mod_tracker\\'.$element->type.'element';
             include_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/'.$element->type.'/'.$element->type.'.class.php');
             $instance = new $eltypeconstructor($tracker, $id, false);
             return $instance;

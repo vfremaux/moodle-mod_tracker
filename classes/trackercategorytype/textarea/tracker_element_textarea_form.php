@@ -19,6 +19,8 @@
  * @category mod
  * @author Valery Fremaux / 1.8
  */
+namespace mod_tracker;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/tracker/forms/tracker_element_form_base.php');

@@ -300,6 +300,22 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2015080600, 'tracker');
     }
 
+    if ($oldversion < 2020120500) {
+        // Define field uplink to be added to tracker.
+        $table = new xmldb_table('tracker_issue');
+        $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'timeassigned');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'timecreated');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Tracker savepoint reached.
+        upgrade_mod_savepoint(true, 2020120500, 'tracker');
+    }
+
     return true;
 }
 
