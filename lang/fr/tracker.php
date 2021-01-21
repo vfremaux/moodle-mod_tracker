@@ -18,6 +18,7 @@
 $string['tracker:addinstance'] = 'Ajouter un gestionnaire de tickets';
 $string['tracker:canbecced'] = 'Peut s\'abonner';
 $string['tracker:comment'] = 'Commenter les tickets';
+$string['tracker:editcomment'] = 'Modifier les commentaires de tickets';
 $string['tracker:configure'] = 'Configurer le gestionnaire';
 $string['tracker:configurenetwork'] = 'Configurer les fonctions réseau';
 $string['tracker:develop'] = 'Etre choisi pour résoudre un ticket';
@@ -53,6 +54,7 @@ $string['attributes'] = 'Attributs';
 $string['autourl'] = 'Collecte d\'Url';
 $string['backtocourse'] = 'Revenir au cours';
 $string['bindlocaltracker'] = 'Attacher ce gestionnaire local';
+$string['branchfromcomment'] = 'Creer un ticket sur ce commentaire';
 $string['browse'] = 'Exploration';
 $string['browser'] = 'Navigateur';
 $string['build'] = 'Version';
@@ -97,8 +99,8 @@ $string['configuserresolveddefault'] = 'A la résolution';
 $string['configuserabandonneddefault'] = 'A l\'abandon';
 $string['configuseroncommentdefault'] = 'au dépôt de commentaire';
 $string['configuserdefault_desc'] = 'activer les notifications (défaut)';
-$string['open'] = 'Open';
-$string['closed'] = 'Closed';
+$string['open'] = 'Ouvert';
+$string['closed'] = 'Fermé';
 $string['constant'] = 'Constante';
 $string['constantinfosource'] = 'Source de la constante';
 $string['customconstant'] = 'Valeur spécifique';
@@ -155,9 +157,6 @@ $string['elucidationratio'] = 'Taux d\'élucidation';
 $string['emailoptions'] = 'Options de courriel';
 $string['emergency'] = 'Avis d\'urgence';
 $string['emptydefinition'] = 'La définition du gestionnaire cible est vide.';
-$string['emulatecommunity'] = 'Emuler la version communautaire';
-$string['emulatecommunity_desc'] = 'Si elle est activée, cette option force le composant à fonctionner en version communautaire.
-Certaines fonctionnalités ne seront plus disponibles.';
 $string['enablecomments'] = 'Autoriser les commentaires';
 $string['errorcaptcha'] = 'Vous n\'avez pas fourni la bonne réponse. Ou peut être êtes vous un robot ?';
 $string['errorcoursemisconfigured'] = 'Ce cours est mal configuré';
@@ -210,13 +209,9 @@ $string['issuenumber'] = 'Ticket&nbsp;';
 $string['issues'] = 'tickets';
 $string['issuestoassign'] = 'Tickets à répartir&nbsp;: {$a}';
 $string['issuestowatch'] = 'Tickets à examiner&nbsp;: {$a}';
-$string['issueupdated'] = '[{$a->tracker}:{$a->issueid}] Ticket mis à jour';
+$string['issueupdated'] = '[{$a->tracker}:{$a->issueid}] Ticket mis à jour. Etat actuel : {$a->state}';
 $string['knownelements'] = 'Rubriques connues&nbsp;';
 $string['lastcomment'] = 'Dernier commentaire&nbsp;: ';
-$string['licenseprovider'] = 'Fournisseur version Pro';
-$string['licenseprovider_desc'] = 'Entrez la clef de votre distributeur.';
-$string['licensekey'] = 'Clef de license pro';
-$string['licensekey_desc'] = 'Entrez ici la clef de produit que vous avez reçu de votre distributeur.';
 $string['listissues'] = 'Liste de tickets';
 $string['local'] = 'Local';
 $string['localtracker'] = 'Gestionnaire local';
@@ -295,8 +290,8 @@ $string['print'] = 'Impression';
 $string['priority'] = 'Prior.';
 $string['priorityid'] = 'Priorité';
 $string['profile'] = 'Mes réglages';
-$string['plugindist'] = 'Distribution du plugin';
 $string['published'] = 'Publié';
+$string['quickfind'] = 'Recherche rapide ';
 $string['radio'] = 'Boutons radio'; // @DYNA
 $string['radiohoriz'] = 'Boutons radio horizontal'; // @DYNA
 $string['raisepriority'] = 'Augmenter la priorité';
@@ -347,6 +342,7 @@ $string['showcomments'] = 'Montrer les commentaires';
 $string['showdependancies'] = 'Montrer les dépendances';
 $string['showhistory'] = 'Montrer l\'historique';
 $string['site'] = 'Site';
+$string['splittedfrom'] = 'Cloné de : {$a}';
 $string['solution'] = 'Solution';
 $string['solve'] = 'Marquer résolu';
 $string['sortorder'] = 'Ordre';
@@ -367,7 +363,7 @@ $string['sum_reported'] = 'Déposés';
 $string['sum_resolved'] = 'Résolus';
 $string['summary'] = 'Résumé';
 $string['supportmode'] = 'Mode de support ';
-$string['testing'] = 'En test';
+$string['testing'] = 'A valider';
 $string['text'] = 'Champ de texte'; // @DYNA
 $string['textarea'] = 'Zone de texte'; // @DYNA
 $string['thanksdefault'] = 'Merci de votre contribution à l\'amélioration continue du service.';
@@ -408,7 +404,7 @@ $string['validated'] = 'Validé';
 $string['view'] = 'Tickets';
 $string['vieworiginal'] = 'Voir l\'orginal';
 $string['voter'] = 'Votes';
-$string['waiting'] = 'Bloqué';
+$string['waiting'] = 'Bloqué / En attente de données';
 $string['watches'] = 'Obs.';
 $string['writtenby'] = '<i>Ecrit par</i>';
 $string['youneedanaccount'] = 'Vous devez posséder un compte dans cet espace pour pouvoir poster';
@@ -781,9 +777,4 @@ $string['update_html_tpl'] = '
 <a href="<%%CCURL%%>">S\'abonner aux événements de cette fiche</a></p>
 ';
 
-$string['plugindist_desc'] = '
-<p>Ce plugin est distribué dans la communauté Moodle pour l\'évaluation de ses fonctions centrales
-correspondant à une utilisation courante du plugin. Une version "professionnelle" de ce plugin existe et est distribuée
-sous certaines conditions, afin de soutenir l\'effort de développement, amélioration; documentation et suivi des versions.</p>
-<p>Contactez un distributeur pour obtenir la version "Pro" et son support.</p>
-<p><a href="http://www.mylearningfactory.com/index.php/documentation/Distributeurs?lang=fr_utf8">Distributeurs MyLF</a></p>';
+require(__DIR__.'/pro_additional_strings.php');
