@@ -1,0 +1,40 @@
+This document maps capabilities and roles to features. 
+
+Editing a ticket : 
+
+Editing a ticket allows to change a set of information that can be manipulated by distinct actors : 
+
+- Ticket description : what the ticket asks for
+- Ticket assignation : who the ticket is given to
+- Ticket state : in which process state the ticket is
+- Comments
+
+Only ticket "manager" can access to ticket content description for changes. This may not be the initial reporter in all cases.
+Only ticket "manager" can access to ticket content description for changes
+
+Capabilities : 
+
+mod/tracker:report : Allows people to create new tickets. 
+mod/tracker:manage : Allows people to change the definition of all tickets in the stack. 
+mod/tracker:develop : Allows people to be assigned to a ticket, and process some work on it. 
+mod/tracker:resolve : Allows people to close the ticket by setting it resolved. Accessorily, allow to edit ticket data to fix descriptions.
+mod/tracker:configure : Allows people to configure the tracker. 
+mod/tracker:seeissues : Allows people to configure the tracker. 
+mod/tracker:viewallissues : Allows people to configure the tracker. 
+
+Bug report mode : 
+
+Use story : Any report capable users post some bug reports that all other user can see for collaborative reference. Managers can assign tickets
+to some developpers that can work on them, opening, working and giving solutions. Some trackers could have a default assigned people among
+developpers or managers, Original reporter (or manager) can close (resolve) the ticket at the end of the process. 
+
+User support mode : 
+
+Use Stroy : Any report capable user can post tickets but CANNOT browse nor see tickts from other people. Managers can assign tickets
+to some developpers that can work on them, opening, working and giving solutions. Some trackers could have a default assigned people among
+developpers or managers, Original reporter (or manager) can close (resolve) the ticket at the end of the process. 
+
+Task distribution mode :
+
+Use Story : Some users can post tickets (query for task) and assign them to people (major difference). Assigned developpers can see 
+only their work, take a ticket and work on it. The reporter (or manager) can solve it. 
