@@ -2,6 +2,17 @@
 
 
 <!-- mod_tracker/issuelistform -->
+
+<div class="tracker-ticket-quick-search">
+<form id="id-quick-find-form" name="quickfindform" action="{{{formurl}}}" method="post">
+<input type="hidden" name="id" value="{{cmid}}" />
+<input type="hidden" name="what" value="quickfind" />
+<input type="hidden" name="view" value="view" />
+<input type="hidden" name="screen" value="{{screen}}" />
+<b>{{#str}}quickfind, tracker{{/str}}: </b></b>{{prefix}}{{trackerid}}_<input id="tracker-quick-find-input" type="text" size="6" maxlength="6" name="findissueid" value="" placeholder="IID" /> {{{notfoundissuesignal}}}
+</form>
+</div>
+
 <form name="manageform" action="{{{formurl}}}" method="post">
 <input type="hidden" name="id" value="{{cmid}}" />
 <input type="hidden" name="what" value="updatelist" />
@@ -18,11 +29,9 @@
 
 <table class="mod-tracker-issuelist generaltable">
 <tr>
-    <th id="issue-list-id" style="width:2%">
-        {{#str}}issueid, tracker{{/str}}
-        {{#priority}}
-        P
-        {{/priority}}
+    <th id="issue-list-id" style="width:2%;min-width:90px">
+        {{#str}}issueid, tracker{{/str}} {{#sortby}}id{{/sortby}}<br/>
+        {{#str}}priority, tracker{{/str}} {{#sortby}}resolutionpriority{{/sortby}}
     </th>
 
     <th id="issue-list-summary" width="*">
@@ -30,7 +39,7 @@
     </th>
 
     <th id="issue-list-datereported">
-        {{#str}}datereported, tracker{{/str}}
+        {{#str}}datereported, tracker{{/str}} {{#sortby}}datereported{{/sortby}}
     </th>
 
     {{^ismytickets}}
@@ -40,11 +49,11 @@
     {{/ismytickets}}
 
     <th id="issue-list-assignedto">
-        {{#str}}assignedto, tracker{{/str}}
+        {{#str}}assignedto, tracker{{/str}} {{#sortby}}assignedto{{/sortby}}
     </th>
 
     <th id="issue-list-status" style="max-width: 100px;width:100px">
-        {{#str}}status, tracker{{/str}}
+        {{#str}}status, tracker{{/str}} {{#sortby}}status{{/sortby}}
     </th>
 
     <th id="issue-list-watches" style="width:2%">
@@ -64,10 +73,13 @@
 
 {{#issues}}
 <tr valign="top">
-    <td class="issue-list-id" width="1%">
-        {{issueid}}
+    <td class="issue-list-id" width="1%" data-source="fullid">
+        {{fullid}}
+
         {{#priority}}
-        {{priority}}
+        <div class="tracker-priority">
+        P{{priority}}
+        </div>
         {{/priority}}
     </td>
 

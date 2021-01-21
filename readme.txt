@@ -29,3 +29,7 @@ Release note : 2012101700
 ===========================
 Fix backup restore inconsistancies
 Add VALIDATED status
+
+Release note : XX.0008
+========================
+Much better control of enrolled status on notification and user lists.

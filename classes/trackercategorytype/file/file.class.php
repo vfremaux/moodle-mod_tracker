@@ -21,6 +21,12 @@
  *
  * A class implementing a filepicker element
  */
+namespace mod_tracker;
+
+use StdClass;
+use html_writer;
+use file_picker;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');

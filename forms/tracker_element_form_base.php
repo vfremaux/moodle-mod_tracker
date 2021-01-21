@@ -21,6 +21,10 @@
  * @category    mod
  * @author      Clifford Tham, Valery Fremaux > 1.8
  */
+namespace mod_tracker;
+
+use moodleform;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/formslib.php');
