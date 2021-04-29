@@ -343,7 +343,6 @@ $string['priorityid'] = 'Priority';
 $string['private'] = 'Private info';
 $string['profile'] = 'User settings';
 $string['published'] = 'Published';
-$string['plugindist'] = 'Plugin distribution';
 $string['quickfind'] = 'Quick find';
 $string['radio'] = 'Radio buttons'; // @DYNA
 $string['radiohoriz'] = 'Horizontal radio buttons'; // @DYNA

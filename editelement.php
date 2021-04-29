@@ -51,7 +51,7 @@ if (!file_exists($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/'.$type
 
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/'.$type.'/tracker_element_'.$type.'_form.php');
 
-$formname = 'tracker_element_'.$type.'_form';
+$formname = 'mod_tracker\\tracker_element_'.$type.'_form';
 $form = new $formname(new moodle_url('/mod/tracker/editelement.php'), array('id' => $id));
 
 if ($form->is_cancelled()) {

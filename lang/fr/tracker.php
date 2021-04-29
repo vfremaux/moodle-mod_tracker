@@ -280,7 +280,6 @@ $string['optionisused'] = 'Ce nom d\'option est déjà utilisé pour cet éléme
 $string['order'] = 'Ordre';
 $string['originalticketnoaccess'] = 'Ce ticket est transféré à partir d\'un ticket original qui ne vous est pas accessible.';
 $string['pages'] = 'Pages';
-$string['plugindist'] = 'Distribution du plugin';
 $string['posted'] = 'Posté';
 $string['potentialresolvers'] = 'Responsables potentiels';
 $string['preferences'] = 'Préférences';

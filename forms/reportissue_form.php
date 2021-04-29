@@ -102,13 +102,22 @@ class TrackerIssueForm extends moodleform {
 
             $mform->addelement('header', 'processinghdr', get_string('processing', 'tracker'), '');
 
-            // Assignee.
+            // Assignee. Both developers and resolvers can be assigned.
             $context = context_module::instance($this->_customdata['cmid']);
             $resolvers = tracker_getresolvers($context);
+            $developers = tracker_getdevelopers($context);
             $resolversmenu[0] = '---- '. get_string('unassigned', 'tracker').' -----';
-            if ($resolvers && has_any_capability(array('mod/tracker:develop', 'mod/tracker:manage'), $this->context)) {
-                foreach ($resolvers as $resolver) {
-                    $resolversmenu[$resolver->id] = fullname($resolver);
+            if (($resolvers || $developers) && has_any_capability(array('mod/tracker:develop', 'mod/tracker:manage'), $this->context)) {
+                if ($resolvers) {
+                    foreach ($resolvers as $resolver) {
+                        $resolversmenu[$resolver->id] = fullname($resolver);
+                    }
+                }
+                if ($developers) {
+                    foreach ($developers as $developer) {
+                        // May overwrite previous resolver entry, but doesn't matter if it does.
+                        $resolversmenu[$developer->id] = fullname($developer);
+                    }
                 }
                 $mform->addElement('select', 'assignedto', get_string('assignedto', 'tracker'), $resolversmenu);
             } else {

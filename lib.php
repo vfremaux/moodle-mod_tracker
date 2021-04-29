@@ -32,7 +32,7 @@ require_once($CFG->dirroot.'/mod/tracker/extralib/lib.php');
  * implementation path where to fetch resources.
  * @param string $feature a feature key to be tested.
  */
-function tracker_supports_feature($feature = null, $getsupported = false) {
+function tracker_supports_feature($feature = null, $getsupported = null) {
     static $supports;
 
     if (!during_initial_install()) {
@@ -55,6 +55,10 @@ function tracker_supports_feature($feature = null, $getsupported = false) {
             ),
         );
         $prefer = array();
+    }
+    
+    if ($getsupported) {
+        return $supports;
     }
 
     // Check existance of the 'pro' dir in plugin.

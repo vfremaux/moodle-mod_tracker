@@ -399,16 +399,34 @@ function tracker_getnumissuesreported($trackerid, $status='*', $reporterid = '*'
  */
 function tracker_getadministrators($context) {
     $allnames = get_all_user_name_fields(true, 'u');
-    return get_users_by_capability($context, 'mod/tracker:manage', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
+    $alladmins = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
+
+    $adms = [];
+    foreach ($alladmins as $a) {
+        if (is_enrolled($context, $a)) {
+            $adms[$a->id] = $a;
+        }
+    }
+
+    return $adms;
 }
 
 /**
- * get available resolvers
+ * get available resolvers, ensure they are enrolled in the context.
  * @param object $context
  */
 function tracker_getresolvers($context) {
     $allnames = get_all_user_name_fields(true, 'u');
-    return get_users_by_capability($context, 'mod/tracker:resolve', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
+    $allresolvers = get_users_by_capability($context, 'mod/tracker:resolve', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
+
+    $res = [];
+    foreach ($allresolvers as $r) {
+        if (is_enrolled($context, $r)) {
+            $res[$r->id] = $r;
+        }
+    }
+
+    return $res;
 }
 
 /**
