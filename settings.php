@@ -15,9 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package mod_learningtimecheck
+ * @package mod_tracker
  * @category mod
- * @author  David Smith <moodle@davosmith.co.uk> as checklist
  * @author Valery Fremaux
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
@@ -26,7 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/mod/tracker/lib.php');
 
 /*
- * Global settings for the learningtimecheck
+ * Global settings for the tracker module
  */
 
 if ($ADMIN->fulltree) {
@@ -76,7 +75,8 @@ if ($ADMIN->fulltree) {
 
     if (tracker_supports_feature('emulate/community') == 'pro') {
         include_once($CFG->dirroot.'/mod/tracker/pro/prolib.php');
-        \mod_tracker\pro_manager::add_settings($ADMIN, $settings);
+        $promanager = mod_tracker\pro_manager::instance();
+        $promanager->add_settings($ADMIN, $settings);
     } else {
         $label = get_string('plugindist', 'mod_tracker');
         $desc = get_string('plugindist_desc', 'mod_tracker');

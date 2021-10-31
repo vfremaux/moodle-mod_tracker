@@ -87,7 +87,7 @@ class view_controller extends base_controller {
                 break;
             }
 
-            case 'cadcade' : {
+            case 'cascade' : {
                 $this->data->issueid = required_param('issueid', PARAM_INT);
             }
 
@@ -138,7 +138,8 @@ class view_controller extends base_controller {
 
         } else if ($cmd == 'solve') {
 
-            $issue = $DB->get_record('tracker_issue', array('id' => $this->data->issueid));
+            $issueid = $this->data->issueid;
+            $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
             $oldstate = $issue->status;
             $issue->status = RESOLVED;
             $DB->update_record('tracker_issue', $issue);
@@ -172,7 +173,8 @@ class view_controller extends base_controller {
 
             // Delete an issue record ***************************************************************.
 
-            $maxpriority = $DB->get_field('tracker_issue', 'resolutionpriority', array('id' => $this->data->issueid));
+            $issueid = $this->data->issueid;
+            $maxpriority = $DB->get_field('tracker_issue', 'resolutionpriority', array('id' => $issueid));
 
             $DB->delete_records('tracker_issue', array('id' => $issueid));
             $DB->delete_records('tracker_issuedependancy', array('childid' => $issueid));
@@ -221,6 +223,7 @@ class view_controller extends base_controller {
 
         } else if ($cmd == 'updatelist') {
 
+            $issueid = $this->data->issueid;
             // Updating list and status ******************************************************************.
             foreach ($this->data->statuskeys as $akey) {
                 $akey = clean_param($akey, PARAM_TEXT); // Ensure we are secure.
@@ -289,14 +292,16 @@ class view_controller extends base_controller {
 
             // Unregister administratively a user ******************************************************.
 
-            $params = array('trackerid' => $this->tracker->id, 'issueid' => $this->data->issueid, 'userid' => $this->data->ccid);
+            $issueid = $this->data->issueid;
+            $params = array('trackerid' => $this->tracker->id, 'issueid' => $issueid, 'userid' => $this->data->ccid);
             if (!$DB->delete_records ('tracker_issuecc', $params)) {
                 print_error('errorcannotdeletecc', 'tracker');
             }
 
         } else if ($cmd == 'register') {
 
-            $issue = $DB->get_record('tracker_issue', array('id' => $this->data->issueid));
+            $issueid = $this->data->issueid;
+            $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
             tracker_register_cc($this->tracker, $issue, $this->data->ccid);
 
         } else if ($cmd == 'cascade') {
@@ -306,7 +311,8 @@ class view_controller extends base_controller {
 
             $fs = get_file_storage();
 
-            $issue = $DB->get_record('tracker_issue', array('id' => $this->data->issueid));
+            $issueid = $this->data->issueid;
+            $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
             $attributes = $DB->get_records('tracker_issueattribute', array('issueid' => $issue->id));
 
             // Remaps elementid to elementname for.
@@ -446,7 +452,8 @@ class view_controller extends base_controller {
 
             // Move an issue to a subtracker **********************************************************.
 
-            $issue = $DB->get_record('tracker_issue', array('id' => $this->data->issueid));
+            $issueid = $this->data->issueid;
+            $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
 
             // Reassign tracker.
 
@@ -508,7 +515,8 @@ class view_controller extends base_controller {
 
             // Raises the priority of the issue *****************************************************************************.
 
-            $issue = $DB->get_record('tracker_issue', array('id' => $this->data->issueid));
+            $issueid = $this->data->issueid;
+            $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
             $params = array('trackerid' => $this->tracker->id,
                             'resolutionpriority' => $issue->resolutionpriority + 1);
             $nextissue = $DB->get_record('tracker_issue', $params);
@@ -524,7 +532,8 @@ class view_controller extends base_controller {
 
             // Raises the priority at top of list ***********************************************************.
 
-            $issue = $DB->get_record('tracker_issue', array('id' => $this->data->issueid));
+            $issueid = $this->data->issueid;
+            $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
             $maxpriority = $DB->get_field('tracker_issue', 'resolutionpriority', array('id' => $issueid));
 
             if ($issue->resolutionpriority != $maxpriority) {
@@ -550,7 +559,8 @@ class view_controller extends base_controller {
 
             // Lowers the priority of the issue ***************************************************************.
 
-            $issue = $DB->get_record('tracker_issue', array('id' => $this->data->issueid));
+            $issueid = $this->data->issueid;
+            $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
             if ($issue->resolutionpriority > 0) {
                 $params = array('trackerid' => $this->tracker->id, 'resolutionpriority' => $issue->resolutionpriority - 1);
                 $nextissue = $DB->get_record('tracker_issue', $params);
@@ -565,7 +575,8 @@ class view_controller extends base_controller {
 
             // Raises the priority at top of list **************************************************************.
 
-            $issue = $DB->get_record('tracker_issue', array('id' => $this->data->issueid));
+            $issueid = $this->data->issueid;
+            $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
 
             if ($issue->resolutionpriority > 0) {
                 // Raise everyone beneath.
@@ -588,8 +599,9 @@ class view_controller extends base_controller {
 
         } else if ($cmd == 'quickfind') {
 
-            if ($DB->get_record('tracker_issue', ['id' => $this->data->issueid, 'trackerid' => $this->tracker->id])) {
-                $params = ['id' => $this->cm->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $this->data->issueid];
+            $issueid = $this->data->issueid;
+            if ($DB->get_record('tracker_issue', ['id' => $issueid, 'trackerid' => $this->tracker->id])) {
+                $params = ['id' => $this->cm->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issueid];
                 $ticketurl = new moodle_url('/mod/tracker/view.php', $params);
                 redirect($ticketurl);
             }

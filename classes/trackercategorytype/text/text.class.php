@@ -74,7 +74,7 @@ class textelement extends trackerelement {
         }
 
         $elmname = 'element'.$this->name;
-        if ($this->private) {
+        if ($this->private || !$this->active) {
             $data->$elmname = optional_param($elmname, '', PARAM_TEXT);
         } else {
             $data->$elmname = required_param($elmname, PARAM_TEXT);
