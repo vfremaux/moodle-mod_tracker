@@ -25,7 +25,7 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
 
         init: function() {
 
-            var licensekeyid = '#id_s_' + modtrackerpro.component + '_licensekey';
+            var licensekeyid = '#id_s_' + modtrackerpro.shortcomponent + '_licensekey';
             $(licensekeyid).bind('change', this.check_product_key);
             $(licensekeyid).trigger('change');
             log.debug('AMD Pro js initialized for ' + modtrackerpro.component + ' system');
@@ -33,7 +33,7 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
 
         check_product_key: function() {
 
-            var licensekeyid = '#id_s_' + modtrackerpro.component + '_licensekey';
+            var licensekeyid = '#id_s_' + modtrackerpro.shortcomponent + '_licensekey';
 
             var that = $(this);
 
@@ -54,7 +54,7 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
                 url += 'what=license';
                 url += '&service=check';
                 url += '&customerkey=' + that.val();
-                url += '&provider=' + $('#id_s_' + modtrackerpro.component + '_licenseprovider').val();
+                url += '&provider=' + $('#id_s_' + modtrackerpro.shortcomponent + '_licenseprovider').val();
 
                 $(licensekeyid + ' + img').remove();
                 $(licensekeyid).after(waiticon);

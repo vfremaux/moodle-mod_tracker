@@ -95,10 +95,12 @@ echo $OUTPUT->header();
 if ($elementid) {
     $data = $DB->get_record('tracker_element', array('id' => $elementid));
     $data->elementid = $data->id;
+    $data->shared = empty($data->course);
     $data->id = $id;
 } else {
     $data = new StdClass();
     $data->id = $id;
+    $data->shared = 0;
     $data->type = $type;
 }
 

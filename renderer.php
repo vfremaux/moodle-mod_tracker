@@ -711,9 +711,10 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $template->formurl = new moodle_url('/mod/tracker/view.php');
         $template->id = $cm->id;
         $template->action = $action;
+        $template->actionstr = get_string($action.'option', 'tracker');
         $template->type = $form->type;
         $template->elementid = $form->elementid;
-        $template->optionsid = @$form->optionid;
+        $template->optionid = @$form->optionid;
 
         $template->errorclassname = print_error_class($errors, 'name');
         $template->name = @$form->name;
@@ -727,7 +728,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
     }
 
     public function option_list_view(&$cm, &$element) {
-        global $COURSE;
+        global $COURSE, $DB;
 
         $strname = get_string('name');
         $strdescription = get_string('description');
@@ -771,14 +772,24 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 $pix = $this->output->pix_icon("{$img}", '', 'mod_tracker');
                 $actions .= '<a href="'.$moveurl.'" title="'.get_string('down').'">'.$pix.'</a>&nbsp;';
 
-                $params = array('id' => $cm->id,
-                                'view' => 'admin',
-                                'what' => 'deleteelementoption',
-                                'optionid' => $option->id,
-                                'elementid' => $option->elementid);
-                $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = $this->output->pix_icon('/t/delete', '', 'core');
-                $actions .= '<a href="'.$deleteurl.'" title="'.get_string('delete').'">'.$pix.'</a>';
+                $usingissues = $DB->get_records('tracker_issueattribute', array('elementitemid' => $option->id), 'id', '*', 0, 1);
+                if (empty($usingissues)) {
+                    $params = array('id' => $cm->id,
+                                    'view' => 'admin',
+                                    'what' => 'deleteelementoption',
+                                    'optionid' => $option->id,
+                                    'elementid' => $option->elementid);
+                    $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
+                    $pix = $this->output->pix_icon('/t/delete', '', 'core');
+                    $actions .= '<a href="'.$deleteurl.'" title="'.get_string('delete').'">'.$pix.'</a>';
+                } else {
+                    $firstusing = array_shift($usingissues);
+                    $pix = $this->output->pix_icon('/t/delete', '', 'core');
+                    $str = get_string('cannotdeleteoption', 'tracker');
+                    $params = ['id' => $cm->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $firstusing->id];
+                    $firstuseurl = new moodle_url('/mod/tracker/view.php', $params);
+                    $actions .= '<a target="_blank" href="'.$firstuseurl.'" class="shadowed" title="'.$str.'">'.$pix.'</a>';
+                }
 
                 $rowlabel = '<b> '.get_string('option', 'tracker').' '.$option->sortorder.':</b>';
                 $table->data[] = array($rowlabel, $option->name, format_string($option->description, true, $COURSE->id), $actions);

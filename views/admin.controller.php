@@ -104,9 +104,9 @@ class admin_controller extends base_controller {
                 break;
             }
 
-            case 'updatelementoption': {
+            case 'updateelementoption': {
                 $this->data->elementid = required_param('elementid', PARAM_INT);
-                $this->data->optionid = required_param('optionid', PARAM_INT);
+                $this->data->id = required_param('optionid', PARAM_INT);
                 $this->data->name = required_param('name', PARAM_ALPHANUM);
                 $this->data->description = required_param('description', PARAM_CLEANHTML);
                 $this->data->format = optional_param('format', 0, PARAM_INT);
@@ -289,11 +289,6 @@ class admin_controller extends base_controller {
             $deletedoption = $element->get_option($this->data->optionid);
             $this->data->type = $element->type;
 
-            if ($DB->get_records('tracker_issueattribute', array('elementitemid' => $this->data->optionid))) {
-                // Cannot delete option as used.
-                print_error('errorcannotdeleteoption', 'tracker', $this->url);
-            }
-
             $list = new datalist('tracker_elementitem', 'id', 'sortorder', ['elementid' => $this->data->elementid]);
             $list->remove($this->data->optionid);
 
@@ -313,6 +308,7 @@ class admin_controller extends base_controller {
             $option = $element->get_option($this->data->optionid);
             $this->data->type = $element->type;
             $this->data->name = $option->name;
+            $this->data->optionid = $option->id;
             $this->data->description = $option->description;
             $this->out .= $renderer->edit_option_form($this->cm, $this->data, 'update', @$errors);
             $this->done = true;
@@ -367,7 +363,7 @@ class admin_controller extends base_controller {
                 foreach ($errors as $error) {
                     $errorstrs[] = $error->message;
                 }
-                $this->out .= $OUTPUT->box(implode("<br/>", $errorstrs), 'center', '70%', '', 5, 'errorbox');
+                $this->out .= $OUTPUT->box(implode("<br/>", $errorstrs), 'errorbox');
 
                 $this->out .= $renderer->edit_option_form($this->cm, $this->data, 'update', @$errors);
             }
