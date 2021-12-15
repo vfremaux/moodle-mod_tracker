@@ -48,7 +48,7 @@ function tracker_supports_feature($feature = null, $getsupported = null) {
                 'reports' => array('status', 'evolution', 'print'),
                 'remote' => array('ws'),
                 'priority' => array('askraise'),
-                'items' => array('mandatories', 'privates'),
+                'items' => array('mandatories', 'privates', 'listables'),
             ),
             'community' => array(
                 'reports' => array('status', 'evolution'),

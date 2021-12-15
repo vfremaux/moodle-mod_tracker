@@ -1169,6 +1169,15 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $template->screen = $screen;
         $template->prefix = $tracker->ticketprefix;
         $template->trackerid = $tracker->id;
+        $template->haslistables = $tracker->haslistables;
+        if (!empty($tracker->listables)) {
+            foreach ($tracker->listables as $listable) {
+                $listabletpl = new StdClass;
+                $listabletpl->name = $listable->name;
+                $listabletpl->description = $listable->description;
+                $template->listables[] = $listabletpl;
+            }
+        }
 
         $page = optional_param('page', 0, PARAM_INT);
         $pagedurl = new moodle_url('/mod/tracker/view.php', ['id' => $cm->id, 'view' => $view, 'screen' => $screen]);
@@ -1213,6 +1222,16 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 // Issue reporter.
                 $user = $DB->get_record('user', array('id' => $issue->reportedby));
                 $issuetpl->reportedby = fullname($user);
+
+                // Listable fields.
+                if ($tracker->haslistables) {
+                    foreach ($tracker->listables as $listable) {
+                        $listabletpl = new StdClass;
+                        $listabletpl->name = $listable->name;
+                        $listabletpl->value = $listable->view($issue->id);
+                        $issuetpl->listables[] = $listabletpl;
+                    }
+                }
 
                 // Issue assigned.
                 $issuetpl->assignedto = $this->assignedto_listform_part($issue, $context);

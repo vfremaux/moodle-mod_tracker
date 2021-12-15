@@ -86,6 +86,13 @@ class fileelement extends trackerelement {
         }
     }
 
+    /**
+     * If true, this element can be told to be listable.
+     */
+    public function has_listable_option() {
+        return false;
+    }
+
     public function edit($issueid = 0) {
         global $OUTPUT, $DB, $PAGE;
 

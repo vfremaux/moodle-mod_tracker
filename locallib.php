@@ -241,6 +241,7 @@ function tracker_loadelementsused(&$tracker, &$used) {
     $usedelements = $DB->get_records('tracker_elementused', array('trackerid' => $tracker->id), 'sortorder', $fields);
     $used = array();
     $sortorder = 1;
+    $tracker->listables = [];
     if (!empty($usedelements)) {
         foreach ($usedelements as $ueid => $ue) {
             // Normalize sortorder indexes.
@@ -253,6 +254,12 @@ function tracker_loadelementsused(&$tracker, &$used) {
                 $used[$ue->elementid] = $elementused;
                 $used[$ue->elementid]->context = $context;
                 $sortorder++;
+
+                if ($elementused->listable) {
+                    $tracker->listables[] = $elementused;
+                    $tracker->haslistables = true;
+                }
+
             }
         }
     }

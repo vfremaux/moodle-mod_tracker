@@ -37,6 +37,13 @@ class constantelement extends trackerelement {
         return false;
     }
 
+    /**
+     * If true, this element can be told to be listable.
+     */
+    public function has_listable_option() {
+        return false;
+    }
+
     public function view($issueid = 0) {
         $this->get_value($issueid);
         return $this->value;

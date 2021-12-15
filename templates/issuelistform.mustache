@@ -48,6 +48,14 @@
     </th>
     {{/ismytickets}}
 
+    {{#haslistables}}
+    {{#listables}}
+    <th class="issue-list-listable-{{name}}">
+        {{description}} {{!-- #sortby]] attr_[[name]][[/sortby --}}
+    </th>
+    {{/listables}}
+    {{/haslistables}}
+
     <th id="issue-list-assignedto">
         {{#str}}assignedto, tracker{{/str}} {{#sortby}}assignedto{{/sortby}}
     </th>
@@ -96,6 +104,14 @@
         {{{reportedby}}}
     </td>
     {{/ismytickets}}
+
+    {{#haslistables}}
+    {{#listables}}
+    <td class="issue-list-listable-{{name}}">
+        {{{value}}}
+    </td>
+    {{/listables}}
+    {{/haslistables}}
 
     <td class="issue-list-assignedto">
         {{> mod_tracker/listformassignedtopart }}

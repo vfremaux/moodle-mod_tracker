@@ -33,7 +33,13 @@ require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelem
 class captchaelement extends trackerelement {
 
     public function has_mandatory_option() {
-        assert(1);
+        return false;
+    }
+
+    /**
+     * If true, this element can be told to be listable.
+     */
+    public function has_listable_option() {
         return false;
     }
 

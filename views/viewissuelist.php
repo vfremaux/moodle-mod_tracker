@@ -36,6 +36,9 @@ if ($page < 0) {
 }
 $limitfrom = ($page) * TRACKER_LIST_PAGE_SIZE;
 
+if (tracker_supports_feature('items/listables')) {
+    tracker_loadelementsused($tracker, $notused);
+}
 list($issues, $totalcount) = tracker_get_issues($tracker, $resolved, $screen, $sort, $limitfrom, TRACKER_LIST_PAGE_SIZE);
 
 // Display list of issues / Start rendering.

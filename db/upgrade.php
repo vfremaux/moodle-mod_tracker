@@ -316,6 +316,18 @@ function xmldb_tracker_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2020120500, 'tracker');
     }
 
+    if ($oldversion < 2021121300) {
+        // Define listable field for element used.
+        $table = new xmldb_table('tracker_elementused');
+        $field = new xmldb_field('listable', XMLDB_TYPE_INTEGER, 1, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'private');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Tracker savepoint reached.
+        upgrade_mod_savepoint(true, 2021121300, 'tracker');
+    }
+
     return true;
 }
 

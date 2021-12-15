@@ -85,6 +85,13 @@ class autourlelement extends trackerelement {
         }
     }
 
+    /**
+     * If true, this element can be told to be listable.
+     */
+    public function has_listable_option() {
+        return false;
+    }
+
     public function set_data(&$defaults, $issueid = 0) {
         $elementname = "element{$this->name}";
         if ($issueid) {
