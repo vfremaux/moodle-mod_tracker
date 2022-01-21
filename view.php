@@ -266,6 +266,7 @@ if ($view == 'view') {
 
             case 'print': {
                 if (tracker_supports_feature('reports/print')) {
+                    echo $output;
                     include($CFG->dirroot.'/mod/tracker/pro/report/print.php');
                 }
                 break;
