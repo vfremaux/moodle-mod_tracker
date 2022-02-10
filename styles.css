@@ -237,6 +237,10 @@
     border: 1px #808080 solid
 }
 
+.tracker-printtable.discussion {
+    background-color: #f0f0f0;
+}
+
 .tracker-issue-editor {
     width: 100%;
 }
