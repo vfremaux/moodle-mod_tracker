@@ -51,7 +51,7 @@
     {{#haslistables}}
     {{#listables}}
     <th class="issue-list-listable-{{name}}">
-        {{description}} {{!-- #sortby]] attr_[[name]][[/sortby --}}
+        {{{description}}} {{#sortby}}attr_{{name}}{{/sortby}}
     </th>
     {{/listables}}
     {{/haslistables}}

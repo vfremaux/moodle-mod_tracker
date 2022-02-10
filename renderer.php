@@ -719,7 +719,8 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $template->errorclassname = print_error_class($errors, 'name');
         $template->name = @$form->name;
         $template->errorclassdescription = print_error_class($errors, 'description');
-        $template->filtereddesc = htmlspecialchars(stripslashes(@$form->description));
+        // $template->filtereddesc = htmlspecialchars(stripslashes(@$form->description));
+        $template->filtereddesc = @$form->description;
 
         $template->jshandler = 'document.forms[\'editoptionform\'].what.value = \'\';';
         $template->jshandler .= 'document.forms[\'editoptionform\'].submit();';
@@ -792,7 +793,8 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 }
 
                 $rowlabel = '<b> '.get_string('option', 'tracker').' '.$option->sortorder.':</b>';
-                $table->data[] = array($rowlabel, $option->name, format_string($option->description, true, $COURSE->id), $actions);
+                // $table->data[] = array($rowlabel, $option->name, format_string($option->description, true, $COURSE->id), $actions);
+                $table->data[] = array($rowlabel, $option->name, format_text($option->description, FORMAT_HTML), $actions);
             }
         }
         return html_writer::table($table);
@@ -1169,6 +1171,8 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $template->screen = $screen;
         $template->prefix = $tracker->ticketprefix;
         $template->trackerid = $tracker->id;
+
+        // Listable column name.
         $template->haslistables = $tracker->haslistables;
         if (!empty($tracker->listables)) {
             foreach ($tracker->listables as $listable) {

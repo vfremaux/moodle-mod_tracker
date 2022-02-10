@@ -38,7 +38,7 @@ class textelement extends trackerelement {
 
     public function view($issueid = 0) {
         $this->get_value($issueid);
-        return format_text(format_string($this->value), $this->format);
+        return format_text($this->value, $this->format);
     }
 
     public function edit($issueid = 0) {

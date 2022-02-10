@@ -48,7 +48,7 @@ abstract class tracker_moodle_form extends moodleform {
         $mform->addRule('name', null, 'required', null, 'client');
 
         $mform->addElement('text', 'description', get_string('visiblename', 'tracker'), array('size' => 64));
-        $mform->setType('description', PARAM_CLEANHTML);
+        $mform->setType('description', PARAM_TEXT);
         $mform->addRule('description', null, 'required', null, 'client');
     }
 
