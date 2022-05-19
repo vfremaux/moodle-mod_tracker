@@ -364,3 +364,8 @@
     border-radius: 14px;
     border: 1px solid #400;
 }
+
+/* checks horiz on report forms */
+#page-mod-tracker-reportissue .form-check {
+    margin-right: 20px;
+}

@@ -79,7 +79,7 @@ class admin_controller extends base_controller {
                 break;
             }
 
-            case 'deletelement': {
+            case 'deleteelement': {
                 $this->data->elementid = required_param('elementid', PARAM_INT);
                 break;
             }

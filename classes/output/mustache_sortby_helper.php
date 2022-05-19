@@ -48,7 +48,6 @@ class mustache_sortby_helper {
     public function sortby($text, Mustache_LambdaHelper $helper) {
         global $PAGE;
 
-        // 
         $text = trim($helper->render($text));
         $renderer = $PAGE->get_renderer('mod_tracker');
         return $renderer->sorticons($text);

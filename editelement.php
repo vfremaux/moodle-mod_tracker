@@ -76,7 +76,7 @@ if ($data = $form->get_data()) {
         $DB->update_record('tracker_element', $element);
     }
 
-    $elementobj = trackerelement::find_instance_by_id($tracker, $element->id);
+    $elementobj = \mod_tracker\trackerelement::find_instance_by_id($tracker, $element->id);
     if (!$data->elementid && $elementobj->has_options()) {
         // Bounces to the option editor.
 

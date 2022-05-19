@@ -779,6 +779,63 @@ function tracker_get_issues(&$tracker, $resolved, $screen, $sort, $limitfrom, $p
         }
     }
 
+    $sortattributeclause = '';
+    if (!empty($sort) && preg_match('/attr_(\\w+) (ASC|DESC)/', $sort, $matches)) {
+
+        // Find a used element that has named attribute.
+        $elementsql = "
+            SELECT
+                te.*
+            FROM
+                {tracker_element} te,
+                {tracker_element_used} teu
+            WHERE
+                te.id = teu.elementid AND
+                teu.trackerid = ? AND
+                te.name = ?
+        ";
+
+        $dir = $matches[2];
+
+        $usedsortingelement = $DB->get_records_sql($elementsql, [$tracker->id, $matches[1]]);
+
+        $orderbyattributeclause = '';
+        $sortattributejoinclause = '';
+        // Listable elements.
+        if (in_array($usedsortingelement->type, ['dropdown', 'radio', 'radiohoriz'])) {
+            $orderbyattributeclause = '
+                tei.sortorder
+            ';
+            $sortattributejoinclause = "
+               LEFT JOIN
+                    {tracker_issueatribute} tia
+                ON
+                    tia.issueid = i.id AND
+                    tia.elementid = {$usedsortingelement->id}
+               LEFT JOIN
+                    {tracker_elementitem} tei
+                ON
+                    tia.elementitemid = tei.id
+           ";
+        } else {
+            // sort is directly operated on issue attribute value.
+            $orderbyattributeclause = '
+                tia.elementitemid
+            ';
+            $sortattributejoinclause = "
+               LEFT JOIN
+                    {tracker_issueatribute} tia
+                ON
+                    tia.issueid = i.id AND
+                    tia.elementid = {$usedsortingelement->id}
+               LEFT JOIN
+                    {tracker_elementitem} tei
+                ON
+                    tia.elementitemid = tei.id
+           ";
+        }
+    }
+
     $sql = "
         SELECT
             i.id,
@@ -797,6 +854,7 @@ function tracker_get_issues(&$tracker, $resolved, $screen, $sort, $limitfrom, $p
             {tracker_issuecc} ic
         ON
             ic.issueid = i.id
+        {$sortattributejoinclause}
         LEFT JOIN
             {user} u
         ON
@@ -830,10 +888,15 @@ function tracker_get_issues(&$tracker, $resolved, $screen, $sort, $limitfrom, $p
     ";
     $numrecords = $DB->count_records_sql($sqlcount, $params);
 
-    if (!empty($sort)) {
-        $sql .= " ORDER BY $sort";
+    if (!empty($orderbyattributeclause)) {
+        // Case of attribute sorting.
+        $sql .= " ORDER BY ".$orderbyattributeclause;
     } else {
-        $sql .= " ORDER BY resolutionpriority ASC";
+        if (!empty($sort)) {
+            $sql .= " ORDER BY $sort";
+        } else {
+            $sql .= " ORDER BY resolutionpriority ASC";
+        }
     }
 
     $issues = $DB->get_records_sql($sql, $params, $limitfrom, $pagesize);
