@@ -31,7 +31,7 @@ namespace mod_tracker;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/lod/tracker/classes/controller.class.php');
+require_once($CFG->dirroot.'/mod/tracker/classes/controller.class.php');
 
 class profile_controller extends base_controller {
 
