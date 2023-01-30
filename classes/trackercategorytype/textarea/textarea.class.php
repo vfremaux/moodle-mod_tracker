@@ -46,6 +46,13 @@ class textareaelement extends textelement {
         echo '<input type="text" name="element'.$this->name.'" style="width:100%" />';
     }
 
+    /**
+     * If true, this element can be told to be listable.
+     */
+    public function has_listable_option() {
+        return false;
+    }
+
     public function add_form_element(&$mform) {
 
         $mform->addElement('textarea', "element{$this->name}", format_string($this->description), array('cols' => 60, 'rows' => 15));

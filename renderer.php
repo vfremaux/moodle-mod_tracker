@@ -22,11 +22,19 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot.'/mod/tracker/lib.php');
+
 /**
  * The master renderer
  */
 class mod_tracker_renderer extends plugin_renderer_base {
 
+    // A local, lighly modified Mustache engine.
+    private $mustache;
+
+    /**
+     * Renders the core issue display when displaying an issue content.
+     */
     public function core_issue(&$issue, &$tracker) {
         global $CFG, $COURSE, $DB;
 
@@ -37,6 +45,10 @@ class mod_tracker_renderer extends plugin_renderer_base {
 
         $template->id = $issue->id;
         $template->summary = format_string($issue->summary);
+
+        if (!empty(optional_param('findissueid', '', PARAM_ALPHANUMEXT))) {
+            $template->notfoundissuesignal = '<i class="fa fa-wrong"></i>';
+        }
 
         if ($issue->downlink) {
             $access = true;
@@ -220,7 +232,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
             }
         }
 
-        return $this->output->render_form_template('mod_tracker/distribution_form', $template);
+        return $this->output->render_from_template('mod_tracker/distribution_form', $template);
     }
 
     /**
@@ -228,7 +240,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
      * @param int $issueid
      */
     public function comments($comments, $initialviewmode, $addcommentlink = '') {
-        global $OUTPUT, $DB;
+        global $OUTPUT, $DB, $USER;
 
         $template = new StdClass;
         $template->addcommentlink = $addcommentlink;
@@ -236,12 +248,52 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $template->initialcommentsviewmode = $initialviewmode;
 
         if ($comments) {
+
+            $first = reset($comments);
+            $cm = get_coursemodule_from_instance('tracker', $first->trackerid);
+            $context = context_module::instance($cm->id);
+            $template->canreport = has_capability('mod/tracker:report', $context);
+
             foreach ($comments as $comment) {
                 $commenttpl = new StdClass;
                 $user = $DB->get_record('user', array('id' => $comment->userid));
                 $commenttpl->user = $this->user($user);
                 $commenttpl->datecreated = userdate($comment->datecreated);
-                $commenttpl->comment = format_text($comment->comment);
+                $commenttext = file_rewrite_pluginfile_urls($comment->comment, 'pluginfile.php', $context->id,
+                        'mod_tracker', 'issuecomment', $comment->id);
+                $commenttpl->comment = format_text($commenttext);
+
+                if (tracker_supports_feature('comment/branch')) {
+                    $params = [
+                        'what' => 'split',
+                        'commentid' => $comment->id,
+                        'sesskey' => sesskey(),
+                        'view' => 'view',
+                        'screen' => 'viewanissue',
+                        't' => $comment->trackerid,
+                    ];
+                    $commenttpl->branchurl = new moodle_url('/mod/tracker/view.php', $params);
+                }
+
+                if (has_capability('mod/tracker:editcomment', $context) || ($comment->userid == $USER->id)) {
+                    $commenttpl->canedit = true;
+                    $params = [
+                        'id' => $cm->id,
+                        'issueid' => $comment->issueid,
+                        'commentid' => $comment->id
+                    ];
+                    $commenttpl->editurl = new moodle_url('/mod/tracker/comment.php', $params);
+
+                    $params = [
+                        'id' => $cm->id,
+                        'issueid' => $comment->issueid,
+                        'view' => 'view',
+                        'screen' => 'viewanissue',
+                        'what' => 'deletecomment',
+                        'commentid' => $comment->id
+                    ];
+                    $commenttpl->deleteurl = new moodle_url('/mod/tracker/view.php', $params);
+                }
                 $template->comments[] = $commenttpl;
             }
         }
@@ -255,37 +307,37 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $template->initialviewmode = $initialviewmode;
 
         $template->parents = $this->parents($tracker, $issue->id, -20);
-        $template->this = $tracker->ticketprefix.$issue->id.' - '.format_string($issue->summary).'<br/>';
-        $template->childs = $this->childs($tracker, $issue->id, 20);
+        $template->this = $tracker->ticketprefix.$issue->id.' - '.format_string($issue->summary);
+        $template->children = $this->children($tracker, $issue->id, 20);
 
-        return $this->output->render_from_template('mod_tracker/dependencies', $tracker);
+        return $this->output->render_from_template('mod_tracker/dependencies', $template);
     }
 
-    protected function childs(&$tracker, $issueid, $indent) {
+    protected function children(&$tracker, $issueid, $indent) {
 
         $statuskeys = tracker_get_statuskeys($tracker);
         $statuscodes = tracker_get_statuscodes();
 
         $res = tracker_get_children($tracker, $issueid);
-        $childs = array();
+        $children = array();
         if ($res) {
             foreach ($res as $asub) {
                 $tpl = new StdClass;
-                $params = array('t' => $tracker->id, 'what' => 'viewanissue', 'issueid' => $asub->childid);
+                $params = array('t' => $tracker->id, 'what' => 'viewanissue', 'issueid' => $asub->id);
                 $issueurl = new moodle_url('/mod/tracker/view.php', $params);
-                $link = '<a href="'.$issueurl.'">'.$tracker->ticketprefix.$asub->childid.' - '.format_string($asub->summary).'</a>';
+                $link = '<a href="'.$issueurl.'">'.$tracker->ticketprefix.$asub->id.' - '.format_string($asub->summary).'</a>';
                 $tpl->link = $link;
                 $tpl->indent = $indent;
                 $tpl->status = $statuscodes[$asub->status];
                 $tpl->key = $statuskeys[$asub->status];
-                $childs[] = $tpl;
+                $children[] = $tpl;
                 $indent = $indent + 20;
-                $subs = $this->childs($tracker, $asub->childid, true, $indent);
-                $childs = $childs + $subs;
+                $subs = $this->children($tracker, $asub->id, true, $indent);
+                $children = $children + $subs;
                 $indent = $indent - 20;
             }
         }
-        return $childs;
+        return $children;
     }
 
     protected function parents(&$tracker, $issueid, $indent) {
@@ -296,18 +348,18 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $res = tracker_get_parents($tracker, $issueid);
         $parents = array();
         if ($res) {
-            foreach ($res as $asub) {
+            foreach ($res as $asup) {
                 $indent = $indent - 20;
-                $parents = $this->parents($tracker, $asub->parentid, $indent);
+                $parents = $parents + $this->parents($tracker, $asup->id, $indent);
                 $indent = $indent + 20;
                 $tpl = new StdClass;
-                $params = array('t' => $tracker->id, 'what' => 'viewanissue', 'issueid' => $asub->childid);
+                $params = array('t' => $tracker->id, 'what' => 'viewanissue', 'issueid' => $asup->id);
                 $issueurl = new moodle_url('/mod/tracker/view.php', $params);
-                $link = '<a href="'.$issueurl.'">'.$tracker->ticketprefix.$asub->childid.' - '.format_string($asub->summary).'</a>';
+                $link = '<a href="'.$issueurl.'">'.$tracker->ticketprefix.$asup->id.' - '.format_string($asup->summary).'</a>';
                 $tpl->link = $link;
                 $tpl->indent = $indent;
-                $tpl->status = $statuscodes[$asub->status];
-                $tpl->key = $statuskeys[$asub->status];
+                $tpl->status = $statuscodes[$asup->status];
+                $tpl->key = $statuskeys[$asup->status];
                 $parents[] = $tpl;
             }
         }
@@ -627,7 +679,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 if (tracker_supports_feature('cascade/mnet')) {
                     if (has_capability('mod/tracker:configurenetwork', $context)) {
                         $params = array('id' => $cm->id, 'view' => 'admin', 'screen' => 'managenetwork');
-                        $taburl = new moodle_url('/mod/tracker/view.php', $params);
+                        $taburl = new moodle_url('/mod/tracker/pro/view.php', $params);
                         $rows[1][] = new tabobject('managenetwork', $taburl, get_string('managenetwork', 'tracker'));
                     }
                 }
@@ -659,14 +711,16 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $template->formurl = new moodle_url('/mod/tracker/view.php');
         $template->id = $cm->id;
         $template->action = $action;
+        $template->actionstr = get_string($action.'option', 'tracker');
         $template->type = $form->type;
         $template->elementid = $form->elementid;
-        $template->optionsid = @$form->optionid;
+        $template->optionid = @$form->optionid;
 
         $template->errorclassname = print_error_class($errors, 'name');
         $template->name = @$form->name;
         $template->errorclassdescription = print_error_class($errors, 'description');
-        $template->filtereddesc = htmlspecialchars(stripslashes(@$form->description));
+        // $template->filtereddesc = htmlspecialchars(stripslashes(@$form->description));
+        $template->filtereddesc = @$form->description;
 
         $template->jshandler = 'document.forms[\'editoptionform\'].what.value = \'\';';
         $template->jshandler .= 'document.forms[\'editoptionform\'].submit();';
@@ -675,7 +729,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
     }
 
     public function option_list_view(&$cm, &$element) {
-        global $COURSE;
+        global $COURSE, $DB;
 
         $strname = get_string('name');
         $strdescription = get_string('description');
@@ -719,17 +773,28 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 $pix = $this->output->pix_icon("{$img}", '', 'mod_tracker');
                 $actions .= '<a href="'.$moveurl.'" title="'.get_string('down').'">'.$pix.'</a>&nbsp;';
 
-                $params = array('id' => $cm->id,
-                                'view' => 'admin',
-                                'what' => 'deleteelementoption',
-                                'optionid' => $option->id,
-                                'elementid' => $option->elementid);
-                $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
-                $pix = $this->output->pix_icon('/t/delete', '', 'core');
-                $actions .= '<a href="'.$deleteurl.'" title="'.get_string('delete').'">'.$pix.'</a>';
+                $usingissues = $DB->get_records('tracker_issueattribute', array('elementitemid' => $option->id), 'id', '*', 0, 1);
+                if (empty($usingissues)) {
+                    $params = array('id' => $cm->id,
+                                    'view' => 'admin',
+                                    'what' => 'deleteelementoption',
+                                    'optionid' => $option->id,
+                                    'elementid' => $option->elementid);
+                    $deleteurl = new moodle_url('/mod/tracker/view.php', $params);
+                    $pix = $this->output->pix_icon('/t/delete', '', 'core');
+                    $actions .= '<a href="'.$deleteurl.'" title="'.get_string('delete').'">'.$pix.'</a>';
+                } else {
+                    $firstusing = array_shift($usingissues);
+                    $pix = $this->output->pix_icon('/t/delete', '', 'core');
+                    $str = get_string('cannotdeleteoption', 'tracker');
+                    $params = ['id' => $cm->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $firstusing->id];
+                    $firstuseurl = new moodle_url('/mod/tracker/view.php', $params);
+                    $actions .= '<a target="_blank" href="'.$firstuseurl.'" class="shadowed" title="'.$str.'">'.$pix.'</a>';
+                }
 
                 $rowlabel = '<b> '.get_string('option', 'tracker').' '.$option->sortorder.':</b>';
-                $table->data[] = array($rowlabel, $option->name, format_string($option->description, true, $COURSE->id), $actions);
+                // $table->data[] = array($rowlabel, $option->name, format_string($option->description, true, $COURSE->id), $actions);
+                $table->data[] = array($rowlabel, $option->name, format_text($option->description, FORMAT_HTML), $actions);
             }
         }
         return html_writer::table($table);
@@ -1067,15 +1132,228 @@ class mod_tracker_renderer extends plugin_renderer_base {
         return html_writer::tag('option', $label, $attributes);
     }
 
-    public function last_comment($lastcomment) {
+    public function last_comment($lastcomment, $context) {
         global $DB;
 
         $commentuser = $DB->get_record('user', array('id' => $lastcomment->userid));
 
         $template = new StdClass;
-        $template->comment = format_text($lastcomment->comment, $lastcomment->commentformat);
+
+        $comment = file_rewrite_pluginfile_urls($lastcomment->comment, 'pluginfile.php', $context->id, 'mod_tracker',
+                                                    'issuecomment', $lastcomment->id);
+
+        $template->comment = format_text($comment, $lastcomment->commentformat);
         $template->by = fullname($commentuser).' '.$this->output->user_picture($commentuser);
 
         return $this->output->render_from_template('mod_tracker/lastcomment', $template);
+    }
+
+    /**
+     * Renders the full issue list
+     */
+    public function issuelist($issues, $totalcount, $cm, $tracker, $view, $screen, $resolved) {
+        global $DB, $CFG;
+
+        $context = context_module::instance($cm->id);
+
+        $this->mustache = $this->get_mustache();
+        include_once($CFG->dirroot.'/mod/tracker/classes/output/mustache_sortby_helper.php');
+        $helper = new mod\tracker\mustache_sortby_helper();
+        $this->mustache->addHelper('sortby', [$helper, 'sortby']);
+
+        $baseurl = new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => $view, 'screen' => $screen));
+
+        $select = " trackerid = ? GROUP BY trackerid ";
+        $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', $select, array($tracker->id));
+
+        $template = new Stdclass;
+        $template->cmid = $cm->id;
+        $template->screen = $screen;
+        $template->prefix = $tracker->ticketprefix;
+        $template->trackerid = $tracker->id;
+
+        // Listable column name.
+        $template->haslistables = $tracker->haslistables;
+        if (!empty($tracker->listables)) {
+            foreach ($tracker->listables as $listable) {
+                $listabletpl = new StdClass;
+                $listabletpl->name = $listable->name;
+                $listabletpl->description = $listable->description;
+                $template->listables[] = $listabletpl;
+            }
+        }
+
+        $page = optional_param('page', 0, PARAM_INT);
+        $pagedurl = new moodle_url('/mod/tracker/view.php', ['id' => $cm->id, 'view' => $view, 'screen' => $screen]);
+        if ($totalcount > TRACKER_LIST_PAGE_SIZE) {
+            $template->pager = $this->output->paging_bar($totalcount, $page , TRACKER_LIST_PAGE_SIZE, $pagedurl, 'page');
+        }
+
+        $template->formurl = new moodle_url('/mod/tracker/view.php');
+        if ($resolved) {
+            $template->priority = false;
+            $template->transferable = false;
+        }
+
+        if ($screen == 'mywork') {
+            $template->ismywork = true;
+        }
+        if ($screen == 'mytickets') {
+            $template->ismytickets = true;
+        }
+
+        if (!empty($issues)) {
+            // Product data for table.
+            foreach ($issues as $issue) {
+
+                $issuetpl = new Stdclass;
+
+                $issuetpl->id = $issue->id;
+                $issuetpl->fullid = $tracker->ticketprefix.$issue->id;
+                $issuetpl->contextid = $context->id;
+
+                // Issue number.
+                $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issue->id);
+                $issuetpl->issueurl = new moodle_url('/mod/tracker/view.php', $params);
+                $issuetpl->issuenumber = '<a href="'.$issuetpl->issueurl.'">'.$tracker->ticketprefix.$issue->id.'</a>';
+
+                // Issue summary.
+                $issuetpl->summary = format_string($issue->summary);
+
+                // Issue date.
+                $issuetpl->datereported = date('Y/m/d H:i', $issue->datereported);
+
+                // Issue reporter.
+                $user = $DB->get_record('user', array('id' => $issue->reportedby));
+                $issuetpl->reportedby = fullname($user);
+
+                // Listable fields.
+                if ($tracker->haslistables) {
+                    foreach ($tracker->listables as $listable) {
+                        $listabletpl = new StdClass;
+                        $listabletpl->name = $listable->name;
+                        $listabletpl->value = $listable->view($issue->id);
+                        $issuetpl->listables[] = $listabletpl;
+                    }
+                }
+
+                // Issue assigned.
+                $issuetpl->assignedto = $this->assignedto_listform_part($issue, $context);
+
+                // Issue status.
+                $issuetpl->status = $this->status_listform_part($tracker, $cm, $issue, $context);
+
+                $issuetpl->watches = $issue->watches;
+
+                // Issue solved signal.
+                $hassolution = $issue->status == RESOLVED && !empty($issue->resolution);
+                $alt = get_string('hassolution', 'tracker');
+                $pix = $this->output->pix_icon('solution', $alt, 'mod_tracker');
+                $issuetpl->solution = ($hassolution) ? $pix : '';
+
+                // Issue controls.
+                $issue->maxpriority = $maxpriority;
+                $issuetpl->controls = $this->controls_listform_part($cm, $issue, $context);
+
+                if (!empty($tracker->parent)) {
+                    $issuetpl->transfer = ($issue->status == TRANSFERED) ? tracker_print_transfer_link($tracker, $issue) : '';
+                }
+
+                // Compose final dataset.
+                if (!$resolved) {
+                    $issuetpl->priority = $maxpriority - $issue->resolutionpriority + 1;
+                }
+                $template->issues[] = $issuetpl;
+            }
+
+            if (tracker_can_workon($tracker, $context)) {
+                $template->cansubmit = true;
+            }
+        } else {
+            $template->emptylist = true;
+            if (!$resolved) {
+                $str = get_string('noissuesreported', 'tracker');
+                $template->emptynotification = $this->output->notification($str, 'box generalbox', 'notice');
+            } else {
+                $str = get_string('noissuesresolved', 'tracker');
+                $template->emptynotification = $this->output->notification($str, 'box generalbox', 'notice');
+            }
+        }
+
+        return $this->render_from_template('mod_tracker/issuelistform', $template);
+    }
+
+    public function sorticons($columnname) {
+        global $FULLME;
+
+        $sort = optional_param('sort', 'datereported DESC', PARAM_TEXT);
+        list($sortby, $dir) = explode(' ', $sort);
+        $template = new Stdclass;
+        $class = '';
+        if ($sortby == $columnname) {
+            if ($dir == 'DESC') {
+                $icon = $this->output->pix_icon('t/sort_desc', '', 'core');
+                $sort = "$columnname ASC";
+            } else {
+                $icon = $this->output->pix_icon('t/sort_asc', '', 'core');
+                $sort = "$columnname DESC";
+            }
+        } else {
+            $icon = $this->output->pix_icon('t/sort', '', 'core');
+            $sort = "$columnname ASC";
+            $class = 'dimmed';
+        }
+
+        $meurl = new moodle_url($FULLME);
+        $meurl->params(['sort' => $sort]);
+        return html_writer::tag('a', $icon, ['href' => $meurl, 'class' => $class]);
+    }
+
+    /**
+     * Renders a template by name with the given context.
+     *
+     * The provided data needs to be array/stdClass made up of only simple types.
+     * Simple types are array,stdClass,bool,int,float,string
+     *
+     * @since 2.9
+     * @param array|stdClass $context Context containing data for the template.
+     * @return string|boolean
+     */
+    public function render_from_template($templatename, $context) {
+        static $templatecache = array();
+
+        try {
+            // Grab a copy of the existing helper to be restored later.
+            $uniqidhelper = $this->mustache->getHelper('uniqid');
+        } catch (Mustache_Exception_UnknownHelperException $e) {
+            // Helper doesn't exist.
+            $uniqidhelper = null;
+        }
+
+        // Provide 1 random value that will not change within a template
+        // but will be different from template to template. This is useful for
+        // e.g. aria attributes that only work with id attributes and must be
+        // unique in a page.
+        $this->mustache->addHelper('uniqid', new \core\output\mustache_uniqid_helper());
+        if (isset($templatecache[$templatename])) {
+            $template = $templatecache[$templatename];
+        } else {
+            try {
+                $template = $this->mustache->loadTemplate($templatename);
+                $templatecache[$templatename] = $template;
+            } catch (Mustache_Exception_UnknownTemplateException $e) {
+                throw new moodle_exception('Unknown template: ' . $templatename);
+            }
+        }
+
+        $renderedtemplate = trim($template->render($context));
+
+        // If we had an existing uniqid helper then we need to restore it to allow
+        // handle nested calls of render_from_template.
+        if ($uniqidhelper) {
+            $this->mustache->addHelper('uniqid', $uniqidhelper);
+        }
+
+        return $renderedtemplate;
     }
 }

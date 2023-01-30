@@ -237,6 +237,10 @@
     border: 1px #808080 solid
 }
 
+.tracker-printtable.discussion {
+    background-color: #f0f0f0;
+}
+
 .tracker-issue-editor {
     width: 100%;
 }
@@ -351,4 +355,17 @@
 .tracker-attribute-modifier {
     display: inline-block;
     float: right;
+}
+
+.tracker-priority {
+    background-color: #a00;
+    color: white;
+    padding: 2px 10px;
+    border-radius: 14px;
+    border: 1px solid #400;
+}
+
+/* checks horiz on report forms */
+#page-mod-tracker-reportissue .form-check {
+    margin-right: 20px;
 }

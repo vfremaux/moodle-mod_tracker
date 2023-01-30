@@ -21,6 +21,12 @@
  *
  * A class implementing a filepicker element
  */
+namespace mod_tracker;
+
+use StdClass;
+use html_writer;
+use file_picker;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
@@ -78,6 +84,13 @@ class fileelement extends trackerelement {
             $html .= html_writer::end_tag('span');
             return $html;
         }
+    }
+
+    /**
+     * If true, this element can be told to be listable.
+     */
+    public function has_listable_option() {
+        return false;
     }
 
     public function edit($issueid = 0) {

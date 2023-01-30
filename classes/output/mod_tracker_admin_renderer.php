@@ -229,6 +229,30 @@ class mod_tracker_admin_renderer extends \plugin_renderer_base {
                     }
                 }
 
+                if (tracker_supports_feature('items/listables')) {
+                    if ($element->has_listable_option()) {
+                        if ($element->listable) {
+                            $params = array('id' => $this->cm->id,
+                                            'view' => 'admin',
+                                            'what' => 'setnotlistable',
+                                            'usedid' => $element->id);
+                            $url = new moodle_url('/mod/tracker/view.php', $params);
+                            $alt = get_string('setnotlistable', 'tracker');
+                            $pix = $this->output->pix_icon('listed', $alt, 'tracker');
+                            $actions .= '&nbsp;<a href="'.$url.'" title="'.$alt.'">'.$pix.'</a>';
+                        } else {
+                            $params = array('id' => $this->cm->id,
+                                            'view' => 'admin',
+                                            'what' => 'setlistable',
+                                            'usedid' => $element->id);
+                            $url = new moodle_url('/mod/tracker/view.php', $params);
+                            $alt = get_string('setlistable', 'tracker');
+                            $pix = $this->output->pix_icon('unlisted', $alt, 'tracker');
+                            $actions .= '&nbsp;<a href="'.$url.'" title="'.$alt.'">'.$pix.'</a>';
+                        }
+                    }
+                }
+
                 $dimmed = '<span class="dimmed">'.format_string($element->description).'</span>';
                 $description = ($element->private) ? $dimmed : format_string($element->description);
 

@@ -10,6 +10,7 @@ define(['jquery', 'core/config', 'core/log', 'mod_tracker/bootstrap-select'], fu
             $(".tracker-issue-edit-handle").bind('click', this.load_change_form);
             $("#modal-status-save").bind('click', this.submit_change_form);
             $(".tracker-quick-solve-buttons").bind('click', this.solve_issue);
+            $('#tracker-quick-find-input').bind('change', this.quick_find);
             log.debug('AMD Tracker List initialized');
         },
 
@@ -91,7 +92,12 @@ define(['jquery', 'core/config', 'core/log', 'mod_tracker/bootstrap-select'], fu
             url += '&issueid=' + issueid;
             url += '&sesskey=' + cfg.sesskey;
             window.location = url;
+        },
+
+        quick_find: function() {
+            $('#id-quick-find-form').submit();
         }
+
     };
 
     return moodletrackerlist;

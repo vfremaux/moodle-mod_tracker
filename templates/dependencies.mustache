@@ -1,0 +1,39 @@
+
+
+
+<!-- mod_tracker/dependencies -->
+<tr>
+    <td colspan="4" width="100%">
+        <div id="tracker-issuedependancies" class="{{initialdpendanciesviewmode}} dependancies">
+        <h2>{{#str}}dependancies, tracker{{/str}}</h2>
+        <center>
+        <table id="issuedependancytrees" class="{{initialviewmode}}">
+            <tr>
+                <td align="left" style="white-space : nowrap">
+                    <div class="issue-parents">
+                    {{#parents}}
+                    <div style="position : relative; left : {{indent}}px" class="issue-parent">
+                        {{{link}}}&nbsp;<span class="status-{{status}}">{{key}}</span>
+                    </div>
+                    {{/parents}}
+                    </div>
+
+                    <div class="issue-this">
+                    <b>{{{this}}}</b>
+                    </div>
+
+                    <div class="issue-children">
+                    {{#children}}
+                    <div style="position : relative; left : {{indent}}px">
+                        {{{link}}}&nbsp;<span class="status-{{status}}">{{key}}</span>
+                    </div>
+                    {{/children}}
+                    </div>
+                </td>
+            </tr>
+        </table>
+        </center>
+        </div>
+    </td>
+</tr>
+<!-- /mod_tracker/dependencies -->

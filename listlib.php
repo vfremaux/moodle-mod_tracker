@@ -77,10 +77,12 @@ class datalist {
         $params = array($idfield => $item->$idfield, $orderfield => $item->$orderfield - 1);
         $this->add_context($params);
         $previtem = $DB->get_record($this->table, $params);
-        $previtem->$orderfield++;
-        $item->$orderfield--;
-        $DB->update_record($this->table, $item);
-        $DB->update_record($this->table, $previtem);
+        if (!empty($previtem)) {
+            $previtem->$orderfield++;
+            $item->$orderfield--;
+            $DB->update_record($this->table, $item);
+            $DB->update_record($this->table, $previtem);
+        }
     }
 
     public function last_order($itemid) {

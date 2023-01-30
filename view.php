@@ -108,6 +108,7 @@ $PAGE->set_context($context);
 $PAGE->set_title(format_string($tracker->name));
 $PAGE->set_heading(format_string($tracker->name));
 $PAGE->set_url($url);
+$resolved = 0;
 
 if ($screen == 'print') {
     $PAGE->set_pagelayout('embedded');
@@ -120,19 +121,41 @@ $renderer = $PAGE->get_renderer('tracker');
 $result = 0;
 if ($view == 'view') {
     if ($action != '') {
-        $result = include($CFG->dirroot.'/mod/tracker/views/view.controller.php');
+        $controller = tracker_get_controller('view', $tracker, $cm);
+        $controller->receive($action);
+        if ($redirecturl = $controller->process($action)) {
+            redirect($redirecturl);
+        }
     }
 } else if ($view == 'resolved') {
     if ($action != '') {
-        $result = include($CFG->dirroot.'/mod/tracker/views/view.controller.php');
+        $controller = tracker_get_controller('view', $tracker, $cm);
+        $controller->receive($action);
+        if ($redirecturl = $controller->process($action)) {
+            if ($redirecturl != -1) {
+                redirect($redirecturl);
+            }
+        }
     }
 } else if ($view == 'admin') {
     if ($action != '') {
-        $result = include($CFG->dirroot.'/mod/tracker/views/admin.controller.php');
+        $controller = tracker_get_controller('admin', $tracker, $cm, $url);
+        $controller->receive($action);
+        if ($redirecturl = $controller->process($action)) {
+            if ($redirecturl instanceof moodle_url) {
+                redirect($redirecturl);
+            }
+        }
     }
 } else if ($view == 'profile') {
     if ($action != '') {
-        $result = include($CFG->dirroot.'/mod/tracker/views/profile.controller.php');
+        $controller = tracker_get_controller('profile', $tracker, $cm);
+        $controller->receive($action);
+        if ($redirecturl = $controller->process($action)) {
+            if ($redirecturl != -1) {
+                redirect($redirecturl);
+            }
+        }
     }
 }
 
@@ -144,8 +167,12 @@ if (!in_array($screen, array('editanissue'))) {
 }
 
 // A pre-buffer that may be a controller output.
-if (!empty($out)) {
-    $output .= $out;
+if (!empty($controller->out)) {
+    $output .= $controller->out;
+    $output .= $OUTPUT->box_end();
+    $output .= $OUTPUT->footer();
+    echo $output;
+    exit;
 }
 
 /*
@@ -239,6 +266,7 @@ if ($view == 'view') {
 
             case 'print': {
                 if (tracker_supports_feature('reports/print')) {
+                    echo $output;
                     include($CFG->dirroot.'/mod/tracker/pro/report/print.php');
                 }
                 break;
