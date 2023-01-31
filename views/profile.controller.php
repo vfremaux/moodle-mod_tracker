@@ -44,13 +44,16 @@ class profile_controller extends base_controller {
         switch ($cmd) {
             case 'register': {
                 $this->data->issueid = required_param('issueid', PARAM_INT);
+                $this->received = true;
             }
 
             case 'unregister': {
                 $this->data->issueid = required_param('issueid', PARAM_INT);
                 $this->data->ccid = required_param('ccid', PARAM_INT);
+                $this->received = true;
             }
-            default :{
+            case 'editwatch': {
+                $this->data->ccid = required_param('ccid', PARAM_INT);
                 $this->received = true;
             }
         }
