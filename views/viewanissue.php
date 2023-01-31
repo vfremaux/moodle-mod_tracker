@@ -65,7 +65,7 @@ $statehistory = $DB->get_records_select('tracker_state_change', $select, array($
 
 $linklabel = get_string(($initialdepsviewmode == 'visiblediv') ? 'hidedependancies' : 'showdependancies', 'tracker');
 $link = '<a id="tracker-issuedependancies-handle">'.$linklabel.'</a>&nbsp;-&nbsp;';
-$showdependancieslink = (!empty($childtree) || !empty($parenttree)) ? $link : '';
+$showdependancieslink = tracker_has_dependancies($tracker) ? $link : '';
 
 $linklabel = get_string(($initialccsviewmode == 'visiblediv') ? 'hideccs' : 'showccs', 'tracker');
 $link = '<a id="tracker-issueccs-handle">'.$linklabel.'</a>&nbsp;-&nbsp;';
@@ -171,16 +171,18 @@ if ($tracker->subtrackers &&
 
 echo '<tr valign="top">';
 echo '<td align="right" colspan="4">';
-echo $showhistorylink.$showccslink.$showdependancieslink.$showcommentslink.$addcommentlink.$transferlink.$distribute;
+echo $showcommentslink.$showdependancieslink.$showccslink.$showhistorylink.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$addcommentlink.$transferlink.$distribute;
 echo '</td>';
 echo '</tr>';
 
 if ($tracker->enablecomments) {
     if (!empty($commentscount)) {
-        echo $renderer->comments($comments, $initialcommentsviewmode);
+        echo $renderer->comments($comments, $initialcommentsviewmode, $addcommentlink);
     }
 }
-echo $renderer->dependencies($tracker, $issue, $initialdepsviewmode);
+if (tracker_has_dependancies($tracker)) {
+    echo $renderer->dependencies($tracker, $issue, $initialdepsviewmode);
+}
 
 if ($showccslink) {
     echo $renderer->ccs($ccs, $issue, $cm, $cced, $initialccsviewmode);

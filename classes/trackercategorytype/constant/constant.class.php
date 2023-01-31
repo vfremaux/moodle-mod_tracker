@@ -21,6 +21,8 @@
  * A class implementing a constant element from an internal configuration value or
  * an instance setting value
  */
+namespace mod_tracker;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
@@ -32,6 +34,13 @@ class constantelement extends trackerelement {
     }
 
     public function has_mandatory_option() {
+        return false;
+    }
+
+    /**
+     * If true, this element can be told to be listable.
+     */
+    public function has_listable_option() {
         return false;
     }
 

@@ -21,6 +21,11 @@
  *
  * A class implementing a radio button (exclusive choice) element
  */
+namespace mod_tracker;
+
+use StdClass;
+use html_writer;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
@@ -38,7 +43,7 @@ class radioelement extends trackerelement {
         $this->get_value($issueid);
 
         if (!empty($this->options) && !empty($this->value) && array_key_exists($this->value, $this->options)) {
-            $str = format_string($this->options[$this->value]->description);
+            $str = format_text($this->options[$this->value]->description, FORMAT_HTML);
         }
         return $str;
     }

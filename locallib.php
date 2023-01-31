@@ -38,7 +38,7 @@ define('TESTING', 7);
 define('PUBLISHED', 8);
 define('VALIDATED', 9);
 
-// Preference defines.
+// Status defines.
 define('ENABLED_POSTED', 1);
 define('ENABLED_OPEN', 2);
 define('ENABLED_RESOLVING', 4);
@@ -50,71 +50,6 @@ define('ENABLED_TESTING', 128);
 define('ENABLED_PUBLISHED', 256);
 define('ENABLED_VALIDATED', 512);
 define('ENABLED_ALL', 1023);
-
-/**
- * Tells wether a feature is supported or not. Gives back the
- * implementation path where to fetch resources.
- * @param string $feature a feature key to be tested.
- */
-function tracker_supports_feature($feature) {
-    static $supports;
-
-    $config = get_config('mod_tracker');
-
-    if (!isset($supports)) {
-        $supports = array(
-            'pro' => array(
-                'emulate' => array('community'),
-                'cascade' => array('mnet'),
-                'reports' => array('status', 'evolution', 'print'),
-                'remote' => array('ws'),
-                'priority' => array('askraise')
-            ),
-            'community' => array(
-                'reports' => array('status', 'evolution'),
-            ),
-        );
-        $prefer = array();
-    }
-
-    // Check existance of the 'pro' dir in plugin.
-    if (is_dir(__DIR__.'/pro')) {
-        if ($feature == 'emulate/community') {
-            return 'pro';
-        }
-        if (empty($config->emulatecommunity)) {
-            $versionkey = 'pro';
-        } else {
-            $versionkey = 'community';
-        }
-    } else {
-        $versionkey = 'community';
-    }
-
-    list($feat, $subfeat) = explode('/', $feature);
-
-    if (!array_key_exists($feat, $supports[$versionkey])) {
-        return false;
-    }
-
-    if (!in_array($subfeat, $supports[$versionkey][$feat])) {
-        return false;
-    }
-
-    if (array_key_exists($feat, $supports['community'])) {
-        if (in_array($subfeat, $supports['community'][$feat])) {
-            // If community exists, default path points community code.
-            if (isset($prefer[$feat][$subfeat])) {
-                // Configuration tells which location to prefer if explicit.
-                $versionkey = $prefer[$feat][$subfeat];
-            } else {
-                $versionkey = 'community';
-            }
-        }
-    }
-
-    return $versionkey;
-}
 
 function tracker_get_context($cmid, $instanceid) {
     global $DB;
@@ -142,6 +77,20 @@ function tracker_get_context($cmid, $instanceid) {
     }
 
     return array($cm, $tracker, $course);
+}
+
+function tracker_get_controller($view, $tracker, $cm, $url = '') {
+    global $CFG;
+
+    if (file_exists($CFG->dirroot.'/mod/tracker/pro/views/'.$view.'.controller.php')) {
+        include($CFG->dirroot.'/mod/tracker/pro/views/'.$view.'.controller.php');
+        $class = '\\mod_tracker\\'.$view.'_controller_extended';
+        return new $class($tracker, $cm, $url);
+    } else {
+        include($CFG->dirroot.'/mod/tracker/pro/views/'.$view.'.controller.php');
+        $class = '\\mod_tracker\\'.$view.'_controller';
+        return new $class($tracker, $cm, $url);
+    }
 }
 
 function tracker_requires($view, $screen) {
@@ -219,7 +168,7 @@ function tracker_loadelements(&$tracker, &$elementsobj) {
         foreach ($elements as $element) {
             // This get the options by the constructor.
             include_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/'.$element->type.'/'.$element->type.'.class.php');
-            $constructorfunction = "{$element->type}element";
+            $constructorfunction = "\\mod_tracker\\{$element->type}element";
 
             $elementsobj[$element->id] = new $constructorfunction($tracker, $element->id);
             $elementsobj[$element->id]->name = $element->name;
@@ -292,6 +241,8 @@ function tracker_loadelementsused(&$tracker, &$used) {
     $usedelements = $DB->get_records('tracker_elementused', array('trackerid' => $tracker->id), 'sortorder', $fields);
     $used = array();
     $sortorder = 1;
+    $tracker->listables = [];
+    $tracker->haslistables = false;
     if (!empty($usedelements)) {
         foreach ($usedelements as $ueid => $ue) {
             // Normalize sortorder indexes.
@@ -299,11 +250,17 @@ function tracker_loadelementsused(&$tracker, &$used) {
                 $ue->sortorder = $sortorder;
                 $DB->update_record('tracker_elementused', $ue);
             }
-            $elementused = trackerelement::find_instance_by_usedid($tracker, $ueid);
+            $elementused = \mod_tracker\trackerelement::find_instance_by_usedid($tracker, $ueid);
             if ($elementused) {
                 $used[$ue->elementid] = $elementused;
                 $used[$ue->elementid]->context = $context;
                 $sortorder++;
+
+                if ($elementused->listable) {
+                    $tracker->listables[] = $elementused;
+                    $tracker->haslistables = true;
+                }
+
             }
         }
     }
@@ -407,464 +364,6 @@ function tracker_printelements(&$tracker, $fields = null, $dest = false) {
     }
 }
 
-// Search engine.
-
-/**
- * constructs an adequate search query, based on both standard and user defined
- * fields.
- * @param int $trackerid
- * @param array $fields
- * @return an object where both the query for counting and the query for getting results are
- * embedded.
- */
-function tracker_constructsearchqueries($trackerid, $fields, $own = false) {
-    global $USER, $DB;
-
-    $keys = array_keys($fields);
-
-    // Check to see if we are search using elements as a parameter.
-    // If so, we need to include the table tracker_issueattribute in the search query.
-    $elementssearch = false;
-    foreach ($keys as $key) {
-        if (is_numeric($key)) {
-            $elementssearch = true;
-        }
-    }
-    $elementssearchclause = ($elementssearch) ? " {tracker_issueattribute} AS ia, " : '';
-
-    $elementssearchconstraint = '';
-    foreach ($keys as $key) {
-        if ($key == 'id') {
-            $elementssearchconstraint .= ' AND  (';
-            foreach ($fields[$key] as $idtoken) {
-                $elementssearchconstraint .= (empty($idquery)) ? 'i.id =' . $idtoken : ' OR i.id = ' . $idtoken;
-            }
-            $elementssearchconstraint .= ')';
-        }
-
-        if ($key == 'datereported' && array_key_exists('checkdate', $fields) ) {
-            $datebegin = $fields[$key][0];
-            $dateend = $datebegin + 86400;
-            $elementssearchconstraint .= " AND i.datereported > {$datebegin} AND i.datereported < {$dateend} ";
-        }
-
-        if ($key == 'description') {
-            $tokens = explode(' ', $fields[$key][0], ' ');
-            foreach ($tokens as $token) {
-                $elementssearchconstraint .= " AND i.description LIKE '%{$descriptiontoken}%' ";
-            }
-        }
-
-        if ($key == 'reportedby') {
-            $elementssearchconstraint .= ' AND i.reportedby = '.$fields[$key][0];
-        }
-
-        if ($key == 'assignedto') {
-            $elementssearchconstraint .= ' AND i.assignedto = '.$fields[$key][0];
-        }
-
-        if ($key == 'summary') {
-            $summarytokens = explode(' ', $fields[$key][0]);
-            foreach ($summarytokens as $summarytoken) {
-                $elementssearchconstraint .= " AND i.summary LIKE '%{$summarytoken}%'";
-            }
-        }
-
-        if (is_numeric($key)) {
-            foreach ($fields[$key] as $value) {
-                $elementssearchconstraint .= '
-                    AND
-                    i.id IN (SELECT
-                                issue
-                             FROM
-                                {tracker_issueattribute}
-                             WHERE
-                             elementdefinition = '.$key.' AND
-                             elementitemid='.$value.')
-                ';
-            }
-        }
-    }
-    if ($own == false) {
-        $sql = new StdClass();
-        $sql->search = "
-            SELECT DISTINCT
-                i.id,
-                i.trackerid,
-                i.summary,
-                i.datereported,
-                i.reportedby,
-                i.assignedto,
-                i.resolutionpriority,
-                i.status,
-                COUNT(cc.userid) AS watches,
-                u.firstname,
-                u.lastname
-            FROM
-                {user} AS u,
-                $elementssearchclause
-                {tracker_issue} i
-            LEFT JOIN
-                {tracker_issuecc} cc
-            ON
-                cc.issueid = i.id
-            WHERE
-                i.trackerid = {$trackerid} AND
-                i.reportedby = u.id $elementssearchconstraint
-            GROUP BY
-                i.id,
-                i.trackerid,
-                i.summary,
-                i.datereported,
-                i.reportedby,
-                i.assignedto,
-                i.status,
-                u.firstname,
-                u.lastname
-        ";
-        $sql->count = "
-            SELECT COUNT(DISTINCT
-                (i.id)) as reccount
-            FROM
-                {tracker_issue} i
-                $elementssearchclause
-            WHERE
-                i.trackerid = {$trackerid}
-                $elementssearchconstraint
-        ";
-    } else {
-        $sql->search = "
-            SELECT DISTINCT
-                i.id,
-                i.trackerid,
-                i.summary,
-                i.datereported,
-                i.reportedby,
-                i.resolutionpriority,
-                i.assignedto,
-                i.status,
-                COUNT(cc.userid) AS watches
-            FROM
-                $elementssearchclause
-                {tracker_issue} i
-            LEFT JOIN
-                {tracker_issuecc} cc
-            ON
-                cc.issueid = i.id
-            WHERE
-                i.trackerid = {$trackerid} AND
-                i.reportedby = {$USER->id}
-                $elementssearchconstraint
-            GROUP BY
-                i.id, i.trackerid, i.summary, i.datereported, i.reportedby, i.assignedto, i.status
-        ";
-        $sql->count = "
-            SELECT COUNT(DISTINCT
-                (i.id)) as reccount
-            FROM
-                {tracker_issue} i
-                $elementssearchclause
-            WHERE
-                i.trackerid = {$trackerid} AND
-                i.reportedby = $USER->id
-                $elementssearchconstraint
-        ";
-    }
-    return $sql;
-}
-
-/**
- * analyses the POST parameters to extract values of additional elements
- * @return an array of field descriptions
- */
-function tracker_extractsearchparametersfrompost() {
-    $count = 0;
-    $fields = array();
-    $issuenumber = optional_param('issueid', '', PARAM_INT);
-    if (!empty ($issuenumber)) {
-        $issuenumberarray = explode(',', $issuenumber);
-        foreach ($issuenumberarray as $issueid) {
-            if (is_numeric($issueid)) {
-                $fields['id'][] = $issueid;
-            } else {
-                print_error('errorbadlistformat', 'tracker', 'view.php?id=' . $this->tracker_getcoursemodule() . '&what=search');
-            }
-        }
-    } else {
-        $checkdate = optional_param('checkdate', 0, PARAM_INT);
-        if ($checkdate) {
-            $month = optional_param('month', '', PARAM_INT);
-            $day = optional_param('day', '', PARAM_INT);
-            $year = optional_param('year', '', PARAM_INT);
-
-            if (!empty($month) && !empty($day) && !empty($year)) {
-                $datereported = make_timestamp($year, $month, $day);
-                $fields['datereported'][] = $datereported;
-            }
-        }
-
-        $description = optional_param('description', '', PARAM_CLEANHTML);
-        if (!empty($description)) {
-            $fields['description'][] = stripslashes($description);
-        }
-
-        $reportedby = optional_param('reportedby', '', PARAM_INT);
-        if (!empty($reportedby)) {
-            $fields['reportedby'][] = $reportedby;
-        }
-
-        $assignedto = optional_param('assignedto', '', PARAM_INT);
-        if (!empty($assignedto)) {
-            $fields['assignedto'][] = $assignedto;
-        }
-
-        $summary = optional_param('summary', '', PARAM_TEXT);
-        if (!empty($summary)) {
-            $fields['summary'][] = $summary;
-        }
-
-        $keys = array_keys($_POST);                     // Get the key value of all the fields submitted;
-        $elementkeys = preg_grep('/element./' , $keys); // Filter out only the element keys;
-
-        foreach ($elementkeys as $elementkey) {
-            preg_match('/element(.*)$/', $elementkey, $elementid);
-            if (!empty($_POST[$elementkey])) {
-                if (is_array($_POST[$elementkey])) {
-                    foreach ($_POST[$elementkey] as $elementvalue) {
-                        $fields[$elementid[1]][] = $elementvalue;
-                    }
-                } else {
-                    $fields[$elementid[1]][] = $_POST[$elementkey];
-                }
-            }
-        }
-    }
-    return $fields;
-}
-
-/**
- * given a query object, and a description of additional fields, stores
- * all the query description to database.
- * @uses $USER
- * @param object $query
- * @param array $fields
- * @return the inserted or updated queryid
- */
-function tracker_savesearchparameterstodb($query, $fields) {
-    global $USER, $DB;
-
-    $query->userid = $USER->id;
-    $query->published = 0;
-    $query->fieldnames = '';
-    $query->fieldvalues = '';
-
-    if (!empty($fields)) {
-        $keys = array_keys($fields);
-        if (!empty($keys)) {
-            foreach ($keys as $key) {
-                foreach ($fields[$key] as $value) {
-                    if (empty($query->fieldnames)) {
-                        $query->fieldnames = $key;
-                        $query->fieldvalues = $value;
-                    } else {
-                        $query->fieldnames = $query->fieldnames . ', ' . $key;
-                        $query->fieldvalues = $query->fieldvalues . ', '  . $value;
-                    }
-                }
-            }
-        }
-    }
-
-    if (!isset($query->id)) {
-        // If not given a $queryid, then insert record.
-        $queryid = $DB->insert_record('tracker_query', $query);
-    } else {
-        // Otherwise, update record.
-        $queryid = $DB->update_record('tracker_query', $query, true);
-    }
-    return $queryid;
-}
-
-/**
- * prints the human understandable search query form
- * @param array $fields
- */
-function tracker_printsearchfields($fields) {
-    global $DB;
-
-    foreach ($fields as $key => $value) {
-        switch (trim($key)) {
-            case 'datereported': {
-                if (!function_exists('trk_userdate')) {
-                    function trk_userdate(&$a) {
-                        $a = userdate($a);
-                        $a = preg_replace("/, \\d\\d:\\d\\d/", '', $a);
-                    }
-                }
-                array_walk($value, 'trk_userdate');
-                $strs[] = get_string($key, 'tracker') . ' '.get_string('IN', 'tracker')." ('".implode("','", $value) . "')";
-                break;
-            }
-
-            case 'summary': {
-                $strs[] = "('".implode("','", $value) ."') ".get_string('IN', 'tracker').' '.get_string('summary', 'tracker');
-                break;
-            }
-
-            case 'description': {
-                $strs[] = "('".implode("','", $value) ."') ".get_string('IN', 'tracker').' '.get_string('description');
-                break;
-            }
-
-            case 'reportedby': {
-                $users = $DB->get_records_list('user', array('id' => implode(',', $value)), 'lastname', 'id,firstname,lastname');
-                $reporters = array();
-                if ($users) {
-                    foreach ($users as $user) {
-                        $reporters[] = fullname($user);
-                    }
-                }
-                $reporterlist = implode ("', '", $reporters);
-                $strs[] = get_string('reportedby', 'tracker').' '.get_string('IN', 'tracker')." ('".$reporterlist."')";
-                break;
-            }
-
-            case 'assignedto': {
-                $users = $DB->get_records_list('user', array('id' => implode(',', $value)), 'lastname', 'id,firstname,lastname');
-                $assignees = array();
-                if ($users) {
-                    foreach ($users as $user) {
-                        $assignees[] = fullname($user);
-                    }
-                }
-                $assigneelist = implode ("', '", $assignees);
-                $strs[] = get_string('assignedto', 'tracker').' '.get_string('IN', 'tracker')." ('".$assigneelist."')";
-                break;
-            }
-
-            default :
-                $strs[] = get_string($key, 'tracker') . ' '.get_string('IN', 'tracker')." ('".implode("','", $value) . "')";
-        }
-    }
-    return implode (' '.get_string('AND', 'tracker').' ', $strs);
-}
-
-/**
- *
- *
- */
-function tracker_extractsearchparametersfromdb($queryid = null) {
-    global $DB;
-
-    if (!$queryid) {
-        $queryid = optional_param('queryid', '', PARAM_INT);
-    }
-    $queryrecord = $DB->get_record('tracker_query', array('id' => $queryid));
-    $fields = null;
-
-    if (!empty($queryrecord)) {
-        $fieldnames = explode(',', $queryrecord->fieldnames);
-        $fieldvalues = explode(',', $queryrecord->fieldvalues);
-        $count = 0;
-        if (!empty($fieldnames)) {
-            foreach ($fieldnames as $fieldname) {
-                $fields[trim($fieldname)][] = trim($fieldvalues[$count]);
-                $count++;
-            }
-        }
-    } else {
-        print_error ('invalidquery', 'tracker', $queryid);
-    }
-
-    return $fields;
-}
-
-/**
- * set a cookie with search information
- * @return boolean
- */
-function tracker_setsearchcookies($fields) {
-    $success = true;
-    if (is_array($fields)) {
-        $keys = array_keys($fields);
-
-        foreach ($keys as $key) {
-            $cookie = '';
-            foreach ($fields[$key] as $value) {
-                if (empty($cookie)) {
-                    $cookie = $cookie . $value;
-                } else {
-                    $cookie = $cookie . ', ' . $value;
-                }
-            }
-
-            $result = setcookie("moodle_tracker_search_" . $key, $cookie);
-            $success = $success && $result;
-        }
-    } else {
-        $success = false;
-    }
-    return $success;
-}
-
-/**
- * get last search parameters from use cookie
- * @uses $_COOKIE
- * @return an array of field desriptions
- */
-function tracker_extractsearchcookies() {
-
-    $keys = array_keys($_COOKIE);                                // Get the key value of all the cookies.
-    $cookiekeys = preg_grep('/moodle_tracker_search./' , $keys); // Filter all search cookies.
-    $fields = null;
-    foreach ($cookiekeys as $cookiekey) {
-        preg_match('/moodle_tracker_search_(.*)$/', $cookiekey, $fieldname);
-        $fields[$fieldname[1]] = explode(', ', $_COOKIE[$cookiekey]);
-    }
-    return $fields;
-}
-
-/**
- * clear the current search
- * @uses _COOKIE
- * @return boolean true if succeeded
- */
-function tracker_clearsearchcookies() {
-
-    $success = true;
-    $keys = array_keys($_COOKIE); // Get the key value of all the cookies.
-    $cookiekeys = preg_grep('/moodle_tracker_search./' , $keys); // Filter all search cookies.
-
-    foreach ($cookiekeys as $cookiekey) {
-        $result = setcookie($cookiekey, '');
-        $success = $success && $result;
-    }
-
-    return $success;
-}
-
-/**
- * settles data for memoising current search context
- * @param int $trackerid
- * @param int $cmid
- */
-function tracker_searchforissues(&$tracker, $cmid) {
-
-    tracker_clearsearchcookies($tracker->id);
-    $fields = tracker_extractsearchparametersfrompost($tracker->id);
-    $success = tracker_setsearchcookies($fields);
-
-    if ($success) {
-        if ($tracker->supportmode == 'bugtracker') {
-            redirect (new moodle_url('/mod/tracker/view.php', array('id' => $cmid, 'view' => 'view', 'screen' => 'browse')));
-        } else {
-            redirect(new moodle_url('/mod/tracker/view.php', array('id' => $cmid, 'view' => 'view', 'screen' => 'mytickets')));
-        }
-    } else {
-        print_error('errorcookie', 'tracker', '', $cookie);
-    }
-}
-
 /**
  * get how many issues in this tracker
  * @param int $trackerid
@@ -908,16 +407,34 @@ function tracker_getnumissuesreported($trackerid, $status='*', $reporterid = '*'
  */
 function tracker_getadministrators($context) {
     $allnames = get_all_user_name_fields(true, 'u');
-    return get_users_by_capability($context, 'mod/tracker:manage', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
+    $alladmins = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
+
+    $adms = [];
+    foreach ($alladmins as $a) {
+        if (is_enrolled($context, $a)) {
+            $adms[$a->id] = $a;
+        }
+    }
+
+    return $adms;
 }
 
 /**
- * get available resolvers
+ * get available resolvers, ensure they are enrolled in the context.
  * @param object $context
  */
 function tracker_getresolvers($context) {
     $allnames = get_all_user_name_fields(true, 'u');
-    return get_users_by_capability($context, 'mod/tracker:resolve', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
+    $allresolvers = get_users_by_capability($context, 'mod/tracker:resolve', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
+
+    $res = [];
+    foreach ($allresolvers as $r) {
+        if (is_enrolled($context, $r)) {
+            $res[$r->id] = $r;
+        }
+    }
+
+    return $res;
 }
 
 /**
@@ -927,6 +444,9 @@ function tracker_getresolvers($context) {
  */
 function tracker_getreporters($trackerid) {
     global $DB;
+
+    $cm = get_coursemodule_from_instance('tracker', $trackerid);
+    $context = context_module::instance($cm->id);
 
     $allnames = get_all_user_name_fields(true, 'u');
 
@@ -940,9 +460,20 @@ function tracker_getreporters($trackerid) {
             {user} u
         WHERE
             i.reportedby = u.id AND
-            i.trackerid = ?
+            i.trackerid = ? AND
+            u.suspended = 0 AND
+            u.deleted = 0
     ";
-    return $DB->get_records_sql($sql, array($trackerid));
+    $users = $DB->get_records_sql($sql, array($trackerid));
+    $reps = [];
+    if (!empty($users)) {
+        foreach ($users as $u) {
+            if (is_enrolled($context, $u)) {
+                $reps[$u->id] = $u;
+            }
+        }
+    }
+    return $reps;
 }
 
 /**
@@ -951,7 +482,16 @@ function tracker_getreporters($trackerid) {
  */
 function tracker_getdevelopers($context) {
     $allnames = get_all_user_name_fields(true, 'u');
-    return get_users_by_capability($context, 'mod/tracker:develop', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
+    $users = get_users_by_capability($context, 'mod/tracker:develop', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
+    $devels = [];
+    if (!empty($users)) {
+        foreach ($users as $u) {
+            if (is_enrolled($context, $u)) {
+                $devels[$u->id] = $u;
+            }
+        }
+    }
+    return $devels;
 }
 
 /**
@@ -979,7 +519,9 @@ function tracker_getassignees($userid) {
             {user} u
         WHERE
             i.assignedto = u.id AND
-            i.bywhomid = ?
+            i.bywhomid = ? AND
+            u.suspended = 0 AND
+            u.deleted = 0
         GROUP BY
             u.id,
             u.firstname,
@@ -1027,15 +569,18 @@ function tracker_submitanissue(&$tracker, &$data) {
     }
     $issue->bywhomid = 0;
     $issue->trackerid = $tracker->id;
-    $issue->reportedby = $USER->id;
 
     if (empty($data->issueid)) {
+        // New issue.
+        $issue->reportedby = $USER->id;
         $issue->status = POSTED;
 
         // Fetch max actual priority.
         $select = " trackerid = ? GROUP BY trackerid ";
         $maxpriority = $DB->get_field_select('tracker_issue', 'MAX(resolutionpriority)', $select, array($tracker->id));
         $issue->resolutionpriority = $maxpriority + 1;
+        $issue->timecreated = time();
+        $issue->timemodified = time();
 
         $issue->id = $DB->insert_record('tracker_issue', $issue);
         $data->issueid = $issue->id;
@@ -1044,14 +589,46 @@ function tracker_submitanissue(&$tracker, &$data) {
         tracker_register_cc($tracker, $issue, $issue->reportedby);
 
     } else {
-        $issue->oldstatus = $DB->get_field('tracker_issue', 'status', array('id' => $data->issueid));
 
+        // Record ownership change.
+        $oldownership = $DB->get_field('tracker_issue', 'assignedto', ['id' => $data->issueid]);
+        if ($data->assignedto && ($oldownership != $data->assignedto)) {
+                $ownership = new StdClass;
+                $ownership->trackerid = $tracker->id;
+                $ownership->issueid = $data->issueid;
+                $ownership->userid = $data->assignedto;
+                $ownership->bywhomid = $USER->id;
+                $ownership->timeassigned = time();
+                $DB->insert_record('tracker_issueownership', $ownership);
+        }
+
+        $issue->oldstatus = $DB->get_field('tracker_issue', 'status', ['id' => $data->issueid]);
         $issue->id = $data->issueid;
         $issue->status = $data->status;
         $issue->resolution = @$data->resolution_editor['text'];
         $issue->resolutionformat = @$data->resolution_editor['format'];
+        $issue->timemodified = time();
         $DB->update_record('tracker_issue', $issue);
     }
+
+    // Record dependancies.
+    $DB->delete_records('tracker_issuedependancy', ['trackerid' => $tracker->id, 'childid' => $issue->id]);
+    if (!empty($data->dependencies)) {
+        foreach ($data->dependencies as $depid) {
+            $dep = new StdClass;
+            $dep->trackerid = $tracker->id;
+            $dep->parentid = $depid;
+            $dep->childid = $issue->id;
+            $dep->comment = ''; // Not yet implemented.
+            $dep->commentformat = FORMAT_MOODLE; // Not yet implemented.
+            $DB->insert_record('tracker_issuedependancy', $dep);
+            $DB->set_field('tracker_issue', 'timemodified', time(), ['id' => $depid]);
+            $DB->set_field('tracker_issue', 'timemodified', time(), ['id' => $issue->id]);
+        }
+    }
+
+    // Get full updated record.
+    $issue = $DB->get_record('tracker_issue', ['id' => $issue->id]);
 
     return $issue;
 }
@@ -1084,7 +661,7 @@ function tracker_recordelements(&$issue, $data) {
     $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
     $usedelements = $DB->get_records('tracker_elementused', array('trackerid' => $issue->trackerid), 'id', 'id,elementid');
     foreach ($usedelements as $ueid => $ue) {
-        if ($ueinstance = trackerelement::find_instance_by_usedid($tracker, $ueid)) {
+        if ($ueinstance = \mod_tracker\trackerelement::find_instance_by_usedid($tracker, $ueid)) {
             $ueinstance->form_process($data);
         }
     }
@@ -1111,6 +688,8 @@ function tracker_clearelements($issueid, $withfiles = false) {
 
     // delete issue attribute fields
     if ($withfiles && !empty($attributeids)) {
+        $cm = get_coursemodule_from_instance('tracker', $issue->trackerid);
+        $context = context_module::intance($cm->id);
         $fs = get_file_storage();
         foreach ($attributeids as $attid => $void) {
             $fs->delete_area_files($context->id, 'mod_tracker', 'issueattribute', $attid);
@@ -1155,7 +734,7 @@ function tracker_register_cc(&$tracker, &$issue, $userid) {
     if ($userid && !$DB->get_record('tracker_issuecc', $params)) {
         // Add new the assignee as new CC !!
         // We do not discard the old one as he may be still concerned.
-        $eventmask = 127;
+        $eventmask = ALL_EVENTS;
         $params = array('trackerid' => $tracker->id, 'userid' => $userid, 'name' => 'eventmask');
         if ($userprefs = $DB->get_record('tracker_preferences', $params)) {
             $eventmask = $userprefs->value;
@@ -1167,6 +746,163 @@ function tracker_register_cc(&$tracker, &$issue, $userid) {
         $cc->events = $eventmask;
         $DB->insert_record('tracker_issuecc', $cc);
     }
+}
+
+function tracker_get_issues(&$tracker, $resolved, $screen, $sort, $limitfrom, $pagesize) {
+    global $DB, $USER;
+
+    $params = array($tracker->id);
+
+    // Check we display only resolved tickets or working.
+    if ($resolved) {
+        $resolvedclause = " AND
+           (status = ".RESOLVED." OR
+           status = ".ABANDONNED.")
+        ";
+    } else {
+        $resolvedclause = " AND
+           status <> ".RESOLVED." AND
+           status <> ".ABANDONNED."
+        ";
+    }
+
+    $userclause = '';
+    switch ($screen) {
+        case 'mytickets': {
+            $userclause = " AND reportedby = ? ";
+            $params[] = $USER->id;
+            break;
+        }
+        case 'mywork': {
+            $userclause = " AND assignedto = ? ";
+            $params[] = $USER->id;
+            break;
+        }
+    }
+
+    $sortattributeclause = '';
+    $orderbyattributeclause = '';
+    $sortattributejoinclause = '';
+    if (!empty($sort) && preg_match('/attr_(\\w+) (ASC|DESC)/', $sort, $matches)) {
+
+        // Find a used element that has named attribute.
+        $elementsql = "
+            SELECT
+                te.*
+            FROM
+                {tracker_element} te,
+                {tracker_element_used} teu
+            WHERE
+                te.id = teu.elementid AND
+                teu.trackerid = ? AND
+                te.name = ?
+        ";
+
+        $dir = $matches[2];
+
+        $usedsortingelement = $DB->get_records_sql($elementsql, [$tracker->id, $matches[1]]);
+
+        // Listable elements.
+        if (in_array($usedsortingelement->type, ['dropdown', 'radio', 'radiohoriz'])) {
+            $orderbyattributeclause = '
+                tei.sortorder
+            ';
+            $sortattributejoinclause = "
+               LEFT JOIN
+                    {tracker_issueatribute} tia
+                ON
+                    tia.issueid = i.id AND
+                    tia.elementid = {$usedsortingelement->id}
+               LEFT JOIN
+                    {tracker_elementitem} tei
+                ON
+                    tia.elementitemid = tei.id
+           ";
+        } else {
+            // sort is directly operated on issue attribute value.
+            $orderbyattributeclause = '
+                tia.elementitemid
+            ';
+            $sortattributejoinclause = "
+               LEFT JOIN
+                    {tracker_issueatribute} tia
+                ON
+                    tia.issueid = i.id AND
+                    tia.elementid = {$usedsortingelement->id}
+               LEFT JOIN
+                    {tracker_elementitem} tei
+                ON
+                    tia.elementitemid = tei.id
+           ";
+        }
+    }
+
+    $sql = "
+        SELECT
+            i.id,
+            i.summary,
+            i.datereported,
+            i.reportedby,
+            i.assignedto,
+            i.status,
+            i.resolutionpriority,
+            u.firstname firstname,
+            u.lastname lastname,
+            COUNT(ic.issueid) watches
+        FROM
+            {tracker_issue} i
+        LEFT JOIN
+            {tracker_issuecc} ic
+        ON
+            ic.issueid = i.id
+        {$sortattributejoinclause}
+        LEFT JOIN
+            {user} u
+        ON
+            i.reportedby = u.id
+        WHERE
+            i.reportedby = u.id AND
+            i.trackerid = ?
+            $resolvedclause
+            $userclause
+        GROUP BY
+            i.id,
+            i.summary,
+            i.datereported,
+            i.reportedby,
+            i.assignedto,
+            i.status,
+            i.resolutionpriority,
+            u.firstname,
+            u.lastname
+    ";
+
+    $sqlcount = "
+        SELECT
+            COUNT(*)
+        FROM
+            {tracker_issue} i
+        WHERE
+            i.trackerid = ?
+            $resolvedclause
+            $userclause
+    ";
+    $numrecords = $DB->count_records_sql($sqlcount, $params);
+
+    if (!empty($orderbyattributeclause)) {
+        // Case of attribute sorting.
+        $sql .= " ORDER BY ".$orderbyattributeclause;
+    } else {
+        if (!empty($sort)) {
+            $sql .= " ORDER BY $sort";
+        } else {
+            $sql .= " ORDER BY resolutionpriority ASC";
+        }
+    }
+
+    $issues = $DB->get_records_sql($sql, $params, $limitfrom, $pagesize);
+
+    return array($issues, $numrecords);
 }
 
 /**
@@ -1242,24 +978,20 @@ function tracker_get_subtree_list($trackerid, $id) {
 function tracker_get_children(&$tracker, $issueid) {
     global $DB;
 
-    $statuskeys = tracker_get_statuskeys($tracker);
-    $statuscodes = tracker_get_statuscodes();
-
-    $str = '';
     $sql = "
        SELECT
-          childid,
-          summary,
-          status
+          i.id,
+          i.summary,
+          i.status
        FROM
           {tracker_issuedependancy} id,
           {tracker_issue} i
        WHERE
           i.id = id.childid AND
-          id.parentid = {$issueid} AND
-          i.trackerid = {$tracker->id}
+          id.parentid = ? AND
+          i.trackerid = ?
     ";
-    $res = $DB->get_records_sql($sql);
+    $res = $DB->get_records_sql($sql, [$issueid, $tracker->id]);
     return $res;
 }
 
@@ -1269,15 +1001,14 @@ function tracker_get_children(&$tracker, $issueid) {
  * @param int $issueid
  * @return the HTML
  */
-function tracker_get_parents(&$tracker, $issueid, $return = false, $indent='') {
+function tracker_get_parents(&$tracker, $issueid) {
     global $DB;
 
-    $str = '';
     $sql = "
        SELECT
-          parentid,
-          summary,
-          status
+          i.id,
+          i.summary,
+          i.status
        FROM
           {tracker_issuedependancy} id,
           {tracker_issue} i
@@ -1286,7 +1017,7 @@ function tracker_get_parents(&$tracker, $issueid, $return = false, $indent='') {
           id.childid = ? AND
           i.trackerid = ?
     ";
-    $res = $DB->get_records_sql($sql, array($issueid, $tracker->id));
+    $res = $DB->get_records_sql($sql, [$issueid, $tracker->id]);
     return $res;
 }
 
@@ -1363,14 +1094,21 @@ function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = 
 
     if (!empty($managers)) {
         foreach ($managers as $manager) {
+
+            if (!is_enrolled($context, $manager)) {
+                continue;
+            }
+
             $notification = tracker_compile_mail_template('raiserequest', $vars, $manager->lang);
             $notificationhtml = tracker_compile_mail_template('raiserequest_html', $vars, $manager->lang);
-            if ($CFG->debugsmtp) {
+            if (!empty($CFG->debugsmtp)) {
                 echo "Sending Raise Request Mail Notification to ".fullname($manager).'<br/>'.$notificationhtml;
             }
             $subject = get_string('raiserequestcaption', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
-            if ($CFG->debugsmtp) {
-                echo "Sending Raise Request Mail Notification to ".fullname($ccuser)."<br/><pre>Subject: $subject\n########\n".shorten_text($notification, 160).'</pre>';
+            if (!empty($CFG->debugsmtp)) {
+                $msg = "Sending Raise Request Mail Notification to ".fullname($manager).'<br/>';
+                $msg .= "<pre>Subject: $subject\n########\n".shorten_text($notification, 160).'</pre>';
+                mtrace($msg);
             }
             email_to_user($manager, $USER, $subject, $notification, $notificationhtml);
         }
@@ -1383,7 +1121,7 @@ function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = 
         foreach ($admins as $admin) {
             $notification = tracker_compile_mail_template('raiserequest', $vars, $admin->lang);
             $notificationhtml = tracker_compile_mail_template('raiserequest_html', $vars, $admin->lang);
-            if ($CFG->debugsmtp) {
+            if (!empty($CFG->debugsmtp)) {
                 echo "Sending Raise Request Mail Notification to " . fullname($admin) . '<br/>'.$notificationhtml;
             }
             $subject = get_string('urgentraiserequestcaption', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
@@ -1437,12 +1175,22 @@ function tracker_notify_submission($issue, &$cm, $tracker = null) {
         include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
 
         foreach ($managers as $manager) {
+
+            if (!is_enrolled($context, $manager)) {
+                continue;
+            }
+
             $notification = tracker_compile_mail_template('submission', $vars, $manager->lang);
             $notificationhtml = tracker_compile_mail_template('submission_html', $vars, $manager->lang);
-            $subject = get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
+            $a = new StdClass;
+            $a->tracker = $SITE->shortname.':'.format_string($tracker->name);
+            $a->issueid = $vars['ISSUE'];
+            $subject = get_string('submission', 'tracker', $a);
 
-            if ($CFG->debugsmtp) {
-                echo "Sending Submission Mail Notification to ".fullname($manager)."<br/><pre>Subject: $subject\n########\n".shorten_text($notification, 160).'</pre>';
+            if (!empty($CFG->debugsmtp)) {
+                $msg = "Sending Submission Mail Notification to ".fullname($manager).'<br/>';
+                $msg .= "<pre>Subject: $subject\n########\n".shorten_text($notification, 160).'</pre>';
+                mtrace($msg);
             }
             email_to_user($manager, $USER, $subject, $notification, $notificationhtml);
         }
@@ -1463,6 +1211,8 @@ function tracker_notify_update($issue, &$cm, $tracker = null) {
         // Database access optimization in case we have a tracker from somewhere else.
         $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
     }
+    $cm = get_coursemodule_from_instance('tracker', $tracker->id);
+    $context = context_module::instance($cm->id);
 
     $fields = 'u.id,'.get_all_user_name_fields(true, 'u').',username,lang,email,emailstop,mailformat,mnethostid';
 
@@ -1497,11 +1247,69 @@ function tracker_notify_update($issue, &$cm, $tracker = null) {
         include_once($CFG->dirroot.'/mod/tracker/mailtemplatelib.php');
 
         foreach ($managers as $manager) {
+
+            if (!is_enrolled($context, $manager)) {
+                continue;
+            }
+
             $notification = tracker_compile_mail_template('update', $vars, $manager->lang);
             $notificationhtml = tracker_compile_mail_template('update_html', $vars, $manager->lang);
-            $subject = get_string('issueupdated', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
+            $a = new StdClass;
+            $a->tracker = $SITE->shortname.':'.format_string($tracker->name);
+            $a->issueid = $vars['ISSUE'];
 
-            if ($CFG->debugsmtp) {
+            switch ($issue->status) {
+                case OPEN: {
+                    $a->state = get_string('open', 'tracker');
+                    break;
+                }
+
+                case RESOLVING: {
+                    $a->state = get_string('resolving', 'tracker');
+                    break;
+                }
+
+                case WAITING: {
+                    $a->state = get_string('waiting', 'tracker');
+                    break;
+                }
+
+                case RESOLVED: {
+                    $a->state = get_string('resolved', 'tracker');
+                    break;
+                }
+
+                case ABANDONNED: {
+                    $a->state = get_string('abandonned', 'tracker');
+                    break;
+                }
+
+                case TRANSFERED: {
+                    $a->state = get_string('transfered', 'tracker');
+                    break;
+                }
+
+                case TESTING: {
+                        $a->state = get_string('testing', 'tracker');
+                    break;
+                }
+
+                case PUBLISHED: {
+                    $a->state = get_string('published', 'tracker');
+                    break;
+                }
+
+                case VALIDATED: {
+                    $a->state = get_string('validated', 'tracker');
+                    break;
+                }
+
+                default:
+            }
+
+            $subject = get_string('issueupdated', 'tracker', $a);
+
+            if (!empty($CFG->debugsmtp)) {
                 echo "Sending Submission Mail Notification to ".fullname($manager)."<br/>";
                 echo "<pre>Subject: $subject\n########\n".shorten_text($notification, 160).'</pre>';
             }
@@ -1525,6 +1333,8 @@ function tracker_notifyccs_changeownership($issueid, $tracker = null) {
         // Database access optimization in case we have a tracker from somewhere else.
         $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
     }
+    $cm = get_coursemodule_from_instance('tracker', $tracker->id);
+    $context = context_module::instance($cm->id);
 
     $issueccs = $DB->get_records('tracker_issuecc', array('issueid' => $issue->id));
     $assignee = $DB->get_record('user', array('id' => $issue->assignedto));
@@ -1548,12 +1358,20 @@ function tracker_notifyccs_changeownership($issueid, $tracker = null) {
         foreach ($issueccs as $cc) {
             list($unccurl, $allunccurl) = tracker_get_unregister_urls($tracker, $cc);
             $ccuser = $DB->get_record('user', array('id' => $cc->userid));
+
+            if (!is_enrolled($context, $ccuser)) {
+                continue;
+            }
+
             $vars['UNCCURL'] = $unccurl;
             $vars['ALLUNCCURL'] = $allunccurl;
             $notification = tracker_compile_mail_template('ownershipchanged', $vars, $ccuser->lang);
             $notificationhtml = tracker_compile_mail_template('ownershipchanged_html', $vars, $ccuser->lang);
-            $subject = get_string('submission', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
-            if ($CFG->debugsmtp) {
+            $a = new StdClass;
+            $a->tracker = $SITE->shortname.':'.format_string($tracker->name);
+            $a->issueid = $vars['ISSUE'];
+            $subject = get_string('changedownership', 'tracker', $a);
+            if (!empty($CFG->debugsmtp)) {
                 echo "Sending Ownership change Mail Notification to ".fullname($ccuser).'<br/>';
                 echo "<pre>Subject: $subject\n##############\n".shorten_text($notification, 160).'</pre>';
             }
@@ -1569,7 +1387,7 @@ function tracker_notifyccs_changeownership($issueid, $tracker = null) {
  * @param object $tracker
  * @param object $newtracker
  */
-function tracker_notifyccs_moveissue($issueid, $tracker, $newtracker = null) {
+function tracker_notifyccs_moveissue($issueid, $tracker, $newtracker) {
     global $COURSE, $SITE, $USER, $DB;
 
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
@@ -1577,6 +1395,12 @@ function tracker_notifyccs_moveissue($issueid, $tracker, $newtracker = null) {
         // Database access optimization in case we have a tracker from somewhere else.
         $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
     }
+    $cm = get_coursemodule_from_instance('tracker', $tracker->id);
+    $context = context_module::instance($cm->id);
+
+    $newcm = get_coursemodule_from_instance('tracker', $newtracker->id);
+    $newcontext = context_module::instance($newcm->id);
+
     $newcourse = $DB->get_record('course', array('id' => $newtracker->course));
 
     $issueccs = $DB->get_records('tracker_issuecc', array('issueid' => $issue->id));
@@ -1600,13 +1424,23 @@ function tracker_notifyccs_moveissue($issueid, $tracker, $newtracker = null) {
         foreach ($issueccs as $cc) {
             list($unccurl, $allunccurl) = tracker_get_unregister_urls($tracker, $cc);
             $ccuser = $DB->get_record('user', array('id' => $cc->userid));
+
+            if (!is_enrolled($context, $ccuser) && !is_enrolled($newcontext, $ccuser)) {
+                continue;
+            }
+
             $vars['UNCCURL'] = $unccurl;
             $vars['ALLUNCCURL'] = $allunccurl;
             $notification = tracker_compile_mail_template('issuemoved', $vars, 'tracker', $ccuser->lang);
             $notificationhtml = tracker_compile_mail_template('issuemoved_html', $vars, 'tracker', $ccuser->lang);
-            $subject = get_string('moved', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
-            if ($CFG->debugsmtp) {
-                echo "Sending CC Notification Mail to ".fullname($ccuser)."<br/><pre>Subject: $subject\n##############\n".shorten_text($notification, 160).'</pre>';
+            $a = new StdClass;
+            $a->tracker = $SITE->shortname.':'.format_string($tracker->name);
+            $a->issueid = $vars['ISSUE'];
+            $subject = get_string('moved', 'tracker', $a);
+            if (!empty($CFG->debugsmtp)) {
+                $msg = "Sending CC Notification Mail to ".fullname($ccuser).'<br/>';
+                $msg .= "<pre>Subject: $subject\n##############\n".shorten_text($notification, 160).'</pre>';
+                mtrace($msg);
             }
             email_to_user($ccuser, $USER, $subject, $notification, $notificationhtml);
         }
@@ -1627,6 +1461,10 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
         // Database access optimization in case we have a tracker from somewhere else.
         $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
     }
+
+    $cm = get_coursemodule_from_instance('tracker', $tracker->id);
+    $context = context_module::instance($cm->id);
+
     $issueccs = $DB->get_records('tracker_issuecc', array('issueid' => $issueid));
 
     if (!empty($issueccs)) {
@@ -1648,6 +1486,11 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
             unset($notification);
             unset($notificationhtml);
             $ccuser = $DB->get_record('user', array('id' => $cc->userid));
+
+            if (!is_enrolled($context, $ccuser)) {
+                continue;
+            }
+
             $vars['UNCCURL'] = $unccurl;
             $vars['ALLUNCCURL'] = $allunccurl;
             switch ($issue->status) {
@@ -1736,9 +1579,15 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
             }
 
             if (!empty($notification)) {
-                $subject = get_string('trackereventchanged', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
-                if ($CFG->debugsmtp) {
-                    echo "Sending State Change Mail Notification to ".fullname($ccuser)."<br/><pre>Subject: $subject\n#############\n".shorten_text($notification, 160).'</pre>';
+                $a = new StdClass;
+                $a->tracker = $SITE->shortname.':'.format_string($tracker->name);
+                $a->event = $vars['EVENT'];
+                $a->issueid = $vars['ISSUE'];
+                $subject = get_string('trackereventchanged', 'tracker', $a);
+                if (!empty($CFG->debugsmtp)) {
+                    $msg = "Sending State Change Mail Notification to ".fullname($ccuser).'<br/>';
+                    $msg .= "<pre>Subject: $subject\n#############\n".shorten_text($notification, 160).'</pre>';
+                    mtrace($msg);
                 }
                 email_to_user($ccuser, $USER, $subject, $notification, $notificationhtml);
             }
@@ -1753,13 +1602,16 @@ function tracker_notifyccs_changestate($issueid, $tracker = null) {
  * @param object $tracker
  */
 function tracker_notifyccs_comment($issueid, $comment, $tracker = null) {
-    global $COURSE, $SITE, $CFG, $USER, $DB;
+    global $COURSE, $SITE, $CFG, $USER, $DB, $OUTPUT;
 
     $issue = $DB->get_record('tracker_issue', array('id' => $issueid));
     if (empty($tracker)) {
         // Database access optimization in case we have a tracker from somewhere else.
         $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
     }
+
+    $cm = get_coursemodule_from_instance('tracker', $tracker->id);
+    $context = context_module::instance($cm->id);
 
     $issueccs = $DB->get_records('tracker_issuecc', array('issueid' => $issue->id));
     if (!empty($issueccs)) {
@@ -1780,25 +1632,35 @@ function tracker_notifyccs_comment($issueid, $comment, $tracker = null) {
         foreach ($issueccs as $cc) {
             list($unccurl, $allunccurl) = tracker_get_unregister_urls($tracker, $cc);
             $ccuser = $DB->get_record('user', array('id' => $cc->userid));
+
+            if (!is_enrolled($context, $ccuser)) {
+                continue;
+            }
+
             if ($cc->events & ON_COMMENT) {
                 $vars['CONTRIBUTOR'] = fullname($USER);
                 $vars['UNCCURL'] = $unccurl;
                 $vars['ALLUNCCURL'] = $allunccurl;
                 $notification = tracker_compile_mail_template('addcomment', $vars, $ccuser->lang);
                 $notificationhtml = tracker_compile_mail_template('addcomment_html', $vars, $ccuser->lang);
-                $subject = get_string('commented', 'tracker', $SITE->shortname.':'.format_string($tracker->name));
-                if ($CFG->debugsmtp) {
-                    echo "Sending Comment Input Mail Notification to ".fullname($ccuser)."<br/><pre>Subject: $subject\n#############\n".shorten_text($notification, 160).'</pre><br/>';
+                $a = new StdClass;
+                $a->tracker = $SITE->shortname.':'.format_string($tracker->name);
+                $a->issueid = $vars['ISSUE'];
+                $subject = get_string('commented', 'tracker', $a);
+                if (!empty($CFG->debugsmtp)) {
+                    $msg = "Sending Comment Input Mail Notification to ".fullname($ccuser).'<br/>';
+                    $msg .= "<pre>Subject: $subject\n#############\n".shorten_text($notification, 160).'</pre><br/>';
+                    mtrace($msg);
                 }
                 email_to_user($ccuser, $USER, $subject, $notification, $notificationhtml);
             } else {
-                if ($CFG->debugsmtp) {
+                if (!empty($CFG->debugsmtp)) {
                     echo $OUTPUT->notification(fullname($ccuser)." disabled for comment norifications <br/>", 'notifyproblem');
                 }
             }
         }
     } else {
-        if ($CFG->debugsmtp) {
+        if (!empty($CFG->debugsmtp)) {
             echo $OUTPUT->notification("No ccs to notifify", 'notifyproblem');
         }
     }
@@ -1934,7 +1796,7 @@ function tracker_add_cascade_backlink(&$cm, &$issue) {
     $str = get_string('cascadedticket', 'tracker', $SITE->shortname);
     $str .= '<br/>';
     $params = array('id' => $cm->id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issue->id);
-    $ticketur = new moodle_url('/mod/tracker/view.php', $params);
+    $ticketurl = new moodle_url('/mod/tracker/view.php', $params);
     $str .= '<a href="'.$ticketurl.'">'.$vieworiginalstr.'</a><br/>';
 
     return $str;
@@ -1988,6 +1850,7 @@ function tracker_get_stats(&$tracker, $from = null, $to = null) {
             status
     ";
     if ($results = $DB->get_records_sql($sql)) {
+        $stats = [];
         foreach ($results as $r) {
             $stats[$r->status] = $r->value;
         }
@@ -2384,7 +2247,7 @@ function tracker_print_direct_editor($attributes, $values, $options) {
                            'width' => 600,
                            'style' => 'border:1px solid #000');
             $str .= html_writer::tag('object', '', $attrs);
-            $sr .= '</div>';
+            $str .= '</div>';
             $str .= '</noscript>';
         }
     }
@@ -2554,6 +2417,7 @@ function tracker_resolve_screen(&$tracker, &$cm, $getdefault = false) {
     if (!$getdefault) {
         $screen = optional_param('screen', @$SESSION->tracker_current_screen, PARAM_ALPHA);
     }
+
     if (empty($screen)) {
         if (has_capability('mod/tracker:develop', $context)) {
             $defaultscreen = 'mywork';
@@ -2566,7 +2430,9 @@ function tracker_resolve_screen(&$tracker, &$cm, $getdefault = false) {
     }
 
     if ($tracker->supportmode == 'ticketting' && $screen == 'browse') {
-        return 'mytickets';
+        $screen = 'mytickets';
+        $SESSION->tracker_current_screen = $screen;
+        return $screen;
     }
 
     // Some forced modes.
@@ -2664,3 +2530,8 @@ function tracker_has_assigned($tracker, $resolved = false) {
     return $DB->count_records_select('tracker_issue', $select, array($tracker->id, $USER->id));
 }
 
+function tracker_has_dependancies($tracker) {
+    global $DB;
+
+    return $DB->record_exists('tracker_issuedependancy', ['trackerid' => $tracker->id]);
+}

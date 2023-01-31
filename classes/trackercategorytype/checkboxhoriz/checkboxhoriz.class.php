@@ -21,6 +21,8 @@
  *
  * A class implementing a checkbox element
  */
+namespace mod_tracker;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/checkbox/checkbox.class.php');

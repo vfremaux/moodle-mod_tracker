@@ -142,6 +142,16 @@ $capabilities = array(
         )
     ),
 
+    'mod/tracker:editcomment' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetype' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+
     'mod/tracker:configure' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,

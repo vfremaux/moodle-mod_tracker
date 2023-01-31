@@ -21,6 +21,8 @@
  *
  * A class implementing a radio button (exclusive choice) element horizontally displayed
  */
+namespace mod_tracker;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/radio/radio.class.php');

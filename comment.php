@@ -60,38 +60,46 @@ if ($form->is_cancelled()) {
 
 if ($data = $form->get_data()) {
 
-    if (empty($data->commentid)) {
-        $comment = new StdClass();
-        $comment->comment = $data->comment_editor['text'];
-        $comment->commentformat = $data->comment_editor['format'];
-        $comment->userid = $USER->id;
-        $comment->trackerid = $tracker->id;
-        $comment->issueid = $issueid;
-        $comment->datecreated = time();
-        $comment->id = $DB->insert_record('tracker_issuecomment', $comment);
+    $data->commentformat = $data->comment_editor['format'];
+    $data->comment = $data->comment_editor['text'];
+
+    $draftideditor = file_get_submitted_draft_itemid('comment_editor');
+
+    if (!empty($data->commentid)) {
+        $data->id = $data->commentid;
+        $data->trackerid = $tracker->id;
+        $data->userid = $USER->id;
+        unset($data->commentid);
+
+        $data->comment = file_save_draft_area_files($draftideditor, $context->id, 'mod_tracker', 'issuecomment',
+                                                        $data->id, $form->editoroptions, $data->comment);
+        $data = file_postupdate_standard_editor($data, 'comment', $form->editoroptions, $context, 'mod_tracker',
+                                                'issuecomment', $data->id);
+
+        $DB->update_record('tracker_issuecomment', $data);
+
+        $event = \mod_tracker\event\tracker_issuecommented::create_from_issue($tracker, $issueid);
+        $event->trigger();
     } else {
-        $comment = $data;
-        $comment->id = $comment->commentid;
-        unset($data->id);
-        $DB->update_record('tracker_issuecomment', $comment);
+        $data->userid = $USER->id;
+        $data->trackerid = $tracker->id;
+        $data->datecreated = time();
+        $data->id = $DB->insert_record('tracker_issuecomment', $data);
+
+        $data->comment = file_save_draft_area_files($draftideditor, $context->id, 'mod_tracker', 'issuecomment',
+                                                        $data->id, $form->editoroptions, $data->comment);
+        $data = file_postupdate_standard_editor($data, 'comment', $form->editoroptions, $context, 'mod_tracker',
+                                                'issuecomment', $data->id);
+
+        $DB->set_field('tracker_issuecomment', 'comment', $data->comment, ['id' => $data->id]);
     }
 
     if ($tracker->allownotifications) {
-        tracker_notifyccs_comment($issueid, $comment->comment, $tracker);
+        tracker_notifyccs_comment($issueid, $data->comment, $tracker);
     }
     tracker_register_cc($tracker, $issue, $USER->id);
 
-    // Stores files.
-    $data = file_postupdate_standard_editor($data, 'comment', $form->editoroptions, $context,
-                                            'mod_tracker', 'issuecomment', $commentid);
-
-    // Update back reencoded field text content.
-    $DB->set_field('tracker_issuecomment', 'comment', $data->comment, array('id' => $comment->id));
-    $params = array('id' => $id, 'view' => 'view', 'screen' => 'viewanissue', 'issueid' => $issueid);
-
-    $event = \mod_tracker\event\tracker_issuecommented::create_from_issue($tracker, $issueid);
-    $event->trigger();
-
+    $params = ['view' => 'view', 'screen' => 'viewanissue', 'id' => $cm->id, 'issueid' => $data->issueid];
     redirect(new moodle_url('/mod/tracker/view.php', $params));
 }
 
@@ -103,12 +111,24 @@ echo $OUTPUT->heading('['.$tracker->ticketprefix.$issue->id.'] '.$issue->summary
 
 $description = file_rewrite_pluginfile_urls($issue->description, 'pluginfile.php', $context->id, 'mod_tracker',
                                             'issuedescription', $issue->id);
+
+if ($lastcomments = $DB->get_records('tracker_issuecomment', array('issueid' => $issue->id), 'datecreated DESC', '*', 0, 1)) {
+    $lastcomment = array_shift($lastcomments);
+}
+
 echo $OUTPUT->box(format_text($description, $issue->descriptionformat), 'tracker-issue-description');
+
+$renderer = $PAGE->get_renderer('mod_tracker');
+if (!empty($lastcomment)) {
+    echo $renderer->last_comment($lastcomment, $context);
+}
 
 echo $OUTPUT->heading(get_string('addacomment', 'tracker'));
 
 if (!empty($commentid)) {
-    $form->set_date($comment);
+    $comment->commentid = $comment->id;
+    $comment->id = $cm->id;
+    $form->set_data($comment);
 }
 $form->display();
 

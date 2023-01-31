@@ -21,152 +21,90 @@
  *
  * Controller for all "profile" related views
  *
- * @usecase savequery (form)
- * @usecase dosavequery
- * @usecase viewquery
- * @usecase editquery (form)
- * @usecase updatequery
- * @usecase deletequery
  * @usecase register
  * @usecase unregister
  * @usecase editwatch (form)
  * @usecase updatewatch
  * @usecase saveprefs
  */
+namespace mod_tracker;
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($action == 'savequery') {
+require_once($CFG->dirroot.'/mod/tracker/classes/controller.class.php');
 
-    // Ask for a new search query **************************************************************.
-    // Collects name and description on the way.
+class profile_controller extends base_controller {
 
-    $fields = tracker_extractsearchparametersfrompost();
-    $form->fields = serialize($fields); // Serialize for passthru.
-    $form->action = 'dosaveasquery';
-    $form->description = tracker_printsearchfields($fields);
-    echo $renderer->add_query_form($cm, $form);
-    return -1;
+    public function receive($cmd, $data = null) {
 
-} else if ($action == 'dosaveasquery') {
+        if (parent::receive($cmd, $data)) {
+            return;
+        }
 
-    // Saves a new search query ****************************************************************.
+        switch ($cmd) {
+            case 'register': {
+                $this->data->issueid = required_param('issueid', PARAM_INT);
+                $this->received = true;
+                break;
+            }
 
-    $query->format = required_param('format', PARAM_INT);
-    $query->name = required_param('name', PARAM_TEXT);
-    $query->description = str_replace("'", "''", required_param('description', PARAM_CLEANHTML));
-
-    if (empty($query->name)) {
-        $error->message = get_string('namecannotbeblank', 'tracker');
-        $error->on = 'name';
-        $errors[] = $error;
-        $form->description = $query->description;
-        include($CFG->dirroot.'/mod/tracker/views/addaquery.html');
-        return -1;
+            case 'unregister': {
+                $this->data->issueid = required_param('issueid', PARAM_INT);
+                $this->data->ccid = required_param('ccid', PARAM_INT);
+                $this->received = true;
+                break;
+            }
+        }
     }
 
-    $fields = unserialize(stripslashes(required_param('fields', PARAM_RAW)));
-    $query->trackerid = $tracker->id;
-    if (! tracker_savesearchparameterstodb($query, $fields)) {
-        print_error('errorunabletosavequery', 'tracker',  $url.'&amp;view=profile');
+    public function process($cmd) {
+        global $DB, $USER;
+
+        parent::process($cmd);
+
+        if ($cmd == 'register') {
+            // Register to an issue ************************************************************************.
+            $params = array('trackerid' => $this->tracker->id, 'issueid' => $this->data->issueid, 'userid' => $USER->id);
+            if (!$DB->get_record('tracker_issuecc', $params)) {
+                $cc->trackerid = $this->tracker->id;
+                $cc->issueid = $this->data->issueid;
+                $cc->userid = $USER->id;
+                $cc->events = (isset($USER->trackerprefs->eventmask)) ? $USER->trackerprefs->eventmask : ALL_EVENTS;
+                $DB->insert_record('tracker_issuecc', $cc);
+            }
+            $this->done = true;
+
+        } else if ($cmd == 'unregister') {
+            // Unregister a watch on an issue *************************************************************.
+            if (!$DB->delete_records('tracker_issuecc', array('trackerid' => $tracker->id, 'issueid' => $issueid, 'userid' => $ccid))) {
+                $e->issue = $tracker->ticketprefix.$issueid;
+                $e->userid = $ccid;
+                print_error('errorcannotdeletecarboncopyforuser', 'tracker', $e);
+            }
+            $this->done = true;
+
+        } else if ($action == 'unregisterall') {
+            // Unregister all my watches ******************************************************************.
+            $userid = required_param('userid', PARAM_INT);
+            $DB->delete_records ('tracker_issuecc', array('trackerid' => $tracker->id, 'userid' => $userid));
+            $this->done = true;
+
+        } else if ($action == 'editwatch') {
+            // Ask for editing the watchers configuration ************************************************.
+            $ccid = optional_param('ccid', '', PARAM_INT);
+            if (!$form = $DB->get_record('tracker_issuecc', array('id' => $ccid))) {
+                print_error('errorcannoteditwatch', 'tracker');
+            }
+            $issue = $DB->get_record('tracker_issue', array('id' => $form->issueid));
+            $form->summary = $issue->summary;
+
+            include($CFG->dirroot.'/mod/tracker/views/editwatch.html');
+            $this->done = true;
+            return -1;
+
+        } else if ($action == 'saveprefs') {
+            assert(1);
+            // Deferred to mypreferences.php view.
+        }
     }
-
-} else if ($action == 'viewquery') {
-
-    // Ask for viewing a personal search query *****************************************************.
-
-    $fields = tracker_extractsearchparametersfromdb();
-    include($CFG->dirroot.'/mod/tracker/views/editquery.html');
-
-} else if ($action == 'editquery') {
-
-    // Ask for editing a personal search query *****************************************************.
-
-    $form->queryid = required_param('queryid', PARAM_INT);
-    $query = $DB->get_record('tracker_query', array('id' => $form->queryid));
-    $fields = tracker_extractsearchparametersfromdb($form->queryid);
-    $form->name = $query->name;
-    $form->checkdate = (empty($fields['datereported'])) ? false : true;
-    if (empty($fields['reportedby'])) {
-        $fields['reportedby'] = array();
-    }
-    if (empty($fields['summary'])) {
-        $fields['summary'] = array();
-    }
-    if (empty($fields['description'])) {
-        $fields['description'] = array();
-    }
-    if (empty($fields['id'])) {
-        $fields['id'] = array();
-    }
-    include($CFG->dirroot.'/mod/tracker/views/editquery.html');
-    return -1;
-
-} else if ($action == 'updatequery') {
-
-    // Updates a personal search query ****************************************************************.
-
-    $query->id = required_param('queryid', PARAM_INT);
-    $fields = tracker_extractsearchparametersfrompost();
-    $query->trackerid = $tracker->id;
-    if (! tracker_savesearchparameterstodb($query, $fields)) {
-        print_error('errorunabletosavequeryid', 'tracker',  $url.'&amp;view=profile', $query->id);
-    }
-} else if ($action == 'deletequery') {
-
-    // Deletes a personal search query **************************************************************.
-
-    $queryid = optional_param('queryid', '', PARAM_INT);
-    if (! $DB->delete_records ('tracker_query', 'id', $queryid, 'trackerid', $tracker->id, 'userid', $USER->id)) {
-        print_error('errorcannotdeletequeryid', 'tracker',  $url.'&amp;view=profile', $queryid);
-    }
-} else if ($action == 'register') {
-
-    // Register to an issue ************************************************************************.
-
-    $issueid = optional_param('issueid', '', PARAM_INT);
-    $params = array('trackerid' => $tracker->id, 'issueid' => $issueid, 'userid' => $USER->id);
-    if (!$DB->get_record('tracker_issuecc', $params)) {
-        $cc->trackerid = $tracker->id;
-        $cc->issueid = $issueid;
-        $cc->userid = $USER->id;
-        $cc->events = (isset($USER->trackerprefs->eventmask)) ? $USER->trackerprefs->eventmask : ALL_EVENTS;
-        $DB->insert_record('tracker_issuecc', $cc);
-    }
-
-} else if ($action == 'unregister') {
-
-    // Unregister a watch on an issue *************************************************************.
-
-    $issueid = required_param('issueid', PARAM_INT);
-    $ccid = required_param('ccid', PARAM_INT);
-    if (!$DB->delete_records('tracker_issuecc', array('trackerid' => $tracker->id, 'issueid' => $issueid, 'userid' => $ccid))) {
-        $e->issue = $tracker->ticketprefix.$issueid;
-        $e->userid = $ccid;
-        print_error('errorcannotdeletecarboncopyforuser', 'tracker', $e);
-    }
-} else if ($action == 'unregisterall') {
-
-    // Unregister all my watches ******************************************************************.
-
-    $userid = required_param('userid', PARAM_INT);
-    $DB->delete_records ('tracker_issuecc', array('trackerid' => $tracker->id, 'userid' => $userid));
-
-} else if ($action == 'editwatch') {
-
-    // Ask for editing the watchers configuration ************************************************.
-
-    $ccid = optional_param('ccid', '', PARAM_INT);
-    if (!$form = $DB->get_record('tracker_issuecc', array('id' => $ccid))) {
-        print_error('errorcannoteditwatch', 'tracker');
-    }
-    $issue = $DB->get_record('tracker_issue', array('id' => $form->issueid));
-    $form->summary = $issue->summary;
-
-    include($CFG->dirroot.'/mod/tracker/views/editwatch.html');
-    return -1;
-
-} else if ($action == 'saveprefs') {
-    assert(1);
-    // Deferred to mypreferences.php view.
 }

@@ -21,6 +21,10 @@
  *
  * A class implementing a textarea element and all its representations
  */
+namespace mod_tracker;
+
+use html_writer;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/text/text.class.php');
@@ -40,6 +44,13 @@ class textareaelement extends textelement {
 
     public function view_query() {
         echo '<input type="text" name="element'.$this->name.'" style="width:100%" />';
+    }
+
+    /**
+     * If true, this element can be told to be listable.
+     */
+    public function has_listable_option() {
+        return false;
     }
 
     public function add_form_element(&$mform) {
