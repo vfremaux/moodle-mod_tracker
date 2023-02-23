@@ -463,7 +463,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $template->historystr = get_string('history', 'tracker');
         $template->assigneesstr = get_string('assignees', 'tracker');
         $template->bystr = get_string('by', 'tracker');
-        $teplate->history = array();
+        $template->history = array();
 
         if (!empty($history)) {
             foreach ($history as $owner) {
@@ -474,7 +474,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 $histtpl->date = userdate($owner->timeassigned);
                 $histtpl->user = $this->user($user);
                 $histtpl->username = fullname($bywhom);
-                $teplate->history[] = $histtpl;
+                $template->history[] = $histtpl;
             }
         }
 
