@@ -32,7 +32,6 @@ $plugin->requires = 2020060900;
 $plugin->component = 'mod_tracker';   // Full name of the plugin (used for diagnostics).
 $plugin->maturity = MATURITY_STABLE;
 $plugin->release = '3.9.0 (Build 2021121300)';
-$plugin->dependencies = array('local_vflibs' => 2016081100);
 
 // Non Moodle attributes.
 $plugin->codeincrement = '3.9.0009';

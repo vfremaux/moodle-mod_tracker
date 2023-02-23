@@ -463,6 +463,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         $template->historystr = get_string('history', 'tracker');
         $template->assigneesstr = get_string('assignees', 'tracker');
         $template->bystr = get_string('by', 'tracker');
+        $teplate->history = array();
 
         if (!empty($history)) {
             foreach ($history as $owner) {
