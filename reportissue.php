@@ -84,7 +84,6 @@ if ($data = $form->get_data()) {
     echo (empty($tracker->thanksmessage)) ? get_string('thanksdefault', 'tracker') : format_string($tracker->thanksmessage);
     echo $OUTPUT->box_end();
     echo $OUTPUT->continue_button(new moodle_url('/mod/tracker/view.php', array('id' => $cm->id, 'view' => 'view', 'screen' => 'browse')));
-    echo $OUTPUT->footer();
 
     tracker_recordelements($issue, $data);
 
@@ -95,6 +94,8 @@ if ($data = $form->get_data()) {
             tracker_notifyccs_changeownership($issue->id, $tracker);
         }
     }
+    echo $OUTPUT->footer();
+    die;
 }
 
 echo $OUTPUT->header();

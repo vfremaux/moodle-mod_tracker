@@ -1,7 +1,7 @@
 
+/*eslint-disable no-unused-vars */
 
-
-define(['jquery', 'core/config', 'core/log'], function($, cfg, log) {
+define(['jquery', 'core/config', 'core/log', 'mod_tracker/bootstrap-select'], function($, cfg, log, bootstrapselect) {
 
     var moodletrackerlist = {
 
@@ -9,11 +9,17 @@ define(['jquery', 'core/config', 'core/log'], function($, cfg, log) {
 
             $(".tracker-issue-edit-handle").bind('click', this.load_change_form);
             $("#modal-status-save").bind('click', this.submit_change_form);
+            $(".tracker-quick-solve-buttons").bind('click', this.solve_issue);
+            $('#tracker-quick-find-input').bind('change', this.quick_find);
             log.debug('AMD Tracker List initialized');
         },
 
         load_change_form: function() {
             var that = $(this);
+
+            var waiter = '<div class="centered"><center><img id="detail-waiter" src="';
+            waiter += cfg.wwwroot + '/pix/i/ajaxloader.gif" /></center></div>';
+            $('#issuelist-edit-inner-form').html(waiter);
 
             var id = that.attr('id').replace(/issue-edit-(.*?)-handle-/, '');
             var mode = that.attr('data-mode');
@@ -72,7 +78,26 @@ define(['jquery', 'core/config', 'core/log'], function($, cfg, log) {
             ];
 
             return statuscodes[statusix];
+        },
+
+        solve_issue: function() {
+            var that = $(this);
+
+            var issueid = that.attr('id').replace('resolve-', '');
+            var cmid = that.attr('data-cmid');
+            var url = cfg.wwwroot + '/mod/tracker/view.php?id=' + cmid;
+            url += '&view=view';
+            url += '&screen=mytickets';
+            url += '&what=solve';
+            url += '&issueid=' + issueid;
+            url += '&sesskey=' + cfg.sesskey;
+            window.location = url;
+        },
+
+        quick_find: function() {
+            $('#id-quick-find-form').submit();
         }
+
     };
 
     return moodletrackerlist;

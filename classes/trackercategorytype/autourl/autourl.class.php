@@ -21,6 +21,10 @@
  *
  * A class implementing a hidden/labelled element that captures the referer url
  */
+namespace mod_tracker;
+
+use StdClass;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
@@ -79,6 +83,13 @@ class autourlelement extends trackerelement {
         } else {
             $DB->update_record('tracker_issueattribute', $attribute);
         }
+    }
+
+    /**
+     * If true, this element can be told to be listable.
+     */
+    public function has_listable_option() {
+        return false;
     }
 
     public function set_data(&$defaults, $issueid = 0) {

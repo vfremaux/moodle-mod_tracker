@@ -82,18 +82,20 @@ class mod_tracker_mod_form extends moodleform_mod {
         $mform->setType('thanksmessage', PARAM_TEXT);
         $mform->setAdvanced('thanksmessage');
 
-        $mform->addElement('checkbox', 'enablecomments', get_string('enablecomments', 'tracker'));
+        $mform->addElement('advcheckbox', 'enablecomments', get_string('enablecomments', 'tracker'));
         $mform->addHelpButton('enablecomments', 'enablecomments', 'tracker');
 
-        $mform->addElement('checkbox', 'allownotifications', get_string('notifications', 'tracker'));
+        $mform->addElement('advcheckbox', 'allownotifications', get_string('notifications', 'tracker'));
         $mform->addHelpButton('allownotifications', 'notifications', 'tracker');
 
-        $mform->addElement('checkbox', 'strictworkflow', get_string('strictworkflow', 'tracker'));
+        $mform->addElement('advcheckbox', 'strictworkflow', get_string('strictworkflow', 'tracker'));
         $mform->addHelpButton('strictworkflow', 'strictworkflow', 'tracker');
 
         if (isset($this->_cm->id)) {
             $context = context_module::instance($this->_cm->id);
-            $fields = 'u.id,'.get_all_user_name_fields(true, 'u');
+			// M4
+            $fields = \core_user\fields::for_name()->excluding('id')->get_required_fields();
+            $fields = 'u.id,'.implode(',', $fields);
             $order = 'lastname, firstname';
             if ($assignableusers = get_users_by_capability($context, 'mod/tracker:resolve', $fields, $order)) {
                 $useropts[0] = get_string('none');

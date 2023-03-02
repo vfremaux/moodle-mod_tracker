@@ -162,66 +162,94 @@ class mod_tracker_admin_renderer extends \plugin_renderer_base {
                     }
                 }
 
-                if ($element->has_mandatory_option()) {
-                    if ($element->mandatory) {
-                        $params = array('id' => $this->cm->id,
-                                        'view' => 'admin',
-                                        'what' => 'setnotmandatory',
-                                        'usedid' => $element->id);
-                        $url = new moodle_url('/mod/tracker/view.php', $params);
-                        $alt = get_string('setnotmandatory', 'tracker');
-                        $pix = $this->output->pix_icon('notempty', $alt, 'tracker');
-                        $actions .= '&nbsp;<a href="'.$url.'" title="'.$alt.'">'.$pix.'</a>';
+                if (tracker_supports_feature('items/mandatories')) {
+                    if ($element->has_mandatory_option()) {
+                        if ($element->mandatory) {
+                            $params = array('id' => $this->cm->id,
+                                            'view' => 'admin',
+                                            'what' => 'setnotmandatory',
+                                            'usedid' => $element->id);
+                            $url = new moodle_url('/mod/tracker/view.php', $params);
+                            $alt = get_string('setnotmandatory', 'tracker');
+                            $pix = $this->output->pix_icon('notempty', $alt, 'tracker');
+                            $actions .= '&nbsp;<a href="'.$url.'" title="'.$alt.'">'.$pix.'</a>';
+                        } else {
+                            $params = array('id' => $this->cm->id,
+                                            'view' => 'admin',
+                                            'what' => 'setmandatory',
+                                            'usedid' => $element->id);
+                            $url = new moodle_url('/mod/tracker/view.php', $params);
+                            $alt = get_string('setmandatory', 'tracker');
+                            $pix = $this->output->pix_icon('empty', $alt, 'tracker');
+                            $actions .= '&nbsp;<a href="'.$url.'" title="'.$alt.'">'.$pix.'</a>';
+                        }
                     } else {
-                        $params = array('id' => $this->cm->id,
-                                        'view' => 'admin',
-                                        'what' => 'setmandatory',
-                                        'usedid' => $element->id);
-                        $url = new moodle_url('/mod/tracker/view.php', $params);
-                        $alt = get_string('setmandatory', 'tracker');
-                        $pix = $this->output->pix_icon('empty', $alt, 'tracker');
-                        $actions .= '&nbsp;<a href="'.$url.'" title="'.$alt.'">'.$pix.'</a>';
-                    }
-                } else {
-                    if ($element->mandatory) {
-                        $mandatorystr = get_string('ismandatory', 'tracker');
-                        $actions .= $this->output->pix_icon('notempty', $mandatorystr, 'tracker');
-                    } else {
-                        $mandatorystr = get_string('isoptional', 'tracker');
-                        $actions .= '&nbsp;'.$this->output->pix_icon('empty', $mandatorystr, 'tracker');
+                        if ($element->mandatory) {
+                            $mandatorystr = get_string('ismandatory', 'tracker');
+                            $actions .= $this->output->pix_icon('notempty', $mandatorystr, 'tracker');
+                        } else {
+                            $mandatorystr = get_string('isoptional', 'tracker');
+                            $actions .= '&nbsp;'.$this->output->pix_icon('empty', $mandatorystr, 'tracker');
+                        }
                     }
                 }
 
-                if ($element->has_private_option() && !$element->mandatory) {
-                    if ($element->private) {
-                        $params = array('id' => $this->cm->id,
-                                        'view' => 'admin',
-                                        'what' => 'setpublic',
-                                        'usedid' => $element->id);
-                        $url = new moodle_url('/mod/tracker/view.php', $params);
-                        $alt = get_string('setpublic', 'tracker');
-                        $actions .= '&nbsp;'.$this->output->pix_icon('t/locked', $alt, 'core');
+                if (tracker_supports_feature('items/privates')) {
+                    if ($element->has_private_option() && !$element->mandatory) {
+                        if ($element->private) {
+                            $params = array('id' => $this->cm->id,
+                                            'view' => 'admin',
+                                            'what' => 'setpublic',
+                                            'usedid' => $element->id);
+                            $url = new moodle_url('/mod/tracker/view.php', $params);
+                            $alt = get_string('setpublic', 'tracker');
+                            $actions .= '&nbsp;'.$this->output->pix_icon('t/locked', $alt, 'core');
+                        } else {
+                            $params = array('id' => $this->cm->id,
+                                            'view' => 'admin',
+                                            'what' => 'setprivate',
+                                            'usedid' => $element->id);
+                            $url = new moodle_url('/mod/tracker/view.php', $params);
+                            $alt = get_string('setprivate', 'tracker');
+                            $pix = $this->output->pix_icon('t/lock', $alt, 'core');
+                            $actions .= '&nbsp;<a href="'.$url.'" title="'.$alt.'">'.$pix.'</a>';
+                        }
                     } else {
-                        $params = array('id' => $this->cm->id,
-                                        'view' => 'admin',
-                                        'what' => 'setprivate',
-                                        'usedid' => $element->id);
-                        $url = new moodle_url('/mod/tracker/view.php', $params);
-                        $alt = get_string('setprivate', 'tracker');
-                        $pix = $this->output->pix_icon('t/lock', $alt, 'core');
-                        $actions .= '&nbsp;<a href="'.$url.'" title="'.$alt.'">'.$pix.'</a>';
+                        if ($element->has_private_option()) {
+                            // Is can choose privac but mandatory, needs to be forced visible.
+                            $DB->set_field('tracker_elementused', 'private', 0, array('id' => $element->id));
+                        }
+                        if ($element->private) {
+                            $privatestr = get_string('isprivate', 'tracker');
+                            $actions .= '&nbsp;'.$this->output->pix_icon('t/locked', $privatestr, 'core');
+                        } else {
+                            $privatestr = get_string('ispublic', 'tracker');
+                            $actions .= '&nbsp;'.$this->output->pix_icon('t/lock', $privatestr, 'core');
+                        }
                     }
-                } else {
-                    if ($element->has_private_option()) {
-                        // Is can choose privac but mandatory, needs to be forced visible.
-                        $DB->set_field('tracker_elementused', 'private', 0, array('id' => $element->id));
-                    }
-                    if ($element->private) {
-                        $privatestr = get_string('isprivate', 'tracker');
-                        $actions .= '&nbsp;'.$this->output->pix_icon('t/locked', $privatestr, 'core');
-                    } else {
-                        $privatestr = get_string('ispublic', 'tracker');
-                        $actions .= '&nbsp;'.$this->output->pix_icon('t/lock', $privatestr, 'core');
+                }
+
+                if (tracker_supports_feature('items/listables')) {
+                    if ($element->has_listable_option()) {
+                        if ($element->listable) {
+                            $params = array('id' => $this->cm->id,
+                                            'view' => 'admin',
+                                            'what' => 'setnotlistable',
+                                            'usedid' => $element->id);
+                            $url = new moodle_url('/mod/tracker/view.php', $params);
+                            $alt = get_string('setnotlistable', 'tracker');
+                            $pix = $this->output->pix_icon('listed', $alt, 'tracker');
+                            $actions .= '&nbsp;<a href="'.$url.'" title="'.$alt.'">'.$pix.'</a>';
+                        } else {
+                            $params = array('id' => $this->cm->id,
+                                            'view' => 'admin',
+                                            'what' => 'setlistable',
+                                            'usedid' => $element->id);
+                            $url = new moodle_url('/mod/tracker/view.php', $params);
+                            $alt = get_string('setlistable', 'tracker');
+                            $pix = $this->output->pix_icon('unlisted', $alt, 'tracker');
+                            $actions .= '&nbsp;<a href="'.$url.'" title="'.$alt.'">'.$pix.'</a>';
+                        }
                     }
                 }
 
