@@ -43,8 +43,7 @@ $params = array('tracker' => $tracker,
                 'issueid' => $issueid,
                 'view' => 'view',
                 'screen' => 'editanissue');
-$urlparams = array('issueid' => $issueid,
-                    'view' => 'view',
+$urlparams = array('view' => 'view',
                     'screen' => 'editanissue');
 $form = new TrackerIssueForm(new moodle_url('/mod/tracker/view.php', $urlparams), $params);
 
@@ -58,33 +57,33 @@ if ($form->is_cancelled()) {
 
 if ($data = $form->get_data()) {
 
-    $issueid = $issue->id = $data->issueid;
+    $issueid = $data->issueid;
 
     if (!$issue = tracker_submitanissue($tracker, $data)) {
         print_error('errorcannotsubmitticket', 'tracker');
     }
 
-    $event = \mod_tracker\event\tracker_issuereported::create_from_issue($tracker, $issue->id);
+    $event = \mod_tracker\event\tracker_issuereported::create_from_issue($tracker, $issueid);
     $event->trigger();
 
     // Stores files.
     $data = file_postupdate_standard_editor($data, 'description', $form->editoroptions, $context, 'mod_tracker',
                                             'issuedescription', $data->issueid);
     // Update back reencoded field text content.
-    $DB->set_field('tracker_issue', 'description', $data->description, array('id' => $issue->id));
+    $DB->set_field('tracker_issue', 'description', $data->description, array('id' => $issueid));
 
     if (!empty($data->id)) {
         // Stores files.
         $data = file_postupdate_standard_editor($data, 'resolution', $form->editoroptions, $context, 'mod_tracker',
                                                 'issueresolution', $data->issueid);
         // Update back reencoded field text content.
-        $DB->set_field('tracker_issue', 'resolution', $data->resolution, array('id' => $issue->id));
+        $DB->set_field('tracker_issue', 'resolution', $data->resolution, array('id' => $issueid));
     }
 
     // Log state change.
     $stc = new StdClass;
     $stc->userid = $USER->id;
-    $stc->issueid = $data->issueid;
+    $stc->issueid = $issueid;
     $stc->trackerid = $tracker->id;
     $stc->timechange = time();
     $stc->statusfrom = $oldstate;
@@ -140,7 +139,7 @@ if ($data = $form->get_data()) {
     $params = array('id' => $cm->id,
                     'view' => 'view',
                     'screen' => 'viewanissue',
-                    'issueid' => $issueid);
+                    'issueid' => $issue->id);
     redirect(new moodle_url('/mod/tracker/view.php', $params));
 }
 

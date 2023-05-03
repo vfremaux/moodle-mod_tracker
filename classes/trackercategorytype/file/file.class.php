@@ -21,6 +21,12 @@
  *
  * A class implementing a filepicker element
  */
+namespace mod_tracker;
+
+use StdClass;
+use html_writer;
+use file_picker;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/trackerelement.class.php');
@@ -78,6 +84,13 @@ class fileelement extends trackerelement {
             $html .= html_writer::end_tag('span');
             return $html;
         }
+    }
+
+    /**
+     * If true, this element can be told to be listable.
+     */
+    public function has_listable_option() {
+        return false;
     }
 
     public function edit($issueid = 0) {
@@ -146,16 +159,18 @@ class fileelement extends trackerelement {
     public function set_data(&$defaults, $issueid = 0) {
         global $COURSE, $DB;
 
-        if ($attribute = $DB->get_record('tracker_issueattribute', array('issueid' => $issueid, 'elementid' => $this->id))) {
-            $itemid = $attribute->id;
+        if ($issueid) {
+            if ($attribute = $DB->get_record('tracker_issueattribute', array('issueid' => $issueid, 'elementid' => $this->id))) {
+                $itemid = $attribute->id;
+            } else {
+                $itemid = 0;
+            }
         } else {
             $itemid = 0;
         }
 
         $elmname = 'element'.$this->name;
         $draftitemid = file_get_submitted_draft_itemid($elmname);
-
-        echo "Item id : {$this->context->id} / {$this->id} $issueid ";
 
         file_prepare_draft_area($draftitemid, $this->context->id, 'mod_tracker', 'issueattribute',
                                 $itemid, $this->filemanageroptions);

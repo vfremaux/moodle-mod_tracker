@@ -78,7 +78,7 @@ if (empty($mywatches)) {
         $notifications = '';
         foreach ($states as $statekey => $state) {
             if (($tracker->enabledstates) & $statekey || ($statekey == ON_COMMENT)) {
-                $pixurl = $OUTPUT->pix_url($state[0], 'mod_tracker');
+                $pixurl = $OUTPUT->image_url($state[0], 'mod_tracker');
                 if ($awatch->events & $statekey) {
                     $pixid = 'watch-'.$state[0].'-'.$awatch->id.'-img';
                     $pix = '<img id="'.$pixid.'" class="" src="'.$pixurl.'" />';

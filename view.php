@@ -30,7 +30,7 @@ require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 
 $PAGE->requires->jquery();
 $PAGE->requires->js_call_amd('mod_tracker/tracker', 'init');
-$PAGE->requires->jquery_plugin('mod-tracker-bootstrapselect', 'mod_tracker', true);
+$PAGE->requires->css('/mod/tracker/css/bootstrap-select.css');
 
 // Check for required parameters.
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID
@@ -86,25 +86,8 @@ tracker_loadpreferences($tracker->id, $USER->id);
 // Search controller - special implementation.
 // TODO : consider incorporing this controller back into standard MVC.
 
-if ($action == 'searchforissues') {
-    $search = optional_param('search', null, PARAM_CLEANHTML);
-    $saveasreport = optional_param('saveasreport', null, PARAM_CLEANHTML);
-
-    // Search for issues.
-    if (!empty($search)) {
-        tracker_searchforissues($tracker, $cm->id);
-    } else if (!empty ($saveasreport)) {
-        // Save search as a report.
-        tracker_saveasreport($tracker->id);
-    }
-} else if ($action == 'viewreport') {
+if ($action == 'viewreport') {
     tracker_viewreport($tracker->id);
-} else if ($action == 'clearsearch') {
-    if (tracker_clearsearchcookies($tracker->id)) {
-        $returnview = ($tracker->supportmode == 'bugtracker') ? 'browse' : 'mytickets';
-        $params = array('id' => $cm->id, 'view' => 'view', 'screen' => $returnview);
-        redirect(new moodle_url('/mod/tracker/view.php', $params));
-    }
 }
 
 $strtrackers = get_string('modulenameplural', 'tracker');
@@ -125,6 +108,7 @@ $PAGE->set_context($context);
 $PAGE->set_title(format_string($tracker->name));
 $PAGE->set_heading(format_string($tracker->name));
 $PAGE->set_url($url);
+$resolved = 0;
 
 if ($screen == 'print') {
     $PAGE->set_pagelayout('embedded');
@@ -137,19 +121,41 @@ $renderer = $PAGE->get_renderer('tracker');
 $result = 0;
 if ($view == 'view') {
     if ($action != '') {
-        $result = include($CFG->dirroot.'/mod/tracker/views/view.controller.php');
+        $controller = tracker_get_controller('view', $tracker, $cm);
+        $controller->receive($action);
+        if ($redirecturl = $controller->process($action)) {
+            redirect($redirecturl);
+        }
     }
 } else if ($view == 'resolved') {
     if ($action != '') {
-        $result = include($CFG->dirroot.'/mod/tracker/views/view.controller.php');
+        $controller = tracker_get_controller('view', $tracker, $cm);
+        $controller->receive($action);
+        if ($redirecturl = $controller->process($action)) {
+            if ($redirecturl != -1) {
+                redirect($redirecturl);
+            }
+        }
     }
 } else if ($view == 'admin') {
     if ($action != '') {
-        $result = include($CFG->dirroot.'/mod/tracker/views/admin.controller.php');
+        $controller = tracker_get_controller('admin', $tracker, $cm, $url);
+        $controller->receive($action);
+        if ($redirecturl = $controller->process($action)) {
+            if ($redirecturl instanceof moodle_url) {
+                redirect($redirecturl);
+            }
+        }
     }
 } else if ($view == 'profile') {
     if ($action != '') {
-        $result = include($CFG->dirroot.'/mod/tracker/views/profile.controller.php');
+        $controller = tracker_get_controller('profile', $tracker, $cm);
+        $controller->receive($action);
+        if ($redirecturl = $controller->process($action)) {
+            if ($redirecturl != -1) {
+                redirect($redirecturl);
+            }
+        }
     }
 }
 
@@ -161,8 +167,12 @@ if (!in_array($screen, array('editanissue'))) {
 }
 
 // A pre-buffer that may be a controller output.
-if (!empty($out)) {
-    $output .= $out;
+if (!empty($controller->out)) {
+    $output .= $controller->out;
+    $output .= $OUTPUT->box_end();
+    $output .= $OUTPUT->footer();
+    echo $output;
+    exit;
 }
 
 /*
@@ -242,7 +252,7 @@ if ($view == 'view') {
             case 'mytickets':
             default:
                 $resolved = 1;
-                include($CFG->dirroot.'/mod/tracker/views/viewmyticketslist.php');
+                include($CFG->dirroot.'/mod/tracker/views/viewissuelist.php');
         }
     }
 } else if ($view == 'reports') {
@@ -256,6 +266,7 @@ if ($view == 'view') {
 
             case 'print': {
                 if (tracker_supports_feature('reports/print')) {
+                    echo $output;
                     include($CFG->dirroot.'/mod/tracker/pro/report/print.php');
                 }
                 break;

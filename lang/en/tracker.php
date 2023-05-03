@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 $string['pluginname'] = 'Ticket Tracker/User support';
+$string['modulename'] = 'Ticket Tracker/User support';
 $string['pluginadministration'] = 'Tracker administration';
 
 // Capabilities.
@@ -22,6 +23,7 @@ $string['pluginadministration'] = 'Tracker administration';
 $string['tracker:addinstance'] = 'Add a tracker';
 $string['tracker:canbecced'] = 'Can be choosen for cc';
 $string['tracker:comment'] = 'Comment issues';
+$string['tracker:editcomment'] = 'Edit comments';
 $string['tracker:configure'] = 'Configure tracker options';
 $string['tracker:configurenetwork'] = 'Configure network features';
 $string['tracker:develop'] = 'Be choosen to resolve tickets';
@@ -44,6 +46,7 @@ $string['active'] = 'Active in form';
 $string['activeplural'] = 'Actives';
 $string['addacomment'] = 'Add a comment';
 $string['addanoption'] = 'Add an option';
+$string['addoption'] = 'Add option';
 $string['addawatcher'] = 'Add a watcher';
 $string['addtothetracker'] = 'Add to this tracker';
 $string['administration'] = 'Administration';
@@ -60,6 +63,7 @@ $string['backtocourse'] = 'Back to course';
 $string['bindlocaltracker'] = 'Bind this local tracker';
 $string['browse'] = 'Browse';
 $string['browser'] = 'Browser';
+$string['branchfromcomment'] = 'Branch from this comment';
 $string['build'] = 'Version';
 $string['by'] = '<i>assigned by</i>';
 $string['captcha'] = 'Captcha';
@@ -149,6 +153,7 @@ $string['doupdateelementtextarea'] = 'Update a text area'; // @DYNA
 $string['dropdown'] = 'Dropdown';
 $string['editelement'] = 'Update Form Element';
 $string['editoptions'] = 'Update options';
+$string['updateoption'] = 'Update option';
 $string['editproperties'] = 'Update properties';
 $string['editwatch'] = 'Change a cc registering';
 $string['elementcode'] = 'Element code';
@@ -158,8 +163,6 @@ $string['elucidationratio'] = 'Elucidation ratio';
 $string['emailoptions'] = 'Mail options';
 $string['emergency'] = 'Urgent query';
 $string['emptydefinition'] = 'Target tracker has no definition.';
-$string['emulatecommunity'] = 'Emulate community version';
-$string['emulatecommunity_desc'] = 'If enabled, the plugin will behave as the public community version. This might loose features !';
 $string['enablecomments'] = 'Allow comments';
 $string['enablecomments_help'] = 'When this option is enabled, readers of issue records can add comments in the tracker.';
 $string['erroraddissueattribute'] = 'Could not submit issue(s) attribute(s). Case {$a} ';
@@ -175,6 +178,7 @@ $string['errorcannotdeleteelement'] = 'Cannot delete element from list of elemen
 $string['errorcannotdeleteelementtouse'] = 'Cannot delete element from list of elements to use for this tracker';
 $string['errorcannotdeleteolddependancy'] = 'Could not delete old dependancies';
 $string['errorcannotdeleteoption'] = 'Error trying to delete element option';
+$string['cannotdeleteoption'] = 'Cannot delete element option because it is in use. Follow link to find usages.';
 $string['errorcannoteditwatch'] = 'Cannot edit this watch';
 $string['errorcannothideelement'] = 'Cannot hide element from form for this tracker';
 $string['errorcannotlogoldownership'] = 'Could not log old ownership';
@@ -256,7 +260,7 @@ $string['issuenumber'] = 'Ticket';
 $string['issues'] = 'ticket records';
 $string['issuestoassign'] = 'Tickets to assign: {$a}';
 $string['issuestowatch'] = 'Tickets to watch: {$a}';
-$string['issueupdated'] = 'A ticket has been updated in tracker [{$a}]';
+$string['issueupdated'] = '[{$a->tracker}:{$a->issueid}] Ticket updated. State : {$a->state}';
 $string['knownelements'] = 'Known tracker form elements';
 $string['lastcomment'] = 'Last comment: ';
 $string['listissues'] = 'List view';
@@ -331,18 +335,18 @@ $string['options'] = 'Options';
 $string['order'] = 'Order';
 $string['originalticketnoaccess'] = 'This ticket is transfered from another ticket you do not have read access on.';
 $string['pages'] = 'Pages';
-$string['plugindist'] = 'Plugin distribution';
 $string['posted'] = 'Posted';
 $string['potentialresolvers'] = 'Potential resolvers';
 $string['preferences'] = 'Preferences';
 $string['processing'] = 'Process';
 $string['prefsnote'] = 'Preferences setups which default notifications you may receive when creating a new entry or when you register a watch for an existing issue';
 $string['print'] = 'Print';
-$string['priority'] = 'Attributed Priority';
+$string['priority'] = 'Prior.';
 $string['priorityid'] = 'Priority';
 $string['private'] = 'Private info';
 $string['profile'] = 'User settings';
 $string['published'] = 'Published';
+$string['quickfind'] = 'Quick find';
 $string['radio'] = 'Radio buttons'; // @DYNA
 $string['radiohoriz'] = 'Horizontal radio buttons'; // @DYNA
 $string['raisepriority'] = 'Raise priority';
@@ -358,7 +362,6 @@ $string['reporter'] = 'Reporter';
 $string['reports'] = 'Reports';
 $string['resolution'] = 'Solution';
 $string['resolved'] = 'Resolved';
-$string['resolvedplural'] = 'Resolved';
 $string['resolvedplural'] = 'Resolved';
 $string['resolvedplural2'] = 'Resolved';
 $string['resolver'] = 'My issues';
@@ -379,6 +382,8 @@ $string['setnotmandatory'] = 'Set data not required ';
 $string['setoncomment'] = 'Send me the coments';
 $string['setprivate'] = 'Set info private to developers ';
 $string['setpublic'] = 'Set info public ';
+$string['setlistable'] = 'Show in list';
+$string['setnotlistable'] = 'Hide in list';
 $string['setwhenopens'] = 'Don\'t advise me when opens';
 $string['setwhenpublished'] = 'Don\'t advise me when solution is published';
 $string['setwhenresolves'] = 'Don\'t advise me when resolves';
@@ -393,18 +398,21 @@ $string['showcomments'] = 'Show comments';
 $string['showdependancies'] = 'Show dependancies';
 $string['showhistory'] = 'Show history';
 $string['site'] = 'Site';
+$string['solve'] = 'Mark Solved';
 $string['solution'] = 'Solution';
 $string['sortorder'] = 'Order';
+$string['splittedfrom'] = 'Splitted from: {$a}';
 $string['standalone'] = 'Standalone tracker (top level support).';
 $string['statehistory'] = 'States';
 $string['stateprofile'] = 'Ticket states';
 $string['status'] = 'Status';
 $string['strictworkflow'] = 'Strict workflow';
-$string['changedownership'] = 'A ticket has been reassigned in tracker [{$a}]';
-$string['commented'] = 'A ticket has been commented in tracker [{$a}]';
-$string['moved'] = 'A ticket has been moved in tracker [{$a}]';
-$string['submission'] = 'A new ticket is reported in tracker [{$a}]';
-$string['submitbug'] = 'Submit the ticket';
+$string['changedownership'] = '[{$a->tracker}:{$a->issueid}]  A ticket has been reassigned ';
+$string['commented'] = '[{$a->tracker}:{$a->issueid}] A ticket has been commented ';
+$string['moved'] = '[{$a->tracker}:{$a->issueid}] Ticket has been moved';
+$string['submission'] = '[{$a->tracker}:{$a->issueid}] A new ticket has been reported';
+$string['submitissue'] = 'Submit the ticket';
+$string['submitoption'] = 'Add option';
 $string['subtrackers'] = 'Subtrackers';
 $string['sum_opened'] = 'Opened';
 $string['sum_posted'] = 'Waiting';
@@ -423,7 +431,7 @@ $string['tracker-levelaccess'] = 'My capabilities in this tracker';
 $string['tracker_name'] = 'Tracker module services';
 $string['tracker_service_name'] = 'Tracker module services';
 $string['trackerelements'] = 'Tracker\'s definition';
-$string['trackereventchanged'] = 'Issue state change in tracker [{$a}]';
+$string['trackereventchanged'] = '[{$a->tracker}:{$a->issueid}] Issue state change to {$a->event}';
 $string['trackerhost'] = 'Parent host for tracker';
 $string['trackername'] = 'Tracker name';
 $string['transfer'] = 'Transfered';
@@ -458,15 +466,6 @@ $string['waiting'] = 'Waiting';
 $string['watches'] = 'Watches';
 $string['writtenby'] = '<i>written by</i>';
 $string['youneedanaccount'] = 'You need an authorized account here to report a ticket';
-
-$string['plugindist_desc'] = '
-<p>This plugin is the community version and is published for anyone to use as is and check the plugin\'s
-core application. A "pro" version of this plugin exists and is distributed under conditions to feed the life cycle, upgrade, documentation
-and improvement effort.</p>
-<p>Please contact one of our distributors to get "Pro" version support.</p>
-<ul><li><a href="http://www.activeprolearn.com/plugin.php?plugin=mod_tracker">ActiveProLearn SAS</a></li>
-<li><a href="http://www.edunao.com">Edunao SAS</a></li></ul>
-';
 
 // help strings
 
@@ -823,3 +822,5 @@ $string['update_html_tpl'] = '
 <p><a href="<%%ISSUEURL%%>">See the issue record</a><br/>
 <a href="<%%CCURL%%>">Register for watches on this record</a></p>
 ';
+
+require(__DIR__.'/pro_additional_strings.php');
