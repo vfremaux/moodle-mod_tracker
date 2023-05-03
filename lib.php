@@ -28,11 +28,81 @@ require_once($CFG->dirroot.'/mod/tracker/locallib.php');
 require_once($CFG->dirroot.'/mod/tracker/extralib/lib.php');
 
 /**
- * This function is not implemented in this plugin, but is needed to mark
- * the vf documentation custom volume availability.
+ * Tells wether a feature is supported or not. Gives back the
+ * implementation path where to fetch resources.
+ * @param string $feature a feature key to be tested.
  */
-function mod_tracker_supports_feature() {
-    assert(1);
+function tracker_supports_feature($feature = null, $getsupported = null) {
+    static $supports;
+
+    if (!during_initial_install()) {
+        $config = get_config('mod_tracker');
+    }
+
+    if (!isset($supports)) {
+        $supports = array(
+            'pro' => array(
+                'emulate' => array('community'),
+                'comment' => array('branch'),
+                'cascade' => array('mnet'),
+                'reports' => array('status', 'evolution', 'print'),
+                'remote' => array('ws'),
+                'priority' => array('askraise'),
+                'items' => array('mandatories', 'privates', 'listables'),
+            ),
+            'community' => array(
+                'reports' => array('status', 'evolution'),
+            ),
+        );
+        $prefer = array();
+    }
+    
+    if ($getsupported) {
+        return $supports;
+    }
+
+    // Check existance of the 'pro' dir in plugin.
+    if (is_dir(__DIR__.'/pro')) {
+        if ($feature == 'emulate/community') {
+            return 'pro';
+        }
+        if (empty($config->emulatecommunity)) {
+            $versionkey = 'pro';
+        } else {
+            $versionkey = 'community';
+        }
+    } else {
+        $versionkey = 'community';
+    }
+
+    if (empty($feature)) {
+        // Just return version.
+        return $versionkey;
+    }
+
+    list($feat, $subfeat) = explode('/', $feature);
+
+    if (!array_key_exists($feat, $supports[$versionkey])) {
+        return false;
+    }
+
+    if (!in_array($subfeat, $supports[$versionkey][$feat])) {
+        return false;
+    }
+
+    if (array_key_exists($feat, $supports['community'])) {
+        if (in_array($subfeat, $supports['community'][$feat])) {
+            // If community exists, default path points community code.
+            if (isset($prefer[$feat][$subfeat])) {
+                // Configuration tells which location to prefer if explicit.
+                $versionkey = $prefer[$feat][$subfeat];
+            } else {
+                $versionkey = 'community';
+            }
+        }
+    }
+
+    return $versionkey;
 }
 
 /**
@@ -518,7 +588,7 @@ function tracker_uninstall() {
     return $return;
 }
 
-function tracker_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload) {
+function mod_tracker_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload) {
     global $DB;
 
     if ($context->contextlevel != CONTEXT_MODULE) {

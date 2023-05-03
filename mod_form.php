@@ -82,13 +82,13 @@ class mod_tracker_mod_form extends moodleform_mod {
         $mform->setType('thanksmessage', PARAM_TEXT);
         $mform->setAdvanced('thanksmessage');
 
-        $mform->addElement('checkbox', 'enablecomments', get_string('enablecomments', 'tracker'));
+        $mform->addElement('advcheckbox', 'enablecomments', get_string('enablecomments', 'tracker'));
         $mform->addHelpButton('enablecomments', 'enablecomments', 'tracker');
 
-        $mform->addElement('checkbox', 'allownotifications', get_string('notifications', 'tracker'));
+        $mform->addElement('advcheckbox', 'allownotifications', get_string('notifications', 'tracker'));
         $mform->addHelpButton('allownotifications', 'notifications', 'tracker');
 
-        $mform->addElement('checkbox', 'strictworkflow', get_string('strictworkflow', 'tracker'));
+        $mform->addElement('advcheckbox', 'strictworkflow', get_string('strictworkflow', 'tracker'));
         $mform->addHelpButton('strictworkflow', 'strictworkflow', 'tracker');
 
         if (isset($this->_cm->id)) {

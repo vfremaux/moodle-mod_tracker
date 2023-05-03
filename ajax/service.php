@@ -40,15 +40,42 @@ if ($action == 'updatewatch') {
     $cc->events = $DB->get_field('tracker_issuecc', 'events', array('id' => $cc->id));
 
     switch($event) {
-        case 'open' : $eventcode = ENABLED_OPEN; break;
-        case 'resolving' : $eventcode = ENABLED_RESOLVING; break;
-        case 'waiting' : $eventcode = ENABLED_WAITING; break;
-        case 'resolved' : $eventcode = ENABLED_RESOLVED; break;
-        case 'abandonned' : $eventcode = ENABLED_ABANDONNED; break;
-        case 'transfered' : $eventcode = ENABLED_TRANSFERED; break;
-        case 'testing' : $eventcode = ENABLED_TESTING; break;
-        case 'published' : $eventcode = ENABLED_PUBLISHED; break;
-        case 'validated' : $eventcode = ENABLED_VALIDATED; break;
+        case 'open': {
+            $eventcode = ENABLED_OPEN;
+            break;
+        }
+        case 'resolving': {
+            $eventcode = ENABLED_RESOLVING;
+            break;
+        }
+        case 'waiting': {
+            $eventcode = ENABLED_WAITING;
+            break;
+        }
+        case 'resolved': {
+            $eventcode = ENABLED_RESOLVED;
+            break;
+        }
+        case 'abandonned': {
+            $eventcode = ENABLED_ABANDONNED;
+            break;
+        }
+        case 'transfered': {
+            $eventcode = ENABLED_TRANSFERED;
+            break;
+        }
+        case 'testing': {
+            $eventcode = ENABLED_TESTING;
+            break;
+        }
+        case 'published': {
+            $eventcode = ENABLED_PUBLISHED;
+            break;
+        }
+        case 'validated': {
+            $eventcode = ENABLED_VALIDATED;
+            break;
+        }
     }
     if ($state) {
         $cc->events = $cc->events | $eventcode;

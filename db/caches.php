@@ -15,14 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package local_vflibs
- * @author valery.fremaux@gmail.com
- * @category local
+ * @package   mod_tracker
+ * @category  mod
+ * @copyright 2006 Valery Fremaux
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die;
 
-$plugins = array(
-    'mod-tracker-bootstrapselect' => array('files' => array(
-        'bootstrap-select-master/js/bootstrap-select.min.js',
-        'bootstrap-select-master/css/bootstrap-select.min.css'))
+defined('MOODLE_INTERNAL') || die();
+
+$definitions = array(
+    'pro' => array(
+        'mode' => cache_store::MODE_APPLICATION
+    )
 );
