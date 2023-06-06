@@ -434,7 +434,9 @@ class mod_tracker_renderer extends plugin_renderer_base {
             $template->issueid = $issue->id;
             $template->addwatcherstr = get_string('addawatcher', 'tracker');
             $contextmodule = context_module::instance($cm->id);
-            $fields = 'u.id,'.get_all_user_name_fields(true, 'u');
+			// M4
+            $fields = \core_user\fields::for_name()->excluding('id')->get_required_fields();
+            $fields = 'u.id,'.implode(',', $fields);
             $potentials = get_users_by_capability($contextmodule, 'mod/tracker:canbecced', $fields.',picture,imagealt');
             $potentialsmenu = array();
             if ($potentials) {

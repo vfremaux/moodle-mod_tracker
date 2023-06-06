@@ -93,7 +93,9 @@ class mod_tracker_mod_form extends moodleform_mod {
 
         if (isset($this->_cm->id)) {
             $context = context_module::instance($this->_cm->id);
-            $fields = 'u.id,'.get_all_user_name_fields(true, 'u');
+			// M4
+            $fields = \core_user\fields::for_name()->excluding('id')->get_required_fields();
+            $fields = 'u.id,'.implode(',', $fields);
             $order = 'lastname, firstname';
             if ($assignableusers = get_users_by_capability($context, 'mod/tracker:resolve', $fields, $order)) {
                 $useropts[0] = get_string('none');

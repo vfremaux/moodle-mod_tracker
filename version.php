@@ -27,16 +27,16 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2023060300;  // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2020060900;
+$plugin->version  = 2023060400;  // The current module version (Date: YYYYMMDDXX).
+$plugin->requires = 2022041900;
 $plugin->component = 'mod_tracker';   // Full name of the plugin (used for diagnostics).
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.9.0 (Build 2023060300)';
-$plugin->supported = [39, 311];
+$plugin->release = '4.0.0 (Build 2023060400)';
+$plugin->supported = [400, 401];
 $plugin->dependencies = array('local_vflibs' => 2016081100);
 
 // Non Moodle attributes.
-$plugin->codeincrement = '3.9.0009';
+$plugin->codeincrement = '4.0.0009';
 $plugin->privacy = 'dualrelease';
 $plugin->prolocations = array(
     'classes/trackercategorytype/autourl',

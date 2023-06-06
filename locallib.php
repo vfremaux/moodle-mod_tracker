@@ -406,8 +406,9 @@ function tracker_getnumissuesreported($trackerid, $status='*', $reporterid = '*'
  * @param object $context
  */
 function tracker_getadministrators($context) {
-    $allnames = get_all_user_name_fields(true, 'u');
-    $alladmins = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
+	// M4
+    $fields = \core_user\fields::for_name()->with_userpic()->excluding('id')->get_required_fields();
+    $alladmins = get_users_by_capability($context, 'mod/tracker:manage', 'u.id,'.implode(',', $fields), 'lastname', '', '', '', '', false);
 
     $adms = [];
     foreach ($alladmins as $a) {
@@ -424,8 +425,10 @@ function tracker_getadministrators($context) {
  * @param object $context
  */
 function tracker_getresolvers($context) {
-    $allnames = get_all_user_name_fields(true, 'u');
-    $allresolvers = get_users_by_capability($context, 'mod/tracker:resolve', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
+	// M4
+    $fields = \core_user\fields::for_name()->excluding('id')->get_required_fields();
+    $fields = 'u.id,'.implode(',', $fields);
+    $allresolvers = get_users_by_capability($context, 'mod/tracker:resolve', $fields, 'lastname', '', '', '', '', false);
 
     $res = [];
     foreach ($allresolvers as $r) {
@@ -448,7 +451,8 @@ function tracker_getreporters($trackerid) {
     $cm = get_coursemodule_from_instance('tracker', $trackerid);
     $context = context_module::instance($cm->id);
 
-    $allnames = get_all_user_name_fields(true, 'u');
+    $fields = \core_user\fields::for_name()->with_userpic()->excluding('id')->get_required_fields();
+    $allnames = implode(',', $fields);
 
     $sql = "
         SELECT
@@ -481,8 +485,10 @@ function tracker_getreporters($trackerid) {
  * @param object $context the associated context
  */
 function tracker_getdevelopers($context) {
-    $allnames = get_all_user_name_fields(true, 'u');
-    $users = get_users_by_capability($context, 'mod/tracker:develop', 'u.id,'.$allnames, 'lastname', '', '', '', '', false);
+	// M4
+    $fields = \core_user\fields::for_name()->excluding('id')->get_required_fields();
+    $fields = 'u.id,'.implode(',', $fields);
+    $users = get_users_by_capability($context, 'mod/tracker:develop', $fields, 'lastname', '', '', '', '', false);
     $devels = [];
     if (!empty($users)) {
         foreach ($users as $u) {
@@ -502,12 +508,12 @@ function tracker_getdevelopers($context) {
 function tracker_getassignees($userid) {
     global $DB;
 
-    $allnames = get_all_user_name_fields(true, 'u');
+    $fields = \core_user\fields::for_name()->with_userpic()->excluding('id')->get_required_fields();
+    $fields = 'u.id,'.implode(',', $fields);
 
     $sql = "
         SELECT DISTINCT
-            u.id,
-            {$allnames},
+            {$fields},
             u.picture,
             u.email,
             u.emailstop,
@@ -1066,7 +1072,9 @@ function tracker_notify_raiserequest($issue, &$cm, $reason, $urgent, $tracker = 
         $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
     }
 
-    $fields = 'u.id,'.get_all_user_name_fields(true, 'u').',username,lang,email,emailstop,mailformat,mnethostid';
+	// M4
+    $fields = \core_user\fields::for_identity()->excluding('id')->including('mnethostid')->get_required_fields();
+    $fields = 'u.id,'.implode(',', $fields);
 
     $context = context_module::instance($cm->id);
     $managers = get_users_by_capability($context, 'mod/tracker:manage', $fields, 'lastname', '', '', '', '', true);
@@ -1146,7 +1154,9 @@ function tracker_notify_submission($issue, &$cm, $tracker = null) {
         $tracker = $DB->get_record('tracker', array('id' => $issue->trackerid));
     }
 
-    $fields = 'u.id,'.get_all_user_name_fields(true, 'u').',username,lang,email,emailstop,mailformat,mnethostid';
+	// M4
+    $fields = \core_user\fields::for_identity()->excluding('id')->including('mnethostid')->get_required_fields();
+    $fields = 'u.id,'.implode(',', $fields);
 
     $context = context_module::instance($cm->id);
     $managers = get_users_by_capability($context, 'mod/tracker:manage', $fields, 'lastname');
@@ -1214,7 +1224,9 @@ function tracker_notify_update($issue, &$cm, $tracker = null) {
     $cm = get_coursemodule_from_instance('tracker', $tracker->id);
     $context = context_module::instance($cm->id);
 
-    $fields = 'u.id,'.get_all_user_name_fields(true, 'u').',username,lang,email,emailstop,mailformat,mnethostid';
+	// M4
+    $fields = \core_user\fields::for_name()->excluding('id')->including('mnethostid')->including('email')->get_required_fields();
+    $fields = 'u.id,'.implode(',', $fields);
 
     $context = context_module::instance($cm->id);
     $managers = get_users_by_capability($context, 'mod/tracker:manage', $fields, 'lastname');
@@ -1999,11 +2011,14 @@ function tracker_backtrack_stats_by_month(&$tracker) {
 function tracker_get_stats_by_user(&$tracker, $userclass, $from = null, $to = null) {
     global $DB;
 
+	// M4
+    $fields = \core_user\fields::for_name()->excluding('id')->get_required_fields();
+    $fields = 'u.id,'.implode(',', $fields);
+
     $sql = "
         SELECT
             CONCAT(u.id, '-', i.status) as resultdid,
-            u.id,
-            ".get_all_user_name_fields(true, 'u').",
+            ".$fields.",
             count(*) as value,
             i.status
         FROM
