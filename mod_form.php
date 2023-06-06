@@ -103,7 +103,6 @@ class mod_tracker_mod_form extends moodleform_mod {
                 $mform->addElement('select', 'defaultassignee', get_string('defaultassignee', 'tracker'), $useropts);
                 $mform->addHelpButton('defaultassignee', 'defaultassignee', 'tracker');
                 $mform->disabledIf('defaultassignee', 'supportmode', 'eq', 'taskspread');
-                $mform->setAdvanced('defaultassignee');
             } else {
                 $mform->addElement('hidden', 'defaultassignee', 0);
             }
