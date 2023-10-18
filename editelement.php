@@ -51,7 +51,7 @@ if (!file_exists($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/'.$type
 
 require_once($CFG->dirroot.'/mod/tracker/classes/trackercategorytype/'.$type.'/tracker_element_'.$type.'_form.php');
 
-$formname = 'tracker_element_'.$type.'_form';
+$formname = 'mod_tracker\\tracker_element_'.$type.'_form';
 $form = new $formname(new moodle_url('/mod/tracker/editelement.php'), array('id' => $id));
 
 if ($form->is_cancelled()) {
@@ -76,7 +76,7 @@ if ($data = $form->get_data()) {
         $DB->update_record('tracker_element', $element);
     }
 
-    $elementobj = trackerelement::find_instance_by_id($tracker, $element->id);
+    $elementobj = \mod_tracker\trackerelement::find_instance_by_id($tracker, $element->id);
     if (!$data->elementid && $elementobj->has_options()) {
         // Bounces to the option editor.
 
@@ -95,10 +95,12 @@ echo $OUTPUT->header();
 if ($elementid) {
     $data = $DB->get_record('tracker_element', array('id' => $elementid));
     $data->elementid = $data->id;
+    $data->shared = empty($data->course);
     $data->id = $id;
 } else {
     $data = new StdClass();
     $data->id = $id;
+    $data->shared = 0;
     $data->type = $type;
 }
 

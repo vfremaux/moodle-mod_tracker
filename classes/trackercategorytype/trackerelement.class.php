@@ -47,6 +47,7 @@ abstract class trackerelement {
     protected $active;
     protected $private;
     protected $mandatory;
+    protected $listable;
     protected $canbemodifiedby;
     protected $context;
     protected $paramint1;
@@ -75,6 +76,7 @@ abstract class trackerelement {
             $elementid = $elmusedrec->elementid;
             $this->active = $elmusedrec->active;
             $this->mandatory = $elmusedrec->mandatory;
+            $this->listable = $elmusedrec->listable;
             $this->private = $elmusedrec->private;
             $this->sortorder = $elmusedrec->sortorder;
             $this->canbemodifiedby = $elmusedrec->canbemodifiedby;
@@ -153,6 +155,13 @@ abstract class trackerelement {
      * If true, this element can be told to be mandatory.
      */
     public function has_mandatory_option() {
+        return true;
+    }
+
+    /**
+     * If true, this element can be told to be listable.
+     */
+    public function has_listable_option() {
         return true;
     }
 

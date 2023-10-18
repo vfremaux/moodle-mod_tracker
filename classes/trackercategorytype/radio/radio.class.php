@@ -43,7 +43,7 @@ class radioelement extends trackerelement {
         $this->get_value($issueid);
 
         if (!empty($this->options) && !empty($this->value) && array_key_exists($this->value, $this->options)) {
-            $str = format_string($this->options[$this->value]->description);
+            $str = format_text($this->options[$this->value]->description, FORMAT_HTML);
         }
         return $str;
     }
