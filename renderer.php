@@ -290,7 +290,8 @@ class mod_tracker_renderer extends plugin_renderer_base {
                         'view' => 'view',
                         'screen' => 'viewanissue',
                         'what' => 'deletecomment',
-                        'commentid' => $comment->id
+                        'commentid' => $comment->id,
+                        'sesskey' => sesskey()
                     ];
                     $commenttpl->deleteurl = new moodle_url('/mod/tracker/view.php', $params);
                 }
@@ -475,7 +476,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
                 $histtpl->date = userdate($owner->timeassigned);
                 $histtpl->user = $this->user($user);
                 $histtpl->username = fullname($bywhom);
-                $teplate->history[] = $histtpl;
+                $template->history[] = $histtpl;
             }
         }
 
@@ -1200,6 +1201,7 @@ class mod_tracker_renderer extends plugin_renderer_base {
         if ($screen == 'mywork') {
             $template->ismywork = true;
         }
+
         if ($screen == 'mytickets') {
             $template->ismytickets = true;
         }
