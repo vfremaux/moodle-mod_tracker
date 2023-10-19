@@ -655,6 +655,7 @@ function tracker_preset_params(&$tracker) {
         $tracker->thanksmessage = get_string('message_bugtracker', 'tracker');
     } else if ($tracker->supportmode == 'ticketting') {
         if ($tracker->defaultassignee) {
+        	// M4
             $fields = \core_user\fields::for_name()->with_userpic()->get_required_fields();
             $defaultassignee = $DB->get_record('user', array('id' => $tracker->defaultassignee), implode(',', $fields));
             $tracker->thanksmessage = get_string('message_ticketting_preassigned', 'tracker', fullname($defaultassignee));

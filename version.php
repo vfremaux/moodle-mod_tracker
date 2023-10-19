@@ -20,19 +20,19 @@
  * @package     mod_tracker
  * @category    mod
  * @author      Clifford Tham till 1.8
- * @author      Valery Fremaux (valery.fremaux@gmeil.com)
- * @copyright   2009 onwards Valery Fremaux (valery.fremaux@gmeil.com)
+ * @author      Valery Fremaux (valery.fremaux@gmail.com)
+ * @copyright   2009 onwards Valery Fremaux (valery.fremaux@gmail.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2022041900;  // The current module version (Date: YYYYMMDDXX).
+$plugin->version  = 2023060400;  // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2022041900;
 $plugin->component = 'mod_tracker';   // Full name of the plugin (used for diagnostics).
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '4.0.0 (Build 2022041900)';
-$plugin->supported = [40, 40];
+$plugin->release = '4.0.0 (Build 2023060400)';
+$plugin->supported = [400, 401];
 $plugin->dependencies = array('local_vflibs' => 2016081100);
 
 // Non Moodle attributes.
