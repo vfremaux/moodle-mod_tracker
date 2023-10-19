@@ -20,18 +20,18 @@
  * @package     mod_tracker
  * @category    mod
  * @author      Clifford Tham till 1.8
- * @author      Valery Fremaux (valery.fremaux@gmeil.com)
- * @copyright   2009 onwards Valery Fremaux (valery.fremaux@gmeil.com)
+ * @author      Valery Fremaux (valery.fremaux@gmail.com)
+ * @copyright   2009 onwards Valery Fremaux (valery.fremaux@gmail.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2022041900;  // The current module version (Date: YYYYMMDDXX).
+$plugin->version  = 2023060300;  // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2020060900;
 $plugin->component = 'mod_tracker';   // Full name of the plugin (used for diagnostics).
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.9.0 (Build 2022041900)';
+$plugin->release = '3.9.0 (Build 2023060300)';
 $plugin->supported = [39, 311];
 $plugin->dependencies = array('local_vflibs' => 2016081100);
 
