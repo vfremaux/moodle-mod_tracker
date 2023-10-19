@@ -108,6 +108,11 @@ $PAGE->set_context($context);
 $PAGE->set_title(format_string($tracker->name));
 $PAGE->set_heading(format_string($tracker->name));
 $PAGE->set_url($url);
+
+// M4.0
+$PAGE->set_cm($cm);
+$PAGE->set_activity_record($tracker);
+
 $resolved = 0;
 
 if ($screen == 'print') {
