@@ -87,7 +87,7 @@ function tracker_get_controller($view, $tracker, $cm, $url = '') {
         $class = '\\mod_tracker\\'.$view.'_controller_extended';
         return new $class($tracker, $cm, $url);
     } else {
-        include($CFG->dirroot.'/mod/tracker/pro/views/'.$view.'.controller.php');
+        include($CFG->dirroot.'/mod/tracker/views/'.$view.'.controller.php');
         $class = '\\mod_tracker\\'.$view.'_controller';
         return new $class($tracker, $cm, $url);
     }
